@@ -1,0 +1,7 @@
+#Basic ignores
+*.o
+*.so
+*.a
+*.swp
+*~
+CMakeCache.txt
