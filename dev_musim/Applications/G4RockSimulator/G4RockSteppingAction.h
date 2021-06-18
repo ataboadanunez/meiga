@@ -2,7 +2,7 @@
 
 #ifndef G4RockSteppingAction_h
 #define G4RockSteppingAction_h 1
-
+#include <iostream>
 #include "G4UserSteppingAction.hh"
 #include "G4String.hh"
 
@@ -18,7 +18,7 @@ class G4RockEventAction;
 class G4RockSteppingAction : public G4UserSteppingAction
 {
     public:
-        G4RockSteppingAction(const G4RockDetectorConstruction* det, G4RockEventAction* event);
+        G4RockSteppingAction(const G4RockDetectorConstruction* det, G4RockEventAction* event, std::ofstream* ofile);
         virtual ~G4RockSteppingAction();
         virtual void UserSteppingAction(const G4Step* step);
         G4bool IsDetected(G4double);
@@ -26,6 +26,7 @@ class G4RockSteppingAction : public G4UserSteppingAction
     private:
         const G4RockDetectorConstruction* fDetectorConstruction;
         G4RockEventAction* fEventAction;
+        std::ofstream* fOutputFile;
 
         G4double fSiPMTime;
         G4double fScinTime;

@@ -1,5 +1,5 @@
 // implementation of the G4RockSteppingAction class
-
+#include "G4RockSimulator.h"
 #include "G4RockSteppingAction.h"
 #include "G4RockDetectorConstruction.h"
 #include "G4RockEventAction.h"
@@ -10,10 +10,11 @@
 
 #include "G4OpticalPhoton.hh"
 
-G4RockSteppingAction::G4RockSteppingAction(const G4RockDetectorConstruction* det, G4RockEventAction* event)
+G4RockSteppingAction::G4RockSteppingAction(const G4RockDetectorConstruction* det, G4RockEventAction* event, std::ofstream* ofile)
 	: G4UserSteppingAction(),
 		fDetectorConstruction(det),
-		fEventAction(event)
+		fEventAction(event),
+    fOutputFile(ofile)
 {
 }
 
@@ -37,9 +38,9 @@ G4RockSteppingAction::UserSteppingAction(const G4Step* step)
 			auto postVolume = step->GetPostStepPoint()->GetPhysicalVolume()->GetName();
       auto photonEnergy = track->GetTotalEnergy() / (1*eV);
       auto trackPosition = track->GetPosition();
-      G4double trackPosX = trackPosition.getX() / (1.*mm);
-      G4double trackPosY = trackPosition.getY() / (1.*mm);
-      G4double trackPosZ = trackPosition.getZ() / (1.*mm);
+      //G4double trackPosX = trackPosition.getX() / (1.*mm);
+      //G4double trackPosY = trackPosition.getY() / (1.*mm);
+      //G4double trackPosZ = trackPosition.getZ() / (1.*mm);
       
 			if (postVolume=="SiPM" && IsDetected(photonEnergy)){
 
@@ -51,6 +52,7 @@ G4RockSteppingAction::UserSteppingAction(const G4Step* step)
         G4ThreeVector sipmPos = theTouchable->GetHistory()->GetTopTransform().TransformPoint(origin);
         // optical photon arrived to SiPM
         //G4cout << "[DEBUG] SteppingAction: OpticalPhoton collected by SiPM: time = " << time << " " << " " << trackPosX << " " << trackPosY << " " << trackPosZ << G4endl;
+        (*fOutputFile) << time << " ";
 				(*fEventAction->fRunAction->outFile) << time << " ";
 				sipmTrace.push_back(time);
 				
