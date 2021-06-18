@@ -9,6 +9,8 @@
 
 #include <iostream>
 
+#include "Event.h"
+
 class G4ParticleGun;
 class G4Event;
 
@@ -16,53 +18,37 @@ class G4Event;
 
 class G4RockPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction 
 {
-	public:
-		G4RockPrimaryGeneratorAction(/*ParticleInjector* partInj*/);
-		virtual ~G4RockPrimaryGeneratorAction();
+  public:
+    G4RockPrimaryGeneratorAction(/*Event& theEvent, const Particle &theParticle*/);
+    virtual ~G4RockPrimaryGeneratorAction();
 
-		// method from the base class
-		virtual void GeneratePrimaries(G4Event*);
+    // method from the base class
+    virtual void GeneratePrimaries(G4Event*);
 
-		void ReadParticleFile();
-		
-		// method to access particle gun
-		const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
+    // method to access particle gun
+    const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
 
-		G4ThreeVector fParticlePosition;
+    G4ThreeVector fParticlePosition;
     G4ThreeVector farticleDirection;
+
+    //void setParticle(const Particle &p) { fParticle = p; }
+
     unsigned fParticleId;
+    double fPx;
+    double fPy;
+    double fPz;
 
-	private:
+  private:
 
-		G4ParticleGun* fParticleGun;
-		//ParticleInjector* fParticleInjector;
+    G4ParticleGun* fParticleGun;
+    
+    //Event &fEvent;
+    //const Particle &fParticle;
 
-		std::string fFileName;
-    	std::ifstream* fInputStream;
-
-		double Ro = 0;
-		double initx = 0.;
-		double inity = 0.;
-		double initz = 0.;
-		double r = 0.;
-    	double theta = 0.;
-		double px;
-		double py;
-		double pz;
-		double x;
-		double y;
-		double z;
-		unsigned primaryShowerId;
-		unsigned primaryParticleId;
-		double 	primaryEnergy;
-		double primaryTheta;
-		double primaryPhi;
-
-		// for testing purposes
-		bool fTestEnabled = true;
-		std::string fOutputFileName = "/home/alvaro/data/particle_trajectories.dat"; 
-		std::ofstream* fTextFile;
-
-};	
+    // for testing purposes
+    bool fTestEnabled = true;
+    std::string fOutputFileName = "/home/alvaro/data/particle_trajectories.dat"; 
+    std::ofstream* fTextFile;
+};  
 
 #endif
