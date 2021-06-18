@@ -57,9 +57,29 @@ public:
       eIron = 1000026056
   };
 
+  /// Constructor using momentum
+  Particle() {;}
+  Particle(const int id, const double px, const double py, const double pz, const double x, const double y, const double z);
+  /*
+  Particle(const int type, 
+  				 const Source& source, const Point& position,
+           const Vector& momentum, const TimeInterval& time,
+           const double weight);
+	*/
+
   /// Calculate particle code for a nucleus given (A, Z)
   static int NucleusCode(const unsigned int theCharge, const unsigned int theAtomicNumber);
-
+  ////Getters
+  int GetParticleId() const { return fId; }
+  double GetParticleMomentumX() const { return fPx; }
+  double GetParticleMomentumY() const { return fPy; }
+  double GetParticleMomentumZ() const { return fPz; }
+  double GetParticlePositionX()  const { return fX; }
+  double GetParticlePositionY()  const { return fY; }
+  double GetParticlePositionZ()  const { return fY; }
+  private:
+  int fId;
+  double fPx, fPy, fPz, fX, fY, fZ;
 };
 
 #endif 
