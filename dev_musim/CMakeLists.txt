@@ -20,8 +20,10 @@ else()
 endif()
 include(${Geant4_USE_FILE})
 
-include_directories(${CMAKE_SOURCE_DIR}/Utilities)
+include_directories(${CMAKE_SOURCE_DIR}/Utilities ${CMAKE_SOURCE_DIR}/Framework)
+#include_directories(${CMAKE_SOURCE_DIR}/Framework)
 add_subdirectory(Utilities)
+add_subdirectory(Framework)
 add_subdirectory(Applications)
 
 #add_executable(musim)
