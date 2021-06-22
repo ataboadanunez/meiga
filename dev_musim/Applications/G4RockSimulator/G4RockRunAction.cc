@@ -22,14 +22,14 @@ G4RockRunAction::~G4RockRunAction()
 
 
 void 
-G4RockRunAction::BeginOfRunAction(const G4Run* aRun)
+G4RockRunAction::BeginOfRunAction(const G4Run* )
 {
   
 }
 
 
 void 
-G4RockRunAction::EndOfRunAction(const G4Run* aRun)
+G4RockRunAction::EndOfRunAction(const G4Run* )
 {
   
 }
