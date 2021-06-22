@@ -24,16 +24,12 @@ G4RockRunAction::~G4RockRunAction()
 void 
 G4RockRunAction::BeginOfRunAction(const G4Run* aRun)
 {
-  G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
-  outFile = new std::ofstream();
-  outFile->open("SiPMTraces.dat"); // mover a config file
+  
 }
 
 
 void 
 G4RockRunAction::EndOfRunAction(const G4Run* aRun)
 {
-  //fTimer->Stop();
-  G4cout << "number of event = " << aRun->GetNumberOfEvent() << G4endl;
-  outFile->close();
+  
 }
