@@ -31,7 +31,7 @@ G4RockSteppingAction::UserSteppingAction(const G4Step* step)
 		const double time = step->GetPreStepPoint()->GetGlobalTime() / (1*ns);
 		trackVolume = step->GetPreStepPoint()->GetPhysicalVolume()->GetName();
 		std::vector<double> sipmTrace = fEventAction->GetSiPMTrace();
-
+    G4bool photonKilled = false;
 
 		if (particleName == "opticalphoton") {
 			auto preVolume = step->GetPreStepPoint()->GetPhysicalVolume()->GetName();
@@ -42,8 +42,16 @@ G4RockSteppingAction::UserSteppingAction(const G4Step* step)
       //G4double trackPosY = trackPosition.getY() / (1.*mm);
       //G4double trackPosZ = trackPosition.getZ() / (1.*mm);
       
-			if (postVolume=="SiPM" && IsDetected(photonEnergy)){
+      if (postVolume == "SiPM_back") {
+        track->SetTrackStatus(fStopAndKill);
+        photonKilled = true;
+      }
 
+
+			if (postVolume == "SiPM" && IsDetected(photonEnergy)){
+
+        if (photonKilled) 
+          G4cout << "[DEBUG] G4RockSteppingAction Photon was supposed to be killed " << G4endl;
 				// dump time to output file
         // compute distance to SiPM
         // info to compute distance to SiPM
@@ -53,12 +61,12 @@ G4RockSteppingAction::UserSteppingAction(const G4Step* step)
         // optical photon arrived to SiPM
         //G4cout << "[DEBUG] SteppingAction: OpticalPhoton collected by SiPM: time = " << time << " " << " " << trackPosX << " " << trackPosY << " " << trackPosZ << G4endl;
         (*fOutputFile) << time << " ";
-				(*fEventAction->fRunAction->outFile) << time << " ";
+				//(*fEventAction->fRunAction->outFile) << time << " ";
 				sipmTrace.push_back(time);
 				
 				// for (int i=0; i<sipmTrace.size(); i++)
 				// 	G4cout << sipmTrace[i] << G4endl;
-			}
+			} 
 			
 		}
 }
