@@ -99,8 +99,8 @@ void OpticalPhysics::ConstructProcess()
 
   pManager->AddDiscreteProcess(fBoundaryProcess);
 
-  fProcess->UseTimeProfile("delta");
-  //fProcess->UseTimeProfile("exponential");
+  //fProcess->UseTimeProfile("delta");
+  fProcess->UseTimeProfile("exponential");
 
   pManager->AddDiscreteProcess(fProcess);
 
