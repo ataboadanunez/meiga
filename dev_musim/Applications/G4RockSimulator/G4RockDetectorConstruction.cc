@@ -302,7 +302,9 @@ G4RockDetectorConstruction::CreateWLS()
   WLSFiberPT->AddProperty("RINDEX", photonEnergy, refIndexWLS, n);
   WLSFiberPT->AddProperty("WLSABSLENGTH", photonEnergy, absLengthWLS, n);
   WLSFiberPT->AddProperty("WLSCOMPONENT", photonEnergy, emissionWLS, n);
-  WLSFiberPT->AddConstProperty("WLSTIMECONSTANT", 20*ns);
+  WLSFiberPT->AddConstProperty("WLSTIMECONSTANT", 2.7*ns); // according to datasheet BCF-92 WLS fiber
+  //WLSFiberPT->AddConstProperty("WLSTIMECONSTANT", 20*ns); // according to AMIGA detector construction in Offline
+
 
   PMMA->SetMaterialPropertiesTable(WLSFiberPT);
 
@@ -370,6 +372,8 @@ G4RockDetectorConstruction::CreateSolids()
 	solidClad1  = new G4Tubs("Clad1", 0, fFiberRadius - fCladdingThickness, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
 	solidClad2  = new G4Tubs("Clad2", 0, fFiberRadius, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
 	solidSiPM   = new G4Box("SiPM", fSiPMSizeX, fSiPMSizeY, fSiPMSizeZ);
+  // create second SiPM volume to be placed on the oposite side
+  solidSiPM_back  = new G4Box("SiPM_back", fSiPMSizeX, fSiPMSizeY, fSiPMSizeZ);
 
 }
 
@@ -417,6 +421,9 @@ G4RockDetectorConstruction::AssembleDetector()
 	G4VisAttributes blue(G4Colour::Blue());
 	logicSiPM = new G4LogicalVolume(solidSiPM, Air, "SiPM", 0, 0, 0);
 	logicSiPM->SetVisAttributes(blue);
+  G4VisAttributes black(G4Colour::Black());
+  logicSiPM_back = new G4LogicalVolume(solidSiPM_back, Air, "SiPM_back", 0, 0, 0);
+  logicSiPM_back->SetVisAttributes(black);
 
 	// place fiber at the top of the bar (y-axis)
   
@@ -427,6 +434,7 @@ G4RockDetectorConstruction::AssembleDetector()
 
 	G4double z = fBarLength/2 - 2*fCoatingThickness;
 	physSiPM  = new G4PVPlacement(rotation, G4ThreeVector(0, y, z), logicSiPM, "SiPM", logicBar, false, 0, fCheckOverlaps);
+  physSiPM_back  = new G4PVPlacement(rotation, G4ThreeVector(0, y, -z), logicSiPM_back, "SiPM_back", logicBar, false, 0, fCheckOverlaps);
   
 
 
