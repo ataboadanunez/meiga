@@ -90,6 +90,7 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     G4Tubs* solidClad1 = nullptr;
     G4Tubs* solidClad2 = nullptr;
     G4Box*  solidSiPM  = nullptr;
+    G4Box*  solidSiPM_back = nullptr;
 
     // logical and physical volumes
     G4LogicalVolume* logicWorld = nullptr;
@@ -107,11 +108,13 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     G4LogicalVolume* logicClad1 = nullptr;
     G4LogicalVolume* logicClad2 = nullptr;
     G4LogicalVolume* logicSiPM  = nullptr;
+    G4LogicalVolume* logicSiPM_back  = nullptr;
     G4VPhysicalVolume* physBar  = nullptr;
     G4VPhysicalVolume* physFiber = nullptr;
     G4VPhysicalVolume* physClad1 = nullptr;
     G4VPhysicalVolume* physClad2 = nullptr;
     G4VPhysicalVolume* physSiPM  = nullptr;
+    G4VPhysicalVolume* physSiPM_back  = nullptr;
     // 
 
     // por ahora hard-coded aqui, eventualmente una funcion seteara los parametros a partir de un config file
