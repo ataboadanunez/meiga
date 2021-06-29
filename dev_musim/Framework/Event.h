@@ -2,6 +2,7 @@
 #define Event_h 1
 
 #include "Particle.h"
+#include "SimData.h"
 #include <vector>
 #include <string>
 
@@ -26,25 +27,17 @@ class Event
   public:
     
     Event();
-
-    typedef std::vector<Particle> ParticleVector;
-    const ParticleVector& GetParticleVector() const { return fParticles; }
-    void InsertParticle(const Particle& particle) { fParticles.push_back(particle); }
-
-    //mover a SimData
-    unsigned int GetTotalNumberOfParticles() const { return fTotalNumberOfParticles; }
-    void SetTotalNumberOfParticles(const unsigned int n) { fTotalNumberOfParticles = n; }
-
-    // por ahora aqui. eventualmente sera un metodo de la clase SimData 
+    virtual ~Event();
+    // por ahora aqui. eventualmente sera un metodo de la clase SimData
     // y tomara como entrada el id del SiPM donde los fotones fueron detectados
-    void AddPhotonTime(const double peTime);
-    std::vector<double> GetPhotonTime() { return fPETimes; }
+    // teniendo en cuenta esto, quiza tenga mas sentido crear una clase SimDetectorData
+    // y otra Detector...
+
+    SimData& GetSimData() { return fSimData; }
 
   private:
 
-    ParticleVector fParticles;
-    int fTotalNumberOfParticles = 0;
-    std::vector<double> fPETimes;
+    SimData fSimData;
 
 };
 

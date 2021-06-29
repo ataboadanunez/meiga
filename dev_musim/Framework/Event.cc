@@ -8,11 +8,11 @@
 
 Event::Event()
 {
-  fParticles.clear();
+
 }
 
-void 
-Event::AddPhotonTime(const double peTime) 
+Event::~Event()
 {
-  fPETimes.push_back(peTime);
+  
 }
+
