@@ -10,15 +10,13 @@
 class G4RunManager;
 class G4StationPrimaryGenerator;
 
-
-
 class G4RockSimulator 
 {
   public:
     G4RockSimulator();
     virtual ~G4RockSimulator();
     static Particle currentParticle;
-    std::ofstream fOutputFile;
+    std::ofstream* fOutputFile;
 
   private:
 

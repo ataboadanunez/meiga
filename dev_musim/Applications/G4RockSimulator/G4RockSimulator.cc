@@ -19,11 +19,13 @@
 #include "G4UImanager.hh"
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
-
 #include "Randomize.hh"
+
 #include "CorsikaUtilities.h"
 #include "Event.h"
-#include "Particle.h"
+#include "SimData.h"
+#include "ReadParticleFile.h"
+
 
 #include <string>
 
@@ -32,10 +34,11 @@ using namespace std;
 Particle G4RockSimulator::currentParticle;
 //G4RockSimulator::fOutputFile->open("SiPMTraces2.dat");
 
-G4RockSimulator::G4RockSimulator()
+G4RockSimulator::G4RockSimulator() 
   //fOutputFile(new ofstream())
 {
-	 
+	 //fOutputFile->open("SiPMTraces2.dat");
+  
 }
 
 G4RockSimulator::~G4RockSimulator()
@@ -51,20 +54,35 @@ main(/*int argc, char** argv*/) {
   bool fGeoVisOn = false;
   bool fTrajVisOn = false;
   // check physicsList etc etc etc
+
+  // TODO: INCLUIR RANDOM SEED!!!
+  G4long myseed = time(NULL);
+  G4Random::setTheEngine(new CLHEP::RanecuEngine);
+  G4Random::setTheSeed(myseed);
+  G4cout << "Seed for random generation: " << myseed << G4endl;
+
   string physicsName = "QGSP_BERT_HP";
   string fRenderFile = "VRML2FILE";
   /*
     ToDo:
+    CHECK PhysicsList 
     CREATE ERROR LOGGER
-    PRINT INPUT VARIABLES / INFO ON SCREEN
+    CREATE CONFIG FILE READER
   */
 
   ofstream* fOutputFile = new ofstream();
-  fOutputFile->open("SiPMTraces2.dat");
+  fOutputFile->open("SiPMTraces_reflections.dat");
 
-  Event theEvent = Event::ReadParticleFile("/home/alvaro/data/sims/sierra_grande/muons_sierra_grande.shw");
+  // create Event from EventFileReader
+  // mover input file a cfg
+  Event theEvent = ReadParticleFile::EventFileReader("/home/alvaro/data/sims/sierra_grande/sample_muons2.txt");
 
-  if (!theEvent.GetTotalNumberOfParticles()) {
+  SimData& simData = theEvent.GetSimData();
+  const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
+
+  std::cout << "[INFO] Event::SimData: Total number of particles in file = " << NumberOfParticles << std::endl;
+  
+  if (!NumberOfParticles) {
     std::cerr << "ERROR! No Particles in the Event! Exiting..." << std::endl;
     return -1;
   }
@@ -89,7 +107,7 @@ main(/*int argc, char** argv*/) {
   G4RockEventAction *fEventAction = new G4RockEventAction(fRunAction, fPrimaryGenerator);
   fRunManager->SetUserAction(fEventAction);
 
-  G4RockSteppingAction *fSteppingAction = new G4RockSteppingAction(fDetConstruction, fEventAction, fOutputFile);
+  G4RockSteppingAction *fSteppingAction = new G4RockSteppingAction(fDetConstruction, fEventAction, fOutputFile, theEvent);
   fRunManager->SetUserAction(fSteppingAction);
   
   // initialize G4 kernel
@@ -151,16 +169,31 @@ main(/*int argc, char** argv*/) {
   
   //ReadParticleFile();
   
-  for (auto it = theEvent.GetParticleVector().begin(); it != theEvent.GetParticleVector().end(); ++it) {
+  for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
     G4RockSimulator::currentParticle = *it;
 	 //G4I->setParticle(*it); 
 	 fRunManager->BeamOn(1);
   }
+
+  /*
+  std::vector<std::vector<double>*>* trazas = fEventAction->GetTrazas();
+  for (unsigned int i=0; i<trazas->size(); i++) {
+    //G4cout << "Evento " << i << G4endl;
+    for (unsigned int j=0; j<trazas->at(i)->size(); j++)
+    G4cout << trazas->at(i)->at(j) << " ";
+  }
+  */
+
+  std::vector<double> peTimes = simData.GetPhotonTime();
+  for (unsigned int i=0; i<peTimes.size(); i++)
+    G4cout << peTimes[i] << " ";
   
   //Particle& currentP = G4RockSimulator::currentParticle;
-	  // job termination
+	// job termination
+  
   delete fVisManager;
   delete fRunManager;
+  fOutputFile->close();
   return 0;
 
 }
