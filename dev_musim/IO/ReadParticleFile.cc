@@ -1,5 +1,6 @@
 // Implementation of ReadParticleFile class
 #include "ReadParticleFile.h"
+#include "SimData.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -39,6 +40,7 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
 
   std::ifstream fInputStream(fileName);
   Event ret;
+  SimData& simData = ret.GetSimData();
 
   unsigned int particleId;
   unsigned int NumberOfParticles = 0;
@@ -86,14 +88,14 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
     }
 
     Particle particle(particleId, px, py, pz, x, y, time); 
-    ret.InsertParticle(particle);
+    simData.InsertParticle(particle);
 
     NumberOfParticles++;
   } while (true);
 
 
-  ret.SetTotalNumberOfParticles(NumberOfParticles);
-  std::cout << "[INFO] Event::ReadParticleFile: Total number of particles in file = " << NumberOfParticles << std::endl;
+  simData.SetTotalNumberOfParticles(NumberOfParticles);
+  //std::cout << "[INFO] Event::ReadParticleFile: Total number of particles in file = " << NumberOfParticles << std::endl;
   return ret;
   
 
