@@ -16,3 +16,9 @@ SimData::AddPhotonTime(const double peTime)
 {
   fPETimes.push_back(peTime);
 }
+
+void
+SimData::MakeSiPMSimData(unsigned int id)
+{
+	fSiPMSimMap.emplace(id, SiPMSimData(id));
+}

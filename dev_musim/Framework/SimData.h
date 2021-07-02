@@ -2,32 +2,46 @@
 #define SimData_h
 
 #include "Particle.h"
+#include "SiPMSimData.h"
 #include <vector>
-
+#include <map>
 
 
 class SimData
 {
-	public:
-		SimData();
-		~SimData();
+  public:
+    SimData();
+    ~SimData();
 
-		typedef std::vector<Particle> ParticleVector;
+    typedef std::vector<Particle> ParticleVector;
     const ParticleVector& GetParticleVector() const { return fParticles; }
     void InsertParticle(const Particle& particle) { fParticles.push_back(particle); }
 
-		unsigned int GetTotalNumberOfParticles() const { return fTotalNumberOfParticles; }
-  	void SetTotalNumberOfParticles(const unsigned int n) { fTotalNumberOfParticles = n; }
+    unsigned int GetTotalNumberOfParticles() const { return fTotalNumberOfParticles; }
+    void SetTotalNumberOfParticles(const unsigned int n) { fTotalNumberOfParticles = n; }
 
-  	void AddPhotonTime(const double peTime);
+    void AddPhotonTime(const double peTime);
     std::vector<double> GetPhotonTime() { return fPETimes; }
 
+    //void MakeSiPMTrace(const int id, const double peTime);
+    void MakeSiPMSimData(unsigned int id);
+    SiPMSimData& GetSiPMSimData() { return fSiPMSimData; }
+    /***
+    // get SiPMSimData passing SiPM id
+    // eventually create SiPM class and GetSiPMSimData as a member of SiPM
+    // here would be GetSiPM(unsigned int id)... blablabla 
+    */
+    SiPMSimData& GetSiPMSimData(unsigned int id) { return fSiPMSimMap[id]; }
 
   private:
 
-  	ParticleVector fParticles;
-  	unsigned int fTotalNumberOfParticles = 0;
+    ParticleVector fParticles;
+    unsigned int fTotalNumberOfParticles = 0;
     std::vector<double> fPETimes;
+
+    SiPMSimData fSiPMSimData;
+    // precio que hay que pagar por no usar punteros? 
+    std::map<int, SiPMSimData> fSiPMSimMap;
 
 };
 
