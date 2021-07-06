@@ -2,7 +2,6 @@
 #define ReadParticleFile_h
 
 #include "Event.h"
-#include "Particle.h"
 #include <string>
 
 /* 

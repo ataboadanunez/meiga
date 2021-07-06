@@ -1,9 +1,16 @@
 // Implementation of ReadParticleFile class
 #include "ReadParticleFile.h"
+#include "CorsikaUtilities.h"
+#include "Particle.h"
 #include "SimData.h"
+
+#include <vector>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+
+
+using namespace std;
 
 ReadParticleFile::ReadParticleFile() 
 {
@@ -34,16 +41,17 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
 
   */
   
-  std::cout << "[INFO] Event::ReadParticleFile: Reading Input File " << fileName << std::endl;
-  std::string errmsg;
-  std::string info;
+  cout << "[INFO] Event::ReadParticleFile: Reading Input File " << fileName << endl;
+  string errmsg;
+  string info;
 
-  std::ifstream fInputStream(fileName);
+  ifstream fInputStream(fileName);
   Event ret;
   SimData& simData = ret.GetSimData();
 
   unsigned int particleId;
   unsigned int NumberOfParticles = 0;
+  
   do {
     
     double px;
@@ -62,7 +70,7 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
     
     if (!fInputStream) {
       errmsg = "[ERROR] Event::ReadParticleFile: Error(s) occurred while reading input file!\n Possible causes of this fail:\n - Misspelled file name\n - Wrong file location\n - Wrong file format ";
-      std::cerr << errmsg << std::endl;
+      cerr << errmsg << endl;
     }
     
     if (!getline(fInputStream, line)) {
@@ -83,11 +91,14 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
               >> primaryTheta
               >> primaryPhi)){
       
-      std::cerr << "ReadParticleFile: Malformed line !!!" << std::endl;
+      cerr << "ReadParticleFile: Malformed line !!!" << endl;
       break;
     }
 
-    Particle particle(particleId, px, py, pz, x, y, time); 
+    vector<double> particlePosition{x, y, time};
+    vector<double> particleMomentum{px, py, pz};
+    //Particle particle(particleId, px, py, pz, x, y, time); 
+    Particle particle(particleId, particlePosition, particleMomentum);
     simData.InsertParticle(particle);
 
     NumberOfParticles++;
