@@ -9,6 +9,7 @@
 
 #include <iostream>
 
+#include "Particle.h"
 #include "Event.h"
 
 class G4ParticleGun;
@@ -28,15 +29,9 @@ class G4RockPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     // method to access particle gun
     const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
 
+    double ComputeKineticEnergy(const Particle& particle);
     G4ThreeVector fParticlePosition;
     G4ThreeVector farticleDirection;
-
-    //void setParticle(const Particle &p) { fParticle = p; }
-
-    unsigned fParticleId;
-    double fPx;
-    double fPy;
-    double fPz;
 
   private:
 
@@ -47,7 +42,7 @@ class G4RockPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 
     // for testing purposes
     bool fTestEnabled = true;
-    std::string fOutputFileName = "/home/alvaro/data/particle_trajectories.dat"; 
+    std::string fOutputFileName = "./particle_trajectories.dat"; 
     std::ofstream* fTextFile;
 };  
 

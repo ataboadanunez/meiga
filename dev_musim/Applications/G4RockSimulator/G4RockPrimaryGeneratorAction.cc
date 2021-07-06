@@ -3,7 +3,6 @@
 #include "G4RockSimulator.h"
 #include "G4RockPrimaryGeneratorAction.h"
 #include "CorsikaUtilities.h"
-#include "Particle.h"
 
 #include "G4RunManager.hh"
 #include "G4ParticleGun.hh"
@@ -64,7 +63,7 @@ G4RockPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
 
   unsigned int currParticleID = currParticle.GetParticleId();
-  fParticleId = Corsika::CorsikaToPDG(currParticleID);
+  int fParticleId = Corsika::CorsikaToPDG(currParticleID);
   G4ParticleDefinition* particleDef = particleTable->FindParticle(fParticleId);
 
   if (!particleDef) {
@@ -72,17 +71,22 @@ G4RockPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
       return;
     }
   
-  fPx = currParticle.GetParticleMomentumX();
-  fPy = currParticle.GetParticleMomentumY();
-  fPz = currParticle.GetParticleMomentumZ();
-
-  // fix units
+  double mass = currParticle.GetMass();
+  const double kineticEnergy = ComputeKineticEnergy(currParticle);
+  double fMomentum = currParticle.GetMomentum() * GeV;
+  const std::vector<double> particleMomentumDirection = currParticle.GetParticleDirection();
+  cout << "Vector Size = " << particleMomentumDirection.size() << endl;
+ 	double fPx = particleMomentumDirection.at(0);
+  double fPy = particleMomentumDirection.at(1);
+  double fPz = particleMomentumDirection.at(2);
+  //double fPx = currParticle.GetParticleMomentumX();
+  //double fPy = currParticle.GetParticleMomentumY();
+  //double fPz = currParticle.GetParticleMomentumZ();
+  // fix momentum units
   fPx *= GeV; fPy *= GeV; fPz *= GeV;
-  
-  
-  
+ 
   fParticleGun->SetParticleDefinition(particleDef);
-  
+
   G4double px2 = fPx*fPx;
   G4double py2 = fPy*fPy;
   G4double pz2 = fPz*fPz;
@@ -90,18 +94,6 @@ G4RockPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   G4double particleMomentum = sqrt(px2 + py2 + pz2);
   G4double particleZenith = acos(fPz / particleMomentum);
   G4double particleAzimut = atan2(-fPy, -fPx);
-  /*
-  G4cout << "[DEBUG] G4RockPrimaryGeneratorAction Particle Info (GEANT4): " << G4endl;
-  G4cout << "        Particle Name (ID) = " << particle->GetParticleName() << " (" << particleId << ") " << G4endl;
-  G4cout << "        Particle momentum / MeV = (" << px / MeV << ", " << py / MeV << ", " << pz / MeV << " )" << G4endl; 
-  G4cout << "        Primary Energy / MeV = " << primaryEnergy / MeV << G4endl;
-  G4cout << "        Primary Zenith / deg = " << primaryTheta / degree << G4endl;
-  G4cout << "        Particle Zenith / deg = " << particleZenith / degree << G4endl;
-  G4cout << "        Particle Azimut / deg = " << particleAzimut / degree << G4endl;
-  */
-
-  if (fTestEnabled)
-    *fTextFile << fParticleId << " " << particleMomentum << " " << particleZenith / degree << " " << particleAzimut / degree << endl;
 
   // 
   /* inject particles following distributions according their incoming direction
@@ -111,23 +103,47 @@ G4RockPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     z = [-BarLength/2, BarLength/2]
     y = fixed height
   */
-  G4double delta = 5*mm;
+ 
   G4double BarWidth = 41*mm;
-  //G4double BarLength = 2*BarWidth;
+  G4double BarLength = 2*BarWidth;
 
-  const G4double injRadius = BarWidth+delta;
-  const G4double injHeight = 2*cm;    
+#warning "compute injection radius according to module size!"
+
+  const G4double injRadius = 2.5*BarWidth;
+  const G4double injHeight = 5*cm;    
   const G4double rand = RandFlat::shoot(0., 1.);
   const G4double r = injRadius*sqrt(rand);
   const G4double phi = RandFlat::shoot(0., M_2_PI);
 
-  G4double x0 = r * cos(phi);
-  G4double y0 = injHeight;
-  G4double z0 = r * sin(phi);
+  G4double x0 = r*cos(phi) - BarWidth/2;
+  G4double y0 = injHeight + 3*m;
+  G4double z0 = r*sin(phi);
   
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(fPx, -fPz, fPy));
-  fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
-  fParticleGun->SetParticleEnergy(10.*GeV);
+  G4cout << "[DEBUG] G4RockPrimaryGeneratorAction " << currParticleID << " " << " " << particleDef->GetParticleName() << " " << mass / GeV << " " << fMomentum / GeV << " " << particleMomentum / GeV << " " << kineticEnergy / GeV << G4endl;
+  if (fTestEnabled) {
+  	/*
+			Intended to test copy of MuSim classes to G4
+			Particle information, energy calculation, position, etc
+  	*/
+    *fTextFile << currParticleID << " " << mass << " " << fPx << " " << fPy << " " << fPz << " " << endl; 
+  }
+
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(fPx, -1*fPz, fPy));
+  fParticleGun->SetParticlePosition(G4ThreeVector(0., y0, 0.));
+  fParticleGun->SetParticleEnergy(kineticEnergy);
 
   fParticleGun->GeneratePrimaryVertex(event);
+}
+
+
+double
+G4RockPrimaryGeneratorAction::ComputeKineticEnergy(const Particle& particle)
+{	
+	// caveat: mass are expressed in MeV (see Framework/PhysicsConstants.h)
+	double mass = particle.GetMass() / GeV;
+	double p = particle.GetMomentum() * GeV;
+
+	double k = sqrt(p*p + mass*mass) - mass;
+	// should be given already in GeV
+	return k;
 }
