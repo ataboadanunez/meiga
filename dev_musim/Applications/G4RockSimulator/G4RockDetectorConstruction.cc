@@ -365,7 +365,7 @@ G4RockDetectorConstruction::CreateSolids()
 	solidWorld 	= new G4Box("World", fWorldSizeX, fWorldSizeY, fWorldSizeZ);
 	solidRock  	= new G4Box("Rock", fRockSizeX, fRockSizeY, fRockSizeZ);
 	solidHall  	= new G4Box("Hall", fHallSizeX, fHallSizeY, fHallSizeZ);
-  solidCasing = new G4Box("Casing", fBarWidth/2+fCasingThickness, fBarThickness/2+fCasingThickness, fBarLength/2+fCasingThickness);
+  solidCasing = new G4Box("Casing", fCasingSizeX, fCasingSizeY, fCasingSizeZ);
 	solidCoat  	= new G4Box("BarCoating", fBarWidth/2, fBarThickness/2, fBarLength/2);
 	solidBar   	= new G4Box("BarScin", fBarWidth/2-fCoatingThickness, fBarThickness/2-fCoatingThickness, fBarLength/2-fCoatingThickness);
 	solidFiber  = new G4Tubs("Fiber", 0, fFiberRadius - 2*fCladdingThickness, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
@@ -394,7 +394,7 @@ G4RockDetectorConstruction::CreateHall()
 	logicRock->SetVisAttributes(brown);
 	physRock 	=  new G4PVPlacement(nullptr, G4ThreeVector(), logicRock, "Rock", logicWorld, false, 0, fCheckOverlaps);
 	logicHall = new G4LogicalVolume(solidHall, Air, "Hall");
-	physHall 	=  new G4PVPlacement(nullptr, G4ThreeVector(), logicHall, "Hall", logicRock, false, 0, fCheckOverlaps);
+	physHall 	=  new G4PVPlacement(nullptr, G4ThreeVector(fHallPosX, fHallPosY, fHallPosZ), logicHall, "Hall", logicRock, false, 0, fCheckOverlaps);
 
 }
 
@@ -411,53 +411,38 @@ G4RockDetectorConstruction::AssembleDetector()
 
 	G4RotationMatrix* rotationTop = new G4RotationMatrix();
   G4RotationMatrix* rotationBot = new G4RotationMatrix();
-  rotationTop->rotateX(M_PI);
+  //rotationTop->rotateX(M_PI);
   rotationBot->rotateY(M_PI/2);
 
   /****
     coordinates and orientation of module components
-    bar thickness along z-axis
-    bar width along y-axis
-    bar length along x-axis
+    bar thickness along zy-axis
+    bar width along x-axis
+    bar length along z-axis
     
     in the (MxN) = (2x2) configuration, 2 bars will be placed
     along the y axis (M) and 2 along the z axis (N). therefore
-    bars should be created within the loop and placed according to:
-    
-    "top"-bars:
-    posBarX = fPosModX + fBarLength/2
-    posBarY = fPosModY + y*fBarWidth/2
-    posBarZ = fPosModZ + fBarThickness/2   
-    
-    "bottom"-bars:
-    posBarX = fPosModX + x*fBarLength/2
-    posBarY = fPosModY + fBarWidth/2
-    posBarZ = fPosModZ - fBarThickness/2
-    
-    where x(y) != 0 and sign deppending on orientation
-    x(y) > 0 if loop index is odd
-    x(y) < 0 if loop index is even
+    bars should be created within the loop and placed accordingly
 
   */
 
-  G4double fPosTopX = 0;
-  G4double fPosTopY = 0;
-  G4double fPosTopZ = 0;
-  //G4double fPosBotX = fPosTopX;
-  G4double fPosBotY = fPosTopY - (fBarThickness + 2*fCasingThickness + fCoatingThickness);
-  //G4double fPosBotZ = fPosTopZ;
-  G4int nbars = 2;
+  G4double fModPosX = 0;
+  G4double fModPosY = 0;
+  G4double fModPosZ = 0;
 
-
-
-  G4double dx = fBarWidth+2*fCasingThickness;
-  //G4double dz = fBarLength+2*fCasingThickness;
+  G4double fPosTopX = fModPosX + fCasingSizeX;
+  G4double fPosTopY = fModPosY + fCasingSizeY;
+  G4double fPosTopZ = fModPosZ + 0;
+  
+  G4double fPosBotX = fModPosX + 0;
+  G4double fPosBotY = fModPosY - fCasingSizeY;
+  G4double fPosBotZ = fModPosZ + fCasingSizeX;
   // place fiber at the top of the bar (y-axis)
   // place SiPM at the end of the bar (z-axis)
-  G4double fFiberTopPosY = fBarThickness/2 - fCoatingThickness - fFiberRadius - fCladdingThickness;
+  G4double fFiberTopPosY = -fBarThickness/2 + fCoatingThickness + fFiberRadius + fCladdingThickness;
   G4double fFiberTopPosZ = fBarLength/2 - 2*fCoatingThickness;
   
-  G4double fFiberBotPosY = -fBarThickness/2 + fCoatingThickness + fCasingThickness - fFiberRadius/2 - fCladdingThickness;
+  G4double fFiberBotPosY = -fBarThickness/2 + fCoatingThickness + fFiberRadius + fCladdingThickness;//fCasingThickness - fFiberRadius/2 - fCladdingThickness;
   G4double fFiberBotPosZ = fFiberTopPosZ;
 
   std::ostringstream nameFiber;
@@ -466,24 +451,25 @@ G4RockDetectorConstruction::AssembleDetector()
   std::ostringstream nameSiPM;
 
   // create 2 consecutive bars along x-axis
-  for (G4int i=0; i<nbars; ++i) {
-    G4double xx = fPosTopX + i*dx;
+  for (G4int i=0; i<nTopBars; ++i) {
+    G4double xx = std::pow(-1, i)*fPosTopX;
     // define LogicalVolumes
     // there must be a way to define only physical volumes in the loop...
     logicCasing = new G4LogicalVolume(solidCasing, Air, "CasingTop", 0, 0, 0);
     logicCoat = new G4LogicalVolume(solidCoat, ScinCoat, "BarCoatingTop", 0, 0, 0);
     logicBar  = new G4LogicalVolume(solidBar, ScinMat, "BarScinTop", 0, 0, 0);
     logicFiber = new G4LogicalVolume(solidFiber, PMMA, "WLSFiberTop", 0, 0, 0);
+    
     logicFiber->SetVisAttributes(green);
-    logicClad1 = new G4LogicalVolume(solidClad1, Pethylene, "FiberCladTop1", 0, 0, 0);
+    logicClad1 = new G4LogicalVolume(solidClad1, Pethylene, "FiberClad1Top", 0, 0, 0);
     logicClad1->SetVisAttributes(green);
-    logicClad2 = new G4LogicalVolume(solidClad2, FPethylene, "FiberCladTop2", 0, 0, 0);
+    logicClad2 = new G4LogicalVolume(solidClad2, FPethylene, "FiberClad2Top", 0, 0, 0);
     logicClad2->SetVisAttributes(green);  
     logicSiPM = new G4LogicalVolume(solidSiPM, Air, "SiPMTop", 0, 0, 0);
     logicSiPM->SetVisAttributes(blue);  
-    logicSiPM_back = new G4LogicalVolume(solidSiPM_back, Air, "SiPMTop_back", 0, 0, 0);
-    logicSiPM_back->SetVisAttributes(black);
-
+    //logicSiPM_back = new G4LogicalVolume(solidSiPM_back, Air, "SiPMTop_back", 0, 0, 0);
+    //logicSiPM_back->SetVisAttributes(black);
+		
     nameFiber.str("");
     nameClad1.str("");
     nameClad2.str("");
@@ -494,77 +480,64 @@ G4RockDetectorConstruction::AssembleDetector()
     nameSiPM  << "SiPMTop" << '_' << i;
 
     physCasing  = new G4PVPlacement(rotationTop, G4ThreeVector(xx, fPosTopY, fPosTopZ), logicCasing, "CasingTop", logicHall, false, 0, fCheckOverlaps);
-    physCoat  = new G4PVPlacement(rotationTop, G4ThreeVector(fPosTopX, fPosTopY, fPosTopZ), logicCoat, "BarCoatingTop", logicCasing, false, 0, fCheckOverlaps);
-    physBar   = new G4PVPlacement(rotationTop, G4ThreeVector(fPosTopX, fPosTopY, fPosTopZ), logicBar, "BarScinTop", logicCoat, false, 0, fCheckOverlaps);
+    physCoat  = new G4PVPlacement(rotationTop, G4ThreeVector(), logicCoat, "BarCoatingTop", logicCasing, false, 0, fCheckOverlaps);
+    physBar   = new G4PVPlacement(rotationTop, G4ThreeVector(), logicBar, "BarScinTop", logicCoat, false, 0, fCheckOverlaps);
+   
     physClad2 = new G4PVPlacement(rotationTop, G4ThreeVector(0, fFiberTopPosY, 0), logicClad2, nameClad2.str(), logicBar, true, 0, fCheckOverlaps);
     physClad1 = new G4PVPlacement(rotationTop, G4ThreeVector(), logicClad1, nameClad1.str(), logicClad2, false, i, fCheckOverlaps);
     physFiber = new G4PVPlacement(rotationTop, G4ThreeVector(), logicFiber, nameFiber.str(), logicClad1, false, i, fCheckOverlaps); 
     physSiPM  = new G4PVPlacement(rotationTop, G4ThreeVector(0, fFiberTopPosY, fFiberTopPosZ), logicSiPM, nameSiPM.str(), logicBar, false, i, fCheckOverlaps);
-    //physSiPM_back  = new G4PVPlacement(rotation, G4ThreeVector(0, posY, -posZ), logicSiPM_back, "SiPM_back", logicBar, false, 0, fCheckOverlaps);
+    
   }
 
-  // create 2 consecutive bars along y-axis
-  // problem: since origin is set by 1st bar origin, positions of the rest of the bars ar relative to this one.
-  // FIX THIS BY SETTING A COMMON COORDINATE ORIGIN
-
 #warning "Add enumeration of SiPMs!"
-  for (G4int i=0; i<2; ++i) {
-    G4double zz;
-    G4double xx = (fBarWidth/2 + fCasingThickness/2 + fCoatingThickness/2);
-    // bottom sipm ids and position
-    /*
-      Write enumeration for SiPM detectors and set SiPM id accordingly! 
-      Needs to be a Module class (for a MusaIc module), then a SiPM class
-      which should be called inside the Module class...
 
-      sipm = GetModule(id).GetSiPM(id) etc...
-    */
-    G4int j;
-    if (i==0){
-      zz = fPosTopZ + dx/2;
-      j = 2;
-    }
-    else{
-      zz = fPosTopZ - dx/2;
-      j = 3;
-    }
+  for (G4int i=0; i<nBotBars; ++i) {
+
+  	G4int j = nTopBars+i;
+  	G4double xx = std::pow(-1, i)*fPosBotZ;
+    // bottom sipm ids and position
+    
+    // Write enumeration for SiPM detectors and set SiPM id accordingly! 
+    // Needs to be a Module class (for a MusaIc module), then a SiPM class
+    // which should be called inside the Module class...
+
+    // sipm = GetModule(id).GetSiPM(id) etc...
+    
     // define LogicalVolumes
     // there must be a way to define only physical volumes in the loop...
+
+
     logicCasing = new G4LogicalVolume(solidCasing, Air, "CasingBot", 0, 0, 0);
     logicCoat = new G4LogicalVolume(solidCoat, ScinCoat, "BarCoatingBot", 0, 0, 0);
     logicBar  = new G4LogicalVolume(solidBar, ScinMat, "BarScinBot", 0, 0, 0);
+    
     logicFiber = new G4LogicalVolume(solidFiber, PMMA, "WLSFiberBot", 0, 0, 0);
     logicFiber->SetVisAttributes(green);
-    logicClad1 = new G4LogicalVolume(solidClad1, Pethylene, "FiberCladBot1", 0, 0, 0);
+    logicClad1 = new G4LogicalVolume(solidClad1, Pethylene, "FiberClad1Bot", 0, 0, 0);
     logicClad1->SetVisAttributes(green);
-    logicClad2 = new G4LogicalVolume(solidClad2, FPethylene, "FiberCladBot2", 0, 0, 0);
+    logicClad2 = new G4LogicalVolume(solidClad2, FPethylene, "FiberClad2Bot", 0, 0, 0);
     logicClad2->SetVisAttributes(green);  
     logicSiPM = new G4LogicalVolume(solidSiPM, Air, "SiPMBot", 0, 0, 0);
     logicSiPM->SetVisAttributes(blue);  
-    logicSiPM_back = new G4LogicalVolume(solidSiPM_back, Air, "SiPMBot_back", 0, 0, 0);
-    logicSiPM_back->SetVisAttributes(black);
-
+		
     nameFiber.str("");
     nameClad1.str("");
     nameClad2.str("");
     nameSiPM.str("");
     nameFiber << "WLSFiberBot" << '_' << j;
-    nameClad1 << "FiberCladBot1" << '_' << j;
-    nameClad2 << "FiberCladBot2" << '_' << j;
+    nameClad1 << "FiberClad1Bot" << '_' << j;
+    nameClad2 << "FiberClad2Bot" << '_' << j;
     nameSiPM  << "SiPMBot" << '_' << j;
 
-    physCasing  = new G4PVPlacement(rotationBot, G4ThreeVector(xx, fPosBotY, zz), logicCasing, "CasingBot", logicHall, false, 0, fCheckOverlaps);
+    physCasing  = new G4PVPlacement(rotationBot, G4ThreeVector(fPosBotX, fPosBotY, xx), logicCasing, "CasingBot", logicHall, false, 0, fCheckOverlaps);
     physCoat  = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicCoat, "BarCoatingBot", logicCasing, false, 0, fCheckOverlaps);
     physBar   = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicBar, "BarScinBot", logicCoat, false, 0, fCheckOverlaps);
     physClad2 = new G4PVPlacement(nullptr, G4ThreeVector(0, fFiberBotPosY, 0), logicClad2, nameClad2.str(), logicBar, true, 0, fCheckOverlaps);
     physClad1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, nameClad1.str(), logicClad2, false, j, fCheckOverlaps);
     physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, nameFiber.str(), logicClad1, false, j, fCheckOverlaps); 
     physSiPM  = new G4PVPlacement(nullptr, G4ThreeVector(0, fFiberBotPosY, fFiberBotPosZ), logicSiPM, nameSiPM.str(), logicBar, false, j, fCheckOverlaps);
-    //physSiPM_back  = new G4PVPlacement(rotation, G4ThreeVector(0, posY, -posZ), logicSiPM_back, "SiPM_back", logicBar, false, 0, fCheckOverlaps);
   }
-  
-  
-
 
 }
 

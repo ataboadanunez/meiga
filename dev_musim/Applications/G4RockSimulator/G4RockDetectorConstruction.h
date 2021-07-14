@@ -138,11 +138,19 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     G4double fSiPMSizeY = 1.*mm; 
     G4double fSiPMSizeZ = 0.1*mm;
 
+    G4double fCasingSizeX = fBarWidth/2 + fCoatingThickness + fCasingThickness;
+    G4double fCasingSizeY = fBarThickness/2 + fCoatingThickness + fCasingThickness;
+    G4double fCasingSizeZ = fBarLength/2 + fCoatingThickness + fCasingThickness;
+
+    G4int nTopBars = 2;
+  	G4int nBotBars = 2;
+
     // por ahora centrar todo en origen de coordenadas de Geant4
     G4double fRockPosX = 0;
     G4double fRockPosY = 0;
     G4double fRockPosZ = 0;
     G4double fHallPosX = 0;
+    //G4double fHallPosY = -fRockSizeY + fHallSizeY;
     G4double fHallPosY = 0;
     G4double fHallPosZ = 0;
     
