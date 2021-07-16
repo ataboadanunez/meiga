@@ -20,7 +20,7 @@ else()
 endif()
 include(${Geant4_USE_FILE})
 
-include_directories(${CMAKE_SOURCE_DIR}/Utilities ${CMAKE_SOURCE_DIR}/Framework ${CMAKE_SOURCE_DIR}/IO)
+include_directories(${CMAKE_SOURCE_DIR}/Utilities ${CMAKE_SOURCE_DIR}/Framework/SimData ${CMAKE_SOURCE_DIR}/Framework/ConfigManager ${CMAKE_SOURCE_DIR}/Framework/Event ${CMAKE_SOURCE_DIR}/Framework/Detector ${CMAKE_SOURCE_DIR}/IO)
 #include_directories(${CMAKE_SOURCE_DIR}/Framework)
 add_subdirectory(Utilities)
 add_subdirectory(Framework)
