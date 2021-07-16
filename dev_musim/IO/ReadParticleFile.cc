@@ -1,6 +1,7 @@
 // Implementation of ReadParticleFile class
 #include "ReadParticleFile.h"
 #include "CorsikaUtilities.h"
+#include "PhysicsConstants.h"
 #include "Particle.h"
 #include "SimData.h"
 
@@ -59,7 +60,7 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
     double pz;
     double x;
     double y;
-    double time;
+    double z;
     unsigned primaryShowerId;
     unsigned primaryParticleId;
     double   primaryEnergy;
@@ -84,7 +85,7 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
     if (!(iss >> particleId
               >> px >> py >> pz
               >> x >> y
-              >> time
+              >> z
               >> primaryShowerId
               >> primaryParticleId
               >> primaryEnergy
@@ -95,9 +96,35 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
       break;
     }
 
-    vector<double> particlePosition{x, y, time};
+    /// note on conversion units
+    /*
+			units should be fix here. we use directly
+			G4 system of units to avoid re-conversions
+
+			input is given in CORSIKA units, i.e.,
+			[x] = cm
+			[p, E] = GeV
+			[theta, phi] = deg
+			
+			particle's IDs are CORSIKA ids.
+			we use the CORSIKA id and then 
+			convert it using Framework functions
+			to PDG encoding (for Geant4)
+
+    */
+
+    x*=cm;
+    y*=cm;
+    px*=GeV;
+    py*=GeV;
+    pz*=GeV;
+    z*=m;
+    primaryEnergy*=GeV;
+    primaryTheta*=deg;
+    primaryPhi*=deg;
+
+    vector<double> particlePosition{x, y, z};
     vector<double> particleMomentum{px, py, pz};
-    //Particle particle(particleId, px, py, pz, x, y, time); 
     Particle particle(particleId, particlePosition, particleMomentum);
     simData.InsertParticle(particle);
 
