@@ -3,25 +3,16 @@
 #include <sstream>
 #include <cmath>
 
-Particle::Particle(const int id, const double px,
-                   const double py, const double pz,
-                   const double x, const double y, const double z) : 
-                  fId(id),
-                  fPx(px),
-                  fPy(py),
-                  fPz(pz),
-                  fX(x),
-                  fY(y),
-                  fZ(z)
-                   { }
+// particle mass defined as static
+std::map<int, double> Particle::gParticleMassMap;
 
 Particle::Particle(const int id, const std::vector<double>& position, const std::vector<double>& momentum) :
+  fId(id),
   fPosition(position),
-  fDirection(momentum),
-  fId(id)
+  fDirection(momentum)
   {
+  	SetMass(id);
     SetMomentum(momentum);
-    SetMass(id);
   }
 
 
@@ -31,9 +22,6 @@ Particle::SetMass(const int id)
   if (gParticleMassMap.empty())
     InitParticleMassMap();
 
-  //const auto index = gParticleMassMap.find(id);
-  //fMass = (index != gParticleMassMap.end()) ? index->second : 0. ;
-  //return (index != gParticleMassMap.end()) ? index->second : 0.;
   fMass = gParticleMassMap[id];
 }
 
@@ -124,10 +112,12 @@ Particle::SetMomentum(const std::vector<double>& momentum)
   const double py = momentum[1];
   const double pz = momentum[2];
   const double mass = GetMass();
-  std::cout << "[DEBUG] FRAMEWORK " << mass << std::endl; 
+  
+  fDirection = momentum;
   fMomentum = sqrt(px*px + py*py + pz*pz);
-  fKineticEnergy = sqrt(fMomentum*fMomentum + mass*mass) - mass;
+  fKineticEnergy = sqrt(fMomentum*fMomentum + mass*mass) - mass;  
 }
+
 
 int
 Particle::NucleusCode(const unsigned int charge,

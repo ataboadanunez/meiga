@@ -60,50 +60,42 @@ class Particle {
 			eIron = 1000026056
 		};
 
-		/// Constructor using momentum
 		Particle() { ; }
-		Particle(const int id, const double px, const double py, const double pz, const double x, const double y, const double z);
-		// here momentum is the momentum direction (px, py, pz) as it comes from the input file
+		// constructor using momentum
 		Particle(const int id, const std::vector<double>& position, const std::vector<double>& momentum);
 
 		int GetParticleId() const { return fId; }
-		/// Calculate particle code for a nucleus given (A, Z)
+		// calculate particle code for a nucleus given (A, Z)
 		static int NucleusCode(const unsigned int theCharge, const unsigned int theAtomicNumber);
 
 		// particle momentum
-		const std::vector<double>& GetParticleDirection() const { return fDirection; }
+		const std::vector<double>& GetDirection() const { return fDirection; }
+		void SetDirection(const std::vector<double>& direction) { fDirection = direction; }
 		void SetMomentum(const std::vector<double>& momentum);
 		double GetMomentum() const { return fMomentum; }
 		
 		// particle mass
 		void InsertParticleMass(const Particle::Type id, const double mass);
-		void InitParticleMassMap();
+		static void InitParticleMassMap();
 		void SetMass(const int id);
 		double GetMass() const { return fMass; }	
 		
 		// particle energy
+		void SetKineticEnergy(const double ke) { fKineticEnergy = ke; }
 		double GetKineticEnergy() const { return fKineticEnergy; }
-
-		double GetParticleMomentumX() const { return fPx; }
-		double GetParticleMomentumY() const { return fPy; }
-		double GetParticleMomentumZ() const { return fPz; }
-		double GetParticlePositionX()  const { return fX; }
-		double GetParticlePositionY()  const { return fY; }
-		double GetParticlePositionZ()  const { return fY; }
-
-
-
+		double GetTotalEnergy() const { return fKineticEnergy + GetMass(); }
+		void SetTotalEnergy(const double totE) { fKineticEnergy = totE - GetMass(); }
+	
 	private:
  		
  		int fId;
- 		double fPx, fPy, fPz, fX, fY, fZ;
  		double fMass = 0;
  		double fMomentum = 0;
  		double fKineticEnergy = 0;
 
  		std::vector<double> fPosition;
   	std::vector<double> fDirection;
-  	std::map<int, double> gParticleMassMap;
+  	static std::map<int, double> gParticleMassMap;
 		// particle properties for mass
 };
 
