@@ -1,0 +1,7 @@
+file(GLOB sources ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
+file(GLOB headers ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+add_library(musim_framework_event STATIC ${sources} ${headers})
+set(MUSIM_LIBRARIES musim_framework_event ${MUSIM_LIBRARIES} PARENT_SCOPE)
+#target_include_directories(musim_framework_event PRIVATE ${MUSIM_INCLUDE_DIRS})
+install(FILES ${headers} DESTINATION include)
+install(TARGETS musim_framework_event DESTINATION lib)
