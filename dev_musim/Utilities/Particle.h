@@ -85,7 +85,11 @@ class Particle {
 		double GetKineticEnergy() const { return fKineticEnergy; }
 		double GetTotalEnergy() const { return fKineticEnergy + GetMass(); }
 		void SetTotalEnergy(const double totE) { fKineticEnergy = totE - GetMass(); }
-	
+		
+		// particle injection position
+		const std::vector<double>& GetInjectionPosition() const { return fInjectionPosition; }
+		void SetInjectionPosition(const std::vector<double>& injPos) { fInjectionPosition = injPos; }
+
 	private:
  		
  		int fId;
@@ -95,6 +99,7 @@ class Particle {
 
  		std::vector<double> fPosition;
   	std::vector<double> fDirection;
+  	std::vector<double> fInjectionPosition;
   	static std::map<int, double> gParticleMassMap;
 		// particle properties for mass
 };
