@@ -1,9 +1,9 @@
 // definition of the G4RockDetectorConstruction class
-
 #ifndef G4RockDetectorConstruction_h
 #define G4RockDetectorConstruction_h 1
 
 #include "G4VUserDetectorConstruction.hh"
+#include "G4SDManager.hh"
 #include "globals.hh"
 #include "G4Element.hh"
 #include "G4ElementTable.hh"
@@ -20,6 +20,9 @@
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 
+#include "Event.h"
+#include "Detector.h"
+
 
 
 class G4VPhysicalVolume;
@@ -31,15 +34,16 @@ class G4OpticalSkinSurface;
 class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
   
   public:
-    G4RockDetectorConstruction();
+    G4RockDetectorConstruction(Event& theEvent);
     virtual ~G4RockDetectorConstruction();
 
     virtual G4VPhysicalVolume* Construct();
-    const G4VPhysicalVolume* GetSiPM() const;
-    const G4VPhysicalVolume* GetFiber() const;
-    const G4VPhysicalVolume* GetScinBar() const;
+    
+    G4double GetRockDepth() const { return fRockDepth; }
+  	G4double GetRockRadius() const { return fRockRadius; }
 
   private:
+  	void SetDetectorParameters();
     void CreateElements();
     void CreateMaterials();
     void CreateSolids();
@@ -47,7 +51,7 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     void CreateHall();
     G4VPhysicalVolume* CreateDetector();
     void AssembleDetector();
-    
+    void CreateModule(Detector& det);
 
     // different methods for each material
     void CreateAir();
@@ -56,6 +60,9 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     void CreateScintillator();
     void SetScinPropertyTable();
     void CreateWLS();
+    void CreatePyrex();
+
+    //G4ThreeVector ToG4Vector(const std::vector<double>* v, const double unit);
 
     bool fCheckOverlaps = true;
 
@@ -65,9 +72,13 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     G4Element* elC = nullptr;
     G4Element* elSi = nullptr;
     G4Element* elTi = nullptr;
+    G4Element* elB  = nullptr;
+    G4Element* elNa = nullptr;
     G4Material* Air = nullptr;
     G4Material* SiO2 = nullptr;
     G4Material* TiO2 = nullptr;
+    G4Material* B2O2 = nullptr;
+    G4Material* Na2O = nullptr;
     G4Material* RockMaterial = nullptr;
     G4Material* Polystyrene = nullptr;
     G4Material* PPO = nullptr;
@@ -77,11 +88,12 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     G4Material* PMMA = nullptr;
     G4Material* Pethylene = nullptr;
     G4Material* FPethylene = nullptr;
+    G4Material* Pyrex = nullptr;
     G4OpticalSurface* ScinOptSurf = nullptr;
 
     // solids
     G4Box* solidWorld = nullptr;
-    G4Box* solidRock = nullptr;
+    G4Tubs* solidRock = nullptr;
     G4Box* solidHall = nullptr;
     G4Box* solidCasing = nullptr;
     G4Box* solidCoat = nullptr;
@@ -91,6 +103,7 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     G4Tubs* solidClad2 = nullptr;
     G4Box*  solidSiPM  = nullptr;
     G4Box*  solidSiPM_back = nullptr;
+    G4Box*  solidEnclosure = nullptr;
 
     // logical and physical volumes
     G4LogicalVolume* logicWorld = nullptr;
@@ -115,32 +128,38 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     G4VPhysicalVolume* physClad2 = nullptr;
     G4VPhysicalVolume* physSiPM  = nullptr;
     G4VPhysicalVolume* physSiPM_back  = nullptr;
+    G4LogicalVolume*   logicEnclosure = nullptr;
+    G4VPhysicalVolume* physEnclosure = nullptr;
+
     // 
 
     // por ahora hard-coded aqui, eventualmente una funcion seteara los parametros a partir de un config file
-    G4double fRockSizeX = 3*m;
-    G4double fRockSizeY = 3*m;
-    G4double fRockSizeZ = 3*m;
-    G4double fWorldSizeX = 5*m;
-    G4double fWorldSizeY = 5*m;
-    G4double fWorldSizeZ = 5*m;
-    G4double fHallSizeX = 1*m;
-    G4double fHallSizeY = 1*m;
-    G4double fHallSizeZ = 1*m;
-    G4double fBarWidth = 41*mm;
-    G4double fBarLength = 2*fBarWidth;
-    G4double fBarThickness = 10*mm;
-    G4double fFiberRadius = 1.2*mm;
-    G4double fCasingThickness = 2*mm;
-    G4double fCladdingThickness = 0.10*mm;
-    G4double fCoatingThickness  = 0.25*mm;
+    G4double fRockRadius = 0.5*m;
+    G4double fRockDepth  = 0.5*m;
+    
+    G4double fWorldSizeX = fRockRadius + 0.5*m;
+    G4double fWorldSizeY = fRockRadius + 0.5*m;
+    G4double fWorldSizeZ = fRockRadius + 0.5*m;
+    G4double fHallSizeX = fRockRadius / 2;
+    G4double fHallSizeY = fRockRadius / 2;
+    G4double fHallSizeZ = fRockRadius / 2;
+
+    // read from Detector class
+    G4double fBarWidth;
+    G4double fBarLength;
+    G4double fBarThickness;
+    G4double fCoatingThickness;
+    G4double fCasingThickness;
+    G4double fFiberRadius;
+    G4double fCladdingThickness;
+    G4double fCasingSizeX;
+    G4double fCasingSizeY;
+    G4double fCasingSizeZ;
+
+    // eventually move to Detector/SiPM class
     G4double fSiPMSizeX = 1.*mm;
     G4double fSiPMSizeY = 1.*mm; 
     G4double fSiPMSizeZ = 0.1*mm;
-
-    G4double fCasingSizeX = fBarWidth/2 + fCoatingThickness + fCasingThickness;
-    G4double fCasingSizeY = fBarThickness/2 + fCoatingThickness + fCasingThickness;
-    G4double fCasingSizeZ = fBarLength/2 + fCoatingThickness + fCasingThickness;
 
     G4int nTopBars = 2;
   	G4int nBotBars = 2;
@@ -150,27 +169,15 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     G4double fRockPosY = 0;
     G4double fRockPosZ = 0;
     G4double fHallPosX = 0;
-    //G4double fHallPosY = -fRockSizeY + fHallSizeY;
     G4double fHallPosY = 0;
+    //G4double fHallPosY = -fRockHeight + fHallSizeY;
+    //G4double fHallPosY = -1*m;
     G4double fHallPosZ = 0;
     
     G4double fScintillationYield = 50/MeV; // according to Auger UMD simulation
     
+    Event& fEvent;
 };
-
-// inline functions (following Geant4 example B4)
-
-inline const G4VPhysicalVolume* G4RockDetectorConstruction::GetSiPM() const { 
-  return physSiPM; 
-}
-
-inline const G4VPhysicalVolume* G4RockDetectorConstruction::GetFiber() const { 
-  return physFiber; 
-}
-
-inline const G4VPhysicalVolume* G4RockDetectorConstruction::GetScinBar() const { 
-  return physBar; 
-}
 
 
 #endif
