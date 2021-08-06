@@ -1,8 +1,15 @@
 #include "Detector.h"
+#include "Module.h"
 
 Detector::Detector() 
 {
-	fModulePosition = new std::vector<double>();
-	//fModulePosition->resize(4);
+	
+}
+
+void
+Detector::MakeModule(unsigned int id)
+{
+	fModuleMap.emplace(id, Module(id));
+	fNModules = fModuleMap.size();
 }
 
