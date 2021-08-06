@@ -7,11 +7,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
 project(musim VERSION 1.0)
 
-#----------------------------------------------------------------------------
-# Find Geant4 package, activating all available UI and Vis drivers by default
-# You can set WITH_GEANT4_UIVIS to OFF via the command line or ccmake/cmake-gui
-# to build a batch mode only executable
-#
+################################################################################
+# External Packages                                                            #
+################################################################################
+
+# Find Geant4 package
+
 option(WITH_GEANT4_UIVIS "Build example with Geant4 UI and Vis drivers" ON)
 if(WITH_GEANT4_UIVIS)
   find_package(Geant4 REQUIRED ui_all vis_all)
@@ -19,6 +20,14 @@ else()
   find_package(Geant4 REQUIRED)
 endif()
 include(${Geant4_USE_FILE})
+
+# Find boost package
+find_package(Boost 1.34 ${Boost_is_REQUIRED})
+
+
+################################################################################
+# Subdirectories                                                               #
+################################################################################
 
 include_directories(${CMAKE_SOURCE_DIR}/Utilities ${CMAKE_SOURCE_DIR}/Framework/SimData ${CMAKE_SOURCE_DIR}/Framework/ConfigManager ${CMAKE_SOURCE_DIR}/Framework/Event ${CMAKE_SOURCE_DIR}/Framework/Detector ${CMAKE_SOURCE_DIR}/IO)
 #include_directories(${CMAKE_SOURCE_DIR}/Framework)
