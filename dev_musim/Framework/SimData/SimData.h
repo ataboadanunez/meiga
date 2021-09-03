@@ -20,13 +20,11 @@ class SimData
     unsigned int GetTotalNumberOfParticles() const { return fTotalNumberOfParticles; }
     void SetTotalNumberOfParticles(const unsigned int n) { fTotalNumberOfParticles = n; }
 
-    void AddPhotonTime(const double peTime);
-    std::vector<double> GetPhotonTime() { return fPETimes; }
-
     // DetectorSimData getters
     void MakeDetectorSimData(unsigned int id);
     DetectorSimData& GetDetectorSimData() { return fDetectorSimData; }
     DetectorSimData& GetDetectorSimData(unsigned int id) { return fDetectorSimDataMap[id]; }
+    
     /***
     void MakeSiPMSimData(unsigned int id);
     SiPMSimData& GetSiPMSimData() { return fSiPMSimData; }
@@ -42,7 +40,6 @@ class SimData
 
     ParticleVector fParticles;
     unsigned int fTotalNumberOfParticles = 0;
-    std::vector<double> fPETimes;
 
     DetectorSimData fDetectorSimData;
     std::map<int, DetectorSimData> fDetectorSimDataMap;

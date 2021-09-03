@@ -12,12 +12,6 @@ SimData::~SimData()
 
 }
 
-void 
-SimData::AddPhotonTime(const double peTime) 
-{
-  fPETimes.push_back(peTime);
-}
-
 void
 SimData::MakeDetectorSimData(unsigned int id)
 {
