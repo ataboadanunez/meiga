@@ -30,15 +30,21 @@ class Detector
 		Detector(); 
 		virtual ~Detector() { }
 
-		// get Module class
+		// Module class getters.
+		/*
+			Module is a detector composed by panels of scintillator bars,
+			WLS fibers and SiPMs / PMTs (Musaic / Mudulus)
+		*/
 		void MakeModule(unsigned int id);
     Module& GetModule() { return fModule; }
     Module& GetModule(unsigned int id) { return fModuleMap[id]; }
-		
-		// crear vector de objetos Module? 
+		 
 		int GetNModules() const { return fNModules; }
-		void SetNModules(int nMod) { fNModules = nMod; }
+		
+		std::map<int, Module>& ModulesRange() { return fModuleMap; }
+		const std::map<int, Module>& ModulesRange() const { return fModuleMap; }
 
+		// WCD ?
 
 	private:
 

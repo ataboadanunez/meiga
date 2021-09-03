@@ -2,12 +2,15 @@
 #ifndef Module_h
 #define Module_h 1
 
-#include "G4SystemOfUnits.hh"
 #include <vector>
+#include <map>
+
+#include "SiPM.h"
 
 class Module {
 	
-	//description
+	// Module detector class
+	// author: alvaro taboada
 
 	public:
 		Module();
@@ -15,9 +18,9 @@ class Module {
 		virtual ~Module() { }
 
 		// module properties
-		int GetModuleId() const { return fModuleId; }
-		void SetModuleId(int id) { fModuleId = id; }
-		bool ModuleExists() { return fModuleId; } 
+		int GetId() const { return fModuleId; }
+		void SetId(int id) { fModuleId = id; }
+		//bool ModuleExists() { return fModuleId; } 
 
 		std::vector<double>* GetModulePosition() { return fModulePosition; }
 		void SetModulePosition(std::vector<double>* pos) { fModulePosition = pos; }
@@ -49,18 +52,27 @@ class Module {
 		double GetCladdingThickness() const { return fCladdingThickness; }
 		void SetCladdingThickness(double cladThickness) { fCladdingThickness = cladThickness; }
 
+		void MakeSiPM(unsigned int id);
+		SiPM& GetSiPM() { return fSiPM; }
+		SiPM& GetSiPM(unsigned int id) { return fSiPMMap[id]; }
+
+		std::map<int, SiPM>& SiPMsRange() { return fSiPMMap; }
+		const std::map<int, SiPM>& SiPMsRange() const { return fSiPMMap; }
+
 	private:
 		// base detector properties
 		// the way properties are set now is redundant
 		// need to implement this in a config file and set from there using a manager
-		// adrian: usar boost::ptree. lee archivos .json y .xml
+		// AS: usar boost::ptree. lee archivos .json y .xml
 		// https://www.technical-recipes.com/2014/using-boostproperty_tree/
 		// escribir codigo en Framework/ConfigManager que lea todo eso
 
 
 		int fModuleId = 0;
 		int fNBars = 0;
+		int fNSiPMs = 0;
 
+		// should be placed in a config file
     double fBarWidth = 41;
     double fBarLength = 2*fBarWidth;
     double fBarThickness = 10;
@@ -68,12 +80,11 @@ class Module {
     double fCasingThickness = 2;
     double fCladdingThickness = 0.10;
     double fCoatingThickness  = 0.25;
-    double fSiPMSizeX = 1.*mm;
-    double fSiPMSizeY = 1.*mm; 
-    double fSiPMSizeZ = 0.1*mm;
 
     std::vector<double>* fModulePosition;
 
+    std::map<int, SiPM> fSiPMMap;
+    SiPM fSiPM;
 };
 
 

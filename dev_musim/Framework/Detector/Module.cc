@@ -10,3 +10,10 @@ Module::Module(unsigned int id) : fModuleId(id)
 {
 	fModulePosition = new std::vector<double>();
 }
+
+void
+Module::MakeSiPM(unsigned int id)
+{
+	fSiPMMap.emplace(id, SiPM(id));
+	fNSiPMs = fSiPMMap.size();
+}
