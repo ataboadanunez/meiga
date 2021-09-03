@@ -12,7 +12,7 @@ class G4TouchableHistory;
 
 class G4RockModuleAction : public G4VSensitiveDetector {
   public:
-    G4RockModuleAction(const G4String& name, Event& theEvent);
+    G4RockModuleAction(const G4String& name, const G4int id, Event& theEvent);
     virtual ~G4RockModuleAction() { }
 
     virtual void Initialize(G4HCofThisEvent* const /*hce*/) override { }

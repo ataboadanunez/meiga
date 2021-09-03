@@ -1,12 +1,24 @@
 // implementation of the G4RockDetectorConstruction class
-
 #include "G4RockDetectorConstruction.h"
 #include "G4RockModuleAction.h"
 #include "G4RockSiPMAction.h"
+#include "G4RockFiberAction.h"
 
 #include "Detector.h"
-
+#include "Module.h"
+#include "SiPM.h"
 #include "Geometry.h"
+
+#include "G4UnitsTable.hh"
+
+#include <iostream>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/foreach.hpp>
+
+using boost::property_tree::ptree;
+using namespace std;
+
 
 G4RockDetectorConstruction::G4RockDetectorConstruction(Event& theEvent) : 
 	G4VUserDetectorConstruction(),
@@ -16,30 +28,6 @@ G4RockDetectorConstruction::G4RockDetectorConstruction(Event& theEvent) :
 
 G4RockDetectorConstruction::~G4RockDetectorConstruction() 
 	{ }
-
-void
-G4RockDetectorConstruction::SetDetectorParameters()
-{
-	Detector& detector = fEvent.GetDetector();
-	assert(nTopBars == nBotBars);
-	detector.SetNBars(nTopBars);
-	// module properties
-	fCasingThickness = detector.GetCasingThickness() * mm;
-
-	// scintillator properties
-	fBarLength 		= detector.GetBarLength() * mm;
-	fBarWidth  		= detector.GetBarWidth() * mm;
-	fBarThickness = detector.GetBarThickness() * mm;
-	fCoatingThickness = detector.GetBarCoatingThickness() * mm;
-
-	// fiber properties
-	fCladdingThickness = detector.GetCladdingThickness() * mm;
-	fFiberRadius = detector.GetFiberRadius() * mm;
-
-	fCasingSizeX = fBarLength/2 + fCoatingThickness + fCasingThickness;
-  fCasingSizeY = fBarWidth/2 + fCoatingThickness;// + fCasingThickness;
-  fCasingSizeZ = fBarThickness/2 + fCoatingThickness;// + fCasingThickness;
-}
 
 void
 G4RockDetectorConstruction::CreateElements() 
@@ -86,12 +74,91 @@ G4RockDetectorConstruction::CreateMaterials()
 G4VPhysicalVolume*
 G4RockDetectorConstruction::CreateDetector()
 {
-	CreateSolids();
+	//CreateSolids();
 	CreateWorld();
 	CreateHall();
-	AssembleDetector();
+	ReadModuleList("./ModuleList.xml");
+	//AssembleDetector();
 	return physWorld;
 }
+
+void
+G4RockDetectorConstruction::ReadModuleList(string fModuleList)
+{
+
+	cout << "G4RockDetectorConstruction::ReadModuleList: Reading Module(s) position(s) from " << fModuleList << endl;
+	Detector& detector = fEvent.GetDetector();
+	int nModules = 0;
+
+	// read XML with module positions
+	ptree tree;
+	read_xml(fModuleList, tree);
+	for (const auto& i : tree.get_child("moduleList")) {		
+		ptree subtree;
+		string name;
+		tie(name, subtree) = i;
+
+		if (name != "module")
+			continue;
+
+		vector<double> modulePosition;
+		string moduleIdstr = subtree.get<string>("<xmlattr>.id");
+		int moduleId = stoi(moduleIdstr);
+
+		// create and get module
+		detector.MakeModule(moduleId);
+		Module& module = detector.GetModule(moduleId);
+
+		nModules+=1;
+		
+		
+		for (const auto &v : subtree.get_child("")) {
+			string label = v.first;
+			if ( label != "<xmlattr>" ) {
+					if (label != "barsInPanel") {
+						double value = stod(v.second.data());
+						string unit = v.second.get<string>("<xmlattr>.unit");
+						modulePosition.push_back(value*G4UnitDefinition::GetValueOf(unit));
+					} else {
+						int nBarsInPanel = stoi(v.second.data());
+						module.SetNBars(nBarsInPanel);
+					}
+				//cout << "The unit of " << label << " is " << unit << " " << G4UnitDefinition::GetValueOf(unit) << " " << cm << endl;
+			} 			
+		}
+
+
+
+		//detector.SetNModules(nModules);
+		module.SetModulePosition(&modulePosition);
+		
+		// module properties
+		fCasingThickness = module.GetCasingThickness() * mm;
+
+		// scintillator bar properties
+		fBarWidth  = module.GetBarWidth() * mm;
+		fBarLength = module.GetNBars() * fBarWidth; 
+		fBarThickness = module.GetBarThickness() * mm;
+		fCoatingThickness = module.GetBarCoatingThickness() * mm;
+
+		// fiber properties
+		fCladdingThickness = module.GetCladdingThickness() * mm;
+		fFiberRadius = module.GetFiberRadius() * mm;
+
+		fCasingSizeX = fBarLength/2 + fCoatingThickness + fCasingThickness;
+  	fCasingSizeY = fBarWidth/2 + fCoatingThickness;// + fCasingThickness;
+  	fCasingSizeZ = fBarThickness/2 + fCoatingThickness;// + fCasingThickness;
+
+  	SiPM& sipm = module.GetSiPM();
+  	fSiPMSizeZ = sipm.GetSiPMWidth() * mm;
+  	fSiPMSizeX = fSiPMSizeY = sipm.GetSiPMLength() * mm;
+  	
+
+		CreateModule(module);	
+	}
+
+}
+
 
 void
 G4RockDetectorConstruction::CreateAir()
@@ -193,21 +260,21 @@ G4RockDetectorConstruction::SetScinPropertyTable()
   assert(sizeof(refIndexScin) == n);
 
   G4double absLengthScin[] = {
-    1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm,
-    1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm,
-    1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm, 1.0*cm,
-    20.0*cm, 20.0*cm, 20.0*cm, 20.0*cm, 20.0*cm, 20.0*cm, 20.0*cm, 20.0*cm, 20.0*cm, 20.0*cm,
-    20.0*cm, 20.0*cm, 20.0*cm, 20.0*cm, 20.0*cm, 20.0*cm, 20.0*cm, 20.0*cm, 20.0*cm, 20.0*cm
+    4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm,
+    4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm,
+    4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm,
+    24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm,
+    24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm
   };
 
   assert(sizeof(absLengthScin) == n);
 
   G4double fastCompScin[] = {
-    0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
-    1, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
   };
   assert(sizeof(fastCompScin) == n);
 
@@ -440,27 +507,10 @@ G4RockDetectorConstruction::CreatePyrex()
 }
 
 void
-G4RockDetectorConstruction::CreateSolids()
+G4RockDetectorConstruction::CreateWorld()
 {
 
 	solidWorld 	= new G4Box("World", fWorldSizeX, fWorldSizeY, fWorldSizeZ);
-	solidRock  	= new G4Tubs("Rock", 0, fRockRadius, fRockDepth, 0, 360*deg);
-	solidHall  	= new G4Box("Hall", fHallSizeX, fHallSizeY, fHallSizeZ);
-  // solidCasing = new G4Box("Casing", fCasingSizeX, fCasingSizeY, fCasingSizeZ);
-	solidCoat  	= new G4Box("BarCoating", fCoatingThickness + fBarLength/2, fCoatingThickness + fBarWidth/2, fCoatingThickness + fBarThickness/2);
-	solidBar   	= new G4Box("BarScin", fBarLength/2, fBarWidth/2, fBarThickness/2);
-	solidFiber  = new G4Tubs("Fiber", 0, fFiberRadius - 2*fCladdingThickness, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
-	solidClad1  = new G4Tubs("Clad1", 0, fFiberRadius - fCladdingThickness, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
-	solidClad2  = new G4Tubs("Clad2", 0, fFiberRadius, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
-	solidSiPM   = new G4Box("SiPM", fSiPMSizeX, fSiPMSizeY, fSiPMSizeZ);
-  // create second SiPM volume to be placed on the oposite side
-  solidSiPM_back  = new G4Box("SiPM_back", fSiPMSizeX, fSiPMSizeY, fSiPMSizeZ);
-
-}
-
-void
-G4RockDetectorConstruction::CreateWorld()
-{
 	logicWorld = new G4LogicalVolume(solidWorld, Air, "World");
 	physWorld	 =  new G4PVPlacement(nullptr, G4ThreeVector(), "World", logicWorld, 0, false, 0, fCheckOverlaps);
 	//logicWorld->SetVisAttributes(G4VisAttributes::Invisible);							
@@ -470,8 +520,8 @@ void
 G4RockDetectorConstruction::CreateHall()
 {
 	// roca y aire (eventualmente Rock sera "ground"... y el hall sera un hall de verdad... 1:35AM)
-	G4RotationMatrix* rotation = new G4RotationMatrix();
-	//rotation->rotateX(M_PI/2);
+	solidRock  	= new G4Tubs("Rock", 0, fRockRadius, fRockDepth, 0, 360*deg);
+	solidHall  	= new G4Box("Hall", fHallSizeX, fHallSizeY, fHallSizeZ);
 	G4VisAttributes brown(G4Colour::Brown());
 	logicRock = new G4LogicalVolume(solidRock, RockMaterial, "Rock");
 	logicRock->SetVisAttributes(brown);
@@ -482,29 +532,43 @@ G4RockDetectorConstruction::CreateHall()
 }
 
 void 
-G4RockDetectorConstruction::CreateModule(Detector& detector)
+G4RockDetectorConstruction::CreateModule(Module& module)
 {
 
 	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
-	
+
 	// module position
-	G4ThreeVector  modulePos = Geometry::ToG4Vector(detector.GetModulePosition(), cm);
-	int moduleId = detector.GetModuleId();
+	G4ThreeVector  modulePos = Geometry::ToG4Vector(module.GetModulePosition(), 1.);
+	int moduleId = module.GetId();
+	int nBars = module.GetNBars();
+
+	cout << "G4RockDetectorConstruction::CreateModule: Creating detector with id " << moduleId << ", with " << nBars << " bars per panel at position (x, y, z) = (" << modulePos[0] / cm << ", " << modulePos[1] / cm << ", " << modulePos[2] / cm << ") cm." << endl;
 
 	// define a enclosure volume that contains the components of the module
 	// this is just to ease the module construction...not a proper volume
-	std::ostringstream nameModule;
+	ostringstream nameModule;
 	nameModule.str("");
-  nameModule << "Enclosure" << '_' << moduleId;
+  nameModule << "Casing" << '_' << moduleId;
+  const double x = fBarLength/2;
+  const double y = fBarWidth/2 * nBars; // number of bars on each panel
+  const double z = fBarThickness/2 * 2; // 2 = number of panels
+  const double t = fCasingThickness;
 
-	solidEnclosure = new G4Box("Enclosure", (fCasingThickness + fCoatingThickness + fBarLength/2), (fCasingThickness + fCoatingThickness + fBarWidth/2)*nTopBars, (fCasingThickness + fCoatingThickness + fBarThickness/2)*nTopBars);
-	logicEnclosure = new G4LogicalVolume(solidEnclosure, Air, "Enclosure", 0, 0, 0);
-	physEnclosure  = new G4PVPlacement(nullptr, modulePos, logicEnclosure, "Enclosure", logicHall, false, moduleId, fCheckOverlaps);
+	solidCasing = new G4Box("Casing", x+t, y+t, z+t);
+	logicCasing = new G4LogicalVolume(solidCasing, Air, "Casing", 0, 0, 0);
+	physCasing  = new G4PVPlacement(nullptr, modulePos, logicCasing, "Casing", logicHall, false, moduleId, fCheckOverlaps);
 	
+	solidCoat  	= new G4Box("BarCoating", fCoatingThickness + fBarLength/2, fCoatingThickness + fBarWidth/2, fCoatingThickness + fBarThickness/2);
+	solidBar   	= new G4Box("BarScin", fBarLength/2, fBarWidth/2, fBarThickness/2);
+	solidFiber  = new G4Tubs("Fiber", 0, fFiberRadius - 2*fCladdingThickness, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
+	solidClad1  = new G4Tubs("Clad1", 0, fFiberRadius - fCladdingThickness, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
+	solidClad2  = new G4Tubs("Clad2", 0, fFiberRadius, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
+	solidSiPM   = new G4Box("SiPM", fSiPMSizeX, fSiPMSizeY, fSiPMSizeZ);
+
 	// registration
-	G4RockModuleAction* const moduleEnclosureSD = new G4RockModuleAction("/Module/" + nameModule.str(), fEvent);
-  sdMan->AddNewDetector(moduleEnclosureSD);
-  logicEnclosure->SetSensitiveDetector(moduleEnclosureSD);
+	G4RockModuleAction* const moduleCasingSD = new G4RockModuleAction("/Module/" + nameModule.str(), moduleId, fEvent);
+  sdMan->AddNewDetector(moduleCasingSD);
+  logicCasing->SetSensitiveDetector(moduleCasingSD);
 
 	// color definitions for visualization
   G4VisAttributes green(G4Colour::Green());
@@ -541,149 +605,123 @@ G4RockDetectorConstruction::CreateModule(Detector& detector)
   // place SiPM at the end of the bar (z-axis)
   G4double fFiberTopPosX = fBarLength/2 - 2*fCoatingThickness;
   G4double fFiberTopPosZ = -fBarThickness/2 + fCoatingThickness + fFiberRadius + fCladdingThickness;
-  
-  G4double fFiberBotPosY = -fBarThickness/2 + fCoatingThickness + fFiberRadius + fCladdingThickness;//fCasingThickness - fFiberRadius/2 - fCladdingThickness;
   G4double fFiberBotPosZ = fFiberTopPosZ;
 
-  std::ostringstream nameFiber;
-  std::ostringstream nameClad1;
-  std::ostringstream nameClad2;
-  std::ostringstream nameSiPM;
+  // bars of the top panel
+  for (G4int i=0; i<nBars; ++i) {
 
-  // create 2 consecutive bars along y-axis
-  for (G4int i=0; i<nTopBars; ++i) {
-    G4double yy = std::pow(-1, i)*fPosTopY;
-    // define LogicalVolumes
-    // there must be a way to define only physical volumes in the loop...
-    //logicCasing = new G4LogicalVolume(solidCasing, Air, "CasingTop", 0, 0, 0);
-    logicCoat = new G4LogicalVolume(solidCoat, ScinCoat, "BarCoatingTop", 0, 0, 0);
-    logicBar  = new G4LogicalVolume(solidBar, ScinMat, "BarScinTop", 0, 0, 0);
-    logicFiber = new G4LogicalVolume(solidFiber, PMMA, "WLSFiberTop", 0, 0, 0);
-    
-    logicFiber->SetVisAttributes(green);
-    logicClad1 = new G4LogicalVolume(solidClad1, Pethylene, "FiberClad1Top", 0, 0, 0);
-    logicClad1->SetVisAttributes(green);
-    logicClad2 = new G4LogicalVolume(solidClad2, FPethylene, "FiberClad2Top", 0, 0, 0);
-    logicClad2->SetVisAttributes(green);  
-    logicSiPM = new G4LogicalVolume(solidSiPM, Pyrex, "SiPMTop", 0, 0, 0);
-    logicSiPM->SetVisAttributes(blue);  
-    //logicSiPM_back = new G4LogicalVolume(solidSiPM_back, Air, "SiPMTop_back", 0, 0, 0);
-    //logicSiPM_back->SetVisAttributes(black);
+		/* 
+			update bar placement for nBars>2...
+			maybe create consecutive bars starting form a given point, i.e.,
+			barPos = MoulePosition - nBars * barLength (?) or smth like this...
+		*/
+
+		unsigned int barId = i;
+	  G4int inc = pow(-1,i);//(1+2*i);
+	  G4double yp = inc*fPosTopY;
+
+	  string nameBarCoating = "BarCoating_"+to_string(barId);
+  	string nameBarScin = "BarScin_"+to_string(barId);
+  	string nameClad2 = "FiberClad2_"+to_string(barId);
+  	string nameClad1 = "FiberClad1_"+to_string(barId);
+  	string nameFiber = "Fiber_"+to_string(barId);
+  	string nameSiPM = "SiPM_"+to_string(barId);
+
+  	// register SiPM in the detector class
+  	module.MakeSiPM(barId);
+
+	  logicCoat = new G4LogicalVolume(solidCoat, ScinCoat, nameBarCoating, 0, 0, 0);
+	  logicBar  = new G4LogicalVolume(solidBar, ScinMat, nameBarScin, 0, 0, 0);
+	  logicClad2 = new G4LogicalVolume(solidClad2, FPethylene, nameClad2, 0, 0, 0);
+	  logicClad2->SetVisAttributes(green);
+	  logicClad1 = new G4LogicalVolume(solidClad1, Pethylene, nameClad1, 0, 0, 0);
+	  logicClad1->SetVisAttributes(green); 
+	  logicFiber = new G4LogicalVolume(solidFiber, PMMA, nameFiber, 0, 0, 0);
+	  logicFiber->SetVisAttributes(green); 
+	  logicSiPM = new G4LogicalVolume(solidSiPM, Pyrex, nameSiPM, 0, 0, 0);
+	  logicSiPM->SetVisAttributes(blue); 
+
+	  // top panel upper direction
+	  physCoat  = new G4PVPlacement(nullptr, G4ThreeVector(fPosTopX, yp, fPosTopZ), logicCoat, 
+	  	nameBarCoating, logicCasing, false, barId, fCheckOverlaps);
+	  physBar   = new G4PVPlacement(nullptr, G4ThreeVector(), logicBar, 
+	  	nameBarScin, logicCoat, false, barId, fCheckOverlaps);
+	  physClad2 = new G4PVPlacement(rotationFiber, G4ThreeVector(0, 0, fFiberTopPosZ), logicClad2, 
+	  	nameClad2, logicBar, true, barId, fCheckOverlaps);
+	  physClad1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
+	  	nameClad1, logicClad2, false, barId, fCheckOverlaps);
+	  physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
+	  	nameFiber, logicClad1, false, barId, fCheckOverlaps); 
+	  physSiPM  = new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberTopPosX, 0, fFiberTopPosZ), logicSiPM, 
+	  	nameSiPM, logicBar, false, barId, fCheckOverlaps);
+
+	  // registration of SiPM
+		G4RockSiPMAction* const SiPMTopSD = new G4RockSiPMAction("/Module/" + nameModule.str() + "/" + nameSiPM, moduleId, barId, fEvent);
+		sdMan->AddNewDetector(SiPMTopSD);
+		logicSiPM->SetSensitiveDetector(SiPMTopSD);
+
 		
-    nameFiber.str("");
-    nameClad1.str("");
-    nameClad2.str("");
-    nameSiPM.str("");
-    nameFiber << "WLSFiberTop" << '_' << i;
-    nameClad1 << "FiberClad1Top" << '_' << i;
-    nameClad2 << "FiberClad2Top" << '_' << i;
-    nameSiPM  << "SiPMTop" << '_' << i;
-
-    //physCasing  = new G4PVPlacement(rotationTop, G4ThreeVector(xx, fPosTopY, fPosTopZ), logicCasing, "CasingTop", logicEnclosure, false, 0, fCheckOverlaps);
-    physCoat  = new G4PVPlacement(nullptr, G4ThreeVector(fPosTopX, yy, fPosTopZ), logicCoat, "BarCoatingTop", logicEnclosure, false, i, fCheckOverlaps);
-    physBar   = new G4PVPlacement(nullptr, G4ThreeVector(), logicBar, "BarScinTop", logicCoat, false, i, fCheckOverlaps);
-   
-    physClad2 = new G4PVPlacement(rotationFiber, G4ThreeVector(0, 0, fFiberTopPosZ), logicClad2, nameClad2.str(), logicBar, true, i, fCheckOverlaps);
-    physClad1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, nameClad1.str(), logicClad2, false, i, fCheckOverlaps);
-    physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, nameFiber.str(), logicClad1, false, i, fCheckOverlaps); 
-    physSiPM  = new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberTopPosX, 0, fFiberTopPosZ), logicSiPM, nameSiPM.str(), logicBar, false, i, fCheckOverlaps);
-    
-    // registration
-		G4RockSiPMAction* const moduleSiPMTopSD = new G4RockSiPMAction("/Module/" + nameModule.str() + "/" + nameSiPM.str(), fEvent);
-  	sdMan->AddNewDetector(moduleSiPMTopSD);
-  	logicSiPM->SetSensitiveDetector(moduleSiPMTopSD);
-
-
   }
 
-#warning "Add enumeration of SiPMs!"
+  
+  // bars of the bottom panel
+  for (G4int i=nBars; i<2*nBars; ++i) {
 
-  for (G4int i=0; i<nBotBars; ++i) {
-
-  	G4int j = nTopBars+i;
-  	G4double xx = std::pow(-1, i)*fPosBotX;
-    // bottom sipm ids and position
+  	unsigned int barId = i;
+  	G4int inc = pow(-1,i);
+	  G4double xp = inc*fPosBotX;
     
-    // Write enumeration for SiPM detectors and set SiPM id accordingly! 
-    // Needs to be a Module class (for a MusaIc module), then a SiPM class
-    // which should be called inside the Module class...
+    string nameBarCoating = "BarCoating_"+to_string(barId);
+  	string nameBarScin = "BarScin_"+to_string(barId);
+  	string nameClad2 = "FiberClad2_"+to_string(barId);
+  	string nameClad1 = "FiberClad1_"+to_string(barId);
+  	string nameFiber = "Fiber_"+to_string(barId);
+  	string nameSiPM = "SiPM_"+to_string(barId);
 
-    // sipm = GetModule(id).GetSiPM(id) etc...
-    
-    // define LogicalVolumes
-    // there must be a way to define only physical volumes in the loop...
+  	// register SiPM in the detector class
+  	module.MakeSiPM(barId);
 
+	  logicCoat = new G4LogicalVolume(solidCoat, ScinCoat, nameBarCoating, 0, 0, 0);
+	  logicBar  = new G4LogicalVolume(solidBar, ScinMat, nameBarScin, 0, 0, 0);
+	  logicClad2 = new G4LogicalVolume(solidClad2, FPethylene, nameClad2, 0, 0, 0);
+	  logicClad2->SetVisAttributes(green);
+	  logicClad1 = new G4LogicalVolume(solidClad1, Pethylene, nameClad1, 0, 0, 0);
+	  logicClad1->SetVisAttributes(green); 
+	  logicFiber = new G4LogicalVolume(solidFiber, PMMA, nameFiber, 0, 0, 0);
+	  logicFiber->SetVisAttributes(green); 
+	  logicSiPM = new G4LogicalVolume(solidSiPM, Pyrex, nameSiPM, 0, 0, 0);
+	  logicSiPM->SetVisAttributes(blue);
 
-    //logicCasing = new G4LogicalVolume(solidCasing, Air, "CasingBot", 0, 0, 0);
-    logicCoat = new G4LogicalVolume(solidCoat, ScinCoat, "BarCoatingBot", 0, 0, 0);
-    logicBar  = new G4LogicalVolume(solidBar, ScinMat, "BarScinBot", 0, 0, 0);
-    
-    logicFiber = new G4LogicalVolume(solidFiber, PMMA, "WLSFiberBot", 0, 0, 0);
-    logicFiber->SetVisAttributes(green);
-    logicClad1 = new G4LogicalVolume(solidClad1, Pethylene, "FiberClad1Bot", 0, 0, 0);
-    logicClad1->SetVisAttributes(green);
-    logicClad2 = new G4LogicalVolume(solidClad2, FPethylene, "FiberClad2Bot", 0, 0, 0);
-    logicClad2->SetVisAttributes(green);  
-    logicSiPM = new G4LogicalVolume(solidSiPM, Pyrex, "SiPMBot", 0, 0, 0);
-    logicSiPM->SetVisAttributes(blue);  
-		
-    nameFiber.str("");
-    nameClad1.str("");
-    nameClad2.str("");
-    nameSiPM.str("");
-    nameFiber << "WLSFiberBot" << '_' << j;
-    nameClad1 << "FiberClad1Bot" << '_' << j;
-    nameClad2 << "FiberClad2Bot" << '_' << j;
-    nameSiPM  << "SiPMBot" << '_' << j;
+    // upper direction
+    physCoat  = new G4PVPlacement(rotationBot, G4ThreeVector(xp, fPosBotY, fPosBotZ), logicCoat, 
+    	nameBarCoating, logicCasing, false, barId, fCheckOverlaps);
+    physBar   = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicBar,
+     nameBarScin, logicCoat, false, barId, fCheckOverlaps);
+    physClad2 = new G4PVPlacement(rotationFiber, G4ThreeVector(0, 0, fFiberBotPosZ), logicClad2, 
+    	nameClad2, logicBar, true, barId, fCheckOverlaps);
+    physClad1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
+    	nameClad1, logicClad2, false, barId, fCheckOverlaps);
+    physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
+    	nameFiber, logicClad1, false, barId, fCheckOverlaps); 
+    physSiPM  = new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberTopPosX, 0, fFiberBotPosZ), logicSiPM, 
+    	nameSiPM, logicBar, false, barId, fCheckOverlaps);
 
-    //physCasing  = new G4PVPlacement(rotationBot, G4ThreeVector(fPosBotX, fPosBotY, xx), logicCasing, "CasingBot", logicEnclosure, false, 0, fCheckOverlaps);
-    physCoat  = new G4PVPlacement(rotationBot, G4ThreeVector(xx, fPosBotY, fPosBotZ), logicCoat, "BarCoatingBot", logicEnclosure, false, j, fCheckOverlaps);
-    physBar   = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicBar, "BarScinBot", logicCoat, false, j, fCheckOverlaps);
-    physClad2 = new G4PVPlacement(rotationFiber, G4ThreeVector(0, 0, fFiberBotPosZ), logicClad2, nameClad2.str(), logicBar, true, j, fCheckOverlaps);
-    physClad1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, nameClad1.str(), logicClad2, false, j, fCheckOverlaps);
-   	physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, nameFiber.str(), logicClad1, false, j, fCheckOverlaps); 
-    physSiPM  = new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberTopPosX, 0, fFiberBotPosZ), logicSiPM, nameSiPM.str(), logicBar, false, j, fCheckOverlaps);
-
-    // registration
-		G4RockSiPMAction* const moduleSiPMBotSD = new G4RockSiPMAction("/Module/" + nameModule.str() + "/" + nameSiPM.str(), fEvent);
-  	sdMan->AddNewDetector(moduleSiPMBotSD);
-  	logicSiPM->SetSensitiveDetector(moduleSiPMBotSD);
+    // registration of SiPM
+		G4RockSiPMAction* const SiPMBotSD = new G4RockSiPMAction("/Module/" + nameModule.str() + "/" + nameSiPM, moduleId, barId, fEvent);
+  	sdMan->AddNewDetector(SiPMBotSD);
+  	logicSiPM->SetSensitiveDetector(SiPMBotSD);
+	
   }
-
+  
 }
 
-void
-G4RockDetectorConstruction::AssembleDetector()
-{
-
-	Detector& detector = fEvent.GetDetector();
-	// loop over module positions
-	
-	std::vector<double> modulePos1 = {0., 0., 0.};
-	std::vector<double> modulePos2 = {0., 0., 7.};
-	std::vector<std::vector<double>> modulePos = {modulePos1, modulePos2};
-
-	int nModules = modulePos.size();
-	detector.SetNModules(nModules);
-	
-	for (int i=0; i<nModules; i++){
-		// ask if module exists
-		detector.SetModuleId(i);
-		detector.SetModulePosition(&modulePos[i]);
-		
-		CreateModule(detector);	
-
-
-	}
-	
-
-}
 
 
 G4VPhysicalVolume* 
-G4RockDetectorConstruction::Construct() {
+G4RockDetectorConstruction::Construct() 
+{
 
-	SetDetectorParameters();
+	//SetDetectorParameters();
 
 	if (!physWorld) {
 		CreateElements();
@@ -693,3 +731,4 @@ G4RockDetectorConstruction::Construct() {
 	return physWorld;
 
 }
+

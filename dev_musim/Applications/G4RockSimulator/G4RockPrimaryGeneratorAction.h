@@ -9,6 +9,7 @@
 
 #include <iostream>
 
+#include "G4RockDetectorConstruction.h"
 #include "Particle.h"
 #include "Event.h"
 
@@ -44,6 +45,10 @@ class G4RockPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     bool fTestEnabled = true;
     std::string fOutputFileName = "./particle_trajectories.dat"; 
     std::ofstream* fTextFile;
+    
+    const G4RockDetectorConstruction *fDetectorConstructor;
+
+  	friend class G4RockDetectorConstruction;
 };  
 
 #endif

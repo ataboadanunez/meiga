@@ -22,6 +22,7 @@
 
 #include "Event.h"
 #include "Detector.h"
+#include "Module.h"
 
 
 
@@ -43,15 +44,15 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
   	G4double GetRockRadius() const { return fRockRadius; }
 
   private:
-  	void SetDetectorParameters();
+  	//void SetDetectorParameters();
     void CreateElements();
     void CreateMaterials();
-    void CreateSolids();
+    
     void CreateWorld();
     void CreateHall();
     G4VPhysicalVolume* CreateDetector();
-    void AssembleDetector();
-    void CreateModule(Detector& det);
+    void CreateModule(Module& mod);
+    void ReadModuleList(std::string fModuleList);
 
     // different methods for each material
     void CreateAir();
@@ -102,34 +103,37 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     G4Tubs* solidClad1 = nullptr;
     G4Tubs* solidClad2 = nullptr;
     G4Box*  solidSiPM  = nullptr;
-    G4Box*  solidSiPM_back = nullptr;
-    G4Box*  solidEnclosure = nullptr;
 
     // logical and physical volumes
     G4LogicalVolume* logicWorld = nullptr;
     G4PVPlacement*   physWorld  = nullptr;
+    
     G4LogicalVolume* logicRock  = nullptr;
     G4VPhysicalVolume* physRock = nullptr;
+    
     G4LogicalVolume* logicHall  = nullptr;
     G4VPhysicalVolume* physHall = nullptr;
+    
     G4LogicalVolume* logicCasing = nullptr;
     G4VPhysicalVolume* physCasing = nullptr;
+    
     G4LogicalVolume* logicCoat  = nullptr;
     G4VPhysicalVolume* physCoat = nullptr;
+    
     G4LogicalVolume* logicBar   = nullptr;
-    G4LogicalVolume* logicFiber = nullptr;
-    G4LogicalVolume* logicClad1 = nullptr;
-    G4LogicalVolume* logicClad2 = nullptr;
-    G4LogicalVolume* logicSiPM  = nullptr;
-    G4LogicalVolume* logicSiPM_back  = nullptr;
     G4VPhysicalVolume* physBar  = nullptr;
+
+    G4LogicalVolume* logicFiber = nullptr;
     G4VPhysicalVolume* physFiber = nullptr;
+    
+    G4LogicalVolume* logicClad1 = nullptr;
     G4VPhysicalVolume* physClad1 = nullptr;
+    
+    G4LogicalVolume* logicClad2 = nullptr;
     G4VPhysicalVolume* physClad2 = nullptr;
+
+    G4LogicalVolume* logicSiPM  = nullptr;
     G4VPhysicalVolume* physSiPM  = nullptr;
-    G4VPhysicalVolume* physSiPM_back  = nullptr;
-    G4LogicalVolume*   logicEnclosure = nullptr;
-    G4VPhysicalVolume* physEnclosure = nullptr;
 
     // 
 
@@ -155,14 +159,12 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     G4double fCasingSizeX;
     G4double fCasingSizeY;
     G4double fCasingSizeZ;
+    G4double fSiPMSizeX;
+    G4double fSiPMSizeY;
+    G4double fSiPMSizeZ;
 
-    // eventually move to Detector/SiPM class
-    G4double fSiPMSizeX = 1.*mm;
-    G4double fSiPMSizeY = 1.*mm; 
-    G4double fSiPMSizeZ = 0.1*mm;
-
-    G4int nTopBars = 2;
-  	G4int nBotBars = 2;
+    //G4int nTopBars = 2;
+  	//G4int nBotBars = 2;
 
     // por ahora centrar todo en origen de coordenadas de Geant4
     G4double fRockPosX = 0;
@@ -174,8 +176,12 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     //G4double fHallPosY = -1*m;
     G4double fHallPosZ = 0;
     
-    G4double fScintillationYield = 50/MeV; // according to Auger UMD simulation
+    // according to Auger UMD simulation this is 20/keV
+    G4double fScintillationYield = 9/keV; // DOI:10.15407/fm20.03.304
+
     
+    std::string fModuleId = "0";
+
     Event& fEvent;
 };
 

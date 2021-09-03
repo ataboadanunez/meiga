@@ -3,6 +3,7 @@
 #include "G4RockSteppingAction.h"
 #include "G4RockDetectorConstruction.h"
 #include "G4RockEventAction.h"
+#include "G4RockTrackingAction.h"
 
 #include "G4Step.hh"
 #include "G4Track.hh"
@@ -10,11 +11,17 @@
 
 #include "G4OpticalPhoton.hh"
 
-G4RockSteppingAction::G4RockSteppingAction(const G4RockDetectorConstruction* det, G4RockEventAction* event, std::ofstream* ofile)
+#include "SimData.h"
+#include "SiPMSimData.h"
+#include "Detector.h"
+#include "Module.h"
+
+G4RockSteppingAction::G4RockSteppingAction(const G4RockDetectorConstruction* det, G4RockEventAction* G4event, std::ofstream* ofile, Event& MSevent)
 	: G4UserSteppingAction(),
 		fDetectorConstruction(det),
-		fEventAction(event),
-    fOutputFile(ofile)
+		fEventAction(G4event),
+    fOutputFile(ofile),
+    fEvent(MSevent)
 {
 }
 
@@ -25,53 +32,65 @@ G4RockSteppingAction::~G4RockSteppingAction()
 void
 G4RockSteppingAction::UserSteppingAction(const G4Step* step)
 {
+    
+	SimData& simData = fEvent.GetSimData();
+	Detector& detector = fEvent.GetDetector();
+	Module& module = detector.GetModule();
+	double barLength = module.GetBarLength();
 
-		const G4String& particleName = step->GetTrack()->GetDefinition()->GetParticleName();
-		auto track = step->GetTrack();
-		const double time = step->GetPreStepPoint()->GetGlobalTime() / (1*ns);
-		trackVolume = step->GetPreStepPoint()->GetPhysicalVolume()->GetName();
-		std::vector<double> sipmTrace = fEventAction->GetSiPMTrace();
-    G4bool photonKilled = false;
+	const G4String& particleName = step->GetTrack()->GetDefinition()->GetParticleName();
+	auto track = step->GetTrack();
+	const double time = step->GetPreStepPoint()->GetGlobalTime() / (1*ns);
+	trackVolume = step->GetPreStepPoint()->GetPhysicalVolume()->GetName();
 
-		if (particleName == "opticalphoton") {
-			auto preVolume = step->GetPreStepPoint()->GetPhysicalVolume()->GetName();
-			auto postVolume = step->GetPostStepPoint()->GetPhysicalVolume()->GetName();
-      auto photonEnergy = track->GetTotalEnergy() / (1*eV);
-      auto trackPosition = track->GetPosition();
-      //G4double trackPosX = trackPosition.getX() / (1.*mm);
-      //G4double trackPosY = trackPosition.getY() / (1.*mm);
-      //G4double trackPosZ = trackPosition.getZ() / (1.*mm);
-      
-      if (postVolume == "SiPM_back") {
-        track->SetTrackStatus(fStopAndKill);
-        photonKilled = true;
-      }
+	std::vector<double>* sipmTrace = fEventAction->GetSiPMTrace();
 
 
-			if (postVolume == "SiPM" && IsDetected(photonEnergy)){
+	if (particleName == "opticalphoton") {
+		auto preVolume = step->GetPreStepPoint()->GetPhysicalVolume()->GetName();
+		auto postVolume = step->GetPostStepPoint()->GetPhysicalVolume()->GetName();
+		auto photonEnergy = track->GetTotalEnergy() / (1*eV);
+		auto trackPosition = track->GetPosition();
 
-        if (photonKilled) 
-          G4cout << "[DEBUG] G4RockSteppingAction Photon was supposed to be killed " << G4endl;
-				// dump time to output file
-        // compute distance to SiPM
-        // info to compute distance to SiPM
-        G4TouchableHandle theTouchable = step->GetPreStepPoint()->GetTouchableHandle();
-        G4ThreeVector origin = step->GetPreStepPoint()->GetPosition();
-        G4ThreeVector sipmPos = theTouchable->GetHistory()->GetTopTransform().TransformPoint(origin);
-        // optical photon arrived to SiPM
-        //G4cout << "[DEBUG] SteppingAction: OpticalPhoton collected by SiPM: time = " << time << " " << " " << trackPosX << " " << trackPosY << " " << trackPosZ << G4endl;
-        (*fOutputFile) << time << " ";
-				//(*fEventAction->fRunAction->outFile) << time << " ";
-				sipmTrace.push_back(time);
-				
-				// for (int i=0; i<sipmTrace.size(); i++)
-				// 	G4cout << sipmTrace[i] << G4endl;
-			} 
+		G4VPhysicalVolume* const current = step->GetTrack()->GetTouchable()->GetVolume(0);
+		G4String currentVolName = current->GetName();
+		unsigned int volumeID = current->GetCopyNo();
+		currentVolName = currentVolName.substr(0, currentVolName.find('_'));
+		//std::cout << "[DEBUG] G4RockSteppingAction: Photon detected in volume " << currentVolName << " " << volumeID << std::endl;
+		if (currentVolName == "SiPM" && IsDetected(photonEnergy)) {
+			//G4cout << "[DEBUG] G4RockSteppingAction: Making Traces For SiPM " << volumeID << G4endl;
+			//fEventAction->MakeSiPMTraces(volumeID);
+
+			//std::vector<double>* sipmTracei = fEventAction->GetSiPMTrace(volumeID);
+			if (volumeID == 0) {
+				fEventAction->fNpe0 += 1;
+				fEventAction->fSiPMTrace0->push_back(time);
+			}
+			else if (volumeID == 1) {
+				fEventAction->fNpe1 += 1;
+				fEventAction->fSiPMTrace1->push_back(time);
+			}
+			else if (volumeID == 2) {
+				fEventAction->fNpe2 += 1;
+				fEventAction->fSiPMTrace2->push_back(time);
+			}
+			else if (volumeID == 3) {
+				fEventAction->fNpe3 += 1;
+				fEventAction->fSiPMTrace3->push_back(time);
+			}
+
+			(*fOutputFile) << time << " ";
+			sipmTrace->push_back(time);
 			
+
+
+			//fEventAction->addPhoton(time);
+
 		}
+	} 
+			
 }
 
-// reescribir esto de mejor forma... -.-'
 G4bool
 G4RockSteppingAction::IsDetected(G4double energy)
 {
@@ -126,3 +145,4 @@ G4RockSteppingAction::IsDetected(G4double energy)
 
   return isdetected;
 }
+

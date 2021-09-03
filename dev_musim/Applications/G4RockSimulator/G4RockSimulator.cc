@@ -1,7 +1,7 @@
 /* main script of a simple application to simulate charged
    particles traversing a block of rock
 
-   author: alvaro
+   author: alvaro taboada
    date: 17.05.21
 
    $Id:$
@@ -13,6 +13,7 @@
 #include "G4RockPrimaryGeneratorAction.h"
 #include "G4RockEventAction.h"
 #include "G4RockRunAction.h"
+#include "G4RockTrackingAction.h"
 #include "G4RockSteppingAction.h"
 
 #include "G4RunManagerFactory.hh"
@@ -21,61 +22,118 @@
 #include "G4UIExecutive.hh"
 #include "Randomize.hh"
 
+#include "CentralConfig.h"
 #include "CorsikaUtilities.h"
-#include "Event.h"
-#include "SimData.h"
 #include "ReadParticleFile.h"
 
+#include "Event.h"
+#include "SimData.h"
+#include "SiPMSimData.h"
+
+#include "Detector.h"
+#include "Module.h"
+#include "SiPM.h"
 
 #include <string>
+#include <iostream>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/info_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/foreach.hpp>
 
+using namespace boost::property_tree;
 using namespace std;
 
 Particle G4RockSimulator::currentParticle;
 //G4RockSimulator::fOutputFile->open("SiPMTraces2.dat");
+G4RockSimulator* fG4RockSimulator;
 
 G4RockSimulator::G4RockSimulator() 
-  //fOutputFile(new ofstream())
 {
-	 //fOutputFile->open("SiPMTraces2.dat");
   
 }
+
 
 G4RockSimulator::~G4RockSimulator()
 {
-  //fOutputFile->close();
+  
 }
 
-int 
-main(/*int argc, char** argv*/) {
-  
-  // estas variables deben ser leidas desde un archivo de configuracion!
-  int fVerbosity = 1;
-  bool fGeoVisOn = false;
-  bool fTrajVisOn = false;
-  // check physicsList etc etc etc
+// WRITE THIS FUNCTION
+void
+G4RockSimulator::ReadConfiguration(string filename) 
+{
+	cout << "G4RockSimulator::ReadConfiguration: Reading configuration from file " << filename << endl;
 
-  // TODO: INCLUIR RANDOM SEED!!!
+	ptree tree;
+	
+	read_xml(filename, tree, xml_parser::no_concat_text | xml_parser::no_comments);
+	
+	for (const auto& i : tree.get_child("G4RockSimulator")) {
+		cout << "[DEBUG] G4RockSimulator::ReadConfiguration: Checking branch name " << i.first << endl;
+
+		write_info(cout, i.second);
+		if (i.first == "<xmlattr>") {
+			continue;
+		}
+
+
+		if (i.first == "InputFile") {
+			fInputFile = i.second.get_value<string>();
+			cout << "InputFile is \"" << fInputFile << "\"" << endl;
+		}
+
+		//for (const auto &v : i.second.get_child("")) {
+		//	string label = v.first;
+		//	cout << "sub-branch name " << label << endl;
+		//}
+		 
+	}
+
+	exit(EXIT_SUCCESS);
+}
+
+int main() 
+{
+  
+  /*******************
+
+   	Application SetUp
+
+  ********************/ 
+	// MOVE TO CONFIG FILE
+  string configFile = "./G4RockSimulator.xml";
+  int fVerbosity = 1;
+  bool fGeoVisOn = true;
+  bool fTrajVisOn = false;
   G4long myseed = time(NULL);
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
   G4Random::setTheSeed(myseed);
   G4cout << "Seed for random generation: " << myseed << G4endl;
-
   string physicsName = "QGSP_BERT_HP";
   string fRenderFile = "VRML2FILE";
-  /*
-    ToDo:
-    CHECK PhysicsList 
-    CREATE ERROR LOGGER
-    CREATE CONFIG FILE READER
-  */
 
+  /******************
+  		
+  	Input / Output
+
+  ******************/
+
+  // MOVE TO CONFIG FILE
+  string fInputFile = "/home/alvaro/data/sims/vertical_muon.txt";
   ofstream* fOutputFile = new ofstream();
   fOutputFile->open("SiPMTraces_reflections.dat");
+  ofstream* fParticleInfo = new ofstream();
+  fParticleInfo->open("particle_information.dat");
 
-  // create Event from EventFileReader
-  // mover input file a cfg
-  Event theEvent = ReadParticleFile::EventFileReader("/home/alvaro/data/sims/sierra_grande/sample_muons2.txt");
+  
+  /****************
+  		
+  	Event Creation
+
+  ******************/
+
+  Event theEvent = ReadParticleFile::EventFileReader(fInputFile);
 
   SimData& simData = theEvent.GetSimData();
   const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
@@ -87,13 +145,20 @@ main(/*int argc, char** argv*/) {
     return -1;
   }
 
+  
+  /***************
+
+  	Geant4 Setup		
+
+	*****************/
+
   G4VisManager* fVisManager = nullptr;
   
   // construct the default run manager
   auto fRunManager = G4RunManagerFactory::CreateRunManager();
 
   // set mandatory initialization classes
-  auto fDetConstruction = new G4RockDetectorConstruction();
+  auto fDetConstruction = new G4RockDetectorConstruction(theEvent);
   fRunManager->SetUserInitialization(fDetConstruction);
   
   fRunManager->SetUserInitialization(new G4RockPhysicsList(physicsName));
@@ -106,6 +171,8 @@ main(/*int argc, char** argv*/) {
   
   G4RockEventAction *fEventAction = new G4RockEventAction(fRunAction, fPrimaryGenerator);
   fRunManager->SetUserAction(fEventAction);
+
+  fRunManager->SetUserAction(new G4RockTrackingAction());
 
   G4RockSteppingAction *fSteppingAction = new G4RockSteppingAction(fDetConstruction, fEventAction, fOutputFile, theEvent);
   fRunManager->SetUserAction(fSteppingAction);
@@ -144,10 +211,10 @@ main(/*int argc, char** argv*/) {
   if (fGeoVisOn || fTrajVisOn) {
     fVisManager->Initialize();
     fUImanager->ApplyCommand(("/vis/open " + fRenderFile).c_str());
-    //fUImanager->ApplyCommand("/vis/open "); // for now hardcoded to this render type
     fUImanager->ApplyCommand("/vis/scene/create");
     fUImanager->ApplyCommand("/vis/sceneHandler/attach");
     fUImanager->ApplyCommand("/vis/scene/add/volume");
+    fUImanager->ApplyCommand("/vis/scene/add/axes 0 0 0 1 m");
     fUImanager->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 0. 0.");
     fUImanager->ApplyCommand("/vis/viewer/set/targetPoint 0 0 0");
     fUImanager->ApplyCommand("/vis/viewer/zoom 1");
@@ -161,39 +228,133 @@ main(/*int argc, char** argv*/) {
     fUImanager->ApplyCommand("/vis/scene/add/trajectories");
   }
 
-  //UI->ApplyCommand("/run/verbose 1");
-  //UI->ApplyCommand("/event/verbose 1");
-  
-  // start a run 
-  //int numberOfEvent = 3;
-  
-  //ReadParticleFile();
-  
+  // loop over particle vector
   for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
-    G4RockSimulator::currentParticle = *it;
-	 //G4I->setParticle(*it); 
-	 fRunManager->BeamOn(1);
+  	G4RockSimulator::currentParticle = *it;
+  	// checks
+  	const int pId = it->GetParticleId();
+  	const double pMass = it->GetMass();
+  	const double pMomentum = it->GetMomentum();
+  	const double pKineticE = it->GetKineticEnergy();
+
+  	(*fParticleInfo) << pId << " " << pMass / MeV << " " << pMomentum / GeV << " " << pKineticE / GeV << endl;
+  	
+  	// Run simulation
+  	fRunManager->BeamOn(1);
   }
 
-  /*
-  std::vector<std::vector<double>*>* trazas = fEventAction->GetTrazas();
-  for (unsigned int i=0; i<trazas->size(); i++) {
-    //G4cout << "Evento " << i << G4endl;
-    for (unsigned int j=0; j<trazas->at(i)->size(); j++)
-    G4cout << trazas->at(i)->at(j) << " ";
-  }
-  */
+  /*************************************************
+		
+		Geant4 simulation ended here!
+		What happens next are calculations and output writing 
 
-  std::vector<double> peTimes = simData.GetPhotonTime();
-  for (unsigned int i=0; i<peTimes.size(); i++)
-    G4cout << peTimes[i] << " ";
+  **************************************************/
+
+  // print simulation output. write external function...
+  // Compute Detector Signal
   
-  //Particle& currentP = G4RockSimulator::currentParticle;
+  Detector& detector = theEvent.GetDetector();
+  int nModules = detector.GetNModules();
+  std::cout << "Number of simulated modules = " << nModules << std::endl;
+  
+  for (auto modIt = detector.ModulesRange().begin(); modIt != detector.ModulesRange().end(); modIt++) {
+  	
+  	auto& currentMod = modIt->second;
+  	unsigned int moduleId = currentMod.GetId();
+  	//GetNBars returns number of bars per panel
+  	unsigned int nSipms = currentMod.GetNBars() * 2;
+  	DetectorSimData& detSimData = simData.GetDetectorSimData(moduleId);
+
+  	G4cout << "G4RockSimulator: Accessing data of Module " << moduleId << " with " << nSipms << " SiPMs" << G4endl;
+  	
+  	// iterate over SiPMs
+  	for (auto sipmIt = currentMod.SiPMsRange().begin(); sipmIt != currentMod.SiPMsRange().end(); sipmIt++) {
+
+  		auto& currentSiPM = sipmIt->second;
+  		unsigned int sipmId = currentSiPM.GetId();
+  		SiPMSimData& sipmSim = detSimData.GetSiPMSimData(sipmId);
+  		
+    	std::vector<std::vector<double>*>* peTimeDistriution = sipmSim.GetPETimeDistribution();
+    	std::ofstream* fPETimeDistriution = new ofstream();
+    	fPETimeDistriution->open("peTimes_module_" + std::to_string(moduleId) + "_sipm_" + std::to_string(sipmId) + ".dat");
+    	
+    	// iterate over PE time distriutions (time pulses)
+    	unsigned int nPulses = peTimeDistriution->size();
+    	for (unsigned int pulseIt=0; pulseIt<nPulses; pulseIt++) {
+      	
+      	// print PE times for each pulse	
+    		std::vector<double>* peTimeDistriutioni = peTimeDistriution->at(pulseIt);
+    		// total number of photo-electrons on that pulse
+    		int npe = peTimeDistriutioni->size();
+    		if (npe) {
+    			// PE iterator
+    			for (int peIt=0; peIt<npe; peIt++) {
+    				(*fPETimeDistriution) << peTimeDistriutioni->at(peIt) << " ";
+    			}
+    			(*fPETimeDistriution) << std::endl;
+    		}
+    		
+    	}
+    
+    G4cout << "PE time distribution(s) of SiPM " << sipmId << " coppied!" << G4endl;
+    fPETimeDistriution->close();
+  	}
+	}
+
+
+  // // iterate over Modules
+  // for (int moduleIt=0; moduleIt<nModules; moduleIt++) {
+
+  // 	// Module is constructed by ID
+  // 	Module& currentMod = detector.GetModule(moduleIt);
+
+  // 	unsigned int moduleId = currentMod.GetId();
+  // 	// GetNBars is the number of bars per panel.
+  // 	unsigned int nsipms = 2 * currentMod.GetNBars();  
+  // 	DetectorSimData& detSimData = simData.GetDetectorSimData(moduleId);
+
+  // 	G4cout << "G4RockSimulator: Accessing data of Module " << moduleId << " with " << nsipms << " SiPMs" << G4endl;
+  	
+  // 	// iterate over SiPMs
+  // 	for (unsigned int sipmIt=0; sipmIt<nsipms; sipmIt++) {
+  // 		SiPMSimData& sipmSim = detSimData.GetSiPMSimData(sipmIt);
+  // 		int sipmId = sipmSim.GetId();
+  //   	std::vector<std::vector<double>*>* peTimeDistriution = sipmSim.GetPETimeDistribution();
+  //   	std::ofstream* fPETimeDistriution = new ofstream();
+  //   	fPETimeDistriution->open("peTimes_module_" + std::to_string(moduleId) + "_sipm_" + std::to_string(sipmId) + ".dat");
+    	
+  //   	// iterate over PE time distriutions (time pulses)
+  //   	unsigned int nPulses = peTimeDistriution->size();
+  //   	for (unsigned int pulseIt=0; pulseIt<nPulses; pulseIt++) {
+      	
+  //     	// print PE times for each pulse	
+  //   		std::vector<double>* peTimeDistriutioni = peTimeDistriution->at(pulseIt);
+  //   		// total number of photo-electrons on that pulse
+  //   		int npe = peTimeDistriutioni->size();
+  //   		if (npe) {
+  //   			// PE iterator
+  //   			for (int peIt=0; peIt<npe; peIt++) {
+  //   				(*fPETimeDistriution) << peTimeDistriutioni->at(peIt) << " ";
+  //   			}
+  //   			(*fPETimeDistriution) << std::endl;
+  //   		}
+    		
+  //   	}
+    
+  //   G4cout << "PE time distribution(s) of SiPM " << sipmId << " coppied!" << G4endl;
+  //   fPETimeDistriution->close();
+  // 	}
+  // }
+
 	// job termination
   
   delete fVisManager;
   delete fRunManager;
   fOutputFile->close();
+  fParticleInfo->close();
+
+
   return 0;
 
 }
+
