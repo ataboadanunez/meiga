@@ -22,13 +22,19 @@ class SiPM {
 
 		bool IsPhotonDetected(double energy);
 
+		void SPEPulse(std::vector<double> &amplitude, double fBinTime, size_t fStartPulse);
+		double GetSPEPulseDuration() { return fPulseDuration; }
+
+
 	private:
 
 		// this sould be placed in a config file
 		double fSiPMLength = 1.3;
     double fSiPMWidth  = 0.1;
-
     unsigned int fSiPMId = 0;
+
+    // sipm SPE pulse parameters
+    double fPulseDuration = 100.;
 
 
 };
