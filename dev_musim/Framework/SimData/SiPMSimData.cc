@@ -25,3 +25,20 @@ SiPMSimData::AddPETimeDistribution(std::vector<double>* peTimeDist)
 {
 	fPETimeDistribution->push_back(peTimeDist);
 }
+
+
+std::vector<double>
+SiPMSimData::CalculatePulse(const double fBinSize, const std::vector<double>& peTime)
+{
+
+	double pulseDuration = fDetSiPM.GetSPEPulseDuration();
+	// Calculate array size: Start of last pulse + pulse duration in bins
+	size_t size = (*std::max_element(peTime.begin(), peTime.end()) + pulseDuration)/fBinSize + 1;
+	std::vector<double> result(size, 0.);
+	//Fill array
+	for (auto t: peTime) {
+			fDetSiPM.SPEPulse(result, fBinSize, static_cast<size_t>(t/fBinSize));
+		}
+
+	return result;
+}

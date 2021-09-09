@@ -1,6 +1,9 @@
 #ifndef SiPMSimData_h
 #define SiPMSimData_h
 #include <vector>
+#include <algorithm>
+#include <cmath>
+#include "SiPM.h"
 
 /*
 	declaration of class SiPMSimData
@@ -9,6 +12,26 @@
 
 	author: alvaro taboada
 */ 
+
+/*
+static const double SPEDURATION = 100.;
+
+#warning MOVER ESTA FUNCION A UN .CC
+static void SPEPulse(std::vector<double> &dest, double fBinTime, size_t startPulse) {
+		static const double A1 = 0.3, A2 = 23.8, A3 = 1.59;
+
+		static const double tr = 3.9, tf1 = 1.13, tf2 = 22.2, tf3 = 2.51e-1;
+
+		const size_t bins = (SPEDURATION/fBinTime);
+
+		for (size_t i = 0; i < bins && i < dest.size(); ++i) {
+			const double t = i*fBinTime;
+			dest[startPulse + i] += A1 * (1.-exp(-t / tr)) * (A2*exp(-t/tf1) + A3*exp(-t/tf2) + exp(-t/tf3));
+		}
+}
+
+*/
+
 
 class SiPMSimData
 {
@@ -20,18 +43,30 @@ class SiPMSimData
 
 		unsigned int GetId() const { return fId; }
 
-		void AddPhotonTime(double time);
+		void AddPhotonTime(const double time);
 		std::vector<double> GetPhotonTime() { return fPhotonTime; }
 
-		void AddPhotonEnergy(double energy);
+		void AddPhotonEnergy(const double energy);
 		std::vector<double> GetPhotonEnergy() { return fPhotonEnergy; }
 
 
 		void AddPETimeDistribution(std::vector<double>* peTimeDist);
-		std::vector<std::vector<double>*>* GetPETimeDistribution() { return fPETimeDistribution; }
+		std::vector<std::vector<double>*>* PETimeDistributionRange() { return fPETimeDistribution; }
 
-		//void MakeTrace(std::vector<double>* fPETime);
-		//std::vector<std::pair<double, double>> GetTrace() { return fTrace; }
+		std::vector<double> CalculatePulse(const double fBinSize, const std::vector<double>& peTime); 
+		/*
+		{
+			//Calculate array size: Start of last pulse + pulse duration in bins
+			size_t size = (*std::max_element(peTime.begin(), peTime.end()) + SPEDURATION)/fBinSize + 1;
+			std::vector<double> res(size, 0.);
+			//Fill array
+			for (auto t: peTime) {
+				SPEPulse(res, fBinSize, static_cast<size_t>(t/fBinSize));
+			}
+
+			return res;
+		}
+		*/
 		
 	private:
 
@@ -43,6 +78,12 @@ class SiPMSimData
 
 		// for PE time distribution
 		std::vector<std::vector<double>*>* fPETimeDistribution;
+
+		// for SiPM pulses
+		std::vector<std::pair<double, double>> fTrace;
+		
+		SiPM fDetSiPM;
+
 };
 
 #endif
