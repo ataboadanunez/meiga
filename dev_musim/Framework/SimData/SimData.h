@@ -15,7 +15,8 @@ class SimData
 
     typedef std::vector<Particle> ParticleVector;
     const ParticleVector& GetParticleVector() const { return fParticles; }
-    void InsertParticle(const Particle& particle) { fParticles.push_back(particle); }
+    ParticleVector& GetParticleVector()  { return fParticles; }
+    void InsertParticle(Particle& particle) { fParticles.push_back(particle); }
 
     unsigned int GetTotalNumberOfParticles() const { return fTotalNumberOfParticles; }
     void SetTotalNumberOfParticles(const unsigned int n) { fTotalNumberOfParticles = n; }
