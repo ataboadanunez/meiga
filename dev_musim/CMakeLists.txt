@@ -5,7 +5,7 @@ endif()
 #Adds our organic, home-grown search modules and etc to the module path of CMake
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
-project(musim VERSION 1.0)
+project(meiga VERSION 1.0)
 
 ################################################################################
 # External Packages                                                            #
@@ -29,12 +29,10 @@ find_package(Boost 1.34 ${Boost_is_REQUIRED})
 # Subdirectories                                                               #
 ################################################################################
 
-include_directories(${CMAKE_SOURCE_DIR}/Utilities ${CMAKE_SOURCE_DIR}/Framework/SimData ${CMAKE_SOURCE_DIR}/Framework/ConfigManager ${CMAKE_SOURCE_DIR}/Framework/Event ${CMAKE_SOURCE_DIR}/Framework/Detector ${CMAKE_SOURCE_DIR}/IO)
+include_directories(${CMAKE_SOURCE_DIR}/Utilities ${CMAKE_SOURCE_DIR}/Framework/SimData ${CMAKE_SOURCE_DIR}/Framework/ConfigManager ${CMAKE_SOURCE_DIR}/Framework/Event ${CMAKE_SOURCE_DIR}/Framework/Detector ${CMAKE_SOURCE_DIR}/IO ${CMAKE_SOURCE_DIR}/Documentation)
 #include_directories(${CMAKE_SOURCE_DIR}/Framework)
 add_subdirectory(Utilities)
 add_subdirectory(Framework)
 add_subdirectory(IO)
 add_subdirectory(Applications)
-
-#add_executable(musim)
-#target_link_libraries(musim PUBLIC Applications)
+#add_subdirectory(Documentation)
