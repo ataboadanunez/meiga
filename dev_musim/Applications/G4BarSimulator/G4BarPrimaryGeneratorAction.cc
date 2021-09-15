@@ -55,6 +55,9 @@ G4BarPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   Particle& currParticle = G4BarSimulator::currentParticle;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
 
+  //double particleEnergy = 4 * GeV;
+  //currParticle.SetKineticEnergy(particleEnergy);
+
   unsigned int currParticleID = currParticle.GetParticleId();
   int fParticleId = Corsika::CorsikaToPDG(currParticleID);
   G4ParticleDefinition* particleDef = particleTable->FindParticle(fParticleId);
@@ -65,9 +68,11 @@ G4BarPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     }
   
   double mass = currParticle.GetMass();
-  const double kineticEnergy = ComputeKineticEnergy(currParticle);
+  //const double kineticEnergy = ComputeKineticEnergy(currParticle);
   double fMomentum = currParticle.GetMomentum();
   double fKineticEnergy = currParticle.GetKineticEnergy();
+
+  fParticlePosition = Geometry::ToG4Vector(currParticle.GetParticlePosition(), 1.);
 
   const std::vector<double> particleMomentumDirection = currParticle.GetDirection();
   
@@ -84,22 +89,17 @@ G4BarPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   G4double particleMomentum = sqrt(px2 + py2 + pz2);
 
   const G4double injRadius = 50*mm;//rockRadius;
-  const G4double injHeight = 10*cm;//rockDepth + 10*cm; // few cm above  
+  const G4double injHeight = 5*cm;//rockDepth + 10*cm; // few cm above  
   const G4double rand = RandFlat::shoot(0., 1.);
   const G4double r = injRadius*sqrt(rand);
   const G4double phi = RandFlat::shoot(0., CLHEP::twopi);
 
-  G4double x0 = r*cos(phi);
-  G4double y0 = r*sin(phi);
+  G4double x0 = fParticlePosition[0];
+  G4double y0 = fParticlePosition[1];
   G4double z0 = injHeight;
   
   const std::vector<double> injectionPosition = {x0, y0, z0};
   currParticle.SetInjectionPosition(injectionPosition);
-
-  //G4cout << "[DEBUG] G4BarPrimaryGeneratorAction: Injected Position = " << x0 / m << " " << y0 / m << " " << z0 / m << G4endl;
-
-  //x0 = 0;
-  //y0 = 15*mm;
 
   if (fTestEnabled) {
   	/*

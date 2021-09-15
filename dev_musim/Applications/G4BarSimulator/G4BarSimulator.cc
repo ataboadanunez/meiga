@@ -1,7 +1,7 @@
 /* 
-	
-	main script of a simple application to simulate charged
-	particles traversing a scintillator bar
+  
+  main script of a simple application to simulate charged
+  particles traversing a scintillator bar
 
    author: alvaro taboada
    date: 3 August 2021
@@ -11,7 +11,11 @@
 
 #include "G4BarSimulator.h"
 #include "G4BarDetectorConstruction.h"
-#include "G4BarPhysicsList.h"
+//#include "G4BarPhysicsList.h"
+#include "FTFP_BERT.hh"
+#include "G4EmStandardPhysics_option4.hh"
+#include "G4OpticalPhysics.hh"
+
 #include "G4BarPrimaryGeneratorAction.h"
 #include "G4BarEventAction.h"
 #include "G4BarRunAction.h"
@@ -38,9 +42,11 @@
 
 #include <string>
 #include <iostream>
+
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 
 using namespace boost::property_tree;
@@ -48,52 +54,99 @@ using namespace std;
 
 Particle G4BarSimulator::currentParticle;
 G4BarSimulator* fG4BarSimulator;
+std::string fCfgFile;
 
-G4BarSimulator::G4BarSimulator() 
+G4BarSimulator::G4BarSimulator()
 {
-  
+
 }
 
 
-G4BarSimulator::~G4BarSimulator()
+//G4BarSimulator::~G4BarSimulator()
+//{
+//  
+//}
+
+namespace 
 {
-  
+	void ProgramUsage() 
+	{
+		cerr << " Program Usage: " << endl;
+		cerr << " ./Executable [ -c ConfigFile.json ] " << endl;
+	}
+
 }
 
 
-int main() 
+int main(int argc, char** argv) 
 {
   
-  /*******************
+  //vector<string> all_args;
 
-   	Application SetUp
+  if (argc < 3) {
+  	ProgramUsage();
+  	throw invalid_argument("Config file needed! (See Program Usage)");
+  }
 
-  ********************/ 
-  int fVerbosity = 1;
-  bool fGeoVisOn = true;
-  bool fTrajVisOn = false;
-  G4long myseed = time(NULL);
-  G4Random::setTheEngine(new CLHEP::RanecuEngine);
-  G4Random::setTheSeed(myseed);
-  G4cout << "Seed for random generation: " << myseed << G4endl;
-  string physicsName = "QGSP_BERT_HP";
-  string fRenderFile = "VRML2FILE";
+  for (int i=1; i<argc; i=i+2) {
+  	string sarg(argv[i]);
+  	if (sarg == "-c")
+  		fCfgFile = argv[i+1];
+  }
+  cout << "Argc = " << argc << endl;
 
-  /******************
-  		
-  	Input / Output
+  Event theEvent;
+  fG4BarSimulator = new G4BarSimulator();
+  fG4BarSimulator->Initialize(theEvent, fCfgFile);
+  fG4BarSimulator->RunSimulation(theEvent);
+  /*************************************************
+    
+    Geant4 simulation ended here!
+    What happens next is up to you =)
 
-  ******************/
+  **************************************************/
 
-  string fInputFile = "/home/alvaro/data/sims/vertical_muon.txt";
   
-  /****************
-  		
-  	Event Creation
+  
+  return 0;
 
-  ******************/
+}
 
-  Event theEvent = ReadParticleFile::EventFileReader(fInputFile);
+void
+G4BarSimulator::Initialize(Event& theEvent, string fileName)
+{
+
+  cout << "... Initialize ..." << endl;
+	// set value of flags according to cfg file
+  // reading cfg file using boost
+  // eventually as input of executable main(char** fConfig)
+  
+	fInputFile.clear();
+	fOutputFile.clear();
+
+	ptree root;
+	read_json(fileName, root);
+
+	fInputFile = root.get<string>("InputFile");
+	fOutputFile = root.get<string>("OutputFile");
+	fGeoVisOn = root.get<bool>("GeoVisOn");
+	fTrajVisOn = root.get<bool>("TrajVisOn");
+  fVerbosity = root.get<int>("Verbosity");
+  fRenderFile = root.get<string>("RenderFile");
+
+  //fInputFile = std::string("/home/alvaro/data/sims/vertical_muon.txt");
+  // Creates event from file reader
+  theEvent = ReadParticleFile::EventFileReader(fInputFile);
+  // this will go in WriteEventInfo()
+  //fOutputFile = std::string("/home/alvaro/data/sims/output/output.dat");
+  fOutput = new ofstream();
+  fOutput->open(fOutputFile);
+}            
+
+
+bool
+G4BarSimulator::RunSimulation(Event& theEvent)
+{
 
   SimData& simData = theEvent.GetSimData();
   const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
@@ -102,15 +155,20 @@ int main()
   
   if (!NumberOfParticles) {
     std::cerr << "ERROR! No Particles in the Event! Exiting..." << std::endl;
-    return -1;
+    return false;
   }
 
   
   /***************
 
-  	Geant4 Setup		
+    Geant4 Setup    
 
-	*****************/
+  *****************/
+
+  G4long myseed = time(NULL);
+  G4Random::setTheEngine(new CLHEP::RanecuEngine);
+  G4Random::setTheSeed(myseed);
+  G4cout << "Seed for random generation: " << myseed << G4endl;
 
   G4VisManager* fVisManager = nullptr;
   
@@ -121,7 +179,13 @@ int main()
   auto fDetConstruction = new G4BarDetectorConstruction(theEvent);
   fRunManager->SetUserInitialization(fDetConstruction);
   
-  fRunManager->SetUserInitialization(new G4BarPhysicsList(physicsName));
+  //fRunManager->SetUserInitialization(new G4BarPhysicsList(physicsName));
+  // Physics list for optical processes
+  G4VModularPhysicsList* physicsList = new FTFP_BERT;
+  physicsList->ReplacePhysics(new G4EmStandardPhysics_option4());
+  G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
+  physicsList->RegisterPhysics(opticalPhysics);
+  fRunManager->SetUserInitialization(physicsList);
   
   G4BarPrimaryGeneratorAction *fPrimaryGenerator = new G4BarPrimaryGeneratorAction();
   fRunManager->SetUserAction(fPrimaryGenerator);
@@ -129,7 +193,7 @@ int main()
   G4BarRunAction *fRunAction = new G4BarRunAction();
   fRunManager->SetUserAction(fRunAction);
   
-  G4BarEventAction *fEventAction = new G4BarEventAction(fRunAction, fPrimaryGenerator);
+  G4BarEventAction *fEventAction = new G4BarEventAction(fOutput, fRunAction, fPrimaryGenerator);
   fRunManager->SetUserAction(fEventAction);
 
   fRunManager->SetUserAction(new G4BarTrackingAction());
@@ -188,29 +252,21 @@ int main()
     fUImanager->ApplyCommand("/vis/scene/add/trajectories");
   }
 
+  int nParticle = 0;
   // loop over particle vector
   for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
-  	G4BarSimulator::currentParticle = *it;  	
-  	// Run simulation
-  	fRunManager->BeamOn(1);
+    G4BarSimulator::currentParticle = *it;
+    // Run simulation
+    fRunManager->BeamOn(1);
+    nParticle+=1;
+
+    cout << "Simulated " << nParticle << " particle(s) out of " << NumberOfParticles << endl;
   }
 
-  /*************************************************
-		
-		Geant4 simulation ended here!
-		What happens next is up to you =)
 
-  **************************************************/
-
-
-	// job termination
-  
   delete fVisManager;
   delete fRunManager;
-  
 
-
-  return 0;
+  return true;
 
 }
-

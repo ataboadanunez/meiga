@@ -10,11 +10,15 @@
 #include <string>
 #include <vector>
 
+#include <sstream>
+#include <fstream>
+#include <iostream>
+
 
 class G4BarEventAction : public G4UserEventAction
 {
   public:
-    G4BarEventAction(G4BarRunAction* runAction, G4BarPrimaryGeneratorAction* primaryGenAction);
+    G4BarEventAction(std::ofstream* out, G4BarRunAction* runAction, G4BarPrimaryGeneratorAction* primaryGenAction);
     virtual ~G4BarEventAction();
 
     virtual void BeginOfEventAction(const G4Event *event);
@@ -22,7 +26,8 @@ class G4BarEventAction : public G4UserEventAction
 
     G4BarRunAction* fRunAction;
     G4BarPrimaryGeneratorAction* fPriGenAction;
-
+    std::ofstream* fOutputFile;
+    
     std::vector<std::vector<double>*>* GetTraces() { return traces; }
 
     int fNpe0;
@@ -36,7 +41,8 @@ class G4BarEventAction : public G4UserEventAction
     std::vector<std::vector<double>*>* traces;
     std::map<int, std::vector<double>*> fTracesMap;
 
-    int fTraceLength = 100; 
+    int fTraceLength = 100;
+		 
     
 };
 

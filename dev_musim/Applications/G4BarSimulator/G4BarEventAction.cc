@@ -1,13 +1,15 @@
 #include "G4BarEventAction.h"
 #include "G4Track.hh"
 
-G4BarEventAction::G4BarEventAction(G4BarRunAction* runAction, G4BarPrimaryGeneratorAction* priGenAction)
+G4BarEventAction::G4BarEventAction(std::ofstream* outputFile, G4BarRunAction* runAction, G4BarPrimaryGeneratorAction* priGenAction)
   : G4UserEventAction(),
     fRunAction(runAction),
-    fPriGenAction(priGenAction)
+    fPriGenAction(priGenAction),
+    fOutputFile(outputFile)
 {
   
   G4cout << "...G4BarEventAction..." << G4endl;
+
   traces = new std::vector<std::vector<double>*>();
 
  }
@@ -32,20 +34,25 @@ void
 G4BarEventAction::EndOfEventAction(const G4Event* )
 {
 
-  if (fNpe0) {
-  	G4cout << "NPE0 " << fNpe0 << " ";
-  	for (int i=0; i<fNpe0; i++) {
-  		G4cout << fPMTTrace0->at(i) << " ";
-  	}
-  	G4cout << G4endl;
-  }
+	G4ThreeVector particlePosition = fPriGenAction->fParticlePosition;
+	double posX = particlePosition[0] / cm;
 
-  if (fNpe1) {
-  	G4cout << "NPE1 " << fNpe1 << " ";
-  	for (int i=0; i<fNpe1; i++) {
-  		G4cout << fPMTTrace1->at(i) << " ";
-  	}
-  	G4cout << G4endl;
-  }
+	(*fOutputFile) << posX << " " << fNpe0 << " " << fNpe1 << "\n";
+
+  // if (fNpe0) {
+  // 	G4cout << "NPE0 " << fNpe0 << " ";
+  // 	for (int i=0; i<fNpe0; i++) {
+  // 		G4cout << fPMTTrace0->at(i) << " ";
+  // 	}
+  // 	G4cout << G4endl;
+  // }
+
+  // if (fNpe1) {
+  // 	G4cout << "NPE1 " << fNpe1 << " ";
+  // 	for (int i=0; i<fNpe1; i++) {
+  // 		G4cout << fPMTTrace1->at(i) << " ";
+  // 	}
+  // 	G4cout << G4endl;
+  // }
 
 }

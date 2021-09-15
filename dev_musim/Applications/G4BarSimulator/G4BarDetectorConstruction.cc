@@ -89,13 +89,14 @@ G4BarDetectorConstruction::CreateDetector()
 	solidCasing = new G4Box("Casing", x+t, y+t, z+t);
 	logicCasing = new G4LogicalVolume(solidCasing, Air, "Casing", 0, 0, 0);
 	physCasing  = new G4PVPlacement(nullptr, barPos, logicCasing, "Casing", logicWorld, false, 0, fCheckOverlaps);
-	
-	solidCoat  	= new G4Box("BarCoating", fCoatingThickness + fBarLength/2, fCoatingThickness + fBarWidth/2, fCoatingThickness + fBarThickness/2);
-	solidBar   	= new G4Box("BarScin", fBarLength/2, fBarWidth/2, fBarThickness/2);
-	solidFiber  = new G4Tubs("Fiber", 0, fFiberRadius - 2*fCladdingThickness, fBarLength/2-2*fCoatingThickness-fPMTSizeZ, 0, 360*deg);
-	solidClad1  = new G4Tubs("Clad1", 0, fFiberRadius - fCladdingThickness, fBarLength/2-2*fCoatingThickness-fPMTSizeZ, 0, 360*deg);
-	solidClad2  = new G4Tubs("Clad2", 0, fFiberRadius, fBarLength/2-2*fCoatingThickness-fPMTSizeZ, 0, 360*deg);
-	solidPMT   = new G4Box("PMT", fPMTSizeX, fPMTSizeY, fPMTSizeZ);
+
+	solidCoat  	= new G4Box("BarCoating", x + fCoatingThickness, y + fCoatingThickness, z + fCoatingThickness);
+	solidBar   	= new G4Box("BarScin", x, y, z);
+	//solidHole   = new G4Tubs("BarHole", 0, fFiberRadius+fHoleThickness, x, 0, 360*deg);
+	solidFiber  = new G4Tubs("Fiber", 0, fFiberRadius - 2*fCladdingThickness, x - 2*fCoatingThickness - fPMTSizeZ, 0, 360*deg);
+	solidClad1  = new G4Tubs("Clad1", 0, fFiberRadius - fCladdingThickness, x - 2*fCoatingThickness - fPMTSizeZ, 0, 360*deg);
+	solidClad2  = new G4Tubs("Clad2", 0, fFiberRadius, x - 2*fCoatingThickness - fPMTSizeZ, 0, 360*deg);
+	solidPMT   	= new G4Box("PMT", fPMTSizeX, fPMTSizeY, fPMTSizeZ);
 
 	// color definitions for visualization
   G4VisAttributes green(G4Colour::Green());
@@ -105,15 +106,10 @@ G4BarDetectorConstruction::CreateDetector()
 	G4RotationMatrix* rotationFiber = new G4RotationMatrix();
   G4RotationMatrix* rotationBot = new G4RotationMatrix();
   rotationFiber->rotateY(M_PI/2);
-  rotationBot->rotateZ(M_PI/2);
-
-  // place fiber at the top of the bar (x-axis)
-  // place PMT at the both ends of the bar (z-axis)
-  G4double fFiberTopPosX = fBarLength/2 - 2*fCoatingThickness;
-  G4double fFiberTopPosZ = -fBarThickness/2 + fCoatingThickness + fFiberRadius + fCladdingThickness;
 
   logicCoat = new G4LogicalVolume(solidCoat, ScinCoat, "coat", 0, 0, 0);
   logicBar  = new G4LogicalVolume(solidBar, ScinMat, "bar", 0, 0, 0);
+  //logicHole = new G4LogicalVolume(solidHole, Air, "hole", 0, 0, 0);
   logicClad2 = new G4LogicalVolume(solidClad2, FPethylene, "clad2", 0, 0, 0);
   logicClad2->SetVisAttributes(green);
   logicClad1 = new G4LogicalVolume(solidClad1, Pethylene, "clad1", 0, 0, 0);
@@ -125,12 +121,23 @@ G4BarDetectorConstruction::CreateDetector()
 
   physCoat  = new G4PVPlacement(nullptr, barPos, logicCoat, "coat", logicCasing, false, 0, fCheckOverlaps);
   physBar   = new G4PVPlacement(nullptr, G4ThreeVector(), logicBar, "bar", logicCoat, false, 0, fCheckOverlaps);
-  physClad2 = new G4PVPlacement(rotationFiber, G4ThreeVector(0, 0, fFiberTopPosZ), logicClad2, "clad2", logicBar, true, 0, fCheckOverlaps);
+  physClad2 = new G4PVPlacement(rotationFiber, G4ThreeVector(0, 0, 0), logicClad2, "clad2", logicBar, true, 0, fCheckOverlaps);
   physClad1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, "clad1", logicClad2, false, 0, fCheckOverlaps);
   physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, "fiber", logicClad1, false, 0, fCheckOverlaps); 
   
-  physPMT1  = new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberTopPosX, 0, fFiberTopPosZ), logicPMT, "pmt_1", logicBar, false, 0, fCheckOverlaps);
-  physPMT2  = new G4PVPlacement(rotationFiber, G4ThreeVector(-1*fFiberTopPosX, 0, fFiberTopPosZ), logicPMT, "pmt_2", logicBar, false, 1, fCheckOverlaps);
+  // place fiber extensions
+  //physClad2Ext1 = new G4PVPlacement(nullptr, G4ThreeVector(fExtFiberPos, 0, 0), logicClad2Ext1, "clad2Ext1", logicHole, true, 0, fCheckOverlaps);
+  //physClad2Ext2 = new G4PVPlacement(nullptr, G4ThreeVector(-1*fExtFiberPos, 0, 0), logicClad2Ext2, "clad2Ext2", logicHole, true, 0, fCheckOverlaps);
+  
+  //physClad1Ext1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1Ext1, "clad1Ext1", logicClad2Ext1, true, 0, fCheckOverlaps);
+  //physClad1Ext2 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1Ext2, "clad1Ext2", logicClad2Ext2, true, 0, fCheckOverlaps);
+
+  //physFiberExt1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiberExt1, "fiberExt1", logicClad1Ext1, true, 0, fCheckOverlaps);
+  //physFiberExt2 = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiberExt2, "fiberExt2", logicClad1Ext2, true, 0, fCheckOverlaps);
+
+  G4double fPMTPosX = x - 2*fCoatingThickness; 
+  physPMT1  = new G4PVPlacement(rotationFiber, G4ThreeVector(fPMTPosX,  0, 0), logicPMT, "pmt_1", logicBar, false, 0, fCheckOverlaps);
+  physPMT2  = new G4PVPlacement(rotationFiber, G4ThreeVector(-fPMTPosX, 0, 0), logicPMT, "pmt_2", logicBar, false, 1, fCheckOverlaps);
 
 	return physWorld;
 }
@@ -143,6 +150,34 @@ G4BarDetectorConstruction::CreateAir()
 	Air = new G4Material("Air", 1.29e-3 * g/cm3, 2);
 	Air->AddElement(elN, 0.7);
 	Air->AddElement(elO, 0.3);
+
+	// Fill material properties table for air
+	G4MaterialPropertiesTable* airMPT = new G4MaterialPropertiesTable();
+
+	G4double photonEnergy[] = 
+	{	2.00*eV,2.03*eV,2.06*eV,2.09*eV,2.12*eV,
+		2.15*eV,2.18*eV,2.21*eV,2.24*eV,2.27*eV,
+		2.30*eV,2.33*eV,2.36*eV,2.39*eV,2.42*eV,
+		2.45*eV,2.48*eV,2.51*eV,2.54*eV,2.57*eV,
+		2.60*eV,2.63*eV,2.66*eV,2.69*eV,2.72*eV,
+		2.75*eV,2.78*eV,2.81*eV,2.84*eV,2.87*eV,
+		2.90*eV,2.93*eV,2.96*eV,2.99*eV,3.02*eV,
+		3.05*eV,3.08*eV,3.11*eV,3.14*eV,3.17*eV,
+		3.20*eV,3.23*eV,3.26*eV,3.29*eV,3.32*eV,
+		3.35*eV,3.38*eV,3.41*eV,3.44*eV,3.47*eV};
+
+	const G4int nEntries = sizeof(photonEnergy)/sizeof(G4double);
+
+	G4double refractiveIndex[] =
+	{ 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
+		1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
+		1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
+		1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
+		1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00};
+
+	assert(sizeof(refractiveIndex) == sizeof(photonEnergy));
+	airMPT->AddProperty("RINDEX", photonEnergy, refractiveIndex, nEntries);
+	Air->SetMaterialPropertiesTable(airMPT);
 
 }
 

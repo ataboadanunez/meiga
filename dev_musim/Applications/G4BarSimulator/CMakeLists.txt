@@ -17,7 +17,7 @@ file(GLOB headers ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 # Add the executable, and link it to the Geant4 libraries
 #
 add_executable(G4BarSimulator G4BarSimulator.cc ${sources} ${headers})
-target_link_libraries(G4BarSimulator ${MUSIM_LIBRARIES} ${Geant4_LIBRARIES})
+target_link_libraries(G4BarSimulator ${MEIGA_LIBRARIES} ${Geant4_LIBRARIES})
 
 
 #----------------------------------------------------------------------------

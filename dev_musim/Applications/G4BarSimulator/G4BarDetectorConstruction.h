@@ -90,8 +90,12 @@ class G4BarDetectorConstruction : public G4VUserDetectorConstruction {
     G4Box* solidCoat = nullptr;
     G4Box* solidBar  = nullptr;
     G4Tubs* solidFiber = nullptr;
+    G4Tubs* solidFiberExt = nullptr;
     G4Tubs* solidClad1 = nullptr;
+    G4Tubs* solidClad1Ext = nullptr;
     G4Tubs* solidClad2 = nullptr;
+    G4Tubs* solidHole  = nullptr;
+    G4Tubs* solidClad2Ext = nullptr;
     G4Box*  solidPMT  = nullptr;
 
     // logical and physical volumes
@@ -109,16 +113,39 @@ class G4BarDetectorConstruction : public G4VUserDetectorConstruction {
 
     G4LogicalVolume* logicFiber = nullptr;
     G4VPhysicalVolume* physFiber = nullptr;
+
+    G4LogicalVolume* logicHole = nullptr;
+    G4VPhysicalVolume* physHole = nullptr;
+
+    G4LogicalVolume* logicFiberExt1 = nullptr;
+    G4VPhysicalVolume* physFiberExt1 = nullptr;
+
+    G4LogicalVolume* logicFiberExt2 = nullptr;
+    G4VPhysicalVolume* physFiberExt2 = nullptr;
     
     G4LogicalVolume* logicClad1 = nullptr;
     G4VPhysicalVolume* physClad1 = nullptr;
+
+    G4LogicalVolume* logicClad1Ext1 = nullptr;
+    G4VPhysicalVolume* physClad1Ext1 = nullptr;
+
+    G4LogicalVolume* logicClad1Ext2 = nullptr;
+    G4VPhysicalVolume* physClad1Ext2 = nullptr;
     
     G4LogicalVolume* logicClad2 = nullptr;
     G4VPhysicalVolume* physClad2 = nullptr;
 
+    G4LogicalVolume* logicClad2Ext1 = nullptr;
+    G4VPhysicalVolume* physClad2Ext1 = nullptr;
+
+    G4LogicalVolume* logicClad2Ext2 = nullptr;
+    G4VPhysicalVolume* physClad2Ext2 = nullptr;
+
     G4LogicalVolume* logicPMT  = nullptr;
     G4VPhysicalVolume* physPMT1  = nullptr;
     G4VPhysicalVolume* physPMT2  = nullptr;
+
+
 
     // 
 
@@ -133,6 +160,7 @@ class G4BarDetectorConstruction : public G4VUserDetectorConstruction {
     G4double fCasingThickness = 2*mm;
     G4double fFiberRadius = 1.2*mm;
     G4double fCladdingThickness = 0.10*mm;
+    G4double fHoleThickness = 0.1*mm;
     G4double fCasingSizeX;
     G4double fCasingSizeY;
     G4double fCasingSizeZ;
