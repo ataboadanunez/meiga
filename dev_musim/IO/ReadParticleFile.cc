@@ -112,7 +112,7 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
 			to PDG encoding (for Geant4)
 
     */
-
+    
     x*=cm;
     y*=cm;
     px*=GeV;
@@ -122,7 +122,7 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
     primaryEnergy*=GeV;
     primaryTheta*=deg;
     primaryPhi*=deg;
-
+		
     vector<double> particlePosition{x, y, z};
     vector<double> particleMomentum{px, py, pz};
     Particle particle(particleId, particlePosition, particleMomentum);
