@@ -7,7 +7,7 @@
 // particle mass defined as static
 std::map<int, double> Particle::gParticleMassMap;
 
-Particle::Particle(const int id, const std::vector<double>& position, const std::vector<double>& momentum) :
+Particle::Particle(int id, std::vector<double>& position, std::vector<double>& momentum) :
   fId(id),
   fPosition(position),
   fDirection(momentum)

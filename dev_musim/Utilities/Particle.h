@@ -62,9 +62,10 @@ class Particle {
 
 		Particle() { ; }
 		// constructor using momentum
-		Particle(const int id, const std::vector<double>& position, const std::vector<double>& momentum);
+		Particle(int id, std::vector<double>& position, std::vector<double>& momentum);
 
-		int GetParticleId() const { return fId; }
+		int GetParticleId() { return fId; }
+		void SetParticleId(const int id) { fId = id; }
 		// calculate particle code for a nucleus given (A, Z)
 		static int NucleusCode(const unsigned int theCharge, const unsigned int theAtomicNumber);
 
@@ -82,10 +83,13 @@ class Particle {
 		
 		// particle energy
 		void SetKineticEnergy(const double ke) { fKineticEnergy = ke; }
-		double GetKineticEnergy() const { return fKineticEnergy; }
+		double GetKineticEnergy() { return fKineticEnergy; }
 		double GetTotalEnergy() const { return fKineticEnergy + GetMass(); }
 		void SetTotalEnergy(const double totE) { fKineticEnergy = totE - GetMass(); }
 		
+		// particle position
+		std::vector<double>& GetParticlePosition() { return fPosition; }
+		// CAVEAT: this sould be part of Detector SimData
 		// particle injection position
 		const std::vector<double>& GetInjectionPosition() const { return fInjectionPosition; }
 		void SetInjectionPosition(const std::vector<double>& injPos) { fInjectionPosition = injPos; }
