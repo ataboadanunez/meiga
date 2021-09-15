@@ -24,7 +24,7 @@ G4RockSiPMAction::G4RockSiPMAction(const G4String& name, const G4int mId, const 
  		detSimData.MakeSiPMSimData(sId);
  		SiPMSimData& sipmSimData = detSimData.GetSiPMSimData(fSiPMId);
 
- 		fPETimeDistribution = sipmSimData.GetPETimeDistribution();
+ 		fPETimeDistribution = sipmSimData.PETimeDistributionRange();
 
   }
 
