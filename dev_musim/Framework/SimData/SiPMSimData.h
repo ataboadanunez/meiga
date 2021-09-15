@@ -53,7 +53,7 @@ class SiPMSimData
 		void AddPETimeDistribution(std::vector<double>* peTimeDist);
 		std::vector<std::vector<double>*>* PETimeDistributionRange() { return fPETimeDistribution; }
 
-		std::vector<double> CalculatePulse(const double fBinSize, const std::vector<double>& peTime); 
+		std::vector<double> CalculatePulse(const double fBinSize, const std::vector<double>& peTime, const double pulseLenght = 500.);
 		/*
 		{
 			//Calculate array size: Start of last pulse + pulse duration in bins
