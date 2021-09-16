@@ -1,10 +1,12 @@
-/* main script of a simple application to simulate charged
-   particles traversing a block of rock
+/* 
+		main script of a simple application to simulate charged
+   	particles traversing a block of rock
 
-   author: alvaro taboada
-   date: 17.05.21
+   	author: alvaro taboada
+   	date: 17.05.21
 
-   $Id:$
+   	$Id:$
+
  */
 
 #include "G4RockSimulator.h"
@@ -39,102 +41,97 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/info_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
 #include <boost/foreach.hpp>
 
 using namespace boost::property_tree;
 using namespace std;
 
 Particle G4RockSimulator::currentParticle;
-//G4RockSimulator::fOutputFile->open("SiPMTraces2.dat");
 G4RockSimulator* fG4RockSimulator;
+string fCfgFile;
 
 G4RockSimulator::G4RockSimulator() 
 {
   
 }
 
-
-G4RockSimulator::~G4RockSimulator()
+namespace 
 {
-  
-}
-
-// WRITE THIS FUNCTION
-void
-G4RockSimulator::ReadConfiguration(string filename) 
-{
-	cout << "G4RockSimulator::ReadConfiguration: Reading configuration from file " << filename << endl;
-
-	ptree tree;
-	
-	read_xml(filename, tree, xml_parser::no_concat_text | xml_parser::no_comments);
-	
-	for (const auto& i : tree.get_child("G4RockSimulator")) {
-		cout << "[DEBUG] G4RockSimulator::ReadConfiguration: Checking branch name " << i.first << endl;
-
-		write_info(cout, i.second);
-		if (i.first == "<xmlattr>") {
-			continue;
-		}
-
-
-		if (i.first == "InputFile") {
-			fInputFile = i.second.get_value<string>();
-			cout << "InputFile is \"" << fInputFile << "\"" << endl;
-		}
-
-		//for (const auto &v : i.second.get_child("")) {
-		//	string label = v.first;
-		//	cout << "sub-branch name " << label << endl;
-		//}
-		 
+	void ProgramUsage() 
+	{
+		cerr << " Program Usage: " << endl;
+		cerr << " ./Executable [ -c ConfigFile.json ] " << endl;
 	}
 
-	exit(EXIT_SUCCESS);
 }
 
-int main() 
+int main(int argc, char** argv) 
 {
   
-	/*******************
+  if (argc < 3) {
+  	ProgramUsage();
+  	throw invalid_argument("Config file needed! (See Program Usage)");
+  }
 
-	 	Application SetUp
+  for (int i=1; i<argc; i=i+2) {
+  	string sarg(argv[i]);
+  	if (sarg == "-c")
+  		fCfgFile = argv[i+1];
+  }
+  
 
-	********************/ 
-	// MOVE TO CONFIG FILE
-	string configFile = "./G4RockSimulator.xml";
-	int fVerbosity = 1;
-	bool fGeoVisOn = true;
-	bool fTrajVisOn = true;
-	G4long myseed = time(NULL);
-	G4Random::setTheEngine(new CLHEP::RanecuEngine);
-	G4Random::setTheSeed(myseed);
-	G4cout << "Seed for random generation: " << myseed << G4endl;
-	string physicsName = "QGSP_BERT_HP";
-	string fRenderFile = "VRML2FILE";
+  Event theEvent;
+  fG4RockSimulator = new G4RockSimulator();
+  fG4RockSimulator->Initialize(theEvent, fCfgFile);
+  fG4RockSimulator->RunSimulation(theEvent);
+  /*************************************************
+    
+    Geant4 simulation ended here!
+    What happens next is up to you =)
 
-	/******************
-			
-		Input / Output
+  **************************************************/
+  fG4RockSimulator->WriteEventInfo(theEvent);
+  
 
-	******************/
+  
+  return 0;
 
-	// MOVE TO CONFIG FILE
-	string fInputFile = "/home/alvaro/data/sims/vertical_muon.txt";
-	ofstream* fOutputFile = new ofstream();
-	fOutputFile->open("SiPMTraces_reflections.dat");
-	ofstream* fParticleInfo = new ofstream();
-	fParticleInfo->open("particle_information.dat");
+}
 
 
-	/****************
-			
-		Event Creation
+void
+G4RockSimulator::Initialize(Event& theEvent, string fileName)
+{
 
-	******************/
+	cout << "... Initialize ..." << endl;
+	// set value of flags according to cfg file
+	// reading cfg file using boost
+	// eventually as input of executable main(char** fConfig)
 
-	Event theEvent = ReadParticleFile::EventFileReader(fInputFile);
+	fInputFile.clear();
+	fOutputFile.clear();
 
+	ptree root;
+	read_json(fileName, root);
+
+	fInputFile = root.get<string>("InputFile");
+	fOutputFile = root.get<string>("OutputFile");
+	fGeoVisOn = root.get<bool>("GeoVisOn");
+	fTrajVisOn = root.get<bool>("TrajVisOn");
+	fVerbosity = root.get<int>("Verbosity");
+	fRenderFile = root.get<string>("RenderFile");
+	fPhysicsName = root.get<string>("PhysicsName");
+	// Creates event from file reader
+	theEvent = ReadParticleFile::EventFileReader(fInputFile);
+  
+}
+
+bool
+G4RockSimulator::RunSimulation(Event& theEvent)
+{
+	
 	SimData& simData = theEvent.GetSimData();
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
 
@@ -142,15 +139,19 @@ int main()
 
 	if (!NumberOfParticles) {
 		cerr << "ERROR! No Particles in the Event! Exiting..." << endl;
-	  return -1;
+		return false;
 	}
 
-  
 	/***************
 
-		Geant4 Setup		
+	Geant4 Setup    
 
 	*****************/
+
+	G4long myseed = time(NULL);
+	G4Random::setTheEngine(new CLHEP::RanecuEngine);
+	G4Random::setTheSeed(myseed);
+	G4cout << "Seed for random generation: " << myseed << G4endl;
 
 	G4VisManager* fVisManager = nullptr;
 
@@ -161,7 +162,7 @@ int main()
 	auto fDetConstruction = new G4RockDetectorConstruction(theEvent);
 	fRunManager->SetUserInitialization(fDetConstruction);
 
-	fRunManager->SetUserInitialization(new G4RockPhysicsList(physicsName));
+	fRunManager->SetUserInitialization(new G4RockPhysicsList(fPhysicsName));
 
 	G4RockPrimaryGeneratorAction *fPrimaryGenerator = new G4RockPrimaryGeneratorAction();
 	fRunManager->SetUserAction(fPrimaryGenerator);
@@ -174,8 +175,8 @@ int main()
 
 	fRunManager->SetUserAction(new G4RockTrackingAction());
 
-	G4RockSteppingAction *fSteppingAction = new G4RockSteppingAction(fDetConstruction, fEventAction, fOutputFile, theEvent);
-	fRunManager->SetUserAction(fSteppingAction);
+	//G4RockSteppingAction *fSteppingAction = new G4RockSteppingAction(fDetConstruction, fEventAction, fOutputFile, theEvent);
+	//fRunManager->SetUserAction(fSteppingAction);
 
 	// initialize G4 kernel
 	fRunManager->Initialize();
@@ -231,29 +232,22 @@ int main()
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
 		G4RockSimulator::currentParticle = *it;
-		// checks
-		const int pId = it->GetParticleId();
-		const double pMass = it->GetMass();
-		const double pMomentum = it->GetMomentum();
-		const double pKineticE = it->GetKineticEnergy();
-
-		(*fParticleInfo) << pId << " " << pMass / MeV << " " << pMomentum / GeV << " " << pKineticE / GeV << endl;
-		
 		// Run simulation
-		
 		fRunManager->BeamOn(1);
 	}
 
-	/*************************************************
+	delete fVisManager;
+	delete fRunManager;
 
-		eant4 simulation ended here!
-		What happens next are calculations and output writing 
+	return true;
 
-	**************************************************/
+}
 
-	// print simulation output. write external function...
-	// Compute Detector Signal
-  
+void
+G4RockSimulator::WriteEventInfo(Event& theEvent)
+{
+
+	SimData& simData = theEvent.GetSimData();
 	Detector& detector = theEvent.GetDetector();
 	int nModules = detector.GetNModules();
 	cout << "Number of simulated modules = " << nModules << endl;
@@ -320,12 +314,4 @@ int main()
 		}
 	}
 
-
-	delete fVisManager;
-	delete fRunManager;
-	fOutputFile->close();
-	fParticleInfo->close();
-	return 0;
-
 }
-

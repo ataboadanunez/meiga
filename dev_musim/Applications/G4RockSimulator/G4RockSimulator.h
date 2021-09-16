@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 
+#include "Event.h"
 #include "Particle.h"
 #include "Detector.h"
 
@@ -15,28 +16,34 @@ class G4StationPrimaryGenerator;
 
 class G4RockSimulator 
 {
-  public:
-    G4RockSimulator();
-    virtual ~G4RockSimulator();
+	public:
+		G4RockSimulator();
+		virtual ~G4RockSimulator() {;}
 
-    void ReadConfiguration(std::string filename);
-    //void ConstructTraces(Detector& det);
+		// main methods of the application
+		void Initialize(Event& evt, std::string fileName);
+		bool RunSimulation(Event& evt);
+		void WriteEventInfo(Event& evt);
 
-    static Particle currentParticle;
-    std::ofstream* fOutputFile;
-    std::ofstream* fParticleInfo;
-    static G4RockSimulator* fG4RockSimulator;
+		static Particle currentParticle;
+		static G4RockSimulator* fG4RockSimulator;
 
-  private:
+		// name of configuration file
+		std::string fCfgFile;
 
-  	std::string fInputFile, fModuleListFile;
-		int geometry, trajectories, verbosity;
-		double injectionRadius;
-		//Estos strings tendrían que ser enum/tipo razonable
-		std::string renderFile, injectionRadiusUnit;
+	private:
 
-  	friend class G4RockDetectorConstructor;
-  	friend class G4RockPrimaryGenerator;
+		// flags for configuration (see .json file)
+		std::string fInputFile;
+		std::string fOutputFile; 
+		bool fGeoVisOn = true;
+		bool fTrajVisOn = false;
+		int fVerbosity = 1;
+		std::string fRenderFile = "VRML2FILE";
+		std::string fPhysicsName = "QGSP_BERT_HP";
+
+		friend class G4RockDetectorConstructor;
+		friend class G4RockPrimaryGenerator;
 
 };
 
