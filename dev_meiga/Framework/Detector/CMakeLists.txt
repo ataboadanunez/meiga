@@ -1,0 +1,6 @@
+file(GLOB sources ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
+file(GLOB headers ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+add_library(meiga_framework_detector STATIC ${sources} ${headers})
+set(MEIGA_LIBRARIES meiga_framework_detector ${MEIGA_LIBRARIES} PARENT_SCOPE)
+install(FILES ${headers} DESTINATION include)
+install(TARGETS meiga_framework_detector DESTINATION lib)
