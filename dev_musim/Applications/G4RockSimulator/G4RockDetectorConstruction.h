@@ -138,15 +138,15 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     // 
 
     // por ahora hard-coded aqui, eventualmente una funcion seteara los parametros a partir de un config file
-    G4double fRockRadius = 0.5*m;
-    G4double fRockDepth  = 0.5*m;
+    G4double fRockRadius = 1000*m;
+    G4double fRockDepth  = 400*m;
     
     G4double fWorldSizeX = fRockRadius + 0.5*m;
     G4double fWorldSizeY = fRockRadius + 0.5*m;
-    G4double fWorldSizeZ = fRockRadius + 0.5*m;
-    G4double fHallSizeX = fRockRadius / 2;
-    G4double fHallSizeY = fRockRadius / 2;
-    G4double fHallSizeZ = fRockRadius / 2;
+    G4double fWorldSizeZ = fRockDepth  + 0.5*m;
+    G4double fHallSizeX = 5*m;
+    G4double fHallSizeY = 5*m;
+    G4double fHallSizeZ = 5*m;
 
     // read from Detector class
     G4double fBarWidth;
@@ -174,7 +174,7 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     G4double fHallPosY = 0;
     //G4double fHallPosY = -fRockHeight + fHallSizeY;
     //G4double fHallPosY = -1*m;
-    G4double fHallPosZ = 0;
+    G4double fHallPosZ = -fRockDepth + fHallSizeZ;
     
     // according to Auger UMD simulation this is 20/keV
     G4double fScintillationYield = 9/keV; // DOI:10.15407/fm20.03.304

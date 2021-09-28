@@ -83,14 +83,17 @@ G4RockPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   G4double pz2 = fPz*fPz;
 
   G4double particleMomentum = sqrt(px2 + py2 + pz2);
-  //G4double particleZenith = acos(fPz / particleMomentum);
-  //G4double particleAzimut = atan2(-fPy, -fPx);
+  G4double particleZenith = acos(fPz / particleMomentum);
+  G4double particleAzimut = atan2(-fPy, -fPx);
+
+  currParticle.SetAzimuth(particleAzimut);
+  currParticle.SetZenith(particleZenith);
 
   const G4double rockDepth = fDetectorConstructor->GetRockDepth();
   const G4double rockRadius = fDetectorConstructor->GetRockRadius();
 
-  const G4double injRadius = 50*mm;//rockRadius;
-  const G4double injHeight = 10*cm;//rockDepth + 10*cm; // few cm above  
+  const G4double injRadius = 1*m;//rockRadius;
+  const G4double injHeight = rockDepth + 10*cm; // few cm above  
   const G4double rand = RandFlat::shoot(0., 1.);
   const G4double r = injRadius*sqrt(rand);
   const G4double phi = RandFlat::shoot(0., CLHEP::twopi);

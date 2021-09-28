@@ -45,6 +45,13 @@ G4RockSteppingAction::UserSteppingAction(const G4Step* step)
 
 	std::vector<double>* sipmTrace = fEventAction->GetSiPMTrace();
 
+	// track only primaries
+	// if (track->GetParentID() == 0) {
+	// 	if (step->GetTotalEnergy() == 0)
+	// 		cout << "Particle " << particleName << " stopped at position " << step->
+	// }
+
+	/***
 
 	if (particleName == "opticalphoton") {
 		auto preVolume = step->GetPreStepPoint()->GetPhysicalVolume()->GetName();
@@ -88,7 +95,7 @@ G4RockSteppingAction::UserSteppingAction(const G4Step* step)
 
 		}
 	} 
-			
+	***/
 }
 
 G4bool

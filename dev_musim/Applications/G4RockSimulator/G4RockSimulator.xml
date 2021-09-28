@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<G4RockSimulator>
+	<InputFile>sample.txt</InputFile>
+	<ModuleList>ModuleList.xml</ModuleList>
+	<visualization>
+		<geometry>0</geometry>
+		<trajectories>0</trajectories>
+		<!-- DAWNFILE OR VRML2FILE -->
+		<renderfile>VRML2FILE</renderfile>
+	</visualization>
+	<verbosity>0</verbosity>
+	<injectionRadius unit="m">5.0</injectionRadius>
+</G4RockSimulator>
