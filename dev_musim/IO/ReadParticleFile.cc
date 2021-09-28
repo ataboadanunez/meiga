@@ -81,7 +81,10 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
 
 
     std::istringstream iss(line);  
-    //std::cout << line << std::endl;
+
+    if (line[0] == '#')
+    	continue;
+
     if (!(iss >> particleId
               >> px >> py >> pz
               >> x >> y
