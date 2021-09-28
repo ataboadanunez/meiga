@@ -94,13 +94,20 @@ class Particle {
 		const std::vector<double>& GetInjectionPosition() const { return fInjectionPosition; }
 		void SetInjectionPosition(const std::vector<double>& injPos) { fInjectionPosition = injPos; }
 
+		void SetZenith(const double zenith) { fZenith = zenith; }
+		double GetZenith() const { return fZenith; }
+		void SetAzimuth(const double azimuth) { fAzimuth = azimuth; }
+		double GetAzimuth() const { return fAzimuth; }
+
 	private:
  		
  		int fId;
  		double fMass = 0;
  		double fMomentum = 0;
  		double fKineticEnergy = 0;
-
+ 		double fZenith = 0;
+ 		double fAzimuth = 0;
+ 		
  		std::vector<double> fPosition;
   	std::vector<double> fDirection;
   	std::vector<double> fInjectionPosition;
