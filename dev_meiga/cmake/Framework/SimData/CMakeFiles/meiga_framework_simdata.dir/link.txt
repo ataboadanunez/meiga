@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmeiga_framework_simdata.a  CMakeFiles/meiga_framework_simdata.dir/DetectorSimData.cc.o CMakeFiles/meiga_framework_simdata.dir/SiPMSimData.cc.o CMakeFiles/meiga_framework_simdata.dir/SimData.cc.o
-/usr/bin/ranlib libmeiga_framework_simdata.a

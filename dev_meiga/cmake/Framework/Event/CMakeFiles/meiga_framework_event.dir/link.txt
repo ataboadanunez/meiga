@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmeiga_framework_event.a  CMakeFiles/meiga_framework_event.dir/Event.cc.o
-/usr/bin/ranlib libmeiga_framework_event.a

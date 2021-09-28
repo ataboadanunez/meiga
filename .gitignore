@@ -1,4 +1,6 @@
 #Basic ignores
+build
+install
 *.o
 *.so
 *.a

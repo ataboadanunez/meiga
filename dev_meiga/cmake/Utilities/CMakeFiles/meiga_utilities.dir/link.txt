@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmeiga_utilities.a  CMakeFiles/meiga_utilities.dir/CorsikaUtilities.cc.o CMakeFiles/meiga_utilities.dir/Geometry.cc.o CMakeFiles/meiga_utilities.dir/Particle.cc.o
-/usr/bin/ranlib libmeiga_utilities.a
