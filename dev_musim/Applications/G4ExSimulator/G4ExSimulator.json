@@ -4,5 +4,6 @@
 	"GeoVisOn" : true,
 	"TrajVisOn" : false,
 	"Verbosity" : 1,
-	"RenderFile" : "VRML2FILE"
+	"RenderFile" : "VRML2FILE",
+	"PhysicsName" : "QGSP_BERT_HP"
 }

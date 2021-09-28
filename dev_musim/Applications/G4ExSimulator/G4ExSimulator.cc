@@ -48,7 +48,7 @@ using namespace std;
 
 Particle G4ExSimulator::currentParticle;
 G4ExSimulator* fG4ExSimulator;
-std::string fCfgFile;
+string fCfgFile;
 
 G4ExSimulator::G4ExSimulator()
 {
@@ -68,8 +68,6 @@ namespace
 
 int main(int argc, char** argv) 
 {
-  
-  //vector<string> all_args;
 
   if (argc < 3) {
   	ProgramUsage();
