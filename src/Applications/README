@@ -1,0 +1,13 @@
+Applications directory for Simulations using Geant4
+
+G4ExSimulator:
+Contains example simulation application with its documentation.
+
+G4RockSimulator:
+Application intended to simulate a block of rock with (optionally) scintillator detectors in a given position.
+
+G4BarSimulator:
+Application used for the simulation of the response to traversing muons through a plastic cintillator bar, 
+with WLS fiber coupled to a photo-detector device (SiPM / PMT).
+
+
