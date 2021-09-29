@@ -1,0 +1,9 @@
+#Basic ignores
+build
+install
+*.o
+*.so
+*.a
+*.swp
+*~
+CMakeCache.txt
