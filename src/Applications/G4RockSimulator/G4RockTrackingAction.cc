@@ -10,9 +10,8 @@
 
 void
 G4RockTrackingAction::PreUserTrackingAction(const G4Track* track)
-{
-  firstStepInVolume = true;
-  	
+{ 
+  
 }
 
 
@@ -24,8 +23,15 @@ G4RockTrackingAction::PostUserTrackingAction(const G4Track* track)
   int particleId = currParticle.GetParticleId();
   double particleEnergy = currParticle.GetTotalEnergy();
   double particleZenith = currParticle.GetZenith();
+  G4ThreeVector trackPosition = track->GetPosition();
+  std::vector<double> injectPosition = currParticle.GetInjectionPosition();
+  double trackZ = trackPosition[2] / CLHEP::m;
+  double injectZ = injectPosition[2] / CLHEP::m;
+
+  double depth = injectZ - trackZ;
+
   // track primaries
   if (track->GetParentID() == 0) {
-  	G4cout << "TrackStoppingInfo " << particleId << " " << particleEnergy / CLHEP::MeV << " " << particleZenith / CLHEP::deg << " " << track->GetPosition()[2] / CLHEP::m << " " << track->GetVolume()->GetName() << G4endl; 
+  	G4cout << "TrackStoppingInfo " << particleId << " " << particleEnergy / CLHEP::MeV << " " << particleZenith / CLHEP::deg << " " << depth << " " << track->GetVolume()->GetName() << G4endl; 
   }
 }
