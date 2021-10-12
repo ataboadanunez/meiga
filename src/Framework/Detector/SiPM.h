@@ -35,6 +35,10 @@ class SiPM {
 
     // sipm SPE pulse parameters
     double fPulseDuration = 100.;
+    double fA0 = 0.013; // mV
+    double fT0 = -1.160; // ns
+    double fTr = 2.679; // ns
+    double fTf = 0.329; // ns
 
 
 };

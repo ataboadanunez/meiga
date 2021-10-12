@@ -10,14 +10,14 @@ SiPM::SPEPulse(std::vector<double> &amplitude, double fBinTime, size_t fStartPul
 
 #warning	move to header. generate random values from mean SPE pulse parameters instead
 
-	const double A1 = 0.3, A2 = 23.8, A3 = 1.59;
-	const double tr = 3.9, tf1 = 1.13, tf2 = 22.2, tf3 = 2.51e-1;
-	
+	// const double A1 = 0.3, A2 = 23.8, A3 = 1.59;
+	// const double tr = 3.9, tf1 = 1.13, tf2 = 22.2, tf3 = 2.51e-1;
 	const size_t bins = (fPulseDuration/fBinTime);
 		
 		for (size_t i = 0; i < bins && (fStartPulse + i) < amplitude.size(); ++i) {
 			const double t = i*fBinTime;
-			amplitude[fStartPulse + i] += A1 * (1.-exp(-t / tr)) * (A2*exp(-t/tf1) + A3*exp(-t/tf2) + exp(-t/tf3));
+			amplitude[fStartPulse + i] += fA0 * ( 1.-exp(-(t-fT0) / fTr) * exp(-(t-fT0) / fTf));
+			//amplitude[fStartPulse + i] += A1 * (1.-exp(-t / tr)) * (A2*exp(-t/tf1) + A3*exp(-t/tf2) + exp(-t/tf3));
 		}
 
 }
