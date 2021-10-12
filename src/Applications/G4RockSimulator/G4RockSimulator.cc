@@ -175,8 +175,8 @@ G4RockSimulator::RunSimulation(Event& theEvent)
 
 	fRunManager->SetUserAction(new G4RockTrackingAction());
 
-	//G4RockSteppingAction *fSteppingAction = new G4RockSteppingAction(fDetConstruction, fEventAction, fOutputFile, theEvent);
-	//fRunManager->SetUserAction(fSteppingAction);
+	G4RockSteppingAction *fSteppingAction = new G4RockSteppingAction(fDetConstruction, fEventAction, theEvent);
+	fRunManager->SetUserAction(fSteppingAction);
 
 	// initialize G4 kernel
 	fRunManager->Initialize();

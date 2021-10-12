@@ -138,8 +138,8 @@ class G4RockDetectorConstruction : public G4VUserDetectorConstruction {
     // 
 
     // por ahora hard-coded aqui, eventualmente una funcion seteara los parametros a partir de un config file
-    G4double fRockRadius = 1000*m;
-    G4double fRockDepth  = 400*m;
+    G4double fRockRadius = 150*m;
+    G4double fRockDepth  = 1500*m;
     
     G4double fWorldSizeX = fRockRadius + 0.5*m;
     G4double fWorldSizeY = fRockRadius + 0.5*m;
