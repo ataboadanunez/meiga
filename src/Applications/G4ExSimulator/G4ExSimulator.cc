@@ -82,8 +82,8 @@ int main(int argc, char** argv)
   cout << "Argc = " << argc << endl;
 
   Event theEvent;
-  fG4ExSimulator = new G4BarSimulator();
-  fG4Eximulator->Initialize(theEvent, fCfgFile);
+  fG4ExSimulator = new G4ExSimulator();
+  fG4ExSimulator->Initialize(theEvent, fCfgFile);
   fG4ExSimulator->RunSimulation(theEvent);
   /*************************************************
     
@@ -99,7 +99,7 @@ int main(int argc, char** argv)
 }
 
 void
-G4BarSimulator::Initialize(Event& theEvent, string fileName)
+G4ExSimulator::Initialize(Event& theEvent, string fileName)
 {
 
   cout << "... Initialize ..." << endl;
@@ -126,7 +126,7 @@ G4BarSimulator::Initialize(Event& theEvent, string fileName)
 
 
 bool
-G4BarSimulator::RunSimulation(Event& theEvent)
+G4ExSimulator::RunSimulation(Event& theEvent)
 {
 
   SimData& simData = theEvent.GetSimData();
@@ -166,18 +166,18 @@ G4BarSimulator::RunSimulation(Event& theEvent)
   physicsList->RegisterPhysics(opticalPhysics);
   fRunManager->SetUserInitialization(physicsList);
   
-  G4BarPrimaryGeneratorAction *fPrimaryGenerator = new G4ExPrimaryGeneratorAction();
+  G4ExPrimaryGeneratorAction *fPrimaryGenerator = new G4ExPrimaryGeneratorAction();
   fRunManager->SetUserAction(fPrimaryGenerator);
   
-  G4BarRunAction *fRunAction = new G4ExRunAction();
+  G4ExRunAction *fRunAction = new G4ExRunAction();
   fRunManager->SetUserAction(fRunAction);
   
-  G4BarEventAction *fEventAction = new G4ExEventAction(fRunAction);
+  G4ExEventAction *fEventAction = new G4ExEventAction(fRunAction);
   fRunManager->SetUserAction(fEventAction);
 
   fRunManager->SetUserAction(new G4ExTrackingAction());
 
-  G4BarSteppingAction *fSteppingAction = new G4ExSteppingAction(fDetConstruction, fEventAction, theEvent);
+  G4ExSteppingAction *fSteppingAction = new G4ExSteppingAction(fDetConstruction, fEventAction, theEvent);
   fRunManager->SetUserAction(fSteppingAction);
   
   // initialize G4 kernel
@@ -234,7 +234,7 @@ G4BarSimulator::RunSimulation(Event& theEvent)
   int nParticle = 0;
   // loop over particle vector
   for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
-    G4BarSimulator::currentParticle = *it;
+    G4ExSimulator::currentParticle = *it;
     // Run simulation
     fRunManager->BeamOn(1);
     nParticle+=1;
