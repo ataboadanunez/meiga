@@ -159,12 +159,7 @@ G4ExSimulator::RunSimulation(Event& theEvent)
   auto fDetConstruction = new G4ExDetectorConstruction(theEvent);
   fRunManager->SetUserInitialization(fDetConstruction);
   
-  // Physics list for optical processes
   G4VModularPhysicsList* physicsList = new FTFP_BERT;
-  physicsList->ReplacePhysics(new G4EmStandardPhysics_option4());
-  G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics();
-  physicsList->RegisterPhysics(opticalPhysics);
-  fRunManager->SetUserInitialization(physicsList);
   
   G4ExPrimaryGeneratorAction *fPrimaryGenerator = new G4ExPrimaryGeneratorAction();
   fRunManager->SetUserAction(fPrimaryGenerator);
@@ -172,7 +167,7 @@ G4ExSimulator::RunSimulation(Event& theEvent)
   G4ExRunAction *fRunAction = new G4ExRunAction();
   fRunManager->SetUserAction(fRunAction);
   
-  G4ExEventAction *fEventAction = new G4ExEventAction(fRunAction);
+  G4ExEventAction *fEventAction = new G4ExEventAction();
   fRunManager->SetUserAction(fEventAction);
 
   fRunManager->SetUserAction(new G4ExTrackingAction());

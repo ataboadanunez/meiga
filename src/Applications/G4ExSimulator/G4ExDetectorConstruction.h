@@ -53,6 +53,8 @@ class G4ExDetectorConstruction : public G4VUserDetectorConstruction {
     G4Element* elO = nullptr;
     G4Element* elH = nullptr;
     G4Element* elSi = nullptr;
+    G4Material* Air = nullptr;
+    G4Material* SiO2 = nullptr;
     
     // solids
     G4Box* solidWorld = nullptr;

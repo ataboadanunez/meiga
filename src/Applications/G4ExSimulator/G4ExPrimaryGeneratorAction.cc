@@ -29,9 +29,6 @@ G4ExPrimaryGeneratorAction::G4ExPrimaryGeneratorAction(/*Event& theEvent, const 
 
 	fDetectorConstructor = static_cast<const G4ExDetectorConstruction*> (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
   
-  if (fTestEnabled) {
-    fTextFile = new ofstream(fOutputFileName.c_str());
-  }
 
 }
 

@@ -1,22 +1,9 @@
 // implementation of the G4ExDetectorConstruction class
 #include "G4ExDetectorConstruction.h"
-#include "G4ExModuleAction.h"
-#include "G4ExSiPMAction.h"
-#include "G4ExFiberAction.h"
-
-#include "Detector.h"
-#include "Module.h"
-#include "SiPM.h"
-#include "Geometry.h"
 
 #include "G4UnitsTable.hh"
-
 #include <iostream>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/foreach.hpp>
 
-using boost::property_tree::ptree;
 using namespace std;
 
 
