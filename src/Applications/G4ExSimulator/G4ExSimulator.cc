@@ -160,7 +160,8 @@ G4ExSimulator::RunSimulation(Event& theEvent)
   fRunManager->SetUserInitialization(fDetConstruction);
   
   G4VModularPhysicsList* physicsList = new FTFP_BERT;
-  
+  fRunManager->SetUserInitialization(physicsList);
+
   G4ExPrimaryGeneratorAction *fPrimaryGenerator = new G4ExPrimaryGeneratorAction();
   fRunManager->SetUserAction(fPrimaryGenerator);
   
