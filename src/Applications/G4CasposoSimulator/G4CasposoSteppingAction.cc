@@ -33,9 +33,9 @@ G4CasposoSteppingAction::UserSteppingAction(const G4Step* step)
 {
   
   // kill non-primary particles to speed up 
-	auto track = step->GetTrack();
+	/*auto track = step->GetTrack();
 	if (track->GetParentID() != 0) {
 		G4cout << "[DEBUG] G4CasposoSteppingAction: Secondary Particle " << track->GetParticleDefinition()->GetParticleName() << " was killed! " << G4endl;
 		track->SetTrackStatus(fStopAndKill);
-	}
+	}*/
 }
