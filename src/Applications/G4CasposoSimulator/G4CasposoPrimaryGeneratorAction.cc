@@ -80,7 +80,7 @@ G4CasposoPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 
   // check injection according to detector dimensions
   const G4double injRadius = 0.5*m;
-  const G4double injHeight = 10*cm;  
+  const G4double injHeight = 150.5*m;  
   const G4double rand = RandFlat::shoot(0., 1.);
   const G4double r = injRadius*sqrt(rand);
   const G4double phi = RandFlat::shoot(0., CLHEP::twopi);

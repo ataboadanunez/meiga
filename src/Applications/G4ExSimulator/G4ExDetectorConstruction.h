@@ -37,8 +37,11 @@ class G4ExDetectorConstruction : public G4VUserDetectorConstruction {
   public:
     G4ExDetectorConstruction(Event& theEvent);
     virtual ~G4ExDetectorConstruction();
-
     virtual G4VPhysicalVolume* Construct();
+
+    G4double GetGroundSizeX() const { return fGroundSizeX; }
+    G4double GetGroundSizeY() const { return fGroundSizeY; }
+    G4double GetGroundSizeZ() const { return fGroundSizeZ; }
 
   private:
 
@@ -46,7 +49,9 @@ class G4ExDetectorConstruction : public G4VUserDetectorConstruction {
     void CreateMaterials();
     
     void CreateWorld();
+    void CreateGround();  
     G4VPhysicalVolume* CreateDetector();
+
     bool fCheckOverlaps = true;
 
     G4Element* elN = nullptr;
@@ -54,19 +59,28 @@ class G4ExDetectorConstruction : public G4VUserDetectorConstruction {
     G4Element* elH = nullptr;
     G4Element* elSi = nullptr;
     G4Material* Air = nullptr;
-    G4Material* SiO2 = nullptr;
+    G4Material* Quartz = nullptr;
     
     // solids
     G4Box* solidWorld = nullptr;
+    G4Box* solidGround = nullptr;
     
     // logical and physical volumes
     G4LogicalVolume* logicWorld = nullptr;
     G4PVPlacement*   physWorld  = nullptr;
     
+    G4LogicalVolume* logicGround = nullptr;
+    G4PVPlacement*   physGround  = nullptr;
+
     // size definitions
-    G4double fWorldSizeX = 1*m;
-    G4double fWorldSizeY = 1*m;
-    G4double fWorldSizeZ = 1*m;
+    
+    G4double fGroundSizeX = 5*m;
+    G4double fGroundSizeY = 5*m;
+    G4double fGroundSizeZ = 1*m;
+
+    G4double fWorldSizeX = fGroundSizeX + 5*m;
+    G4double fWorldSizeY = fGroundSizeY + 5*m;
+    G4double fWorldSizeZ = fGroundSizeZ + 5*m;
 
     Event& fEvent;
 };
