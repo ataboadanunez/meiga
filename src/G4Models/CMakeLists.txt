@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.10)
+file(GLOB sources ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
+file(GLOB headers ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+add_library(meiga_g4models STATIC ${sources} ${headers})
+set(MEIGA_LIBRARIES meiga_g4models ${MEIGA_LIBRARIES} PARENT_SCOPE)
+install(FILES ${headers} DESTINATION include)
+install(TARGETS meiga_g4models DESTINATION lib)
