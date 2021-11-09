@@ -44,22 +44,13 @@ class G4ExDetectorConstruction : public G4VUserDetectorConstruction {
     G4double GetGroundSizeZ() const { return fGroundSizeZ; }
 
   private:
-
-    void CreateElements();
-    void CreateMaterials();
     
     void CreateWorld();
-    void CreateGround();  
+    void CreateGround();
+    void PlaceDetector(Event& theEvent);  
     G4VPhysicalVolume* CreateDetector();
 
     bool fCheckOverlaps = true;
-
-    G4Element* elN = nullptr;
-    G4Element* elO = nullptr;
-    G4Element* elH = nullptr;
-    G4Element* elSi = nullptr;
-    G4Material* Air = nullptr;
-    G4Material* Quartz = nullptr;
     
     // solids
     G4Box* solidWorld = nullptr;

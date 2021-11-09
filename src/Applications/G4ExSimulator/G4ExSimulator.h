@@ -38,11 +38,13 @@ class G4ExSimulator
 
 		// flags for configuration (see .json file)
 		std::string fInputFile;
-		std::string fOutputFile; 
+		std::string fOutputFile;
+    std::string fDetectorList;
 		bool fGeoVisOn = true;
 		bool fTrajVisOn = false;
 		int fVerbosity = 1;
 		std::string fRenderFile = "VRML2FILE";
+    std::string fPhysicsName = "QGSP_BERT_HP";
 
   	friend class G4ExDetectorConstructor;
   	friend class G4ExPrimaryGenerator;

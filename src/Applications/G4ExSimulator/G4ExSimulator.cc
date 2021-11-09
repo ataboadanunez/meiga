@@ -27,6 +27,7 @@
 #include "Randomize.hh"
 
 // Framework libraries
+#include "CentralConfig.h"
 #include "CorsikaUtilities.h"
 #include "ReadParticleFile.h"
 #include "Event.h"
@@ -35,6 +36,7 @@
 #include "Detector.h"
 #include "Module.h"
 #include "SiPM.h"
+#include "G4MPhysicsList.h"
 
 // boost libraries
 #include <boost/property_tree/xml_parser.hpp>
@@ -115,12 +117,17 @@ G4ExSimulator::Initialize(Event& theEvent, string fileName)
 
 	fInputFile = root.get<string>("InputFile");
 	fOutputFile = root.get<string>("OutputFile");
+  fDetectorList = root.get<string>("DetectorList");
 	fGeoVisOn = root.get<bool>("GeoVisOn");
 	fTrajVisOn = root.get<bool>("TrajVisOn");
   fVerbosity = root.get<int>("Verbosity");
   fRenderFile = root.get<string>("RenderFile");
+  fPhysicsName = root.get<string>("PhysicsName");
   // Creates event from file reader
   theEvent = ReadParticleFile::EventFileReader(fInputFile);
+
+  // Read Detector Configuration
+  CentralConfig::ReadDetectorList(fDetectorList, theEvent);
   
 }            
 
@@ -159,8 +166,9 @@ G4ExSimulator::RunSimulation(Event& theEvent)
   auto fDetConstruction = new G4ExDetectorConstruction(theEvent);
   fRunManager->SetUserInitialization(fDetConstruction);
   
-  G4VModularPhysicsList* physicsList = new FTFP_BERT;
-  fRunManager->SetUserInitialization(physicsList);
+  //G4VModularPhysicsList* physicsList = new FTFP_BERT;
+  //fRunManager->SetUserInitialization(physicsList);
+  fRunManager->SetUserInitialization(new G4MPhysicsList(fPhysicsName));
 
   G4ExPrimaryGeneratorAction *fPrimaryGenerator = new G4ExPrimaryGeneratorAction();
   fRunManager->SetUserAction(fPrimaryGenerator);

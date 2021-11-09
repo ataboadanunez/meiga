@@ -93,7 +93,8 @@ G4ExPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   currParticle.SetInjectionPosition(injectionPosition);
   
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(fPx, fPy, -1*fPz));
-  fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
+  //fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
+  fParticleGun->SetParticlePosition(G4ThreeVector(1*cm, 1*cm, 1*m));
   fParticleGun->SetParticleEnergy(fKineticEnergy);
 
   fParticleGun->GeneratePrimaryVertex(event);

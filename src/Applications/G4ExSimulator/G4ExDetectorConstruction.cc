@@ -1,11 +1,13 @@
 // implementation of the G4ExDetectorConstruction class
 #include "G4ExDetectorConstruction.h"
+#include "Materials.h"
+
+#include "Musaic.h"
 
 #include "G4UnitsTable.hh"
 #include <iostream>
 
 using namespace std;
-
 
 G4ExDetectorConstruction::G4ExDetectorConstruction(Event& theEvent) : 
 	G4VUserDetectorConstruction(),
@@ -16,26 +18,6 @@ G4ExDetectorConstruction::G4ExDetectorConstruction(Event& theEvent) :
 G4ExDetectorConstruction::~G4ExDetectorConstruction() 
 	{ }
 
-void
-G4ExDetectorConstruction::CreateElements() 
-{
-// example function to define elements and materials
-
-  elN  = new G4Element("Nitrogen", "N", 7, 14.01 * g/mole);
-  elO  = new G4Element("Oxygen", "O", 8, 16.00 * g/mole);
-  elH  = new G4Element("Hydrogen", "H", 1, 1.01 * g/mole);
-  elSi = new G4Element("Silicon", "Si", 14, 28.09 * g/mole);
- 
-  Air = new G4Material("Air", 1.29e-3 * g/cm3, 2);
-  Air->AddElement(elN, 0.7);
-  Air->AddElement(elO, 0.3); 
-	
-  // quartz (SiO2)
-  Quartz = new G4Material("Quartz", 2.65 * g/cm3, 2);
-  Quartz->AddElement(elSi, 1);
-  Quartz->AddElement(elO, 2);
-}
-
 
 G4VPhysicalVolume*
 G4ExDetectorConstruction::CreateDetector()
@@ -43,10 +25,10 @@ G4ExDetectorConstruction::CreateDetector()
 
 	CreateWorld();
   CreateGround();
-	//PlaceDetector();
+	PlaceDetector(fEvent);
   /***
-   The function PlaceDetector() should be a replacement of ReadModuleList in G4ExSimulator.
-   It should call an specific detector class (type) from Framework/Detector/ and place it at a given
+   The function PlaceDetector() should be a replacement of ReadModuleList in G4RockSimulator.
+   It should call an specific detector class (type) from G4Models and place it at a given
    position in a given mother volume.
 
   ***/
@@ -57,8 +39,9 @@ void
 G4ExDetectorConstruction::CreateWorld()
 {
 
+
 	solidWorld 	= new G4Box("World", fWorldSizeX/2, fWorldSizeY/2, fWorldSizeZ/2);
-	logicWorld = new G4LogicalVolume(solidWorld, Air, "World");
+	logicWorld = new G4LogicalVolume(solidWorld, Materials().Air, "World");
 	physWorld	 =  new G4PVPlacement(nullptr, G4ThreeVector(), "World", logicWorld, 0, false, 0, fCheckOverlaps);
 
 }
@@ -66,25 +49,38 @@ G4ExDetectorConstruction::CreateWorld()
 void
 G4ExDetectorConstruction::CreateGround()
 {
-        solidGround = new G4Box("Quartz", fGroundSizeX/2, fGroundSizeY/2, fGroundSizeZ/2);
-        G4VisAttributes brown(G4Colour::Brown());
-        logicGround = new G4LogicalVolume(solidGround, Quartz, "Ground");
-        logicGround->SetVisAttributes(brown);
-        physGround  =  new G4PVPlacement(nullptr, G4ThreeVector(), logicGround, "Ground", logicWorld, false, 0, fCheckOverlaps);
+  solidGround = new G4Box("Ground", fGroundSizeX/2, fGroundSizeY/2, fGroundSizeZ/2);
+  G4VisAttributes brown(G4Colour::Brown());
+  logicGround = new G4LogicalVolume(solidGround, Materials().StdRock, "Ground");
+  logicGround->SetVisAttributes(brown);
+  physGround  =  new G4PVPlacement(nullptr, G4ThreeVector(), logicGround, "Ground", logicWorld, false, 0, fCheckOverlaps);
 }
 
+
+void
+G4ExDetectorConstruction::PlaceDetector(Event& theEvent)
+{
+  
+  Detector& detector = theEvent.GetDetector();
+  int nModules = detector.GetNModules();
+  cout << "Number of simulated modules = " << nModules << endl;
+  // loop in ModulesRange
+  for (auto modIt = detector.ModulesRange().begin(); modIt != detector.ModulesRange().end(); modIt++) {
+
+    auto& currentMod = modIt->second;
+    Musaic().BuildDetector(logicGround, currentMod, theEvent);
+  }
+
+}
 
 G4VPhysicalVolume* 
 G4ExDetectorConstruction::Construct() 
 {
 
-	//SetDetectorParameters();
-
 	if (!physWorld) {
-		CreateElements();
+		//CreateElements();
 		return CreateDetector();
 	}
 	return physWorld;
 
 }
-

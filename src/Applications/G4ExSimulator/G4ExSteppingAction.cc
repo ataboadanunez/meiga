@@ -32,10 +32,10 @@ void
 G4ExSteppingAction::UserSteppingAction(const G4Step* step)
 {
   
-  // kill non-primary particles to speed up 
-	auto track = step->GetTrack();
-	if (track->GetParentID() != 0) {
-		G4cout << "[DEBUG] G4ExSteppingAction: Secondary Particle " << track->GetParticleDefinition()->GetParticleName() << " was killed! " << G4endl;
-		track->SetTrackStatus(fStopAndKill);
-	}
+ //  // kill non-primary particles to speed up 
+	// auto track = step->GetTrack();
+	// if (track->GetParentID() != 0) {
+	// 	G4cout << "[DEBUG] G4ExSteppingAction: Secondary Particle " << track->GetParticleDefinition()->GetParticleName() << " was killed! " << G4endl;
+	// 	track->SetTrackStatus(fStopAndKill);
+	// }
 }
