@@ -3,6 +3,10 @@
 #ifndef CentralConfig_h
 #define CentralConfig_h 1
 
+#include "Event.h"
+#include "Detector.h"
+#include "Module.h"
+
 #include <string>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -18,7 +22,7 @@ class CentralConfig
 		CentralConfig() { }
 		~CentralConfig() { }
 
-		boost::property_tree::ptree ReadConfiguraton(std::string filename);
+		static void ReadDetectorList(std::string filename, Event& theEvent);
 
 
 };
