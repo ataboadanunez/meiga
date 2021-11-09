@@ -33,7 +33,7 @@ class Detector
 		// Module class getters.
 		/*
 			Module is a detector composed by panels of scintillator bars,
-			WLS fibers and SiPMs / PMTs (Musaic / Mudulus)
+			WLS fibers and SiPMs or PMTs (e.g. G4Models/Musaic.{h,cc})
 		*/
 		void MakeModule(unsigned int id);
     Module& GetModule() { return fModule; }
