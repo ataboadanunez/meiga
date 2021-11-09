@@ -78,7 +78,6 @@ G4RockDetectorConstruction::CreateDetector()
 	CreateWorld();
 	CreateHall();
 	ReadModuleList("./ModuleList.xml");
-	//AssembleDetector();
 	return physWorld;
 }
 
