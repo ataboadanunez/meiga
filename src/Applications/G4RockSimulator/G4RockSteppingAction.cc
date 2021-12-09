@@ -11,6 +11,7 @@
 
 #include "G4OpticalPhoton.hh"
 
+#include "Particle.h"
 #include "SimData.h"
 #include "SiPMSimData.h"
 #include "Detector.h"
@@ -32,10 +33,30 @@ void
 G4RockSteppingAction::UserSteppingAction(const G4Step* step)
 {
   
-  // kill non-primary particles to speed up 
+	// keep only primaries and muons (also from decay)
 	auto track = step->GetTrack();
-	if (track->GetParentID() != 0) {
+	const int particleId = track->GetDefinition()->GetPDGEncoding();
+	G4RockTrackingAction* const trackingA = (G4RockTrackingAction*)G4RunManager::GetRunManager()->GetUserTrackingAction();
+
+
+
+	if (!(((particleId == Particle::eMuon) || (particleId == Particle::eAntiMuon)) || (track->GetParentID() == 0))){
 		G4cout << "[DEBUG] G4RockSteppingAction: Secondary Particle " << track->GetParticleDefinition()->GetParticleName() << " was killed! " << G4endl;
 		track->SetTrackStatus(fStopAndKill);
 	}
+
+	// if ((track->GetParentID() == 0) || ( (particleId == Particle::eMuon) || (particleId == Particle::eAntiMuon) ) ) {
+		
+	// 	// if not primary it means muon comes from decay
+	// 	if (track->GetParentID() != 0) {
+	// 		trackingA->SetIsMuonDecay();
+	// 		G4cout << "[DEBUG] G4RockSteppingAction: Secondary particle " << track->GetParticleDefinition()->GetParticleName() << " is from decay! " << G4endl;
+	// 	}
+		
+	// }
+	// else {
+	// 	G4cout << "[DEBUG] G4RockSteppingAction: Secondary Particle " << track->GetParticleDefinition()->GetParticleName() << " was killed! " << G4endl;
+	// 	track->SetTrackStatus(fStopAndKill);
+	// }
+
 }

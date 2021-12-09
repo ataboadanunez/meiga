@@ -109,9 +109,9 @@ class Particle {
  		double fAzimuth = 0;
  		
  		std::vector<double> fPosition;
-  	std::vector<double> fDirection;
-  	std::vector<double> fInjectionPosition;
-  	static std::map<int, double> gParticleMassMap;
+  		std::vector<double> fDirection;
+  		std::vector<double> fInjectionPosition;
+  		static std::map<int, double> gParticleMassMap;
 		// particle properties for mass
 };
 
