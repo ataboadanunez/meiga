@@ -11,16 +11,16 @@
 void
 G4RockTrackingAction::PreUserTrackingAction(const G4Track* track)
 { 
-  
+  fIsMuonDecay = false;
 }
 
 
 void
 G4RockTrackingAction::PostUserTrackingAction(const G4Track* track)
 {
-  firstStepInVolume = false;
+  
   Particle& currParticle = G4RockSimulator::currentParticle;
-  int particleId = currParticle.GetParticleId();
+  int primaryId = currParticle.GetParticleId();
   double particleEnergy = currParticle.GetTotalEnergy();
   double particleZenith = currParticle.GetZenith();
   G4ThreeVector trackPosition = track->GetPosition();
@@ -29,9 +29,10 @@ G4RockTrackingAction::PostUserTrackingAction(const G4Track* track)
   double injectZ = injectPosition[2] / CLHEP::m;
 
   double depth = injectZ - trackZ;
-
-  // track primaries
-  if (track->GetParentID() == 0) {
-  	G4cout << "TrackStoppingInfo " << particleId << " " << particleEnergy / CLHEP::MeV << " " << particleZenith / CLHEP::deg << " " << depth << " " << track->GetVolume()->GetName() << G4endl; 
+  fIsMuonDecay = GetIsMuonDecay();
+  const int particleId = track->GetDefinition()->GetPDGEncoding();
+  // track primaries and decay muons
+  if ((track->GetParentID() == 0) ||  (particleId == Particle::eMuon) || (particleId == Particle::eAntiMuon)) {
+  	G4cout << "TrackStoppingInfo " << primaryId << " " << particleId << " " << particleEnergy / CLHEP::MeV << " " << particleZenith / CLHEP::deg << " " << depth << " " << track->GetVolume()->GetName() << G4endl; 
   }
 }
