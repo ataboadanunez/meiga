@@ -66,8 +66,8 @@ G4ExDetectorConstruction::PlaceDetector(Event& theEvent)
   cout << "Number of simulated modules = " << nModules << endl;
   // loop in ModulesRange
   for (auto modIt = detector.ModulesRange().begin(); modIt != detector.ModulesRange().end(); modIt++) {
-
     auto& currentMod = modIt->second;
+    cout << "Building module " << currentMod.GetId() << endl;
     Musaic().BuildDetector(logicGround, currentMod, theEvent);
   }
 

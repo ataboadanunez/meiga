@@ -28,7 +28,7 @@
 #include "G4UIExecutive.hh"
 #include "Randomize.hh"
 
-#include "CentralConfig.h"
+#include "ConfigManager.h"
 #include "CorsikaUtilities.h"
 #include "ReadParticleFile.h"
 

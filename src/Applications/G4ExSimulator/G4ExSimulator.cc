@@ -27,7 +27,7 @@
 #include "Randomize.hh"
 
 // Framework libraries
-#include "CentralConfig.h"
+#include "ConfigManager.h"
 #include "CorsikaUtilities.h"
 #include "ReadParticleFile.h"
 #include "Event.h"
@@ -114,7 +114,7 @@ G4ExSimulator::Initialize(Event& theEvent, string fileName)
 
 	ptree root;
 	read_json(fileName, root);
-
+#warning "JSON parser of input config file should be a method of ConfigManager"
 	fInputFile = root.get<string>("InputFile");
 	fOutputFile = root.get<string>("OutputFile");
   fDetectorList = root.get<string>("DetectorList");
@@ -127,7 +127,7 @@ G4ExSimulator::Initialize(Event& theEvent, string fileName)
   theEvent = ReadParticleFile::EventFileReader(fInputFile);
 
   // Read Detector Configuration
-  CentralConfig::ReadDetectorList(fDetectorList, theEvent);
+  ConfigManager::ReadDetectorList(fDetectorList, theEvent);
   
 }            
 

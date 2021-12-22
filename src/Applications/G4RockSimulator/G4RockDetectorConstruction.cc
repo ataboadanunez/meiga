@@ -129,7 +129,8 @@ G4RockDetectorConstruction::ReadModuleList(string fModuleList)
 
 
 		//detector.SetNModules(nModules);
-		module.SetModulePosition(&modulePosition);
+		//module.SetModulePosition(&modulePosition);
+    module.SetModulePosition(modulePosition);
 		
 		// module properties
 		fCasingThickness = module.GetCasingThickness() * mm;
