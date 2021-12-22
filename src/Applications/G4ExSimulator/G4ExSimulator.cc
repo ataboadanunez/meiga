@@ -81,7 +81,7 @@ int main(int argc, char** argv)
   	if (sarg == "-c")
   		fCfgFile = argv[i+1];
   }
-  cout << "Argc = " << argc << endl;
+  
 
   Event theEvent;
   fG4ExSimulator = new G4ExSimulator();
