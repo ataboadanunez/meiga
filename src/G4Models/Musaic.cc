@@ -22,23 +22,16 @@ void
 Musaic::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEvent, G4int fBarsPanel, G4bool fCheckOverlaps)
 {
 
-	std::cout << "[DEBUG] G4Models::Musaic: Building Detector Musaic! " << std::endl;
 	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
-
-	// module position
-	G4ThreeVector  modulePos = G4ThreeVector(0., 0., 0.);
-	//Geometry::ToG4Vector(module.GetModulePosition(), 1.);
-	auto pos = module.GetModulePosition();
-	//std::cout << "[DEBUG] G4Models::Musaic: Module position = " << pos[0] << std::endl;
+  	auto pos = module.GetModulePosition();
+  	auto  modulePos = Geometry::ToG4Vector(pos, 1.);
 	int moduleId = module.GetId();
 	int nBars = module.GetNBars();
-	std::cout << "[DEBUG] G4Models::Musaic: Number of Bars per panel = " << nBars << std::endl;
 	// module properties
 	fCasingThickness = module.GetCasingThickness() * mm;
-
 	// scintillator bar properties
 	fBarWidth  = module.GetBarWidth() * mm;
-	fBarLength = module.GetNBars() * fBarWidth; 
+	fBarLength = module.GetBarLength(); //* mm;
 	fBarThickness = module.GetBarThickness() * mm;
 	fCoatingThickness = module.GetBarCoatingThickness() * mm;
 
