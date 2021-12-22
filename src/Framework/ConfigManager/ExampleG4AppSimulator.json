@@ -1,0 +1,10 @@
+{
+	"InputFile" : "/home/alvaro/data/sims/vertical_muon.txt",
+	"OutputFile" : "/home/alvaro/data/output/output.dat",
+	"GeoVisOn" : true,
+	"TrajVisOn" : false,
+	"Verbosity" : 1,
+	"RenderFile" : "VRML2FILE",
+	"PhysicsName" : "QGSP_BERT_HP",
+	"DetectorList" : "./DetectorList.xml"
+}
