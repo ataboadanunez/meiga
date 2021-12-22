@@ -22,8 +22,11 @@ class Module {
 		void SetId(int id) { fModuleId = id; }
 		//bool ModuleExists() { return fModuleId; } 
 
-		std::vector<double>* GetModulePosition() { return fModulePosition; }
-		void SetModulePosition(std::vector<double>* pos) { fModulePosition = pos; }
+		// std::vector<double>* GetModulePosition() { return fModulePosition; }
+		// void SetModulePosition(std::vector<double>* pos) { fModulePosition = pos; }
+
+    std::vector<double> GetModulePosition() { return fModulePosition; }
+    void SetModulePosition(std::vector<double> pos) { fModulePosition = pos; }
 
 		double GetCasingThickness() const { return fCasingThickness; }
 		void SetCasingThickness(double casingThickness) { fCasingThickness = casingThickness; }
@@ -72,17 +75,18 @@ class Module {
 		int fNBars = 0;
 		int fNSiPMs = 0;
 
-		// should be placed in a config file
+		// scintillator bar dimensions
     double fBarWidth = 41;
-    double fBarLength = 2*fBarWidth;
+    double fBarLength = 82;
     double fBarThickness = 10;
-    double fFiberRadius = 1.2;
     double fCasingThickness = 2;
+    // fiber dimensions
+    double fFiberRadius = 1.2;
     double fCladdingThickness = 0.10;
     double fCoatingThickness  = 0.25;
 
-    std::vector<double>* fModulePosition;
-
+    //std::vector<double>* fModulePosition;
+    std::vector<double> fModulePosition;
     std::map<int, SiPM> fSiPMMap;
     SiPM fSiPM;
 };
