@@ -37,6 +37,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 	fBarLength = module.GetBarLength(); 
 	fBarThickness = module.GetBarThickness() * mm;
 	fCoatingThickness = module.GetBarCoatingThickness() * mm;
+	G4double fHalfWidth = 0.5*fBarWidth*nBars;
 
 	// fiber properties
 	fCladdingThickness = module.GetCladdingThickness() * mm;
@@ -57,16 +58,19 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 	fCasingThickness = module.GetCasingThickness() * mm;
 	
 	// Casing
-	solidCasing = new G4Box("Casing", fCasingSizeX+fCasingThickness, fCasingSizeY+fCasingThickness, fCasingSizeZ+fCasingThickness);
+	solidCasing = new G4Box("Casing", fCasingSizeX+fCasingThickness,fCasingSizeY+fCasingThickness, fCasingSizeZ+fCasingThickness);
 	logicCasing = new G4LogicalVolume(solidCasing, Materials().Air, "Casing", 0, 0, 0);
 	physCasing  = new G4PVPlacement(nullptr, modulePos, logicCasing, "Casing", logMother, false, moduleId, fCheckOverlaps);
 	// Bars: Coating + Scintillator bar
 	solidCoating  	= new G4Box("BarCoating", fBarLength/2 + fCoatingThickness, fBarWidth/2 + fCoatingThickness, fBarThickness/2 + fCoatingThickness);
 	solidScinBar   	= new G4Box("BarScin", fBarLength/2, fBarWidth/2, fBarThickness/2);
 	// Fiber: Cladding (external & internal) + fiber core
-	solidClad2  = new G4Tubs("Clad2", 0, fFiberRadius, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
-	solidClad1  = new G4Tubs("Clad1", 0, fFiberRadius - fCladdingThickness, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
-	solidFiber  = new G4Tubs("Fiber", 0, fFiberRadius - 2*fCladdingThickness, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
+	// solidClad2  = new G4Tubs("Clad2", 0, fFiberRadius, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
+	// solidClad1  = new G4Tubs("Clad1", 0, fFiberRadius - fCladdingThickness, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
+	// solidFiber  = new G4Tubs("Fiber", 0, fFiberRadius - 2*fCladdingThickness, fBarLength/2-2*fCoatingThickness-fSiPMSizeZ, 0, 360*deg);
+	solidClad2  = new G4Tubs("Clad2", 0, fFiberRadius, fBarLength/2 + 20*cm, 0, 360*deg);
+	solidClad1  = new G4Tubs("Clad1", 0, fFiberRadius - fCladdingThickness, fBarLength/2 + 20*cm, 0, 360*deg);
+	solidFiber  = new G4Tubs("Fiber", 0, fFiberRadius - 2*fCladdingThickness, fBarLength/2 + 20*cm, 0, 360*deg);
 #warning "Change to PMT!"
 	// SiPM
 	solidSiPM   = new G4Box("SiPM", fSiPMSizeX, fSiPMSizeY, fSiPMSizeZ);
@@ -106,11 +110,15 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 	G4double fPosBotX = fCasingSizeY;
 	G4double fPosBotY = 0;
 	G4double fPosBotZ = -fCasingSizeZ;
-	// place fiber at the top of the bar (x-axis)
-	// place SiPM at the end of the bar (z-axis)
-	G4double fFiberTopPosX = fBarLength/2 - 2*fCoatingThickness;
+	// place fiber at the top of the bar (z-axis)
+	// place SiPM at the end of the bar (x-axis)
+	//G4double fFiberTopPosX = fBarLength/2 - 2*fCoatingThickness;
+	G4double fFiberTopPosX = fBarLength/2 + 20*cm + fSiPMSizeZ/2;
 	G4double fFiberTopPosZ = -fBarThickness/2 + fCoatingThickness + fFiberRadius + fCladdingThickness;
 	G4double fFiberBotPosZ = fFiberTopPosZ;
+
+	G4double fSiPMPositionX = fBarLength/2 + 20*cm + fSiPMSizeZ/2;
+	G4double fSiPMPositionZ = fFiberTopPosZ;
 
 	// bars of the top panel
 	for (G4int i=0; i<nBars; ++i) {
@@ -121,7 +129,8 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 
 		unsigned int barId = i;
 		G4double yPos = i*(fBarWidth + 2*fCoatingThickness);
-
+		// shift each bar position by 1/2 of the panel width
+		//yPos -= fHalfWidth;
 		string nameCoating = "BarCoating_"+to_string(barId);
 		string nameScinBar = "BarScin_"+to_string(barId);
 		string nameClad2 = "FiberClad2_"+to_string(barId);
@@ -144,7 +153,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 		logicSiPM->SetVisAttributes(blue); 
 
 		// top panel positon
-		physCoating  = new G4PVPlacement(nullptr, G4ThreeVector(0, yPos - 25*cm, fCasingSizeZ/2), logicCoating, 
+		physCoating  = new G4PVPlacement(nullptr, G4ThreeVector(0, yPos, fCasingSizeZ/2), logicCoating, 
 			nameCoating, logicCasing, false, barId, fCheckOverlaps);
 		physScinBar   = new G4PVPlacement(nullptr, G4ThreeVector(), logicScinBar, 
 			nameScinBar, logicCoating, false, barId, fCheckOverlaps);
@@ -154,8 +163,10 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 			nameClad1, logicClad2, false, barId, fCheckOverlaps);
 		physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
 			nameFiber, logicClad1, false, barId, fCheckOverlaps); 
-		physSiPM  = new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberTopPosX, 0, fFiberTopPosZ), logicSiPM, 
-			nameSiPM, logicScinBar, false, barId, fCheckOverlaps);
+		//physSiPM  = new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberTopPosX, 0, fFiberTopPosZ), logicSiPM, 
+			//nameSiPM, logicScinBar, false, barId, fCheckOverlaps);
+		physSiPM  = new G4PVPlacement(rotationFiber, G4ThreeVector(fSiPMPositionX, 0, fSiPMPositionZ), logicSiPM, 
+			nameSiPM, logicFiber, false, barId, fCheckOverlaps);
 
 		// registration of SiPM
 		G4MSiPMAction* const SiPMTopSD = new G4MSiPMAction("/Module/" + nameModule.str() + "/" + nameSiPM, moduleId, barId, theEvent);
@@ -168,8 +179,8 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
  
 
 	// bars of the bottom panel
-	
-	for (G4int i=0; i<nBars; ++i) {
+	if (false) {
+		for (G4int i=0; i<nBars; ++i) {
 
 		/* 
 			place bars in the bottom panel along x-axis
@@ -219,4 +230,6 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 	
 	}
 
+	}
+	
 }
