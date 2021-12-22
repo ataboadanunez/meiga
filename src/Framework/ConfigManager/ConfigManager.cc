@@ -34,8 +34,6 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 
 		nModules+=1;
 
-    std::cout << "[DEBUG] hola!" << std::endl;
-
 		for (const auto &v : subtree.get_child("")) {
 			string label = v.first;
 			if ( label != "<xmlattr>" ) {
@@ -53,12 +51,11 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 				else {
 					double value = stod(v.second.data());
 					string unit = v.second.get<string>("<xmlattr>.unit");
-					double valueG4 = value*G4UnitDefinition::GetValueOf(unit);
 					modulePosition.push_back(value*G4UnitDefinition::GetValueOf(unit));
 				}
 			}
 		}
-     std::cout << "[DEBUG] adios! " << std::endl;
+    
 		module.SetModulePosition(modulePosition);
 	}
 
