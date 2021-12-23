@@ -68,7 +68,7 @@ G4MudulusDetectorConstruction::PlaceDetector(Event& theEvent)
   for (auto modIt = detector.ModulesRange().begin(); modIt != detector.ModulesRange().end(); modIt++) {
     auto& currentMod = modIt->second;
     cout << "Building module " << currentMod.GetId() << endl;
-    Mudulus().BuildDetector(logicGround, currentMod, theEvent);
+    Mudulus().BuildDetector(logicWorld, currentMod, theEvent);
   }
 
 }
