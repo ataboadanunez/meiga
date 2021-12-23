@@ -127,16 +127,18 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 			place bars in the top panel along y-axis
 		*/
 
+		string panelId = "X";
 		unsigned int barId = i;
 		G4double yPos = i*(fBarWidth + 2*fCoatingThickness);
 		// shift each bar position by 1/2 of the panel width
-		//yPos -= fHalfWidth;
-		string nameCoating = "BarCoating_"+to_string(barId);
-		string nameScinBar = "BarScin_"+to_string(barId);
-		string nameClad2 = "FiberClad2_"+to_string(barId);
-		string nameClad1 = "FiberClad1_"+to_string(barId);
-		string nameFiber = "Fiber_"+to_string(barId);
-		string nameSiPM = "SiPM_"+to_string(barId);
+		yPos -= fHalfWidth;
+		string nameCoating = "BarCoating_"+panelId+"_"+to_string(barId);
+		string nameScinBar = "BarScin_"+panelId+"_"+to_string(barId);
+		string nameClad2 = "FiberClad2_"+panelId+"_"+to_string(barId);
+		string nameClad1 = "FiberClad1_"+panelId+"_"+to_string(barId);
+		string nameFiber = "Fiber_"+panelId+"_"+to_string(barId);
+		string nameSiPMl = "SiPM_left_"+panelId+"_"+to_string(barId);
+		string nameSiPMr = "SiPM_right_"+panelId+"_"+to_string(barId);
 
 		// register SiPM in the detector class
 		module.MakeSiPM(barId);
@@ -149,8 +151,10 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 		logicClad1->SetVisAttributes(green); 
 		logicFiber = new G4LogicalVolume(solidFiber, Materials().PMMA, nameFiber, 0, 0, 0);
 		logicFiber->SetVisAttributes(green); 
-		logicSiPM = new G4LogicalVolume(solidSiPM, Materials().Pyrex, nameSiPM, 0, 0, 0);
-		logicSiPM->SetVisAttributes(blue); 
+		logicSiPMl = new G4LogicalVolume(solidSiPM, Materials().Pyrex, nameSiPMl, 0, 0, 0);
+		logicSiPMl->SetVisAttributes(blue); 
+		logicSiPMr = new G4LogicalVolume(solidSiPM, Materials().Pyrex, nameSiPMr, 0, 0, 0);
+		logicSiPMr->SetVisAttributes(blue);
 
 		// top panel positon
 		physCoating  = new G4PVPlacement(nullptr, G4ThreeVector(0, yPos, fCasingSizeZ/2), logicCoating, 
@@ -165,36 +169,38 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 			nameFiber, logicClad1, false, barId, fCheckOverlaps); 
 		//physSiPM  = new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberTopPosX, 0, fFiberTopPosZ), logicSiPM, 
 			//nameSiPM, logicScinBar, false, barId, fCheckOverlaps);
-		physSiPM  = new G4PVPlacement(rotationFiber, G4ThreeVector(fSiPMPositionX, 0, fSiPMPositionZ), logicSiPM, 
-			nameSiPM, logicFiber, false, barId, fCheckOverlaps);
+		physSiPMl  = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, fSiPMPositionX), logicSiPMl,
+			nameSiPMl, logicFiber, false, barId, fCheckOverlaps);
+		physSiPMr  = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, -1*fSiPMPositionX), logicSiPMr,
+			nameSiPMr, logicFiber, false, barId, fCheckOverlaps);
 
 		// registration of SiPM
-		G4MSiPMAction* const SiPMTopSD = new G4MSiPMAction("/Module/" + nameModule.str() + "/" + nameSiPM, moduleId, barId, theEvent);
+		G4MSiPMAction* const SiPMTopSD = new G4MSiPMAction("/Mudulus/" + nameModule.str() + "/" + nameSiPMl, moduleId, barId, theEvent);
 		sdMan->AddNewDetector(SiPMTopSD);
-		logicSiPM->SetSensitiveDetector(SiPMTopSD);
+		logicSiPMl->SetSensitiveDetector(SiPMTopSD);
 
 		
   }
 
- 
-
 	// bars of the bottom panel
-	if (false) {
-		for (G4int i=0; i<nBars; ++i) {
+	
+	for (G4int i=0; i<nBars; ++i) {
 
 		/* 
 			place bars in the bottom panel along x-axis
 		*/
 
+		string panelId = "Y";
 		unsigned int barId = i+nBars;
 		G4double xPos = i*(fBarWidth + 2*fCoatingThickness);
 
-		string nameCoating = "BarCoating_"+to_string(barId);
-		string nameScinBar = "BarScin_"+to_string(barId);
-		string nameClad2 = "FiberClad2_"+to_string(barId);
-		string nameClad1 = "FiberClad1_"+to_string(barId);
-		string nameFiber = "Fiber_"+to_string(barId);
-		string nameSiPM = "SiPM_"+to_string(barId);
+		string nameCoating = "BarCoating_"+panelId+"_"+to_string(i);
+		string nameScinBar = "BarScin_"+panelId+"_"+to_string(i);
+		string nameClad2 = "FiberClad2_"+panelId+"_"+to_string(i);
+		string nameClad1 = "FiberClad1_"+panelId+"_"+to_string(i);
+		string nameFiber = "Fiber_"+panelId+"_"+to_string(i);
+		string nameSiPMl = "SiPM_left_"+panelId+"_"+to_string(barId);
+		string nameSiPMr = "SiPM_right_"+panelId+"_"+to_string(barId);
 
 		// register SiPM in the detector class
 		module.MakeSiPM(barId);
@@ -207,8 +213,10 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 		logicClad1->SetVisAttributes(green); 
 		logicFiber = new G4LogicalVolume(solidFiber, Materials().PMMA, nameFiber, 0, 0, 0);
 		logicFiber->SetVisAttributes(green); 
-		logicSiPM = new G4LogicalVolume(solidSiPM, Materials().Pyrex, nameSiPM, 0, 0, 0);
-		logicSiPM->SetVisAttributes(blue);
+		logicSiPMl = new G4LogicalVolume(solidSiPM, Materials().Pyrex, nameSiPMl, 0, 0, 0);
+		logicSiPMl->SetVisAttributes(blue);
+		logicSiPMr = new G4LogicalVolume(solidSiPM, Materials().Pyrex, nameSiPMr, 0, 0, 0);
+		logicSiPMr->SetVisAttributes(blue);
 
 		physCoating  = new G4PVPlacement(rotationBot, G4ThreeVector(xPos, 0, -fCasingSizeZ/2 - 2*fCoatingThickness), logicCoating, 
 			nameCoating, logicCasing, false, barId, fCheckOverlaps);
@@ -220,16 +228,19 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 			nameClad1, logicClad2, false, barId, fCheckOverlaps);
 		physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
 			nameFiber, logicClad1, false, barId, fCheckOverlaps); 
-		physSiPM  = new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberTopPosX, 0, fFiberBotPosZ), logicSiPM, 
-		nameSiPM, logicScinBar, false, barId, fCheckOverlaps);
+		// physSiPM  = new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberTopPosX, 0, fFiberBotPosZ), logicSiPM, 
+		// nameSiPM, logicScinBar, false, barId, fCheckOverlaps);
+		physSiPMl  = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, fSiPMPositionX), logicSiPMl, 
+				nameSiPMl, logicFiber, false, barId, fCheckOverlaps);
+		physSiPMr  = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, -1*fSiPMPositionX), logicSiPMr, 
+				nameSiPMr, logicFiber, false, barId, fCheckOverlaps);
 
 		// registration of SiPM
-		G4MSiPMAction* const SiPMBotSD = new G4MSiPMAction("/Module/" + nameModule.str() + "/" + nameSiPM, moduleId, barId, theEvent);
+		G4MSiPMAction* const SiPMBotSD = new G4MSiPMAction("/Mudulus/" + nameModule.str() + "/" + nameSiPMl, moduleId, barId, theEvent);
 		sdMan->AddNewDetector(SiPMBotSD);
-		logicSiPM->SetSensitiveDetector(SiPMBotSD);
-	
-	}
+		logicSiPMl->SetSensitiveDetector(SiPMBotSD);
 
 	}
+
 	
 }

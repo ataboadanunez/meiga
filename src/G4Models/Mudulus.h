@@ -50,7 +50,8 @@ class Mudulus {
 		G4LogicalVolume* logicClad1 = nullptr;
 		G4LogicalVolume* logicFiber = nullptr;
 
-		G4LogicalVolume* logicSiPM = nullptr;
+		G4LogicalVolume* logicSiPMl = nullptr;
+		G4LogicalVolume* logicSiPMr = nullptr;
 
 		// physical volumes
 		G4PVPlacement* physCasing = nullptr;
@@ -61,7 +62,8 @@ class Mudulus {
 		G4PVPlacement* physClad1 = nullptr;
 		G4PVPlacement* physFiber = nullptr;
 
-		G4PVPlacement* physSiPM = nullptr;
+		G4PVPlacement* physSiPMl = nullptr;
+		G4PVPlacement* physSiPMr = nullptr;
 
 		// following variables are read from Detector class
 		G4double fCasingThickness;
