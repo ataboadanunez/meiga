@@ -1,6 +1,6 @@
 #include "Mudulus.h"
 #include "Geometry.h"
-#include "G4MSiPMAction.h"
+#include "G4MPixelAction.h"
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 
@@ -137,8 +137,8 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 		string nameClad2 = "FiberClad2_"+panelId+"_"+to_string(barId);
 		string nameClad1 = "FiberClad1_"+panelId+"_"+to_string(barId);
 		string nameFiber = "Fiber_"+panelId+"_"+to_string(barId);
-		string nameSiPMl = "SiPM_left_"+panelId+"_"+to_string(barId);
-		string nameSiPMr = "SiPM_right_"+panelId+"_"+to_string(barId);
+		string nameSiPMl = "Pixel_left_"+panelId+"_"+to_string(barId);
+		string nameSiPMr = "Pixel_right_"+panelId+"_"+to_string(barId);
 
 		// register SiPM in the detector class
 		module.MakeSiPM(barId);
@@ -175,7 +175,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 			nameSiPMr, logicFiber, false, barId, fCheckOverlaps);
 
 		// registration of SiPM
-		G4MSiPMAction* const SiPMTopSD = new G4MSiPMAction("/Mudulus/" + nameModule.str() + "/" + nameSiPMl, moduleId, barId, theEvent);
+		G4MPixelAction* const SiPMTopSD = new G4MPixelAction("/Mudulus/" + nameModule.str() + "/" + nameSiPMl, moduleId, barId, theEvent);
 		sdMan->AddNewDetector(SiPMTopSD);
 		logicSiPMl->SetSensitiveDetector(SiPMTopSD);
 
@@ -193,14 +193,14 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 		string panelId = "Y";
 		unsigned int barId = i+nBars;
 		G4double xPos = i*(fBarWidth + 2*fCoatingThickness);
-
+		xPos -= fHalfWidth;
 		string nameCoating = "BarCoating_"+panelId+"_"+to_string(i);
 		string nameScinBar = "BarScin_"+panelId+"_"+to_string(i);
 		string nameClad2 = "FiberClad2_"+panelId+"_"+to_string(i);
 		string nameClad1 = "FiberClad1_"+panelId+"_"+to_string(i);
 		string nameFiber = "Fiber_"+panelId+"_"+to_string(i);
-		string nameSiPMl = "SiPM_left_"+panelId+"_"+to_string(barId);
-		string nameSiPMr = "SiPM_right_"+panelId+"_"+to_string(barId);
+		string nameSiPMl = "Pixel_left_"+panelId+"_"+to_string(barId);
+		string nameSiPMr = "Pixel_right_"+panelId+"_"+to_string(barId);
 
 		// register SiPM in the detector class
 		module.MakeSiPM(barId);
@@ -236,7 +236,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 				nameSiPMr, logicFiber, false, barId, fCheckOverlaps);
 
 		// registration of SiPM
-		G4MSiPMAction* const SiPMBotSD = new G4MSiPMAction("/Mudulus/" + nameModule.str() + "/" + nameSiPMl, moduleId, barId, theEvent);
+		G4MPixelAction* const SiPMBotSD = new G4MPixelAction("/Mudulus/" + nameModule.str() + "/" + nameSiPMl, moduleId, barId, theEvent);
 		sdMan->AddNewDetector(SiPMBotSD);
 		logicSiPMl->SetSensitiveDetector(SiPMBotSD);
 
