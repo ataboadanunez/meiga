@@ -79,6 +79,8 @@ class Mudulus {
 
 		G4double fCladdingThickness;
 		G4double fFiberRadius;
+		// this detector has an extra portion of 100 cm of fiber outside the bar
+		G4double fFiberExtra = 100*cm;
 
 		G4double fSiPMSizeX;
 		G4double fSiPMSizeY;
