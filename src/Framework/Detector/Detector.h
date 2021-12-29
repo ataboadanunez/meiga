@@ -1,8 +1,9 @@
 #ifndef Detector_h
 #define Detector_h
 
-#include "Module.h"
-#include "G4SystemOfUnits.hh"
+//#include "Module.h"
+//#include "G4SystemOfUnits.hh"
+#include "Pixel.h"
 #include <vector>
 #include <map>
 
@@ -30,27 +31,84 @@ class Detector
 		Detector(); 
 		virtual ~Detector() { }
 
-		// Module class getters.
-		/*
-			Module is a detector composed by panels of scintillator bars,
-			WLS fibers and SiPMs or PMTs (e.g. G4Models/Musaic.{h,cc})
-		*/
-		void MakeModule(unsigned int id);
-    Module& GetModule() { return fModule; }
-    Module& GetModule(unsigned int id) { return fModuleMap[id]; }
-		 
-		int GetNModules() const { return fNModules; }
-		
-		std::map<int, Module>& ModulesRange() { return fModuleMap; }
-		const std::map<int, Module>& ModulesRange() const { return fModuleMap; }
+		int GetId() const { return fDetectorId; }
+		void SetId(int id) { fDetectorId = id; }
 
+		std::vector<double> GetDetectorPosition() { return fDetectorPosition; }
+		void SetDetectorPosition(std::vector<double> pos) { fDetectorPosition = pos; }
+
+		// Mechanical properties
+		double GetCasingThickness() const { return fCasingThickness; }
+		void SetCasingThickness(double casingThickness) { fCasingThickness = casingThickness; }
+		double GetHeight() const { return fHeight; }
+		void SetHeight(double h) { fHeight = h; }
+		double GetRadius() const { return fRadius; }
+		void SetRadius(double r) { fRadius = r; }
+
+		// scintillator-type detector properties
+		int GetNBars() const { return fNBars; }
+		void SetNBars(int nBars) { fNBars = nBars; }
+
+		double GetBarLength() const { return fBarLength; }
+		void SetBarLength(double barLength) { fBarLength = barLength; }
+		
+		double GetBarWidth() const { return fBarWidth; }
+		void SetBarWidth(double barWidth) { fBarWidth = barWidth; }
+		
+		double GetBarThickness() const { return fBarThickness; }
+		void SetBarThickness(double barThickness) { fBarThickness = barThickness; }
+		
+		double GetBarCoatingThickness() const { return fCoatingThickness; }
+		void SetBarCoatingThickness(double barCoatThickness) { fCoatingThickness = barCoatThickness; }
+
+		// WLS fibers
+		double GetFiberRadius() const { return fFiberRadius; }
+		void SetFiberRadius(double fiberRad) { fFiberRadius = fiberRad; }
+
+		double GetCladdingThickness() const { return fCladdingThickness; }
+		void SetCladdingThickness(double cladThickness) { fCladdingThickness = cladThickness; }
+
+		// Pixel
+
+		void MakePixel(unsigned int id);
+		Pixel& GetPixel() { return fPixel; }
+		Pixel& GetPixel(unsigned int id) { return fPixelMap[id]; }
+
+		std::map<unsigned int, Pixel>& PixelRange() { return fPixelMap; }
+		const std::map<unsigned int, Pixel>& PixelRange() const { return fPixelMap; }
+
+		//void MakeModule(unsigned int id);
+		//Module& GetModule() { return fModule; }
+		//Module& GetModule(unsigned int id) { return fModuleMap[id]; }
+		 
+		//int GetNModules() const { return fNModules; }
+		
+		
 		// WCD ?
 
 	private:
 
-		int fNModules = 0;
-		Module fModule;
-		std::map<int, Module> fModuleMap;
+		int fDetectorId = 0;
+		int fNBars = 0;
+		int fNSiPMs = 0;
+
+		double fBarWidth = 41;
+		double fBarLength = 82;
+		double fBarThickness = 10;
+		double fCasingThickness = 2;
+		double fFiberRadius = 1.2;
+		double fCladdingThickness = 0.10;
+		double fCoatingThickness  = 0.25;
+
+		double fHeight = 0;
+		double fRadius = 0;
+		
+
+		//std::vector<double>* fModulePosition;
+		std::vector<double> fDetectorPosition;
+		std::map<unsigned int, Pixel> fPixelMap;
+		Pixel fPixel;
+		//std::map<int, Module> fModuleMap;
 
 };
 
