@@ -29,17 +29,21 @@ class Event
     
     Event();
     virtual ~Event();
-    // por ahora aqui. eventualmente sera un metodo de la clase SimData
-    // y tomara como entrada el id del SiPM donde los fotones fueron detectados
-    // teniendo en cuenta esto, quiza tenga mas sentido crear una clase SimDetectorData
-    // y otra Detector...
 
+    // interface to fwk/SimData
     SimData& GetSimData() { return fSimData; }
+
+    // interface to fwk/Detector
     Detector& GetDetector() { return fDetector; }
+    std::map<int, Detector>& DetectorRange() { return fDetectorMap; }
+    const std::map<int, Detector>& DetectorRange() const { return fDetectorMap; }
+
   private:
 
     SimData fSimData;
     Detector fDetector;
+
+    std::map<int, Detector> fDetectorMap;
 
 };
 
