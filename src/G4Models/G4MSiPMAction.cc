@@ -1,8 +1,12 @@
 #include "G4MSiPMAction.h"
+
+#include "Pixel.h"
+#include "SiPM.h"
+
 #include "SimData.h"
 #include "DetectorSimData.h"
 #include "SiPMSimData.h"
-#include "SiPM.h"
+
 
 #include <G4Step.hh>
 #include <G4TouchableHistory.hh>
@@ -65,28 +69,30 @@ G4MSiPMAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHis
   // for Module (Casing)
 #warning "Avoid hard-coded numbers. Look for better way to retrieve mother volume!"
   G4VPhysicalVolume* const motherPhysVol = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume(3);
-  const G4int sipmId = currentPhysVol->GetCopyNo();
+	unsigned int sipmId = currentPhysVol->GetCopyNo();
   const G4int moduleId = motherPhysVol->GetCopyNo();
 
-  G4double photonEnergy = step->GetTrack()->GetTotalEnergy() / (1*eV);
+  G4double photonEnergy = step->GetTrack()->GetTotalEnergy() / (1*CLHEP::eV);
 
-  SiPM& sipm = fEvent.GetDetector().GetModule().GetSiPM();
+  Detector& detector = fEvent.GetDetector();
+  detector.MakePixel(sipmId);
+  Pixel& sipm = detector.GetPixel(sipmId);
 
   if (sipm.IsPhotonDetected(photonEnergy)) {
- 		// get detector sim data by module ID
-    std::cout << "[DEBUG] G4Models::G4MSiPMAction: Photon arrived to SiPM!! " << std::endl;
- 		DetectorSimData& detSimData = simData.GetDetectorSimData(moduleId);
- 		//detSimData.MakeSiPMSimData(sipmId);
- 		SiPMSimData& sipmSimData = detSimData.GetSiPMSimData(sipmId);
- 		
- 		//unsigned int sipmIdFwk = sipmSimData.GetId();
+  	// get detector sim data by module ID
+  	std::cout << "[DEBUG] G4Models::G4MSiPMAction: Photon arrived to SiPM!! " << std::endl;
+  	DetectorSimData& detSimData = simData.GetDetectorSimData(moduleId);
+  	//detSimData.MakeSiPMSimData(sipmId);
+  	SiPMSimData& sipmSimData = detSimData.GetSiPMSimData(sipmId);
 
- 		const double time = step->GetPreStepPoint()->GetGlobalTime() / (1*ns);
+  	//unsigned int sipmIdFwk = sipmSimData.GetId();
 
- 		sipmSimData.AddPhotonEnergy(photonEnergy);
- 		sipmSimData.AddPhotonTime(time);
- 		
- 		fPETime->push_back(time);
+  	const double time = step->GetPreStepPoint()->GetGlobalTime() / (1*CLHEP::ns);
+
+  	sipmSimData.AddPhotonEnergy(photonEnergy);
+  	sipmSimData.AddPhotonTime(time);
+
+  	fPETime->push_back(time);
 
   }
  	

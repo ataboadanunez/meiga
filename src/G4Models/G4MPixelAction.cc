@@ -2,7 +2,7 @@
 #include "SimData.h"
 #include "DetectorSimData.h"
 #include "SiPMSimData.h"
-#include "SiPM.h"
+#include "Pixel.h"
 
 #include <G4Step.hh>
 #include <G4TouchableHistory.hh>
@@ -68,25 +68,23 @@ G4MPixelAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHi
   const G4int PixelId = currentPhysVol->GetCopyNo();
   const G4int moduleId = motherPhysVol->GetCopyNo();
 
-  G4double photonEnergy = step->GetTrack()->GetTotalEnergy() / (1*eV);
+  G4double photonEnergy = step->GetTrack()->GetTotalEnergy() / (1*CLHEP::eV);
 #warning "Add SiPM / PMT cases"
-  SiPM& Pixel = fEvent.GetDetector().GetModule().GetSiPM();
+  Pixel& Pixel = fEvent.GetDetector().GetPixel(PixelId);
 
-  if (Pixel.IsPhotonDetected(photonEnergy)) {
- 		// get detector sim data by module ID
-    std::cout << "[DEBUG] G4Models::G4MPixelAction: Photon arrived to Pixel!! " << PixelId << std::endl;
- 		DetectorSimData& detSimData = simData.GetDetectorSimData(moduleId);
- 		//detSimData.MakePixelSimData(PixelId);
- 		SiPMSimData& PixelSimData = detSimData.GetSiPMSimData(PixelId);
- 		
+	if (Pixel.IsPhotonDetected(photonEnergy)) {
+		// get detector sim data by module ID
+		std::cout << "[DEBUG] G4Models::G4MPixelAction: Photon arrived to Pixel!! " << PixelId << std::endl;
+		DetectorSimData& detSimData = simData.GetDetectorSimData(moduleId);
+		//detSimData.MakePixelSimData(PixelId);
+		SiPMSimData& PixelSimData = detSimData.GetSiPMSimData(PixelId);
  		//unsigned int PixelIdFwk = PixelSimData.GetId();
-
- 		const double time = step->GetPreStepPoint()->GetGlobalTime() / (1*ns);
+ 		const double time = step->GetPreStepPoint()->GetGlobalTime() / (1*CLHEP::ns);
 #warning "Add SiPM / PMT cases"
- 		PixelSimData.AddPhotonEnergy(photonEnergy);
- 		PixelSimData.AddPhotonTime(time);
+		PixelSimData.AddPhotonEnergy(photonEnergy);
+		PixelSimData.AddPhotonTime(time);
  		
- 		fPETime->push_back(time);
+		fPETime->push_back(time);
 
   }
  	
