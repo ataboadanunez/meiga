@@ -24,7 +24,7 @@ class Mudulus {
 		Mudulus();
 		virtual ~Mudulus();
 
-		void BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEvent, G4int fBarsPanel = 12, G4bool fCheckOverlaps = true);
+		void BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4int fBarsPanel = 12, G4bool fCheckOverlaps = true);
 
 		// getters
 		G4LogicalVolume* GetLogicCasing() { return logicCasing; }

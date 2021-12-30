@@ -19,43 +19,43 @@ Musaic::~Musaic()
 }
 
 void 
-Musaic::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEvent, G4int fBarsPanel, G4bool fCheckOverlaps)
+Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4int fBarsPanel, G4bool fCheckOverlaps)
 {
 
 	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
-  	auto pos = module.GetModulePosition();
-  	auto  modulePos = Geometry::ToG4Vector(pos, 1.);
-	int moduleId = module.GetId();
-	int nBars = module.GetNBars();
-	// module properties
-	fCasingThickness = module.GetCasingThickness() * mm;
+  	auto pos = detector.GetDetectorPosition();
+  	auto  detectorPos = Geometry::ToG4Vector(pos, 1.);
+	int detectorId = detector.GetId();
+	int nBars = detector.GetNBars();
+	// detector properties
+	fCasingThickness = detector.GetCasingThickness() * mm;
 	// scintillator bar properties
-	fBarWidth  = module.GetBarWidth() * mm;
-	fBarLength = module.GetBarLength(); //* mm;
-	fBarThickness = module.GetBarThickness() * mm;
-	fCoatingThickness = module.GetBarCoatingThickness() * mm;
+	fBarWidth  = detector.GetBarWidth() * mm;
+	fBarLength = detector.GetBarLength(); //* mm;
+	fBarThickness = detector.GetBarThickness() * mm;
+	fCoatingThickness = detector.GetBarCoatingThickness() * mm;
 
 	// fiber properties
-	fCladdingThickness = module.GetCladdingThickness() * mm;
-	fFiberRadius = module.GetFiberRadius() * mm;
+	fCladdingThickness = detector.GetCladdingThickness() * mm;
+	fFiberRadius = detector.GetFiberRadius() * mm;
 
 	fCasingSizeX = fBarLength/2 + fCoatingThickness + fCasingThickness;
 	fCasingSizeY = fBarWidth/2 + fCoatingThickness;// + fCasingThickness;
 	fCasingSizeZ = fBarThickness/2 + fCoatingThickness;// + fCasingThickness;
 
-	SiPM& sipm = module.GetSiPM();
-	fSiPMSizeZ = sipm.GetSiPMWidth() * mm;
-	fSiPMSizeX = fSiPMSizeY = sipm.GetSiPMLength() * mm;
+	Pixel& pixel = detector.GetPixel();
+	fSiPMSizeZ = pixel.GetPixelWidth() * mm;
+	fSiPMSizeX = fSiPMSizeY = pixel.GetPixelLength() * mm;
 
 	fCasingSizeX = fBarLength/2 + fCoatingThickness + fCasingThickness;
 	fCasingSizeY = fBarWidth/2 + fCoatingThickness;
 	fCasingSizeZ = fBarThickness/2 + fCoatingThickness;
 
-	// define a enclosure volume that contains the components of the module
-	// this is just to ease the module construction...not a proper volume
-	ostringstream nameModule;
-	nameModule.str("");
-	nameModule << "Casing" << '_' << moduleId;
+	// define a enclosure volume that contains the components of the detector
+	// this is just to ease the detector construction...not a proper volume
+	ostringstream namedetector;
+	namedetector.str("");
+	namedetector << "Casing" << '_' << detectorId;
 	const double x = fBarLength/2;
 	const double y = fBarWidth/2 * nBars; // number of bars on each panel
 	const double z = fBarThickness/2 * 2; // 2 = number of panels
@@ -64,7 +64,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEven
 	// Casing
 	solidCasing = new G4Box("Casing", x+t, y+t, z+t);
 	logicCasing = new G4LogicalVolume(solidCasing, Materials().Air, "Casing", 0, 0, 0);
-	physCasing  = new G4PVPlacement(nullptr, modulePos, logicCasing, "Casing", logMother, false, moduleId, fCheckOverlaps);
+	physCasing  = new G4PVPlacement(nullptr, detectorPos, logicCasing, "Casing", logMother, false, detectorId, fCheckOverlaps);
 	std::cout << "[DEBUG] G4Models::Musaic: Building Casing! " << std::endl;
 	// Bars: Coating + Scintillator bar
 	solidCoating  	= new G4Box("BarCoating", fCoatingThickness + fBarLength/2, fCoatingThickness + fBarWidth/2, fCoatingThickness + fBarThickness/2);
@@ -93,7 +93,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEven
 	G4VisAttributes black(G4Colour::Black());
 
 	/****
-		coordinates and orientation of module components
+		coordinates and orientation of detector components
 		bar length 		along x-axis
 		bar width 		along y-axis
 		bar thickness along z-axis
@@ -102,7 +102,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEven
 		along the y axis (M) and 2 along the z axis (N). therefore
 		bars should be created within the loop and placed accordingly
 
-		position of top and bottom bars are set wrt module origin
+		position of top and bottom bars are set wrt detector origin
 
 	*/
 
@@ -140,7 +140,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEven
 		string nameSiPM = "SiPM_"+to_string(barId);
 
 		// register SiPM in the detector class
-		module.MakeSiPM(barId);
+		detector.MakePixel(barId);
 
 		logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
 		logicScinBar  = new G4LogicalVolume(solidScinBar, Materials().ScinPlastic, nameScinBar, 0, 0, 0);
@@ -168,7 +168,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEven
 			nameSiPM, logicScinBar, false, barId, fCheckOverlaps);
 
 		// registration of SiPM
-		G4MSiPMAction* const SiPMTopSD = new G4MSiPMAction("/Module/" + nameModule.str() + "/" + nameSiPM, moduleId, barId, theEvent);
+		G4MSiPMAction* const SiPMTopSD = new G4MSiPMAction("/Musaic/" + namedetector.str() + "/" + nameSiPM, detectorId, barId, theEvent);
 		sdMan->AddNewDetector(SiPMTopSD);
 		logicSiPM->SetSensitiveDetector(SiPMTopSD);
 
@@ -191,7 +191,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEven
 		string nameSiPM = "SiPM_"+to_string(barId);
 
 		// register SiPM in the detector class
-		module.MakeSiPM(barId);
+		detector.MakePixel(barId);
 
 		logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
 		logicScinBar  = new G4LogicalVolume(solidScinBar, Materials().ScinPlastic, nameScinBar, 0, 0, 0);
@@ -219,7 +219,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEven
 		nameSiPM, logicScinBar, false, barId, fCheckOverlaps);
 
 		// registration of SiPM
-		G4MSiPMAction* const SiPMBotSD = new G4MSiPMAction("/Module/" + nameModule.str() + "/" + nameSiPM, moduleId, barId, theEvent);
+		G4MSiPMAction* const SiPMBotSD = new G4MSiPMAction("/Musaic/" + namedetector.str() + "/" + nameSiPM, detectorId, barId, theEvent);
 		sdMan->AddNewDetector(SiPMBotSD);
 		logicSiPM->SetSensitiveDetector(SiPMBotSD);
 	

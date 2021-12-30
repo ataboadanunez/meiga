@@ -19,48 +19,48 @@ Mudulus::~Mudulus()
 }
 
 void 
-Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEvent, G4int fBarsPanel, G4bool fCheckOverlaps)
+Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4int fBarsPanel, G4bool fCheckOverlaps)
 {
 
 	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
 
-	// module position
-	G4ThreeVector  modulePos = Geometry::ToG4Vector(module.GetModulePosition(), 1.);
-	int moduleId = module.GetId();
-	int nBars = module.GetNBars();
-	// module properties
+	// detector position
+	G4ThreeVector  detectorPos = Geometry::ToG4Vector(detector.GetDetectorPosition(), 1.);
+	int detectorId = detector.GetId();
+	int nBars = detector.GetNBars();
+	// detector properties
 	
 	std::cout << "[DEBUG] Mudulus::BuildDetector: Creating Detector Mudulus with " << nBars << " bars." << std::endl;
 
 	// scintillator bar properties
-	fBarWidth  = module.GetBarWidth() * mm;
-	fBarLength = module.GetBarLength(); 
-	fBarThickness = module.GetBarThickness() * mm;
-	fCoatingThickness = module.GetBarCoatingThickness() * mm;
+	fBarWidth  = detector.GetBarWidth() * mm;
+	fBarLength = detector.GetBarLength(); 
+	fBarThickness = detector.GetBarThickness() * mm;
+	fCoatingThickness = detector.GetBarCoatingThickness() * mm;
 	G4double fHalfWidth = 0.5*fBarWidth*nBars;
 
 	// fiber properties
-	fCladdingThickness = module.GetCladdingThickness() * mm;
-	fFiberRadius = module.GetFiberRadius() * mm;
+	fCladdingThickness = detector.GetCladdingThickness() * mm;
+	fFiberRadius = detector.GetFiberRadius() * mm;
 
-	SiPM& sipm = module.GetSiPM();
-	fSiPMSizeZ = sipm.GetSiPMWidth() * mm;
-	fSiPMSizeX = fSiPMSizeY = sipm.GetSiPMLength() * mm;
+	Pixel& pixel = detector.GetPixel();
+	fSiPMSizeZ = pixel.GetPixelWidth() * mm;
+	fSiPMSizeX = fSiPMSizeY = pixel.GetPixelLength() * mm;
 
-	// define a enclosure volume that contains the components of the module
-	// this is just to ease the module construction...not a proper volume
-	ostringstream nameModule;
-	nameModule.str("");
-	nameModule << "Casing" << '_' << moduleId;
+	// define a enclosure volume that contains the components of the detector
+	// this is just to ease the detector construction...not a proper volume
+	ostringstream namedetector;
+	namedetector.str("");
+	namedetector << "Casing" << '_' << detectorId;
 	fCasingSizeX = fBarLength;
 	fCasingSizeY = fBarLength;
 	fCasingSizeZ = 0.5*fBarThickness * 2; // (x2) number of panels 
-	fCasingThickness = module.GetCasingThickness() * mm;
+	fCasingThickness = detector.GetCasingThickness() * mm;
 	
 	// Casing
 	solidCasing = new G4Box("Casing", fCasingSizeX+fCasingThickness,fCasingSizeY+fCasingThickness, fCasingSizeZ+fCasingThickness);
 	logicCasing = new G4LogicalVolume(solidCasing, Materials().Air, "Casing", 0, 0, 0);
-	physCasing  = new G4PVPlacement(nullptr, modulePos, logicCasing, "Casing", logMother, false, moduleId, fCheckOverlaps);
+	physCasing  = new G4PVPlacement(nullptr, detectorPos, logicCasing, "Casing", logMother, false, detectorId, fCheckOverlaps);
 	// Bars: Coating + Scintillator bar
 	solidCoating  	= new G4Box("BarCoating", 0.5*fBarLength + fCoatingThickness, 0.5*fBarWidth + fCoatingThickness, 0.5*fBarThickness + fCoatingThickness);
 	solidScinBar   	= new G4Box("BarScin", 0.5*fBarLength, 0.5*fBarWidth, 0.5*fBarThickness);
@@ -113,7 +113,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 		string nameSiPMr = "Pixel_right_"+panelId+"_"+to_string(barId);
 
 		// register SiPM in the detector class
-		module.MakeSiPM(barId);
+		detector.MakePixel(barId);
 
 		logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
 		logicScinBar  = new G4LogicalVolume(solidScinBar, Materials().ScinPlastic, nameScinBar, 0, 0, 0);
@@ -145,7 +145,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 			nameSiPMr, logicFiber, false, barId, fCheckOverlaps);
 
 		// registration of SiPM
-		G4MPixelAction* const SiPMTopSD = new G4MPixelAction("/Mudulus/" + nameModule.str() + "/" + nameSiPMl, moduleId, barId, theEvent);
+		G4MPixelAction* const SiPMTopSD = new G4MPixelAction("/Mudulus/" + namedetector.str() + "/" + nameSiPMl, detectorId, barId, theEvent);
 		sdMan->AddNewDetector(SiPMTopSD);
 		logicSiPMl->SetSensitiveDetector(SiPMTopSD);
 
@@ -173,7 +173,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 		string nameSiPMr = "Pixel_right_"+panelId+"_"+to_string(barId);
 
 		// register SiPM in the detector class
-		module.MakeSiPM(barId);
+		detector.MakePixel(barId);
 
 		logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
 		logicScinBar  = new G4LogicalVolume(solidScinBar, Materials().ScinPlastic, nameScinBar, 0, 0, 0);
@@ -204,7 +204,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Module& module, Event& theEve
 				nameSiPMr, logicFiber, false, barId, fCheckOverlaps);
 
 		// registration of SiPM
-		G4MPixelAction* const SiPMBotSD = new G4MPixelAction("/Mudulus/" + nameModule.str() + "/" + nameSiPMl, moduleId, barId, theEvent);
+		G4MPixelAction* const SiPMBotSD = new G4MPixelAction("/Mudulus/" + namedetector.str() + "/" + nameSiPMl, detectorId, barId, theEvent);
 		sdMan->AddNewDetector(SiPMBotSD);
 		logicSiPMl->SetSensitiveDetector(SiPMBotSD);
 
