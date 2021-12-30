@@ -61,12 +61,12 @@ void
 G4ExDetectorConstruction::PlaceDetector(Event& theEvent)
 {
   
-  Detector& detector = theEvent.GetDetector();
-  int nModules = detector.GetNModules();
-  cout << "Number of simulated modules = " << nModules << endl;
-  // loop in ModulesRange
-  for (auto modIt = detector.ModulesRange().begin(); modIt != detector.ModulesRange().end(); modIt++) {
-    auto& currentMod = modIt->second;
+  //Detector& detector = theEvent.GetDetector();
+  int nDetectors = theEvent.GetNDetectors();
+  cout << "Number of Detectors = " << nDetectors << endl;
+  // loop in Detectors Range
+  for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
+    auto& currentMod = detIt->second;
     cout << "Building module " << currentMod.GetId() << endl;
     Musaic().BuildDetector(logicGround, currentMod, theEvent);
   }
