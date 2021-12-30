@@ -36,6 +36,7 @@
 #include "Detector.h"
 #include "Module.h"
 #include "SiPM.h"
+#include "Pixel.h"
 #include "G4MPhysicsList.h"
 
 // boost libraries
