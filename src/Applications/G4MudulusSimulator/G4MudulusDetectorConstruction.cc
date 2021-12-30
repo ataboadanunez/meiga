@@ -61,14 +61,11 @@ void
 G4MudulusDetectorConstruction::PlaceDetector(Event& theEvent)
 {
   
-  Detector& detector = theEvent.GetDetector();
-  int nModules = detector.GetNModules();
-  cout << "Number of simulated modules = " << nModules << endl;
-  // loop in ModulesRange
-  for (auto modIt = detector.ModulesRange().begin(); modIt != detector.ModulesRange().end(); modIt++) {
-    auto& currentMod = modIt->second;
-    cout << "Building module " << currentMod.GetId() << endl;
-    Mudulus().BuildDetector(logicWorld, currentMod, theEvent);
+  // loop over Detectors Range
+  for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
+    auto& currentDet = detIt->second;
+    cout << "Building module " << currentDet.GetId() << endl;
+    Mudulus().BuildDetector(logicWorld, currentDet, theEvent);
   }
 
 }
