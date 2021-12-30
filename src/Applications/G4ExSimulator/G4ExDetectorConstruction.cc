@@ -24,14 +24,8 @@ G4ExDetectorConstruction::CreateDetector()
 {
 
 	CreateWorld();
-  CreateGround();
+	CreateGround();
 	PlaceDetector(fEvent);
-  /***
-   The function PlaceDetector() should be a replacement of ReadModuleList in G4RockSimulator.
-   It should call an specific detector class (type) from G4Models and place it at a given
-   position in a given mother volume.
-
-  ***/
 	return physWorld;
 }
 
@@ -49,27 +43,27 @@ G4ExDetectorConstruction::CreateWorld()
 void
 G4ExDetectorConstruction::CreateGround()
 {
-  solidGround = new G4Box("Ground", fGroundSizeX/2, fGroundSizeY/2, fGroundSizeZ/2);
-  G4VisAttributes brown(G4Colour::Brown());
-  logicGround = new G4LogicalVolume(solidGround, Materials().StdRock, "Ground");
-  logicGround->SetVisAttributes(brown);
-  physGround  =  new G4PVPlacement(nullptr, G4ThreeVector(), logicGround, "Ground", logicWorld, false, 0, fCheckOverlaps);
+	solidGround = new G4Box("Ground", fGroundSizeX/2, fGroundSizeY/2, fGroundSizeZ/2);
+	G4VisAttributes brown(G4Colour::Brown());
+	logicGround = new G4LogicalVolume(solidGround, Materials().StdRock, "Ground");
+	logicGround->SetVisAttributes(brown);
+	physGround  =  new G4PVPlacement(nullptr, G4ThreeVector(), logicGround, "Ground", logicWorld, false, 0, fCheckOverlaps);
 }
 
 
 void
 G4ExDetectorConstruction::PlaceDetector(Event& theEvent)
 {
-  
-  //Detector& detector = theEvent.GetDetector();
-  int nDetectors = theEvent.GetNDetectors();
-  cout << "Number of Detectors = " << nDetectors << endl;
-  // loop in Detectors Range
-  for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
-    auto& currentMod = detIt->second;
-    cout << "Building module " << currentMod.GetId() << endl;
-    Musaic().BuildDetector(logicGround, currentMod, theEvent);
-  }
+	
+	//Detector& detector = theEvent.GetDetector();
+	int nDetectors = theEvent.GetNDetectors();
+	cout << "Number of Detectors = " << nDetectors << endl;
+	// loop in Detectors Range
+	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
+		auto& currentMod = detIt->second;
+		cout << "Building module " << currentMod.GetId() << endl;
+		Musaic().BuildDetector(logicGround, currentMod, theEvent);
+	}
 
 }
 
