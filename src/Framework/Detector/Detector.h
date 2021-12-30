@@ -28,7 +28,8 @@
 class Detector
 {
 	public:
-		Detector(); 
+		Detector();
+		Detector(const unsigned int id); 
 		virtual ~Detector() { }
 
 		int GetId() const { return fDetectorId; }
@@ -90,7 +91,7 @@ class Detector
 
 		int fDetectorId = 0;
 		int fNBars = 0;
-		int fNSiPMs = 0;
+		int fNPixels = 0;
 
 		double fBarWidth = 41;
 		double fBarLength = 82;

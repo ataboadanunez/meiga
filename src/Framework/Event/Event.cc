@@ -16,3 +16,16 @@ Event::~Event()
   
 }
 
+void
+Event::MakeDetector(unsigned int id)
+{
+	fDetectorMap.emplace(id, Detector(id));
+	fNDetectors = fDetectorMap.size();
+}
+
+bool
+Event::HasDetector(unsigned int id)
+{	
+
+	return fDetectorMap.find(id) != fDetectorMap.end();
+}
