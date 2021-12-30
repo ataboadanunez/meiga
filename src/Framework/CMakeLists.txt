@@ -1,5 +1,5 @@
-add_subdirectory(SimData)
-add_subdirectory(ConfigManager)
 add_subdirectory(Detector)
+add_subdirectory(ConfigManager)
+add_subdirectory(SimData)
 add_subdirectory(Event)
 set(MEIGA_LIBRARIES ${MEIGA_LIBRARIES} PARENT_SCOPE)
