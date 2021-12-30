@@ -3,7 +3,7 @@
 
 //#include "Module.h"
 //#include "G4SystemOfUnits.hh"
-#include "Pixel.h"
+#include "OptDevice.h"
 #include <vector>
 #include <map>
 
@@ -28,15 +28,15 @@
 class Detector
 {
 	public:
-		Detector();
-		Detector(const unsigned int id); 
+		Detector(){;}
+		Detector(const unsigned int id) : fDetectorId(id) {;}
 		virtual ~Detector() { }
 
 		int GetId() const { return fDetectorId; }
 		void SetId(int id) { fDetectorId = id; }
 
 		std::vector<double> GetDetectorPosition() { return fDetectorPosition; }
-		void SetDetectorPosition(std::vector<double> pos) { fDetectorPosition = pos; }
+		void SetDetectorPosition(const std::vector<double> &pos) { fDetectorPosition = pos; }
 
 		// Mechanical properties
 		double GetCasingThickness() const { return fCasingThickness; }
@@ -69,14 +69,14 @@ class Detector
 		double GetCladdingThickness() const { return fCladdingThickness; }
 		void SetCladdingThickness(double cladThickness) { fCladdingThickness = cladThickness; }
 
-		// Pixel
+		// Optical device
 
-		void MakePixel(unsigned int id);
-		Pixel& GetPixel() { return fPixel; }
-		Pixel& GetPixel(unsigned int id) { return fPixelMap[id]; }
+		static Detector MakeOptDevice(unsigned int id, OptDevice::DeviceType type);
+		OptDevice& GetOptDevice() { return fOptDevice; }
+		OptDevice& GetOptDevice(unsigned int id) { return fOptDeviceMap[id]; }
 
-		std::map<unsigned int, Pixel>& PixelRange() { return fPixelMap; }
-		const std::map<unsigned int, Pixel>& PixelRange() const { return fPixelMap; }
+		std::map<unsigned int, OptDevice>& OptDeviceRange() { return fOptDeviceMap; }
+		const std::map<unsigned int, OptDevice>& OptDeviceRange() const { return fOptDeviceMap; }
 
 		//void MakeModule(unsigned int id);
 		//Module& GetModule() { return fModule; }
@@ -91,7 +91,7 @@ class Detector
 
 		int fDetectorId = 0;
 		int fNBars = 0;
-		int fNPixels = 0;
+		int fNOptDevices = 0;
 
 		double fBarWidth = 41;
 		double fBarLength = 82;
@@ -107,8 +107,8 @@ class Detector
 
 		//std::vector<double>* fModulePosition;
 		std::vector<double> fDetectorPosition;
-		std::map<unsigned int, Pixel> fPixelMap;
-		Pixel fPixel;
+		std::map<unsigned int, OptDevice> fOptDeviceMap;
+		OptDevice fOptDevice;
 		//std::map<int, Module> fModuleMap;
 
 };

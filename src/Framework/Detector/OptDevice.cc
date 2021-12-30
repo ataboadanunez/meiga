@@ -1,11 +1,40 @@
-#include "Pixel.h"
+#include "OptDevice.h"
 #include "CLHEP/Random/RandFlat.h"
 #include "CLHEP/Random/RandGauss.h"
 
-Pixel::Pixel(unsigned int id) : fPixelId(id) { }
+using namespace std;
+
+OptDevice::OptDevice(unsigned int id, OptDevice::DeviceType type) : 
+	fOptDeviceId(id) ,
+	fType(type)
+{ 
+
+}
+
+const string
+OptDevice::GetName()
+{
+	
+	string name;
+	DeviceType t = GetType();
+
+	switch(t) {
+		case eSiPM:
+			name = "SiPM";
+		break;
+
+		case ePMT:
+			name = "PMT";
+		break;
+	}
+
+	return name;
+
+}
+
 
 void
-Pixel::SiPMSPEPulse(std::vector<double> &amplitude, double fBinTime, size_t fStartPulse)
+OptDevice::SPEPulse(std::vector<double> &amplitude, double fBinTime, size_t fStartPulse)
 {
 
 #warning	move to header. generate random values from mean SPE pulse parameters instead
@@ -23,7 +52,7 @@ Pixel::SiPMSPEPulse(std::vector<double> &amplitude, double fBinTime, size_t fSta
 }
 
 bool 
-Pixel::IsPhotonDetected(double energy)
+OptDevice::IsPhotonDetected(double energy)
 {
 
 	/*

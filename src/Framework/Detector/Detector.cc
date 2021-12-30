@@ -1,22 +1,10 @@
 #include "Detector.h"
-//#include "Module.h"
 
-Detector::Detector() 
+Detector
+Detector::MakeOptDevice(unsigned int id, OptDevice::DeviceType type)
 {
-	fDetectorPosition[3];
-}
-
-Detector::Detector(unsigned int id) : fDetectorId(id) 
-{
-	fDetectorPosition[3];
-}
-
-
-// Add constructor by detector type
-
-void
-Detector::MakePixel(unsigned int id)
-{
-	fPixelMap.emplace(id, Pixel(id));
-	fNPixels = fPixelMap.size();
+	Detector res;
+	res.fOptDeviceMap.emplace(id, OptDevice(id, type));
+	res.fNOptDevices = res.fOptDeviceMap.size();
+  return res;
 }
