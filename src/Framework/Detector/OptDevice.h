@@ -14,22 +14,29 @@ class OptDevice
 		};
 
 		OptDevice() { }
-		OptDevice(unsigned int id, OptDevice::DeviceType type);
+		OptDevice(int id, OptDevice::DeviceType type);
+		OptDevice(OptDevice::DeviceType type);
 		virtual ~OptDevice() { }
 
 		
 		// Generic OptDevice stuff
-		unsigned int GetId() { return fOptDeviceId; }
-		void SetId(unsigned int id) { fOptDeviceId = id; }
+		int GetId() { return fOptDeviceId; }
+		void SetId(int id) { fOptDeviceId = id; }
+
+		DeviceType GetType() { return fType; }
+		void SetType(OptDevice::DeviceType type) { fType = type; }
+		const std::string GetName();
 
 		double GetLength() { return fOptDeviceLength; }
 		void SetLength(double len) { fOptDeviceLength = len; }
 
 		double GetWidth() { return fOptDeviceWidth; }
 		void SetWidth(double wid) { fOptDeviceWidth = wid; }
+
+		double GetThickness() { return fOptDeviceThickness; }
+		void SetThickness(double thi) { fOptDeviceThickness = thi; }
+
 		
-		DeviceType GetType() { return fType; }
-		const std::string GetName();
 
 		// response stuff
 		bool IsPhotonDetected(double energy);
@@ -37,13 +44,28 @@ class OptDevice
 		double GetSPEPulseDuration() { return fPulseDuration; }
 
 
+
 	private:
-		unsigned int fOptDeviceId = 0;
+		int fOptDeviceId = 0;
 		DeviceType fType; 
 
 		// this sould be placed in a config file
-		double fOptDeviceLength = 1.3;
-		double fOptDeviceWidth  = 0.1;
+		double fOptDeviceLength = 0.0;
+		double fOptDeviceWidth  = 0.0;
+		double fOptDeviceThickness = 0.0;
+
+		// SiPM properties
+		double fSiPMLength 		= 1.3;
+		double fSiPMWidth  		= 1.3;
+		double fSiPMThickness = 0.1;
+		// add quantum efficiency
+
+		// PMT properties
+		double fPMTLength 		= 1.3;
+		double fPMTWidth  		= 1.3;
+		double fPMTThickness = 0.1;
+		// add quantum efficiency
+
 
 		// sipm SPE pulse parameters
 		double fPulseDuration = 100.;
