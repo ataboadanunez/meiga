@@ -39,7 +39,7 @@ class Mudulus {
 		G4Tubs* solidClad1 = nullptr;
 		G4Tubs* solidFiber = nullptr;
 
-		G4Box* solidSiPM = nullptr;
+		G4Box* solidPixel = nullptr;
 
 		// logical volumes
 		G4LogicalVolume* logicCasing = nullptr;
@@ -50,8 +50,8 @@ class Mudulus {
 		G4LogicalVolume* logicClad1 = nullptr;
 		G4LogicalVolume* logicFiber = nullptr;
 
-		G4LogicalVolume* logicSiPMl = nullptr;
-		G4LogicalVolume* logicSiPMr = nullptr;
+		G4LogicalVolume* logicPixelL = nullptr;
+		G4LogicalVolume* logicPixelR = nullptr;
 
 		// physical volumes
 		G4PVPlacement* physCasing = nullptr;
@@ -62,8 +62,8 @@ class Mudulus {
 		G4PVPlacement* physClad1 = nullptr;
 		G4PVPlacement* physFiber = nullptr;
 
-		G4PVPlacement* physSiPMl = nullptr;
-		G4PVPlacement* physSiPMr = nullptr;
+		G4PVPlacement* physPixelL = nullptr;
+		G4PVPlacement* physPixelR = nullptr;
 
 		// following variables are read from Detector class
 		G4double fCasingThickness;
@@ -82,9 +82,9 @@ class Mudulus {
 		// this detector has an extra portion of 100 cm of fiber outside the bar
 		G4double fFiberExtra = 100*cm;
 
-		G4double fSiPMSizeX;
-		G4double fSiPMSizeY;
-		G4double fSiPMSizeZ;
+		G4double fPixelSizeX;
+		G4double fPixelSizeY;
+		G4double fPixelSizeZ;
 
 
 

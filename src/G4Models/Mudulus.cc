@@ -1,6 +1,6 @@
 #include "Mudulus.h"
 #include "Geometry.h"
-#include "G4MPixelAction.h"
+#include "G4MOptDeviceAction.h"
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 
@@ -43,9 +43,9 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	fCladdingThickness = detector.GetCladdingThickness() * mm;
 	fFiberRadius = detector.GetFiberRadius() * mm;
 
-	Pixel& pixel = detector.GetPixel();
-	fSiPMSizeZ = pixel.GetPixelWidth() * mm;
-	fSiPMSizeX = fSiPMSizeY = pixel.GetPixelLength() * mm;
+	OptDevice& pmt = detector.GetOptDevice();
+	fPixelSizeZ = pmt.GetWidth() * mm;
+	fPixelSizeX = fPixelSizeY = pmt.GetLength() * mm;
 
 	// define a enclosure volume that contains the components of the detector
 	// this is just to ease the detector construction...not a proper volume
@@ -71,10 +71,8 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	solidClad2  = new G4Tubs("Clad2", 0, fFiberRadius, 0.5*fBarLength + 0.5*fFiberExtra, 0, 360*deg);
 	solidClad1  = new G4Tubs("Clad1", 0, fFiberRadius - fCladdingThickness, 0.5*fBarLength + 0.5*fFiberExtra, 0, 360*deg);
 	solidFiber  = new G4Tubs("Fiber", 0, fFiberRadius - 2*fCladdingThickness, 0.5*fBarLength + 0.5*fFiberExtra, 0, 360*deg);
-#warning "Change to PMT!"
-	// SiPM
-	solidSiPM   = new G4Box("SiPM", fSiPMSizeX, fSiPMSizeY, fSiPMSizeZ);
-	//std::cout << "[DEBUG] G4Models::Musaic: Building SiPM! " << std::endl;
+
+	solidPixel   = new G4Box("PMT", fPixelSizeX, fPixelSizeY, fPixelSizeZ);
 	
 	new G4LogicalSkinSurface("BarCoating", logicCoating, Materials().ScinOptSurf);
 
@@ -90,7 +88,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	G4VisAttributes black(G4Colour::Black());
 
 	G4double fFiberPosZ = -fBarThickness/2 + fCoatingThickness + fFiberRadius + fCladdingThickness;
-	G4double fPixelPosZ = 0.5*fBarLength + 0.5*fFiberExtra - 0.5*fSiPMSizeZ;
+	G4double fPixelPosZ = 0.5*fBarLength + 0.5*fFiberExtra - 0.5*fPixelSizeZ;
 
 	// bars of the top panel
 	for (G4int i=0; i<nBars; ++i) {
@@ -109,45 +107,54 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 		string nameClad2 = "FiberClad2_"+panelId+"_"+to_string(barId);
 		string nameClad1 = "FiberClad1_"+panelId+"_"+to_string(barId);
 		string nameFiber = "Fiber_"+panelId+"_"+to_string(barId);
-		string nameSiPMl = "Pixel_left_"+panelId+"_"+to_string(barId);
-		string nameSiPMr = "Pixel_right_"+panelId+"_"+to_string(barId);
+		string namePixelL = "Pixel_left_"+panelId+"_"+to_string(barId);
+		string namePixelR = "Pixel_right_"+panelId+"_"+to_string(barId);
 
-		// register SiPM in the detector class
-		detector.MakePixel(barId);
+#warning "dont use bar ID for PMTs. 2 PMTs (with different ID) per bar!"
+		detector.MakeOptDevice(barId, OptDevice::ePMT);
 
+		// logic volumes for scintillator bars
 		logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
 		logicScinBar  = new G4LogicalVolume(solidScinBar, Materials().ScinPlastic, nameScinBar, 0, 0, 0);
+		// logic volumes for WLS fibers
 		logicClad2 = new G4LogicalVolume(solidClad2, Materials().FPethylene, nameClad2, 0, 0, 0);
 		logicClad2->SetVisAttributes(green);
 		logicClad1 = new G4LogicalVolume(solidClad1, Materials().Pethylene, nameClad1, 0, 0, 0);
 		logicClad1->SetVisAttributes(green); 
 		logicFiber = new G4LogicalVolume(solidFiber, Materials().PMMA, nameFiber, 0, 0, 0);
 		logicFiber->SetVisAttributes(green); 
-		logicSiPMl = new G4LogicalVolume(solidSiPM, Materials().Pyrex, nameSiPMl, 0, 0, 0);
-		logicSiPMl->SetVisAttributes(blue); 
-		logicSiPMr = new G4LogicalVolume(solidSiPM, Materials().Pyrex, nameSiPMr, 0, 0, 0);
-		logicSiPMr->SetVisAttributes(blue);
+		// logic volumes for pixels of the optical device
+		logicPixelL = new G4LogicalVolume(solidPixel, Materials().Pyrex, namePixelL, 0, 0, 0);
+		logicPixelL->SetVisAttributes(blue); 
+		logicPixelR = new G4LogicalVolume(solidPixel, Materials().Pyrex, namePixelR, 0, 0, 0);
+		logicPixelR->SetVisAttributes(blue);
 
-		// top panel positon
+		// phys volumes for bars
 		physCoating  = new G4PVPlacement(nullptr, G4ThreeVector(0, yPos, fCasingSizeZ/2), logicCoating, 
 			nameCoating, logicCasing, false, barId, fCheckOverlaps);
 		physScinBar   = new G4PVPlacement(nullptr, G4ThreeVector(), logicScinBar, 
 			nameScinBar, logicCoating, false, barId, fCheckOverlaps);
+		// phys volumes for fibers
 		physClad2 = new G4PVPlacement(rotationFiber, G4ThreeVector(0, 0, fFiberPosZ), logicClad2, 
 			nameClad2, logicScinBar, true, barId, fCheckOverlaps);
 		physClad1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
 			nameClad1, logicClad2, false, barId, fCheckOverlaps);
 		physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
 			nameFiber, logicClad1, false, barId, fCheckOverlaps); 
-		physSiPMl  = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, fPixelPosZ), logicSiPMl,
-			nameSiPMl, logicFiber, false, barId, fCheckOverlaps);
-		physSiPMr  = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, -1*fPixelPosZ), logicSiPMr,
-			nameSiPMr, logicFiber, false, barId, fCheckOverlaps);
+		// phys volumes for pixels of the optical device
+		physPixelL  = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, fPixelPosZ), logicPixelL,
+			namePixelL, logicFiber, false, barId, fCheckOverlaps);
+		physPixelR  = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, -1*fPixelPosZ), logicPixelR,
+			namePixelR, logicFiber, false, barId, fCheckOverlaps);
 
-		// registration of SiPM
-		G4MPixelAction* const SiPMTopSD = new G4MPixelAction("/Mudulus/" + namedetector.str() + "/" + nameSiPMl, detectorId, barId, theEvent);
-		sdMan->AddNewDetector(SiPMTopSD);
-		logicSiPMl->SetSensitiveDetector(SiPMTopSD);
+		// registration of pixels as Sensitive Detectors
+		G4MOptDeviceAction* const PixelTopL = new G4MOptDeviceAction("/Mudulus/" + namedetector.str() + "/" + namePixelL, detectorId, barId, theEvent);
+		sdMan->AddNewDetector(PixelTopL);
+		logicPixelL->SetSensitiveDetector(PixelTopL);
+
+		G4MOptDeviceAction* const PixelTopR = new G4MOptDeviceAction("/Mudulus/" + namedetector.str() + "/" + namePixelR, detectorId, barId, theEvent);
+		sdMan->AddNewDetector(PixelTopR);
+		logicPixelR->SetSensitiveDetector(PixelTopR);
 
 		
   }
@@ -169,44 +176,54 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 		string nameClad2 = "FiberClad2_"+panelId+"_"+to_string(i);
 		string nameClad1 = "FiberClad1_"+panelId+"_"+to_string(i);
 		string nameFiber = "Fiber_"+panelId+"_"+to_string(i);
-		string nameSiPMl = "Pixel_left_"+panelId+"_"+to_string(barId);
-		string nameSiPMr = "Pixel_right_"+panelId+"_"+to_string(barId);
+		string namePixelL = "Pixel_left_"+panelId+"_"+to_string(barId);
+		string namePixelR = "Pixel_right_"+panelId+"_"+to_string(barId);
 
-		// register SiPM in the detector class
-		detector.MakePixel(barId);
+#warning "dont use bar ID for PMTs. 2 PMTs (with different ID) per bar!"
+		detector.MakeOptDevice(barId, OptDevice::ePMT);
 
+		// logic volumes for scintillator bars
 		logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
 		logicScinBar  = new G4LogicalVolume(solidScinBar, Materials().ScinPlastic, nameScinBar, 0, 0, 0);
+		// logic volumes for WLS fibers
 		logicClad2 = new G4LogicalVolume(solidClad2, Materials().FPethylene, nameClad2, 0, 0, 0);
 		logicClad2->SetVisAttributes(green);
 		logicClad1 = new G4LogicalVolume(solidClad1, Materials().Pethylene, nameClad1, 0, 0, 0);
 		logicClad1->SetVisAttributes(green); 
 		logicFiber = new G4LogicalVolume(solidFiber, Materials().PMMA, nameFiber, 0, 0, 0);
-		logicFiber->SetVisAttributes(green); 
-		logicSiPMl = new G4LogicalVolume(solidSiPM, Materials().Pyrex, nameSiPMl, 0, 0, 0);
-		logicSiPMl->SetVisAttributes(blue);
-		logicSiPMr = new G4LogicalVolume(solidSiPM, Materials().Pyrex, nameSiPMr, 0, 0, 0);
-		logicSiPMr->SetVisAttributes(blue);
+		logicFiber->SetVisAttributes(green);
+		// logic volumes for pixels of the optical device
+		logicPixelL = new G4LogicalVolume(solidPixel, Materials().Pyrex, namePixelL, 0, 0, 0);
+		logicPixelL->SetVisAttributes(blue);
+		logicPixelR = new G4LogicalVolume(solidPixel, Materials().Pyrex, namePixelR, 0, 0, 0);
+		logicPixelR->SetVisAttributes(blue);
 
+		// phys volumes for bars		
 		physCoating  = new G4PVPlacement(rotationBot, G4ThreeVector(xPos, 0, -fCasingSizeZ/2 - 2*fCoatingThickness), logicCoating, 
 			nameCoating, logicCasing, false, barId, fCheckOverlaps);
 		physScinBar   = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicScinBar,
 			nameScinBar, logicCoating, false, barId, fCheckOverlaps);
+		// phys volumes for fibers
 		physClad2 = new G4PVPlacement(rotationFiber, G4ThreeVector(0, 0, fFiberPosZ), logicClad2, 
 			nameClad2, logicScinBar, true, barId, fCheckOverlaps);
 		physClad1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
 			nameClad1, logicClad2, false, barId, fCheckOverlaps);
 		physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
 			nameFiber, logicClad1, false, barId, fCheckOverlaps); 
-		physSiPMl  = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, fPixelPosZ), logicSiPMl, 
-				nameSiPMl, logicFiber, false, barId, fCheckOverlaps);
-		physSiPMr  = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, -1*fPixelPosZ), logicSiPMr, 
-				nameSiPMr, logicFiber, false, barId, fCheckOverlaps);
+		// phys volumes for optical devices
+		physPixelL  = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, fPixelPosZ), logicPixelL, 
+				namePixelL, logicFiber, false, barId, fCheckOverlaps);
+		physPixelR  = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, -1*fPixelPosZ), logicPixelR, 
+				namePixelR, logicFiber, false, barId, fCheckOverlaps);
 
-		// registration of SiPM
-		G4MPixelAction* const SiPMBotSD = new G4MPixelAction("/Mudulus/" + namedetector.str() + "/" + nameSiPMl, detectorId, barId, theEvent);
-		sdMan->AddNewDetector(SiPMBotSD);
-		logicSiPMl->SetSensitiveDetector(SiPMBotSD);
+		// registration of pixels as Sensitive Detectors
+		G4MOptDeviceAction* const PixelBotL = new G4MOptDeviceAction("/Mudulus/" + namedetector.str() + "/" + namePixelL, detectorId, barId, theEvent);
+		sdMan->AddNewDetector(PixelBotL);
+		logicPixelL->SetSensitiveDetector(PixelBotL);
+
+		G4MOptDeviceAction* const PixelBotR = new G4MOptDeviceAction("/Mudulus/" + namedetector.str() + "/" + namePixelR, detectorId, barId, theEvent);
+		sdMan->AddNewDetector(PixelBotR);
+		logicPixelR->SetSensitiveDetector(PixelBotR);
 
 	}
 

@@ -1,6 +1,6 @@
 #include "Musaic.h"
 #include "Geometry.h"
-#include "G4MSiPMAction.h"
+#include "G4MOptDeviceAction.h"
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 
@@ -23,8 +23,8 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 {
 
 	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
-  	auto pos = detector.GetDetectorPosition();
-  	auto  detectorPos = Geometry::ToG4Vector(pos, 1.);
+  auto pos = detector.GetDetectorPosition();
+  auto  detectorPos = Geometry::ToG4Vector(pos, 1.);
 	int detectorId = detector.GetId();
 	int nBars = detector.GetNBars();
 	// detector properties
@@ -43,9 +43,14 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	fCasingSizeY = fBarWidth/2 + fCoatingThickness;// + fCasingThickness;
 	fCasingSizeZ = fBarThickness/2 + fCoatingThickness;// + fCasingThickness;
 
-	Pixel& pixel = detector.GetPixel();
-	fSiPMSizeZ = pixel.GetPixelWidth() * mm;
-	fSiPMSizeX = fSiPMSizeY = pixel.GetPixelLength() * mm;
+	//detector.MakeOptDevice(OptDevice::eSiPM);
+	OptDevice sipm = detector.GetOptDevice(OptDevice::eSiPM);
+	std::cout << "[DEBUG] G4Models::Musaic: Building detector Musaic with " << sipm.GetName() << ". " << std::endl;
+	fSiPMSizeZ = sipm.GetThickness() * mm;
+	fSiPMSizeX = sipm.GetLength() * mm;
+	fSiPMSizeY = sipm.GetWidth() * mm;
+
+	std::cout << "Optical Device dimensions = (" << fSiPMSizeX << ", " << fSiPMSizeY << ", " << fSiPMSizeZ << ") / mm" << std::endl;
 
 	fCasingSizeX = fBarLength/2 + fCoatingThickness + fCasingThickness;
 	fCasingSizeY = fBarWidth/2 + fCoatingThickness;
@@ -140,7 +145,9 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 		string nameSiPM = "SiPM_"+to_string(barId);
 
 		// register SiPM in the detector class
-		detector.MakePixel(barId);
+		detector.MakeOptDevice(barId, OptDevice::eSiPM);
+		// OptDevice& currSipm = detector.GetOptDevice(barId);
+		// currSipm.SetType(OptDevice::eSiPM);
 
 		logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
 		logicScinBar  = new G4LogicalVolume(solidScinBar, Materials().ScinPlastic, nameScinBar, 0, 0, 0);
@@ -168,7 +175,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 			nameSiPM, logicScinBar, false, barId, fCheckOverlaps);
 
 		// registration of SiPM
-		G4MSiPMAction* const SiPMTopSD = new G4MSiPMAction("/Musaic/" + namedetector.str() + "/" + nameSiPM, detectorId, barId, theEvent);
+		G4MOptDeviceAction* const SiPMTopSD = new G4MOptDeviceAction("/Musaic/" + namedetector.str() + "/" + nameSiPM, detectorId, barId, theEvent);
 		sdMan->AddNewDetector(SiPMTopSD);
 		logicSiPM->SetSensitiveDetector(SiPMTopSD);
 
@@ -191,7 +198,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 		string nameSiPM = "SiPM_"+to_string(barId);
 
 		// register SiPM in the detector class
-		detector.MakePixel(barId);
+		detector.MakeOptDevice(barId, OptDevice::eSiPM);
 
 		logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
 		logicScinBar  = new G4LogicalVolume(solidScinBar, Materials().ScinPlastic, nameScinBar, 0, 0, 0);
@@ -219,7 +226,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 		nameSiPM, logicScinBar, false, barId, fCheckOverlaps);
 
 		// registration of SiPM
-		G4MSiPMAction* const SiPMBotSD = new G4MSiPMAction("/Musaic/" + namedetector.str() + "/" + nameSiPM, detectorId, barId, theEvent);
+		G4MOptDeviceAction* const SiPMBotSD = new G4MOptDeviceAction("/Musaic/" + namedetector.str() + "/" + nameSiPM, detectorId, barId, theEvent);
 		sdMan->AddNewDetector(SiPMBotSD);
 		logicSiPM->SetSensitiveDetector(SiPMBotSD);
 	
