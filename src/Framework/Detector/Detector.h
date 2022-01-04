@@ -28,8 +28,8 @@
 class Detector
 {
 	public:
-		Detector(){;}
-		Detector(const unsigned int id) : fDetectorId(id) {;}
+		Detector(){ ; }
+		Detector(const unsigned int id) : fDetectorId(id) { ; }
 		virtual ~Detector() { }
 
 		int GetId() const { return fDetectorId; }
@@ -70,13 +70,15 @@ class Detector
 		void SetCladdingThickness(double cladThickness) { fCladdingThickness = cladThickness; }
 
 		// Optical device
+		static Detector MakeOptDevice(int id, OptDevice::DeviceType type);
+		static Detector MakeOptDevice(OptDevice::DeviceType type);
 
-		static Detector MakeOptDevice(unsigned int id, OptDevice::DeviceType type);
 		OptDevice& GetOptDevice() { return fOptDevice; }
-		OptDevice& GetOptDevice(unsigned int id) { return fOptDeviceMap[id]; }
+		OptDevice& GetOptDevice(int id) { return fOptDeviceMap[id]; }
+		OptDevice GetOptDevice(OptDevice::DeviceType type) { return OptDevice(type); }
 
-		std::map<unsigned int, OptDevice>& OptDeviceRange() { return fOptDeviceMap; }
-		const std::map<unsigned int, OptDevice>& OptDeviceRange() const { return fOptDeviceMap; }
+		std::map<int, OptDevice>& OptDeviceRange() { return fOptDeviceMap; }
+		const std::map<int, OptDevice>& OptDeviceRange() const { return fOptDeviceMap; }
 
 		//void MakeModule(unsigned int id);
 		//Module& GetModule() { return fModule; }
@@ -104,12 +106,10 @@ class Detector
 		double fHeight = 0;
 		double fRadius = 0;
 		
-
-		//std::vector<double>* fModulePosition;
 		std::vector<double> fDetectorPosition;
-		std::map<unsigned int, OptDevice> fOptDeviceMap;
 		OptDevice fOptDevice;
-		//std::map<int, Module> fModuleMap;
+		std::map<int, OptDevice> fOptDeviceMap;
+		std::map<OptDevice::DeviceType, OptDevice> fOptDeviceMapT;
 
 };
 
