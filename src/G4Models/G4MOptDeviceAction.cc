@@ -74,7 +74,7 @@ G4MOptDeviceAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*
 
 	if (OptDevice.IsPhotonDetected(photonEnergy)) {
 		// get detector sim data by module ID
-		std::cout << "[DEBUG] G4Models::G4MOptDeviceAction: Photon arrived to " << OptDevice.GetType() << " " << OptDeviceId << std::endl;
+		std::cout << "[DEBUG] G4Models::G4MOptDeviceAction: Photon arrived to " << OptDevice.GetName() << " " << OptDeviceId << std::endl;
 		DetectorSimData& detSimData = simData.GetDetectorSimData(moduleId);
 		//detSimData.MakeOptDeviceSimData(OptDeviceId);
 		SiPMSimData& OptDeviceSimData = detSimData.GetSiPMSimData(OptDeviceId);
