@@ -31,7 +31,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	fCasingThickness = detector.GetCasingThickness() * mm;
 	// scintillator bar properties
 	fBarWidth  = detector.GetBarWidth() * mm;
-	fBarLength = detector.GetBarLength(); //* mm;
+	fBarLength = detector.GetBarLength() * mm;
 	fBarThickness = detector.GetBarThickness() * mm;
 	fCoatingThickness = detector.GetBarCoatingThickness() * mm;
 
@@ -39,17 +39,16 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	fCladdingThickness = detector.GetCladdingThickness() * mm;
 	fFiberRadius = detector.GetFiberRadius() * mm;
 
-	fCasingSizeX = fBarLength/2 + fCoatingThickness + fCasingThickness;
-	fCasingSizeY = fBarWidth/2 + fCoatingThickness;// + fCasingThickness;
-	fCasingSizeZ = fBarThickness/2 + fCoatingThickness;// + fCasingThickness;
-
 	//detector.MakeOptDevice(OptDevice::eSiPM);
 	OptDevice sipm = detector.GetOptDevice(OptDevice::eSiPM);
 	std::cout << "[DEBUG] G4Models::Musaic: Building detector Musaic with " << sipm.GetName() << ". " << std::endl;
 	fSiPMSizeZ = sipm.GetThickness() * mm;
 	fSiPMSizeX = sipm.GetLength() * mm;
 	fSiPMSizeY = sipm.GetWidth() * mm;
-
+	std::cout << "[DEBUG] Number of bars = " << nBars << std::endl;
+	std::cout << "[DEBUG] Bar Length / mm = " << fBarLength  << std::endl;
+	std::cout << "[DEBUG] Bar Width / mm = " << fBarWidth  << std::endl;
+	std::cout << "[DEBUG] Bar Thickness / mm = " << fBarThickness  << std::endl;
 	std::cout << "Optical Device dimensions = (" << fSiPMSizeX << ", " << fSiPMSizeY << ", " << fSiPMSizeZ << ") / mm" << std::endl;
 
 	fCasingSizeX = fBarLength/2 + fCoatingThickness + fCasingThickness;
@@ -61,9 +60,9 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	ostringstream namedetector;
 	namedetector.str("");
 	namedetector << "Casing" << '_' << detectorId;
-	const double x = fBarLength/2;
-	const double y = fBarWidth/2 * nBars; // number of bars on each panel
-	const double z = fBarThickness/2 * 2; // 2 = number of panels
+	const double x = 0.5*fBarLength;
+	const double y = 0.5*fBarLength;
+	const double z = 0.5*fBarThickness * 2; // 2 = number of panels
 	const double t = fCasingThickness;
 	std::cout << "[DEBUG] G4Models::Musaic: up to here all good! " << std::endl;
 	// Casing
@@ -146,6 +145,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 
 		// register SiPM in the detector class
 		detector.MakeOptDevice(barId, OptDevice::eSiPM);
+		std::cout << "[DEBUG] Registering SiPM in Detector = " << detector.GetId() << std::endl;
 		// OptDevice& currSipm = detector.GetOptDevice(barId);
 		// currSipm.SetType(OptDevice::eSiPM);
 
