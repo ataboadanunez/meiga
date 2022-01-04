@@ -8,7 +8,21 @@ OptDevice::OptDevice(int id, OptDevice::DeviceType type) :
 	fOptDeviceId(id) ,
 	fType(type)
 { 
-	//OptDevice(type);
+
+	switch(type) {
+
+		case eSiPM:
+			SetWidth(fSiPMWidth);
+			SetLength(fSiPMLength);
+			SetThickness(fSiPMThickness);
+		break;
+
+		case ePMT:
+			SetWidth(fPMTWidth);
+			SetLength(fPMTLength);
+			SetThickness(fPMTThickness);
+		break;
+	}
 }
 
 OptDevice::OptDevice(OptDevice::DeviceType type) : 
