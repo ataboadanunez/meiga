@@ -70,8 +70,8 @@ class Detector
 		void SetCladdingThickness(double cladThickness) { fCladdingThickness = cladThickness; }
 
 		// Optical device
-		static Detector MakeOptDevice(int id, OptDevice::DeviceType type);
-		static Detector MakeOptDevice(OptDevice::DeviceType type);
+		//static Detector MakeOptDevice(int id, OptDevice::DeviceType type);
+		void MakeOptDevice(int id, OptDevice::DeviceType type);
 
 		OptDevice& GetOptDevice() { return fOptDevice; }
 		OptDevice& GetOptDevice(int id) { return fOptDeviceMap[id]; }
@@ -79,7 +79,7 @@ class Detector
 
 		std::map<int, OptDevice>& OptDeviceRange() { return fOptDeviceMap; }
 		const std::map<int, OptDevice>& OptDeviceRange() const { return fOptDeviceMap; }
-
+		int GetNOptDevice() const { return fNOptDevices; }
 		//void MakeModule(unsigned int id);
 		//Module& GetModule() { return fModule; }
 		//Module& GetModule(unsigned int id) { return fModuleMap[id]; }
