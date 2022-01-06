@@ -19,7 +19,7 @@ Musaic::~Musaic()
 }
 
 void 
-Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4int fBarsPanel, G4bool fCheckOverlaps)
+Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps)
 {
 
 	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
@@ -30,6 +30,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	
 	// detector properties
 	fCasingThickness = detector.GetCasingThickness() * mm;
+	
 	// scintillator bar properties
 	fBarWidth  = detector.GetBarWidth() * mm;
 	fBarLength = detector.GetBarLength() * mm;
@@ -51,11 +52,11 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	fCasingSizeY = 0.5*fBarLength + fCasingThickness;
 	fCasingSizeZ = 0.5*fBarThickness * 2 + fCasingThickness; // (x2 = number of panels)
 
-	string namedetector = "Musaic";
-	string newname; 
-	newname = namedetector + '_' + to_string(detectorId) + '/';
-	
-	std::cout << "[DEBUG] G4Models::Musaic: Building detector " << namedetector << " with " << sipm.GetName() << ". " << std::endl;
+	ostringstream namedetector;
+	namedetector.str("");
+	namedetector << "Musaic" << '_' << detectorId;
+	std::cout << "G4Models::Musaic: Building detector " << namedetector.str();
+	std::cout << " with " << sipm.GetName() << ". " << std::endl;
 	
 
 	/****************************
@@ -150,7 +151,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 			nameSiPM, logicScinBar, false, barId, fCheckOverlaps);
 
 		// registration of SiPM as a Sensitive Volume
-		G4MOptDeviceAction* const SiPMTopSD = new G4MOptDeviceAction(newname + nameSiPM, detectorId, barId, theEvent);
+		G4MOptDeviceAction* const SiPMTopSD = new G4MOptDeviceAction(namedetector.str() + "/" + nameSiPM, detectorId, barId, theEvent);
 		sdMan->AddNewDetector(SiPMTopSD);
 		logicSiPM->SetSensitiveDetector(SiPMTopSD);
 
@@ -203,7 +204,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 		nameSiPM, logicScinBar, false, barId, fCheckOverlaps);
 
 		// registration of SiPM as a Sensitive Volume
-		G4MOptDeviceAction* const SiPMBotSD = new G4MOptDeviceAction(newname + nameSiPM, detectorId, barId, theEvent);
+		G4MOptDeviceAction* const SiPMBotSD = new G4MOptDeviceAction(namedetector.str() + "/" + nameSiPM, detectorId, barId, theEvent);
 		sdMan->AddNewDetector(SiPMBotSD);
 		logicSiPM->SetSensitiveDetector(SiPMBotSD);
 	
