@@ -108,8 +108,8 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 		G4String nameClad2 = "FiberClad2_"+panelId+"_"+to_string(barId);
 		G4String nameClad1 = "FiberClad1_"+panelId+"_"+to_string(barId);
 		G4String nameFiber = "Fiber_"+panelId+"_"+to_string(barId);
-		G4String namePixelL = "Pixel_"+panelId+"_"+to_string(barId)+"_left";
-		G4String namePixelR = "Pixel_"+panelId+"_"+to_string(barId)+"_right";
+		G4String namePixelL = "PMT_"+panelId+"_"+to_string(barId)+"_left";
+		G4String namePixelR = "PMT_"+panelId+"_"+to_string(barId)+"_right";
 		// register PMTs in the detector class
 		detector.MakeOptDevice(-1*barId, OptDevice::ePMT);
 		detector.MakeOptDevice(barId, OptDevice::ePMT);
@@ -173,8 +173,8 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 		string nameClad2 = "FiberClad2_"+panelId+"_"+to_string(barId);
 		string nameClad1 = "FiberClad1_"+panelId+"_"+to_string(barId);
 		string nameFiber = "Fiber_"+panelId+"_"+to_string(barId);
-		G4String namePixelL = "Pixel_"+panelId+"_"+to_string(barId)+"_left";
-		G4String namePixelR = "Pixel_"+panelId+"_"+to_string(barId)+"_right";
+		G4String namePixelL = "PMT_"+panelId+"_"+to_string(barId)+"_left";
+		G4String namePixelR = "PMT_"+panelId+"_"+to_string(barId)+"_right";
 		// register PMTs in the detector class
 		detector.MakeOptDevice(-1*barId, OptDevice::ePMT);
 		detector.MakeOptDevice(barId, OptDevice::ePMT);

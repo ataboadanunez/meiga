@@ -70,7 +70,7 @@ G4MOptDeviceAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*
 
   G4double photonEnergy = step->GetTrack()->GetTotalEnergy() / (1*CLHEP::eV);
 #warning "Add SiPM / PMT cases"
-  OptDevice& OptDevice = fEvent.GetDetector().GetOptDevice(OptDeviceId);
+  OptDevice& OptDevice = fEvent.GetDetector(fModuleId).GetOptDevice(OptDeviceId);
 
 	if (OptDevice.IsPhotonDetected(photonEnergy)) {
 		// get detector sim data by module ID
