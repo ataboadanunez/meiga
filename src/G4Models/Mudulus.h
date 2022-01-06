@@ -24,7 +24,7 @@ class Mudulus {
 		Mudulus();
 		virtual ~Mudulus();
 
-		void BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4int fBarsPanel = 12, G4bool fCheckOverlaps = true);
+		void BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps = true);
 
 		// getters
 		G4LogicalVolume* GetLogicCasing() { return logicCasing; }
@@ -75,16 +75,17 @@ class Mudulus {
 
 		G4double fBarWidth;
 		G4double fBarLength;
-		G4double fBarThickness; 
+		G4double fBarThickness;
+		G4double fHalfWidth; 
 
 		G4double fCladdingThickness;
 		G4double fFiberRadius;
 		// this detector has an extra portion of 100 cm of fiber outside the bar
-		G4double fFiberExtra = 100*cm;
+		G4double fFiberExtra = 0*cm;
 
-		G4double fPixelSizeX;
-		G4double fPixelSizeY;
-		G4double fPixelSizeZ;
+		G4double fPMTSizeX;
+		G4double fPMTSizeY;
+		G4double fPMTSizeZ;
 
 
 

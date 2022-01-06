@@ -43,10 +43,10 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 
 	// Optical device properties
 	OptDevice sipm = detector.GetOptDevice(OptDevice::eSiPM);
-	fSiPMSizeZ = sipm.GetThickness() * mm;
 	fSiPMSizeX = sipm.GetLength() * mm;
 	fSiPMSizeY = sipm.GetWidth() * mm;
-
+	fSiPMSizeZ = sipm.GetThickness() * mm;
+	
 	// define a enclosure volume that contains the components of the detector
 	fCasingSizeX = 0.5*fBarLength + fCasingThickness;
 	fCasingSizeY = 0.5*fBarLength + fCasingThickness;
@@ -58,7 +58,6 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	std::cout << "G4Models::Musaic: Building detector " << namedetector.str();
 	std::cout << " with " << sipm.GetName() << ". " << std::endl;
 	
-
 	/****************************
 		
 		Geant4 Volume construction
@@ -92,7 +91,6 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	G4VisAttributes black(G4Colour::Black());
 
 	// definitions for fibers and SiPM placements
-
 	G4double fPosTopX = 0;
 	G4double fPosTopY = 0.5*fBarWidth + fCoatingThickness;
 	G4double fPosTopZ = 0.5*fBarThickness + fCoatingThickness;
@@ -110,7 +108,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	for (G4int i=0; i<nBars; ++i) {
 
 		// definitions for bar placement
-		unsigned int barId = i;
+		int barId = i+1;
 		G4int inc = pow(-1,i);//(1+2*i);
 		G4double yp = inc*fPosTopY;
 		
