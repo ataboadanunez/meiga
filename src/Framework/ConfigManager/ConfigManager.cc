@@ -11,16 +11,16 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 	//Detector& detector = theEvent.GetDetector();
 	int nDetectors = 0;
 
-	// read XML with module positions
+	// read XML with detector positions
 	ptree tree;
 	read_xml(fDetectorList, tree);
-	for (const auto& i : tree.get_child("moduleList")) {
+	for (const auto& i : tree.get_child("detectorList")) {
 		ptree subtree;
 		string name;
 		tie(name, subtree) = i;
 #warning "add detector cases"
 		// do this for type cases
-		if (name != "module")
+		if (name != "detector")
 			continue;
 
 		vector<double> detPosition;
@@ -28,7 +28,7 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 		int detId = stoi(detIdstr);
 		detPosition.clear();
 
-		// create and get module
+		// create and get detector
 		if (!theEvent.HasDetector(detId))
 			theEvent.MakeDetector(detId);
 		
@@ -39,8 +39,13 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 		for (const auto &v : subtree.get_child("")) {
 			string label = v.first;
 			if ( label != "<xmlattr>" ) {
-       
-				if (label == "barsInPanel") {
+
+				if (label == "type") {
+					std::cout << " reading detector type " << std::endl;
+					auto detType = (Detector::DetectorType)stoi(v.second.data());
+					detector.SetType(detType);
+				}	
+				else if (label == "barsInPanel") {
 					int nBarsInPanel = stoi(v.second.data());
 					detector.SetNBars(nBarsInPanel);
 				}
@@ -57,7 +62,7 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 				}
 			}
 		}
-    
+		
 		detector.SetDetectorPosition(detPosition);
 	}
 

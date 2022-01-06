@@ -3,6 +3,7 @@
 #include "Materials.h"
 
 #include "Musaic.h"
+#include "Mudulus.h"
 
 #include "G4UnitsTable.hh"
 #include <iostream>
@@ -59,8 +60,16 @@ G4ExDetectorConstruction::PlaceDetector(Event& theEvent)
 	int nDetectors = theEvent.GetNDetectors();
 	// loop in Detectors Range
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
-		auto& currentMod = detIt->second;
-		Musaic().BuildDetector(logicGround, currentMod, theEvent);
+		auto& currentDet = detIt->second;
+		Detector::DetectorType detType = currentDet.GetType();
+		std::cout << "[DEBUG] G4ExDetectorConstruction: Detector Type = " << currentDet.GetType() << std::endl;
+
+		if (detType == Detector::DetectorType::eMusaic)
+			Musaic().BuildDetector(logicGround, currentDet, theEvent);
+		else if (detType == Detector::DetectorType::eMudulus)
+			Mudulus().BuildDetector(logicGround, currentDet, theEvent);
+		else
+			std::cout << "[WARNING] Unknown detector type!" << std::endl;
 	}
 
 }

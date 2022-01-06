@@ -1,14 +1,15 @@
 <?xml version='1.0' encoding='ISO-8859-1'?>
 
-<moduleList xmlns="http://tempuri.org/po.xsd" orderDate="1999-10-20">
+<detectorList xmlns="http://tempuri.org/po.xsd" orderDate="1999-10-20">
 	
-	<module id="0">
+	<detector id="0">
+			<type> 1 </type>
 	    <x unit="cm"> 0.0 </x>
 	    <y unit="cm"> 0.0 </y>
 	    <z unit="cm"> 0.0 </z>
 	    <barsInPanel> 2 </barsInPanel>
-	    <barLength unit="cm"> 4.8 </barLength>
-	</module>
+	    <barLength unit="mm"> 82 </barLength>
+	</detector>
 
 
-</moduleList>
+</detectorList>

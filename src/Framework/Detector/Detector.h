@@ -28,12 +28,23 @@
 class Detector
 {
 	public:
+
+		enum DetectorType {
+			eMusaic = 1,
+			eMudulus = 2,
+			eUnknown = 0
+		};
+
+
 		Detector(){ ; }
 		Detector(const unsigned int id) : fDetectorId(id) { ; }
 		virtual ~Detector() { }
 
 		int GetId() const { return fDetectorId; }
 		void SetId(int id) { fDetectorId = id; }
+
+		DetectorType GetType() const { return fType; }
+		void SetType(Detector::DetectorType type) { fType = type; }
 
 		std::vector<double> GetDetectorPosition() { return fDetectorPosition; }
 		void SetDetectorPosition(const std::vector<double> &pos) { fDetectorPosition = pos; }
@@ -92,6 +103,7 @@ class Detector
 	private:
 
 		int fDetectorId = 0;
+		DetectorType fType;
 		int fNBars = 0;
 		int fNOptDevices = 0;
 
