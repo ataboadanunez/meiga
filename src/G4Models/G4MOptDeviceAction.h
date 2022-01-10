@@ -23,7 +23,7 @@ class G4MOptDeviceAction : public G4VSensitiveDetector {
     Event& fEvent;
 
     int fModuleId = 0;
-    int fOptDeviceId   = 0;
+    int fOptDeviceId = 0;
 
     std::vector<double>* fPETime;
     std::vector<std::vector<double>*>* fPETimeDistribution;
