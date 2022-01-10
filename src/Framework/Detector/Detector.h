@@ -30,9 +30,9 @@ class Detector
 	public:
 
 		enum DetectorType {
+			eUnknown = 0,
 			eMusaic = 1,
-			eMudulus = 2,
-			eUnknown = 0
+			eMudulus = 2
 		};
 
 
