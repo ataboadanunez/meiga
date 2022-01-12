@@ -158,10 +158,10 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 
   
 	// bars of the bottom panel
-	for (G4int i=nBars; i<2*nBars; ++i) {
+	for (G4int i=0; i<nBars; ++i) {
 
 		// definitions for bar placement
-		unsigned int barId = i;
+		unsigned int barId = i+1+nBars;
 		G4int inc = pow(-1,i);
 		G4double xp = inc*fPosBotX;
 		
