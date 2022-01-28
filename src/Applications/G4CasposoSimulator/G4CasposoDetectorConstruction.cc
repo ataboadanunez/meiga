@@ -5,7 +5,7 @@
 // include detector models (should be in separate header)
 #include "Materials.h"
 #include "Musaic.h"
-#include "Casposo.h"
+#include "Mudulus.h"
 
 #include "G4UnitsTable.hh"
 
@@ -59,12 +59,12 @@ G4CasposoDetectorConstruction::PlaceDetector(Event& theEvent)
 	
 	//Detector& detector = theEvent.GetDetector();
 	int nDetectors = theEvent.GetNDetectors();
-	// loop in Detectors Range
+	// loop in Detectors vector
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 		auto& currentDet = detIt->second;
 		Detector::DetectorType detType = currentDet.GetType();
 		
-		Casposo().BuildDetector(logicGround, currentDet, theEvent);
+		Mudulus().BuildDetector(logicGround, currentDet, theEvent);
 	}
 
 }

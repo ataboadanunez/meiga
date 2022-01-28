@@ -6,7 +6,7 @@
 #include "Materials.h"
 #include "Musaic.h"
 #include "Mudulus.h"
-#include "Casposo.h"
+#include "RCDetector.h"
 
 #include "G4UnitsTable.hh"
 
