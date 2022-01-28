@@ -22,9 +22,6 @@
 
 #include "Event.h"
 #include "Detector.h"
-#include "Module.h"
-
-
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
@@ -33,75 +30,59 @@ class G4OpticalSkinSurface;
 // Detector construction class to define materials and geometry
 
 class G4CasposoDetectorConstruction : public G4VUserDetectorConstruction {
-  
-  public:
-    G4CasposoDetectorConstruction(Event& theEvent);
-    virtual ~G4CasposoDetectorConstruction();
-    virtual G4VPhysicalVolume* Construct();
+	
+	public:
+		G4CasposoDetectorConstruction(Event& theEvent);
+		virtual ~G4CasposoDetectorConstruction();
+		virtual G4VPhysicalVolume* Construct();
 
-    G4double GetRockSizeX() const { return fRockSizeX; }
-    G4double GetRockSizeY() const { return fRockSizeY; }
-    G4double GetRockSizeZ() const { return fRockSizeZ; }
+		G4double GetGroundSizeX() const { return fGroundSizeX; }
+		G4double GetGroundSizeY() const { return fGroundSizeY; }
+		G4double GetGroundSizeZ() const { return fGroundSizeZ; }
 
 
-  private:
-    //void SetDetectorParameters(); 
-    void CreateElements();
-    void CreateMaterials();
-    
-    void CreateWorld();
-    void CreateRock();
-    void CreateHall();
-    G4VPhysicalVolume* CreateDetector();
-    
-    bool fCheckOverlaps = true;
+	private:
 
-    G4Element* elN = nullptr;
-    G4Element* elO = nullptr;
-    G4Element* elH = nullptr;
-    G4Element* elSi = nullptr;
-    G4Material* Air = nullptr;
-    G4Material* Quartz = nullptr;
-    G4Material* Water = nullptr;  
+		void CreateWorld();
+		void CreateGround();
+		void PlaceDetector(Event& theEvent);
+		G4VPhysicalVolume* CreateDetector();
+		
+		bool fCheckOverlaps = true;
 
-    // solids
-    G4Box* solidWorld = nullptr;
-    G4Box* solidRock = nullptr;
-    G4Box* solidHall = nullptr;
-    
-    
-    // logical and physical volumes
-    G4LogicalVolume* logicWorld = nullptr;
-    G4PVPlacement*   physWorld  = nullptr;
-    
-    G4LogicalVolume* logicRock = nullptr;
-    G4PVPlacement*   physRock  = nullptr;
+		// solids
+		G4Box* solidWorld = nullptr;
+		G4Box* solidGround = nullptr;
+		
+		// logical and physical volumes
+		G4LogicalVolume* logicWorld = nullptr;
+		G4PVPlacement*   physWorld  = nullptr;
+		
+		G4LogicalVolume* logicGround = nullptr;
+		G4PVPlacement*   physGround  = nullptr;
 
-    G4LogicalVolume* logicHall = nullptr;
-    G4PVPlacement*   physHall  = nullptr;
+		// size definitions
+		G4double fGroundSizeX = 15 * CLHEP::m;
+		G4double fGroundSizeY = 15 * CLHEP::m;
+		G4double fGroundSizeZ = 15 * CLHEP::m;
 
-    // size definitions
-    G4double fRockSizeX = 150*m;
-    G4double fRockSizeY = 150*m;
-    G4double fRockSizeZ = 150*m;
+		G4double fWorldSizeX = fGroundSizeX + 5 * CLHEP::m;
+		G4double fWorldSizeY = fGroundSizeY + 5 * CLHEP::m;
+		G4double fWorldSizeZ = fGroundSizeZ + 5 * CLHEP::m;
 
-    G4double fWorldSizeX = fRockSizeX + 0.5*m;
-    G4double fWorldSizeY = fRockSizeX + 0.5*m;
-    G4double fWorldSizeZ = fRockSizeX + 0.5*m;
+		G4double fHallSizeX = 25*m;
+		G4double fHallSizeY = 3*m;
+		G4double fHallSizeZ = 3*m;
 
-    G4double fHallSizeX = 25*m;
-    G4double fHallSizeY = 3*m;
-    G4double fHallSizeZ = 3*m;
+		G4double fRockPosX = 0;
+		G4double fRockPosY = 0;
+		G4double fRockPosZ = 0;
 
-    G4double fRockPosX = 0;
-    G4double fRockPosY = 0;
-    G4double fRockPosZ = 0;
+		G4double fHallPosX = 0;
+		G4double fHallPosY = 0;
+		G4double fHallPosZ = fHallSizeZ - 150*m;
 
-    G4double fHallPosX = 0;
-    G4double fHallPosY = 0;
-    G4double fHallPosZ = fHallSizeZ - 150*m;
-
-    Event& fEvent;
+		Event& fEvent;
 };
 
 

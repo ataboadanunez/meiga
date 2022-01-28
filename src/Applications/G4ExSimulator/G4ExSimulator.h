@@ -13,7 +13,6 @@
 #include "Detector.h"
 
 class G4RunManager;
-class G4StationPrimaryGenerator;
 
 class G4ExSimulator 
 {

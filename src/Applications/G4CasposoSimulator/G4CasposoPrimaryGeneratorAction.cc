@@ -79,8 +79,8 @@ G4CasposoPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   currParticle.SetZenith(particleZenith);
 
   // check injection according to detector dimensions
-  const G4double injRadius = 0.5*m;
-  const G4double injHeight = 150.5*m;  
+  const G4double injRadius = 0.25*m;
+  const G4double injHeight = 1.5*m;  
   const G4double rand = RandFlat::shoot(0., 1.);
   const G4double r = injRadius*sqrt(rand);
   const G4double phi = RandFlat::shoot(0., CLHEP::twopi);
@@ -88,7 +88,8 @@ G4CasposoPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   G4double x0 = r*cos(phi);
   G4double y0 = r*sin(phi);
   G4double z0 = injHeight;
-  
+  x0 = 0 * CLHEP::mm;
+  y0 = 0 * CLHEP::mm;
   const std::vector<double> injectionPosition = {x0, y0, z0};
   currParticle.SetInjectionPosition(injectionPosition);
   

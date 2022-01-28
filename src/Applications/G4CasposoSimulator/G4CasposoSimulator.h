@@ -13,7 +13,6 @@
 #include "Detector.h"
 
 class G4RunManager;
-class G4StationPrimaryGenerator;
 
 class G4CasposoSimulator 
 {
@@ -37,13 +36,15 @@ class G4CasposoSimulator
   private:
 
 		// flags for configuration (see .json file)
-		std::string fInputFile;
-		std::string fOutputFile; 
-		bool fGeoVisOn = true;
-		bool fTrajVisOn = false;
-		int fVerbosity = 1;
-		std::string fRenderFile = "VRML2FILE";
-		std::string fPhysicsName = "QGSP_BERT_HP";
+    std::string fInputFile;
+    std::string fOutputFile;
+    std::string fDetectorList;
+    bool fGeoVisOn = true;
+    bool fTrajVisOn = false;
+    int fVerbosity = 1;
+    std::string fRenderFile = "VRML2FILE";
+    std::string fPhysicsName = "QGSP_BERT_HP";
+
   	friend class G4CasposoDetectorConstructor;
   	friend class G4CasposoPrimaryGenerator;
 };

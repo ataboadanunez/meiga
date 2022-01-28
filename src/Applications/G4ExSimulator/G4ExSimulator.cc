@@ -34,8 +34,6 @@
 #include "SimData.h"
 #include "SiPMSimData.h"
 #include "Detector.h"
-#include "Module.h"
-//#include "SiPM.h"
 #include "OptDevice.h"
 #include "G4MPhysicsList.h"
 
@@ -82,7 +80,6 @@ int main(int argc, char** argv)
 		if (sarg == "-c")
 			fCfgFile = argv[i+1];
 	}
-	
 
 	Event theEvent;
 	fG4ExSimulator = new G4ExSimulator();
@@ -140,10 +137,10 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	SimData& simData = theEvent.GetSimData();
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
 
-	std::cout << "[INFO] Event::SimData: Total number of particles in file = " << NumberOfParticles << std::endl;
+	cout << "[INFO] Event::SimData: Total number of particles in file = " << NumberOfParticles << endl;
 	
 	if (!NumberOfParticles) {
-		std::cerr << "ERROR! No Particles in the Event! Exiting..." << std::endl;
+		cerr << "ERROR! No Particles in the Event! Exiting..." << endl;
 		return false;
 	}
 	
@@ -156,7 +153,7 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	G4long myseed = time(NULL);
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
 	G4Random::setTheSeed(myseed);
-	G4cout << "Seed for random generation: " << myseed << G4endl;
+	cout << "Seed for random generation: " << myseed << endl;
 
 	G4VisManager* fVisManager = nullptr;
 	
@@ -230,11 +227,14 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 		fUImanager->ApplyCommand("/vis/drawVolume");
 		fUImanager->ApplyCommand("/vis/scene/notifyHandlers");
 		fUImanager->ApplyCommand("/vis/viewer/update");
+
 	}
+
 	if (fTrajVisOn) {
-		fUImanager->ApplyCommand("/tracking/storeTrajectory 1");
-		fUImanager->ApplyCommand("/vis/scene/add/trajectories");
+			fUImanager->ApplyCommand("/tracking/storeTrajectory 1");
+			fUImanager->ApplyCommand("/vis/scene/add/trajectories");
 	}
+	
 
 	int nParticle = 0;
 	// loop over particle vector

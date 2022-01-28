@@ -1,12 +1,14 @@
 // implementation of the G4ExDetectorConstruction class
-#include "G4ExDetectorConstruction.h"
-#include "Materials.h"
+#include <iostream>
 
+#include "G4ExDetectorConstruction.h"
+// include detector models (should be in separate header)
+#include "Materials.h"
 #include "Musaic.h"
 #include "Mudulus.h"
+#include "Casposo.h"
 
 #include "G4UnitsTable.hh"
-#include <iostream>
 
 using namespace std;
 
@@ -62,14 +64,14 @@ G4ExDetectorConstruction::PlaceDetector(Event& theEvent)
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 		auto& currentDet = detIt->second;
 		Detector::DetectorType detType = currentDet.GetType();
-		std::cout << "[DEBUG] G4ExDetectorConstruction: Detector Type = " << currentDet.GetType() << std::endl;
+		cout << "[DEBUG] G4ExDetectorConstruction: Detector Type = " << currentDet.GetType() << endl;
 
 		if (detType == Detector::DetectorType::eMusaic)
 			Musaic().BuildDetector(logicGround, currentDet, theEvent);
 		else if (detType == Detector::DetectorType::eMudulus)
 			Mudulus().BuildDetector(logicGround, currentDet, theEvent);
 		else
-			std::cout << "[WARNING] Unknown detector type!" << std::endl;
+			cout << "[WARNING] Unknown detector type!" << endl;
 	}
 
 }
