@@ -11,7 +11,7 @@ class G4TouchableHistory;
 
 class G4MOptDeviceAction : public G4VSensitiveDetector {
   public:
-    G4MOptDeviceAction(const G4String& name, const G4int mId, const G4int sId, Event& theEvent);
+    G4MOptDeviceAction(const G4String& name, const G4int dId, const G4int oId, Event& theEvent);
     virtual ~G4MOptDeviceAction() { }
 
     virtual void Initialize(G4HCofThisEvent* const /*hce*/) override;
@@ -22,7 +22,7 @@ class G4MOptDeviceAction : public G4VSensitiveDetector {
   	
     Event& fEvent;
 
-    int fModuleId = 0;
+    int fDetectorId = 0;
     int fOptDeviceId = 0;
 
     std::vector<double>* fPETime;
