@@ -64,7 +64,7 @@ G4CasposoDetectorConstruction::PlaceDetector(Event& theEvent)
 		auto& currentDet = detIt->second;
 		Detector::DetectorType detType = currentDet.GetType();
 		
-		Mudulus().BuildDetector(logicGround, currentDet, theEvent);
+		Mudulus::BuildDetector(logicGround, currentDet, theEvent);
 	}
 
 }
