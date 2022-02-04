@@ -9,19 +9,68 @@
 
 using namespace std;
 
-Mudulus::Mudulus()
-{
-
-}
-
-Mudulus::~Mudulus()
-{
-
-}
 
 void 
 Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps)
 {
+	
+	// the following variables need to be declared here as
+	// BuildDetector() is a static method of the Class.
+
+	// solids
+	G4Box* solidCasing = nullptr;
+	G4Box* solidCoating = nullptr;
+	G4Box* solidScinBar = nullptr;
+
+	G4Tubs* solidClad2 = nullptr;
+	G4Tubs* solidClad1 = nullptr;
+	G4Tubs* solidFiber = nullptr;
+
+	G4Box* solidPixel = nullptr;
+
+	// logical volumes
+	G4LogicalVolume* logicCasing = nullptr;
+	G4LogicalVolume* logicCoating = nullptr;
+	G4LogicalVolume* logicScinBar = nullptr;
+	
+	G4LogicalVolume* logicClad2 = nullptr;
+	G4LogicalVolume* logicClad1 = nullptr;
+	G4LogicalVolume* logicFiber = nullptr;
+
+	G4LogicalVolume* logicPixelL = nullptr;
+	G4LogicalVolume* logicPixelR = nullptr;
+
+	// physical volumes
+	G4PVPlacement* physCasing = nullptr;
+	G4PVPlacement* physCoating = nullptr;
+	G4PVPlacement* physScinBar = nullptr;
+
+	G4PVPlacement* physClad2 = nullptr;
+	G4PVPlacement* physClad1 = nullptr;
+	G4PVPlacement* physFiber = nullptr;
+
+	// detector properties are fixed for this detector.
+	G4int nPanels = 3;
+	G4double fDistanceBtwPanels = 1 * CLHEP::m;
+
+	const G4int nBars = 12;
+	const G4double fBarLength   = 495 * CLHEP::mm;
+	const G4double fFiberLength = 1970 * CLHEP::mm;
+	const G4double fBarThickness = 10 * CLHEP::mm;
+	const G4double fCoatingThickness = 0.25 * CLHEP::mm;
+	const G4double fBarWidth = 41 * CLHEP::mm;
+	const G4double fHalfWidth = 0.5 * nBars * (fBarWidth + fCoatingThickness); 
+
+	const G4double fCladdingThickness = 0.10 * CLHEP::mm;
+	const G4double fFiberRadius = 1.2 * CLHEP::mm;
+	const G4double fCasingThickness = 2 * CLHEP::mm;
+	const G4double fCasingSizeX = fFiberLength + 570 * CLHEP::mm;
+	const G4double fCasingSizeY = fFiberLength + 570 * CLHEP::mm;
+	const G4double fCasingSizeZ = fBarThickness * 4 + fCasingThickness; // (x2 number of panels)
+
+	const G4double fPMTSizeX = 1.0 * CLHEP::mm;
+	const G4double fPMTSizeY = 1.0 * CLHEP::mm;
+	const G4double fPMTSizeZ = 0.1 * CLHEP::mm;
 
 	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
 	G4ThreeVector  detectorPos = Geometry::ToG4Vector(detector.GetDetectorPosition(), 1.);
@@ -117,7 +166,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			G4ThreeVector barPosition = G4ThreeVector(fBarPosX, fBarPosY-fHalfWidth, fBarPosZ);
 
 			// fiber position (w.r.t scintillator bar)
-			G4double fFiberPosX = GetFiberXCoordinate(bIt);
+			G4double fFiberPosX = GetFiberXCoordinate(bIt, fBarLength, fFiberLength);
 			G4double fFiberPosY = 0 * CLHEP::mm;
 			G4double fFiberPosZ = -0.5*fBarThickness + fCoatingThickness + fFiberRadius + fCladdingThickness;
 			G4ThreeVector fiberPosition = G4ThreeVector(fFiberPosX, fFiberPosY, fFiberPosZ);
@@ -158,22 +207,13 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			logicPixelR->SetVisAttributes(blue);
 
 			// physical volumes
-			physCoating  = new G4PVPlacement(nullptr, barPosition, logicCoating, 
-				nameCoating, logicCasing, false, barId, fCheckOverlaps);
-			physScinBar   = new G4PVPlacement(nullptr, G4ThreeVector(), logicScinBar, 
-				nameScinBar, logicCoating, false, barId, fCheckOverlaps);
-			cout << "[DEBUG] G4Models::Mudulus: Placement of fiber " <<  barId << ": " << fFiberPosX / CLHEP::mm << endl; 
-			physClad2 = new G4PVPlacement(rotationFiber, fiberPosition, logicClad2, 
-				nameClad2, logicScinBar, true, barId, fCheckOverlaps);
-			physClad1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
-				nameClad1, logicClad2, false, barId, fCheckOverlaps);
-			physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
-				nameFiber, logicClad1, false, barId, fCheckOverlaps); 
-
-			physPixelL  = new G4PVPlacement(nullptr, G4ThreeVector(fPMTPosX, fPMTPosY, fPMTPosZ), logicPixelL,
-				namePixelL, logicFiber, false, pixelLId, fCheckOverlaps);
-			physPixelR  = new G4PVPlacement(nullptr, G4ThreeVector(fPMTPosX, fPMTPosY, -1*fPMTPosZ), logicPixelR,
-				namePixelR, logicFiber, false, pixelRId, fCheckOverlaps);
+			physCoating = new G4PVPlacement(0, barPosition, nameCoating, logicCoating, physCasing, false, barId, fCheckOverlaps);
+			physScinBar = new G4PVPlacement(0, G4ThreeVector(), nameScinBar, logicScinBar, physCoating, false, barId, fCheckOverlaps);
+			physClad2 = new G4PVPlacement(rotationFiber, fiberPosition, nameClad2, logicClad2, physScinBar, false, barId, fCheckOverlaps);
+			physClad1 = new G4PVPlacement(0, G4ThreeVector(), nameClad1, logicClad1, physClad2, false, barId, fCheckOverlaps);
+			physFiber = new G4PVPlacement(0, G4ThreeVector(), nameFiber, logicFiber, physClad1, false, barId, fCheckOverlaps);
+			new G4PVPlacement(0, G4ThreeVector(fPMTPosX, fPMTPosY, fPMTPosZ), namePixelL, logicPixelL, physFiber, false, pixelLId, fCheckOverlaps);
+			new G4PVPlacement(0, G4ThreeVector(fPMTPosX, fPMTPosY, -1*fPMTPosZ), namePixelR, logicPixelR, physFiber, false, pixelRId, fCheckOverlaps);
 
 			// registration of PMTs as Sensitive Detectors
 			G4MOptDeviceAction* const PixelTopL = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelL, detectorId, pixelLId, theEvent);
@@ -199,7 +239,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			G4ThreeVector barPosition = G4ThreeVector(fBarPosX-fHalfWidth, fBarPosY, fBarPosZ);
 
 			// fiber position (w.r.t scintillator bar)
-			G4double fFiberPosX = -1*GetFiberXCoordinate(bIt);
+			G4double fFiberPosX = -1*GetFiberXCoordinate(bIt, fBarLength, fFiberLength);
 			G4double fFiberPosY = 0 * CLHEP::mm;
 			G4double fFiberPosZ = -0.5*fBarThickness + fCoatingThickness + fFiberRadius + fCladdingThickness;
 			G4ThreeVector fiberPosition = G4ThreeVector(fFiberPosX, fFiberPosY, fFiberPosZ);
@@ -213,13 +253,13 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			G4int pixelLId = 100*panelId + barId + nBars;   // (125...136, 225...236, 325...336)
 			G4int pixelRId = 100*panelId + barId + 2*nBars; // (137...148, 237...248, 337...348)
 
-			string nameCoating = "BarCoating_"+gridName+"_"+to_string(barId);
-			string nameScinBar = "BarScin_"+gridName+"_"+to_string(barId);
-			string nameClad2 = "FiberClad2_"+gridName+"_"+to_string(barId);
-			string nameClad1 = "FiberClad1_"+gridName+"_"+to_string(barId);
-			string nameFiber = "Fiber_"+gridName+"_"+to_string(barId);
-			G4String namePixelL = "PMT_"+gridName+"_"+to_string(barId)+"_left";
-			G4String namePixelR = "PMT_"+gridName+"_"+to_string(barId)+"_right";
+			G4String nameCoating = "BarCoating_"+gridName+"_"+to_string(barId);
+			G4String nameScinBar = "BarScin_"+gridName+"_"+to_string(barId);
+			G4String nameClad2 = "FiberClad2_"+gridName+"_"+to_string(barId);
+			G4String nameClad1 = "FiberClad1_"+gridName+"_"+to_string(barId);
+			G4String nameFiber = "Fiber_"+gridName+"_"+to_string(barId);
+			G4String namePixelL = "PMT_"+gridName+"_"+to_string(pixelLId);
+			G4String namePixelR = "PMT_"+gridName+"_"+to_string(pixelRId);
 			// register PMTs in the detector class
 			detector.MakeOptDevice(pixelLId, OptDevice::ePMT);
 			detector.MakeOptDevice(pixelRId, OptDevice::ePMT);
@@ -239,27 +279,20 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			logicPixelR->SetVisAttributes(blue);
 
 			// physical volumes		
-			physCoating  = new G4PVPlacement(rotationBot, barPosition, logicCoating, 
-				nameCoating, logicCasing, false, barId, fCheckOverlaps);
-			physScinBar   = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicScinBar,
-				nameScinBar, logicCoating, false, barId, fCheckOverlaps);
-			physClad2 = new G4PVPlacement(rotationFiber, fiberPosition, logicClad2, 
-				nameClad2, logicScinBar, true, barId, fCheckOverlaps);
-			physClad1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
-				nameClad1, logicClad2, false, barId, fCheckOverlaps);
-			physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
-				nameFiber, logicClad1, false, barId, fCheckOverlaps); 
-			physPixelL  = new G4PVPlacement(nullptr, G4ThreeVector(fPMTPosX, fPMTPosY, fPMTPosZ), logicPixelL, 
-					namePixelL, logicFiber, false, pixelLId, fCheckOverlaps);
-			physPixelR  = new G4PVPlacement(nullptr, G4ThreeVector(fPMTPosX, fPMTPosY, -1*fPMTPosZ), logicPixelR, 
-					namePixelR, logicFiber, false, pixelRId, fCheckOverlaps);
+			physCoating = new G4PVPlacement(rotationBot, barPosition, nameCoating, logicCoating, physCasing, false, barId, fCheckOverlaps);
+			physScinBar = new G4PVPlacement(0, G4ThreeVector(), nameScinBar, logicScinBar, physCoating, false, barId, fCheckOverlaps);
+			physClad2 = new G4PVPlacement(rotationFiber, fiberPosition, nameClad2, logicClad2, physScinBar, false, barId, fCheckOverlaps);
+			physClad1 = new G4PVPlacement(0, G4ThreeVector(), nameClad1, logicClad1, physClad2, false, barId, fCheckOverlaps);
+			physFiber = new G4PVPlacement(0, G4ThreeVector(), nameFiber, logicFiber, physClad1, false, barId, fCheckOverlaps);
+			new G4PVPlacement(0, G4ThreeVector(fPMTPosX, fPMTPosY, fPMTPosZ), namePixelL, logicPixelL, physFiber, false, pixelLId, fCheckOverlaps);
+			new G4PVPlacement(0, G4ThreeVector(fPMTPosX, fPMTPosY, -1*fPMTPosZ), namePixelR, logicPixelR, physFiber, false, pixelRId, fCheckOverlaps);
 
 			// registration of pixels as Sensitive Detectors
-			G4MOptDeviceAction* const PixelBotL = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelL, detectorId, barId, theEvent);
+			G4MOptDeviceAction* const PixelBotL = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelL, detectorId, pixelLId, theEvent);
 			sdMan->AddNewDetector(PixelBotL);
 			logicPixelL->SetSensitiveDetector(PixelBotL);
 
-			G4MOptDeviceAction* const PixelBotR = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelR, detectorId, barId, theEvent);
+			G4MOptDeviceAction* const PixelBotR = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelR, detectorId, pixelRId, theEvent);
 			sdMan->AddNewDetector(PixelBotR);
 			logicPixelR->SetSensitiveDetector(PixelBotR);
 
@@ -270,7 +303,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 }
 
 G4double
-Mudulus::GetFiberXCoordinate(G4int barId)
+Mudulus::GetFiberXCoordinate(G4int barId, G4double barLength, G4double fiberLength)
 {
 	G4double pos = 0;
 	if (barId == 0)
@@ -298,5 +331,5 @@ Mudulus::GetFiberXCoordinate(G4int barId)
 	else if (barId == 11)
 		pos = -1000;
 
-	return (pos * CLHEP::mm - 0.5*fBarLength + 0.5*fFiberLength);
+	return (pos * CLHEP::mm - 0.5*barLength + 0.5*fiberLength);
 }
