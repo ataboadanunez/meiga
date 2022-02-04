@@ -284,10 +284,17 @@ G4ExSimulator::WriteEventInfo(Event& theEvent)
 			cout << "G4ExSimulator::WriteEventInfo: Accessing signal of " << currOd.GetName() << " " << odId << " from Detector " << detId << endl;
 
 			// checking signal at optical devices
-			for (auto peTime = odSimData.PETimeDistributionRange()->begin(); peTime != odSimData.PETimeDistributionRange()->end(); ++peTime) {
+			const auto *peTimeDistributionRange = odSimData.PETimeDistributionRange();
+			if (!peTimeDistributionRange) {
+				cerr << "No Time for this channel!" << endl;
+				continue;
+			}
+
+			for (auto peTime = peTimeDistributionRange->begin(); peTime != peTimeDistributionRange->end(); ++peTime) {
 
 				size_t npe = (*peTime)->size();
 				cout << "Number of photo-electrons = " << npe << endl;
+				// write pulses to output file
 
 			}
 

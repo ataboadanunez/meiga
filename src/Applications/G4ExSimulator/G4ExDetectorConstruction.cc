@@ -6,7 +6,7 @@
 #include "Materials.h"
 #include "Musaic.h"
 #include "Mudulus.h"
-#include "RCDetector.h"
+//#include "RCDetector.h"
 
 #include "G4UnitsTable.hh"
 
@@ -50,7 +50,7 @@ G4ExDetectorConstruction::CreateGround()
 	G4VisAttributes brown(G4Colour::Brown());
 	logicGround = new G4LogicalVolume(solidGround, Materials().StdRock, "Ground");
 	logicGround->SetVisAttributes(brown);
-	physGround  =  new G4PVPlacement(nullptr, G4ThreeVector(), logicGround, "Ground", logicWorld, false, 0, fCheckOverlaps);
+	physGround  =  new G4PVPlacement(nullptr, G4ThreeVector(0, 0, -fWorldSizeZ/2 + fGroundSizeZ/2), logicGround, "Ground", logicWorld, false, 0, fCheckOverlaps);
 }
 
 
@@ -63,15 +63,18 @@ G4ExDetectorConstruction::PlaceDetector(Event& theEvent)
 	// loop in Detectors Range
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 		auto& currentDet = detIt->second;
-		Detector::DetectorType detType = currentDet.GetType();
 		cout << "[DEBUG] G4ExDetectorConstruction: Detector Type = " << currentDet.GetType() << endl;
-
+#if 0
+		Detector::DetectorType detType = currentDet.GetType();
 		if (detType == Detector::DetectorType::eMusaic)
 			Musaic().BuildDetector(logicGround, currentDet, theEvent);
 		else if (detType == Detector::DetectorType::eMudulus)
-			Mudulus().BuildDetector(logicGround, currentDet, theEvent);
+			Mudulus::BuildDetector(logicGround, currentDet, theEvent);
 		else
 			cout << "[WARNING] Unknown detector type!" << endl;
+#endif
+		BuildDetector(logicWorld, currentDet, theEvent, false);
+
 	}
 
 }

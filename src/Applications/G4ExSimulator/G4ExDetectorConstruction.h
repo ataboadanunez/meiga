@@ -66,8 +66,8 @@ class G4ExDetectorConstruction : public G4VUserDetectorConstruction {
 		G4double fGroundSizeY = 5 * CLHEP::m;
 		G4double fGroundSizeZ = 1 * CLHEP::m;
 
-		G4double fWorldSizeX = fGroundSizeX + 5 * CLHEP::m;
-		G4double fWorldSizeY = fGroundSizeY + 5 * CLHEP::m;
+		G4double fWorldSizeX = fGroundSizeX + 0.5 * CLHEP::m;
+		G4double fWorldSizeY = fGroundSizeY + 0.5 * CLHEP::m;
 		G4double fWorldSizeZ = fGroundSizeZ + 5 * CLHEP::m;
 
 		Event& fEvent;
