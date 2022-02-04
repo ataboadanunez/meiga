@@ -64,7 +64,7 @@ G4MudulusDetectorConstruction::PlaceDetector(Event& theEvent)
   // loop over Detectors Range
   for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
     auto& currentDet = detIt->second;
-    Mudulus().BuildDetector(logicWorld, currentDet, theEvent);
+    Mudulus::BuildDetector(logicWorld, currentDet, theEvent);
   }
 
 }
