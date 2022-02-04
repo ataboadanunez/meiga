@@ -4,9 +4,12 @@
 //#include "Module.h"
 //#include "G4SystemOfUnits.hh"
 #include "OptDevice.h"
+#include "G4LogicalVolume.hh"
+
 #include <vector>
 #include <map>
 
+class Event;
 
 /*
 	declaration of Detector class
@@ -124,5 +127,7 @@ class Detector
 		std::map<OptDevice::DeviceType, OptDevice> fOptDeviceMapT;
 
 };
+
+void BuildDetector(G4LogicalVolume *logMother, Detector &det, Event &evt, G4bool overlaps = false);
 
 #endif
