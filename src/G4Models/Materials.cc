@@ -13,7 +13,7 @@ static G4double scinPhotonEnergy[] = {
 	3.05*eV, 3.08*eV, 3.11*eV, 3.14*eV, 3.17*eV,
 	3.20*eV, 3.23*eV, 3.26*eV, 3.29*eV, 3.32*eV,
 	3.35*eV, 3.38*eV, 3.41*eV, 3.44*eV, 3.47*eV
-	};
+};
 
 G4int scinArrEntries = sizeof(scinPhotonEnergy)/sizeof(G4double);
 
@@ -23,7 +23,7 @@ static G4double scinRefIndex[] = {
 	1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5,
 	1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5,
 	1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5
-	};
+};
 
 static G4double scinAbsLen[] = {
 	4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 4.0*cm, 
@@ -32,7 +32,7 @@ static G4double scinAbsLen[] = {
 	24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 
 	24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 24.0*cm, 
 	24.0*cm, 24.0*cm
-  };
+ };
 
 static G4double scinFastComp[] = {
 	0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -40,7 +40,7 @@ static G4double scinFastComp[] = {
 	0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 	1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
 	1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
-	};
+};
 
 static G4double scinSlowComp[] = {
 	1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
@@ -48,7 +48,7 @@ static G4double scinSlowComp[] = {
 	1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
 	0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 	0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-	};
+};
 
 static G4double scinOptSurfRefIndex[] = {
 	1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
@@ -56,7 +56,7 @@ static G4double scinOptSurfRefIndex[] = {
 	1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
 	1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
 	1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
-  };
+ };
 
 static G4double scinOptSurfEff[] = {
 	0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -64,7 +64,7 @@ static G4double scinOptSurfEff[] = {
 	0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 	0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 	0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-  };
+ };
 
 static G4double pmmaRefIndex[] = {
 	1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60,
@@ -72,7 +72,7 @@ static G4double pmmaRefIndex[] = {
 	1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60,
 	1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60,
 	1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60, 1.60
-  };
+};
 
 static G4double pmmaAbsLen[] = {
 	10.00*m, 10.00*m, 10.00*m, 10.00*m, 10.00*m, 10.00*m, 10.00*m, 10.00*m, 10.00*m, 10.00*m,
@@ -80,7 +80,7 @@ static G4double pmmaAbsLen[] = {
 	10.00*m, 10.00*m, 10.00*m, 10.00*m, 10.00*m, 10.00*m, 10.00*m, 10.00*m, 10.00*m, 1.0*m,
 	0.0001*m, 0.0001*m, 0.0001*m, 0.0001*m, 0.0001*m, 0.0001*m, 0.0001*m, 0.0001*m, 0.0001*m, 0.0001*m,
 	0.0001*m, 0.0001*m, 0.0001*m, 0.0001*m, 0.0001*m, 0.0001*m, 0.0001*m, 0.0001*m, 0.0001*m, 0.0001*m
-  };
+};
 
 static G4double pmmaEmission[] = {
 	0.05, 0.10, 0.30, 0.50, 0.75, 1.00, 1.50, 1.85, 2.30, 2.75,
@@ -88,7 +88,7 @@ static G4double pmmaEmission[] = {
 	12.9, 13.0, 12.8, 12.3, 11.1, 11.0, 12.0, 11.0, 17.0, 16.9,
 	15.0, 9.00, 2.50, 1.00, 0.05, 0.00, 0.00, 0.00, 0.00, 0.00,
 	0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00
-  };
+};
 
 
 static G4double pethyRefIndex[] = {
@@ -97,7 +97,7 @@ static G4double pethyRefIndex[] = {
 	1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49,
 	1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49,
 	1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49, 1.49
-	};
+};
 
 static G4double pethyAbsLen[] = {
 	20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m,
@@ -105,7 +105,7 @@ static G4double pethyAbsLen[] = {
 	20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m,
 	20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m,
 	20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m, 20.0*m
-	};
+};
 
 static G4double fpethyRefIndex[] = {
 	1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42,
@@ -113,12 +113,78 @@ static G4double fpethyRefIndex[] = {
 	1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42,
 	1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42,
 	1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42, 1.42
-	};
+};
 
 static G4double pmtPhotonEnergy[] = {2.00*eV, 4.00*eV};
 static G4double pmtRefIndex[] = {1.47, 1.47};
 G4int pmtArrEntries = sizeof(pmtPhotonEnergy) / sizeof(G4double);
 
+// array of photon energies for Cerenkov processes in WCD tanks
+// this energy range corresponds to the efficiency region of Auger WCD large PMTs
+static G4double waterPhotonEnergy[] = {
+	2.08*eV,  2.16*eV,  2.19*eV,  2.23*eV,  2.27*eV,  2.32*eV,
+	2.36*eV,  2.41*eV,  2.46*eV,  2.50*eV,  2.56*eV,  2.61*eV,
+	2.67*eV,  2.72*eV,  2.79*eV,  2.85*eV,  2.92*eV,  2.99*eV,
+	3.06*eV,  3.14*eV,  3.22*eV,  3.31*eV,  3.40*eV,  3.49*eV,
+	3.59*eV,  3.70*eV,  3.81*eV,  3.94*eV,  4.07*eV,  4.20*eV
+};
+
+G4int waterArrEntries = sizeof(waterPhotonEnergy) / sizeof(G4double);
+G4double scaleAbsLen = 100*m;
+
+static G4double waterAbsLen[] = {
+	0.092*scaleAbsLen, 0.133*scaleAbsLen, 0.180*scaleAbsLen, 0.203*scaleAbsLen, 0.226*scaleAbsLen, 0.258*scaleAbsLen,
+	0.284*scaleAbsLen, 0.302*scaleAbsLen, 0.403*scaleAbsLen, 0.560*scaleAbsLen, 0.735*scaleAbsLen, 0.818*scaleAbsLen,
+	0.923*scaleAbsLen, 0.923*scaleAbsLen, 0.993*scaleAbsLen, 0.993*scaleAbsLen, 1.000*scaleAbsLen, 0.941*scaleAbsLen,
+	0.889*scaleAbsLen, 0.842*scaleAbsLen, 0.754*scaleAbsLen, 0.655*scaleAbsLen, 0.480*scaleAbsLen, 0.380*scaleAbsLen,
+	0.311*scaleAbsLen, 0.257*scaleAbsLen, 0.212*scaleAbsLen, 0.171*scaleAbsLen, 0.137*scaleAbsLen, 0.102*scaleAbsLen
+};
+
+static G4double waterPhotonEnergyShort[] = {2.08*eV, 4.20*eV};
+static G4double waterRefIndex[] = {1.33, 1.33};
+
+static G4double linerAbsLen[] = {
+	10*m,  10*m,  10*m,  10*m,  10*m,  10*m,
+	10*m,  10*m,  10*m,  10*m,  10*m,  10*m,
+	10*m,  10*m,  10*m,  10*m,  10*m,  10*m,
+	10*m,  10*m,  10*m,  10*m,  10*m,  10*m,
+	10*m,  10*m,  10*m,  10*m,  10*m,  10*m
+};
+
+static G4double linerRefIndex[] = {
+	0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0
+};
+
+static G4double linerBackScatter[] = {
+	0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0
+};
+
+static G4double scaleLinerRef = 0.94;
+static G4double linerReflectivity[] = {
+	0.9957*scaleLinerRef, 0.9953*scaleLinerRef, 0.9948*scaleLinerRef, 0.9942*scaleLinerRef, 0.9939*scaleLinerRef, 0.9937*scaleLinerRef,
+	0.9937*scaleLinerRef, 0.9940*scaleLinerRef, 0.9945*scaleLinerRef, 0.9954*scaleLinerRef, 0.9964*scaleLinerRef, 0.9975*scaleLinerRef,
+	0.9985*scaleLinerRef, 0.9993*scaleLinerRef, 1.0000*scaleLinerRef, 1.0000*scaleLinerRef, 0.9993*scaleLinerRef, 0.9977*scaleLinerRef,
+	0.9948*scaleLinerRef, 0.9903*scaleLinerRef, 0.9840*scaleLinerRef, 0.9753*scaleLinerRef, 0.9642*scaleLinerRef, 0.9500*scaleLinerRef, 
+	0.9334*scaleLinerRef, 0.9108*scaleLinerRef, 0.8849*scaleLinerRef, 0.8541*scaleLinerRef, 0.8178*scaleLinerRef, 0.7755*scaleLinerRef
+};
+
+// sigmaAlpha is used to model specular reflections from the surface
+static G4double fSigmaAlpha = 0.17;
+static G4double specularLobePhotonEnergy[] = {2.08*eV, 3.0*eV, 4.20*eV};
+// fraction of light reflected in a lobe with width characterized by sigmaAlpha
+static G4double specularLobe[] = {0.2, 0.2, 0.2};
+static G4double specularSpike[] = {0, 0, 0};
+
+
+//////
 static bool isInitialized = 0;
 G4Element* Materials::elN;
 G4Element* Materials::elO;
@@ -139,6 +205,7 @@ G4Material* Materials::Polystyrene;
 
 // Materials
 G4Material* Materials::Air;
+G4Material* Materials::Water;
 G4Material* Materials::StdRock;
 G4Material* Materials::ScinPlastic;
 G4Material* Materials::ScinCoating;
@@ -146,7 +213,9 @@ G4Material* Materials::PMMA;
 G4Material* Materials::Pethylene;
 G4Material* Materials::FPethylene;
 G4Material* Materials::Pyrex;
+G4Material* Materials::HDPE;
 G4OpticalSurface* Materials::ScinOptSurf;
+G4OpticalSurface* Materials::LinerOptSurf;
 
 Materials::Materials() 
 {
@@ -253,6 +322,17 @@ Materials::CreateMaterials()
 	Air = new G4Material("Air", 1.29e-3 * g/cm3, 2);
 	Air->AddElement(elN, 0.7);
 	Air->AddElement(elO, 0.3);
+	// --------------------------------------------------------------------
+	// Water
+	// --------------------------------------------------------------------
+	Water = new G4Material("Water", 1 * g/cm3, 2);
+	Water->AddElement(elH, 2);
+	Water->AddElement(elO, 1);
+
+	G4MaterialPropertiesTable* waterPT = new G4MaterialPropertiesTable();
+	waterPT->AddProperty("RINDEX", waterPhotonEnergyShort, waterRefIndex, 2);
+	waterPT->AddProperty("ABSLENGTH", waterPhotonEnergy, waterAbsLen, waterArrEntries);
+	Water->SetMaterialPropertiesTable(waterPT);
 
 	// --------------------------------------------------------------------
 	// Rocks
@@ -372,5 +452,28 @@ Materials::CreateMaterials()
 	Pyrex->SetMaterialPropertiesTable(pyrexPT);
 
 
+	// HDPE for WCD material
+	HDPE = new G4Material("HDPE", 0.94 * g/cm3, 2);
+	HDPE->AddElement(elC, 2);
+	HDPE->AddElement(elH, 4);
+
+	G4MaterialPropertiesTable* linerPT = new G4MaterialPropertiesTable();
+	linerPT->AddProperty("ABSLENGTH", waterPhotonEnergy, linerAbsLen, waterArrEntries);
+	HDPE->SetMaterialPropertiesTable(linerPT);
+
+	// Liner optical surface properties
+	G4MaterialPropertiesTable* linerOpticalPT = new G4MaterialPropertiesTable();
+	linerOpticalPT->AddProperty("SPECULARLOBECONSTANT", specularLobePhotonEnergy, specularLobe, 3);
+	linerOpticalPT->AddProperty("SPECULARSPIKECONSTANT", specularLobePhotonEnergy, specularSpike, 3);
+	linerOpticalPT->AddProperty("REFLECTIVITY", waterPhotonEnergy, linerReflectivity, waterArrEntries);
+	linerOpticalPT->AddProperty("BACKSCATTERCONSTANT", waterPhotonEnergy, linerBackScatter, waterArrEntries);
+	linerOpticalPT->AddProperty("RINDEX", waterPhotonEnergy, linerRefIndex, waterArrEntries);
+
+  LinerOptSurf =  new G4OpticalSurface("WallSurface");
+  LinerOptSurf->SetModel(unified);
+  LinerOptSurf->SetType(dielectric_metal);
+  LinerOptSurf->SetFinish(ground);
+  LinerOptSurf->SetSigmaAlpha(fSigmaAlpha);
+  LinerOptSurf->SetMaterialPropertiesTable(linerOpticalPT);
 
 }

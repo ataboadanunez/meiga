@@ -43,6 +43,7 @@ public:
 
 	// Materials
 	static G4Material* Air;
+	static G4Material* Water;
 	static G4Material* StdRock;
 	static G4Material* ScinPlastic;
 	static G4Material* ScinCoating;
@@ -50,7 +51,9 @@ public:
 	static G4Material* Pethylene;
 	static G4Material* FPethylene;
 	static G4Material* Pyrex;
+	static G4Material* HDPE;
 	static G4OpticalSurface* ScinOptSurf;
+	static G4OpticalSurface* LinerOptSurf;
 
 	const G4double* GetScinPhotonEnergyArray() const;
 	const G4double* GetScinRefIndexArray() const;

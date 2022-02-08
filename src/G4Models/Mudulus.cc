@@ -72,7 +72,6 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	const G4double fPMTSizeY = 1.0 * CLHEP::mm;
 	const G4double fPMTSizeZ = 0.1 * CLHEP::mm;
 
-	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
 	G4ThreeVector  detectorPos = Geometry::ToG4Vector(detector.GetDetectorPosition(), 1.);
 
 	int detectorId = detector.GetId();
@@ -131,6 +130,9 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	G4VisAttributes green(G4Colour::Green());
 	G4VisAttributes blue(G4Colour::Blue());
 	G4VisAttributes black(G4Colour::Black());
+
+	// assemble Mudulus detector
+	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
 
 	// loop over casings (volume which contains the panels)
 	for (G4int pIt=0; pIt<nPanels; ++pIt) {
