@@ -18,6 +18,7 @@ static void initConversionMap() {
 	conversion["eUnknown"] = Detector::eUnknown;
 	conversion["eMusaic"]  = Detector::eMusaic;
 	conversion["eMudulus"] = Detector::eMudulus;
+	conversion["eWCD"]     = Detector::eWCD;
 }
 
 void
