@@ -1,6 +1,7 @@
 #include "Detector.h"
 #include "Mudulus.h"
 #include "Musaic.h"
+#include "WCD.h"
 
 #include <map>
 #include <iostream>
@@ -25,6 +26,7 @@ static void initEnumToBuild() {
 	isInitialized = true;
 	enumToBuild[Detector::eMudulus] = Mudulus::BuildDetector;
 	enumToBuild[Detector::eMusaic]  = Musaic::BuildDetector;
+	enumToBuild[Detector::eWCD]			= WCD::BuildDetector;
 }
 
 void BuildDetector(G4LogicalVolume *logMother, Detector &det, Event &evt, G4bool overlaps) {
