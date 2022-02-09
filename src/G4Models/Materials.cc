@@ -117,6 +117,7 @@ static G4double fpethyRefIndex[] = {
 
 static G4double pmtPhotonEnergy[] = {2.00*eV, 4.00*eV};
 static G4double pmtRefIndex[] = {1.47, 1.47};
+static G4double pmtAbsLength[] = {0.0005*mm, 0.0005*mm};
 G4int pmtArrEntries = sizeof(pmtPhotonEnergy) / sizeof(G4double);
 
 // array of photon energies for Cerenkov processes in WCD tanks
@@ -449,6 +450,7 @@ Materials::CreateMaterials()
 	#warning "This properties are for PMTs! Check Pyrex optical properties for SiPMs!!"
 	G4MaterialPropertiesTable* pyrexPT = new G4MaterialPropertiesTable();
 	pyrexPT->AddProperty("RINDEX", pmtPhotonEnergy, pmtRefIndex, pmtArrEntries);
+	pyrexPT->AddProperty("ABSLENGTH", pmtPhotonEnergy, pmtAbsLength, pmtArrEntries);
 	Pyrex->SetMaterialPropertiesTable(pyrexPT);
 
 
