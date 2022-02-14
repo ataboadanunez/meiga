@@ -1,7 +1,7 @@
 #include "G4MOptDeviceAction.h"
 #include "SimData.h"
 #include "DetectorSimData.h"
-#include "SiPMSimData.h"
+#include "OptDeviceSimData.h"
 #include "OptDevice.h"
 
 #include <G4Step.hh>
@@ -20,8 +20,8 @@ G4MOptDeviceAction::G4MOptDeviceAction(const G4String& name, const G4int dId, co
 		std::cout << "[INFO] G4Models::G4MOptDeviceAction: Registering OptDevice " << name << std::endl;
 		SimData& simData = fEvent.GetSimData();
 		DetectorSimData& detSimData = simData.GetDetectorSimData(fDetectorId);
-		detSimData.MakeSiPMSimData(fOptDeviceId);
-		SiPMSimData& OptDeviceSimData = detSimData.GetSiPMSimData(fOptDeviceId);
+		detSimData.MakeOptDeviceSimData(fOptDeviceId);
+		OptDeviceSimData& OptDeviceSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
 
 		fPETimeDistribution = OptDeviceSimData.PETimeDistributionRange();
 
@@ -38,7 +38,7 @@ G4MOptDeviceAction::Initialize(G4HCofThisEvent* const /*hce*/)
 void
 G4MOptDeviceAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 {
-	fEvent.GetSimData().GetDetectorSimData(fDetectorId).GetSiPMSimData(fOptDeviceId).AddPETimeDistribution(fPETime);
+	fEvent.GetSimData().GetDetectorSimData(fDetectorId).GetOptDeviceSimData(fOptDeviceId).AddPETimeDistribution(fPETime);
 	//fPETimeDistribution->push_back(fPETime);
 
 }
@@ -77,7 +77,7 @@ G4MOptDeviceAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*
 		std::cout << "[DEBUG] G4Models::G4MOptDeviceAction: Photon arrived to " << OptDevice.GetName() << " " << OptDeviceId << " from bar " << moduleId << std::endl;
 		DetectorSimData& detSimData = simData.GetDetectorSimData(fDetectorId);
 		//detSimData.MakeOptDeviceSimData(OptDeviceId);
-		SiPMSimData& OptDeviceSimData = detSimData.GetSiPMSimData(OptDeviceId);
+		OptDeviceSimData& OptDeviceSimData = detSimData.GetOptDeviceSimData(OptDeviceId);
 		//unsigned int OptDeviceIdFwk = OptDeviceSimData.GetId();
 		const double time = step->GetPreStepPoint()->GetGlobalTime() / (1*CLHEP::ns);
 #warning "Add SiPM / PMT cases"

@@ -1,7 +1,7 @@
 #include "G4MPMTAction.h"
 #include "SimData.h"
 #include "DetectorSimData.h"
-#include "SiPMSimData.h"
+#include "OptDeviceSimData.h"
 #include "OptDevice.h"
 
 #include <G4Step.hh>
@@ -22,8 +22,8 @@ G4MPMTAction::G4MPMTAction(const G4String& name, const G4int dId, const G4int oI
     cout << "[INFO] G4Models::G4MPMTAction: Registering PMT " << name << endl;
     SimData& simData = fEvent.GetSimData();
     DetectorSimData& detSimData = simData.GetDetectorSimData(fDetectorId);
-    detSimData.MakeSiPMSimData(fOptDeviceId);
-    SiPMSimData& OptDeviceSimData = detSimData.GetSiPMSimData(fOptDeviceId);
+    detSimData.MakeOptDeviceSimData(fOptDeviceId);
+    OptDeviceSimData& OptDeviceSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
 
     fPETimeDistribution = OptDeviceSimData.PETimeDistributionRange();
 
@@ -40,7 +40,7 @@ G4MPMTAction::Initialize(G4HCofThisEvent* const /*hce*/)
 void
 G4MPMTAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 {
-  fEvent.GetSimData().GetDetectorSimData(fDetectorId).GetSiPMSimData(fOptDeviceId).AddPETimeDistribution(fPETime);
+  fEvent.GetSimData().GetDetectorSimData(fDetectorId).GetOptDeviceSimData(fOptDeviceId).AddPETimeDistribution(fPETime);
   //fPETimeDistribution->push_back(fPETime);
 
 }
