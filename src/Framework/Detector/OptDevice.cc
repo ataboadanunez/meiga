@@ -47,7 +47,6 @@ OptDevice::OptDevice(OptDevice::DeviceType type) :
 	}
 
 
-
 }
 
 const string
