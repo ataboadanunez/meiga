@@ -12,9 +12,7 @@
 #include "G4OpticalPhoton.hh"
 
 #include "SimData.h"
-#include "SiPMSimData.h"
 #include "Detector.h"
-#include "Module.h"
 
 G4WCDSteppingAction::G4WCDSteppingAction(const G4WCDConstruction* det, G4WCDEventAction* G4event, Event& MSevent)
 	: G4UserSteppingAction(),

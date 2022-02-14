@@ -30,7 +30,7 @@
 #include "ReadParticleFile.h"
 #include "Event.h"
 #include "SimData.h"
-#include "SiPMSimData.h"
+#include "OptDeviceSimData.h"
 #include "Detector.h"
 #include "OptDevice.h"
 #include "G4MPhysicsList.h"
@@ -138,7 +138,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 	cout << "[INFO] Event::SimData: Total number of particles in file = " << NumberOfParticles << endl;
 	
 	if (!NumberOfParticles) {
-		cerr << "ERROR! No Particles in the Event! WCDiting..." << endl;
+		cerr << "ERROR! No Particles in the Event! Exiting..." << endl;
 		return false;
 	}
 	
@@ -278,7 +278,7 @@ G4WCDSimulator::WriteEventInfo(Event& theEvent)
 			auto& currOd = odIt->second;
 			int odId = currOd.GetId();
 
-			SiPMSimData& odSimData = detSimData.GetSiPMSimData(odId);
+			OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(odId);
 			cout << "G4WCDSimulator::WriteEventInfo: Accessing signal of " << currOd.GetName() << " " << odId << " from Detector " << detId << endl;
 
 			// checking signal at optical devices
