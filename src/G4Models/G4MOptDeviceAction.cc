@@ -70,14 +70,14 @@ G4MOptDeviceAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*
 
 	G4double photonEnergy = step->GetTrack()->GetTotalEnergy() / (1*CLHEP::eV);
 #warning "Add SiPM / PMT cases"
-	OptDevice& OptDevice = fEvent.GetDetector(fDetectorId).GetOptDevice(OptDeviceId);
+	OptDevice& OptDevice = fEvent.GetDetector(fDetectorId).GetOptDevice(fOptDeviceId);
 
 	if (true/*OptDevice.IsPhotonDetected(photonEnergy)*/) {
 		// get detector sim data by module ID
-		std::cout << "[DEBUG] G4Models::G4MOptDeviceAction: Photon arrived to " << OptDevice.GetName() << " " << OptDeviceId << " from bar " << moduleId << std::endl;
+		std::cout << "[DEBUG] G4Models::G4MOptDeviceAction: Photon arrived to " << OptDevice.GetName() << " " << fOptDeviceId << " from bar " << moduleId << std::endl;
 		DetectorSimData& detSimData = simData.GetDetectorSimData(fDetectorId);
 		//detSimData.MakeOptDeviceSimData(OptDeviceId);
-		OptDeviceSimData& OptDeviceSimData = detSimData.GetOptDeviceSimData(OptDeviceId);
+		OptDeviceSimData& OptDeviceSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
 		//unsigned int OptDeviceIdFwk = OptDeviceSimData.GetId();
 		const double time = step->GetPreStepPoint()->GetGlobalTime() / (1*CLHEP::ns);
 #warning "Add SiPM / PMT cases"
