@@ -31,7 +31,7 @@ G4WCDTrackingAction::PostUserTrackingAction(const G4Track* track)
   double depth = injectZ - trackZ;
 
   // track primaries
-  if (track->GetParentID() == 0) {
-  	G4cout << "TrackStoppingInfo " << particleId << " " << particleEnergy / CLHEP::MeV << " " << particleZenith / CLHEP::deg << " " << depth << " " << track->GetVolume()->GetName() << G4endl; 
-  }
+  //if (track->GetParentID() == 0) {
+  	//G4cout << "TrackStoppingInfo " << particleId << " " << particleEnergy / CLHEP::MeV << " " << particleZenith / CLHEP::deg << " " << depth << " " << track->GetVolume()->GetName() << G4endl; 
+  //}
 }

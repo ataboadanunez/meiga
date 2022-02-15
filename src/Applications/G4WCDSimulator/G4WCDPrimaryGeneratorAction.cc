@@ -79,8 +79,8 @@ G4WCDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   currParticle.SetZenith(particleZenith);
 
   // check injection according to detector dimensions
-  const G4double injRadius = 0.5*m;
-  const G4double injHeight = 10*cm;  
+  const G4double injRadius = 105 * CLHEP::cm;
+  const G4double injHeight = 90 * CLHEP::cm + 10*CLHEP::cm; // slightly above tank  
   const G4double rand = RandFlat::shoot(0., 1.);
   const G4double r = injRadius*sqrt(rand);
   const G4double phi = RandFlat::shoot(0., CLHEP::twopi);
@@ -93,9 +93,9 @@ G4WCDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   currParticle.SetInjectionPosition(injectionPosition);
   
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(fPx, fPy, -1*fPz));
-  //fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
-  fParticleGun->SetParticlePosition(G4ThreeVector(1*cm, 1*cm, 1*m));
+  fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
+  //fParticleGun->SetParticlePosition(G4ThreeVector(1*cm, 1*cm, 1*m));
   fParticleGun->SetParticleEnergy(fKineticEnergy);
-
   fParticleGun->GeneratePrimaryVertex(event);
+  
 }
