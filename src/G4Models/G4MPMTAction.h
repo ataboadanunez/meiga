@@ -24,6 +24,7 @@ class G4MPMTAction : public G4VSensitiveDetector {
 
     int fDetectorId = 0;
     int fOptDeviceId = 0;
+    int NumCerenkovPhotons;
 
     std::vector<double>* fPETime;
     std::vector<std::vector<double>*>* fPETimeDistribution;
