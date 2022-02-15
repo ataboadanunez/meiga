@@ -44,13 +44,13 @@ void WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 
 	G4PVPlacement* physPMT = nullptr;
 	// Auger's WCD dimensions
-	G4double fTankRadius = 1.8 * CLHEP::m;
-	G4double fTankHeight = 1.2 * CLHEP::m;
+	G4double fTankRadius = 105 * CLHEP::cm;
+	G4double fTankHeight = 90 * CLHEP::cm;
 	G4double fTankHalfHeight = 0.5 * fTankHeight;
 	G4double fTankThickness = 12.7 * CLHEP::mm;
 	// Auger's photonis-XP1805
-	G4double fPmtRmin = 114 * CLHEP::mm;
-	G4double fPmtRzmin = 84.5781 * CLHEP::mm;
+	G4double fPMTSemiX = 10.1 * CLHEP::cm;
+	G4double fPMTSemiZ = 6.5  * CLHEP::cm;
 
 	G4ThreeVector detectorPos = Geometry::ToG4Vector(detector.GetDetectorPosition(), 1.);
 
@@ -67,7 +67,7 @@ void WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 	solidSide = new G4Tubs("Side", fTankRadius, fTankRadius + fTankThickness, fTankHalfHeight, 0, 360*deg);
 
 	// pmt solids (G4StationConstruction.cc:1416)
-	solidPMT = new G4Ellipsoid("PMT", fPmtRmin, fPmtRmin, fPmtRzmin, -fPmtRzmin, 0);
+	solidPMT = new G4Ellipsoid("PMT", fPMTSemiX, fPMTSemiX, fPMTSemiZ, -fPMTSemiZ, 0);
 
 	// assemble WCD 
 	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
@@ -83,8 +83,6 @@ void WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 	logSide  = new G4LogicalVolume(solidSide, Materials().HDPE, "logSide", 0, 0, 0);
 	physSide = new G4PVPlacement(nullptr, G4ThreeVector(fTankPosX, fTankPosY, fTankPosZ + fTankHalfHeight + fTankThickness), logSide, "physSide", logMother, false, 0, fCheckOVerlaps);
 
-	
-
 	// tank liner surface
 	new G4LogicalBorderSurface("TopSurface", physTank, physTop, Materials().LinerOptSurf);
 	new G4LogicalBorderSurface("BotSurface", physTank, physBot, Materials().LinerOptSurf);
@@ -95,12 +93,15 @@ void WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 	physPMT = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, fTankHalfHeight), logPMT, "physPMT", logTank, false, 0, fCheckOVerlaps);
 
 	// register the PMT as sensitive detectors
-	ostringstream name;
-	name.str("");
-	name << "/WCD/pmt";
-# warning "include PMT ids?"
-	G4MPMTAction* const pmtSD = new G4MPMTAction(name.str().c_str(), 0, 0, theEvent);
+	// register PMT in the detector class
+	detector.MakeOptDevice(0, OptDevice::ePMT);
+	OptDevice optDevice = detector.GetOptDevice(0);
+	string optName = optDevice.GetName();
+	ostringstream fullName;
+	fullName.str("");
+	fullName << "/WCD/" << optName;
+	G4MPMTAction* const pmtSD = new G4MPMTAction(fullName.str().c_str(), 0, 0, theEvent);
 	sdMan->AddNewDetector(pmtSD);
 	logPMT->SetSensitiveDetector(pmtSD);
-
+	
 }
