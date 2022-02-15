@@ -76,7 +76,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 
 	int detectorId = detector.GetId();
 
-	OptDevice pmt = detector.GetOptDevice(OptDevice::ePMT);
+	OptDevice pmt = detector.GetOptDevice(OptDevice::eMChPMT);
 	
 	ostringstream namedetector;
 	namedetector.str("");
@@ -190,8 +190,8 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			G4String namePixelL = "PMT_"+gridName+"_"+to_string(pixelLId);
 			G4String namePixelR = "PMT_"+gridName+"_"+to_string(pixelRId);
 			// register PMTs in the detector class
-			detector.MakeOptDevice(pixelLId, OptDevice::ePMT);
-			detector.MakeOptDevice(pixelRId, OptDevice::ePMT);
+			detector.MakeOptDevice(pixelLId, OptDevice::eMChPMT);
+			detector.MakeOptDevice(pixelRId, OptDevice::eMChPMT);
 			
 
 			// logical volumes
@@ -263,8 +263,8 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			G4String namePixelL = "PMT_"+gridName+"_"+to_string(pixelLId);
 			G4String namePixelR = "PMT_"+gridName+"_"+to_string(pixelRId);
 			// register PMTs in the detector class
-			detector.MakeOptDevice(pixelLId, OptDevice::ePMT);
-			detector.MakeOptDevice(pixelRId, OptDevice::ePMT);
+			detector.MakeOptDevice(pixelLId, OptDevice::eMChPMT);
+			detector.MakeOptDevice(pixelRId, OptDevice::eMChPMT);
 
 			// logical volumes
 			logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
