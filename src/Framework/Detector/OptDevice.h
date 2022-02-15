@@ -10,6 +10,7 @@ class OptDevice
 	public:
 		enum DeviceType {
 			eSiPM,
+			eMChPMT,
 			ePMT
 		};
 
@@ -40,6 +41,7 @@ class OptDevice
 
 		// response stuff
 		bool IsPhotonDetected(double energy);
+		double GetQuantumEfficiency(double wl, OptDevice::DeviceType t);
 		void SPEPulse(std::vector<double> &amplitude, double fBinTime, size_t fStartPulse);
 		double GetSPEPulseDuration() { return fPulseDuration; }
 
@@ -65,7 +67,7 @@ class OptDevice
 		double fPMTWidth  		= 1.3;
 		double fPMTThickness = 0.1;
 		// add quantum efficiency
-
+		double fQEScaleParameter = 0.31;
 
 		// sipm SPE pulse parameters
 		double fPulseDuration = 100.;
