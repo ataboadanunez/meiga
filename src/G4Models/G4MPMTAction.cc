@@ -34,6 +34,7 @@ G4MPMTAction::Initialize(G4HCofThisEvent* const /*hce*/)
 {
   
   NumCerenkovPhotons = 0;
+  NumPE = 0;
   fPETime = new std::vector<double>();
 
 }
@@ -42,9 +43,10 @@ void
 G4MPMTAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 {
   fEvent.GetSimData().GetDetectorSimData(fDetectorId).GetOptDeviceSimData(fOptDeviceId).AddPETimeDistribution(fPETime);
-  //fPETimeDistribution->push_back(fPETime);
-
-  cout << "Number of Cerenkov Photons at PMT = " << NumCerenkovPhotons << endl;
+  // gets current particle in the event to stream the number of PE for each particle
+  Particle currentParticle = fEvent.GetSimData().GetCurrentParticle();
+  int partId = currentParticle.GetParticleId();
+  cout << "Particle_ID " << partId << " PE " << NumPE << endl;
 
 }
 
@@ -78,6 +80,7 @@ G4MPMTAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHist
     OptDeviceSimData.AddPhotonEnergy(energy);
     OptDeviceSimData.AddPhotonTime(time);
     fPETime->push_back(time);
+    NumPE += 1;
 
   }
   
