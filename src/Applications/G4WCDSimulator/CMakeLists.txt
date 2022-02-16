@@ -52,5 +52,15 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E copy "${copy_source_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
   COMMENT "Copying ${copy_file_name} to build directory"
 )
+set(copy_file_name "vertical_muon.txt")
+add_custom_command(
+  TARGET G4WCDSimulator POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${copy_dest_dir}
+)
+add_custom_command(
+  TARGET G4WCDSimulator POST_BUILD 
+  COMMAND ${CMAKE_COMMAND} -E copy "${copy_source_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
+  COMMENT "Copying ${copy_file_name} to build directory"
+)
 
 

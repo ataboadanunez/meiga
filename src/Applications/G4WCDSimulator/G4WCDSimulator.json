@@ -1,6 +1,6 @@
 {
-	"InputFile" : "/home/alvaro/data/sims/test/vertical_muon.txt",
-	"OutputFile" : "/home/alvaro/data/output/output.dat",
+	"InputFile" : "./vertical_muon.txt",
+	"OutputFile" : "./output.dat",
 	"GeoVisOn" : true,
 	"TrajVisOn" : false,
 	"Verbosity" : 1,
