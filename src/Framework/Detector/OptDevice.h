@@ -68,6 +68,7 @@ class OptDevice
 		double fPMTThickness = 0.1;
 		// add quantum efficiency
 		double fQEScaleParameter = 0.31;
+		double fPMTCollectionEfficiency = 0.7;
 
 		// sipm SPE pulse parameters
 		double fPulseDuration = 100.;
