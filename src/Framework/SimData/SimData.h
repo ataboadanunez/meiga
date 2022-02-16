@@ -21,6 +21,9 @@ class SimData
     unsigned int GetTotalNumberOfParticles() const { return fTotalNumberOfParticles; }
     void SetTotalNumberOfParticles(const unsigned int n) { fTotalNumberOfParticles = n; }
 
+    Particle& GetCurrentParticle() { return fCurrentParticle; }
+    void SetCurrentParticle(Particle particle) { fCurrentParticle = particle; }
+
     // DetectorSimData getters
     void MakeDetectorSimData(unsigned int id);
     DetectorSimData& GetDetectorSimData() { return fDetectorSimData; }
@@ -40,6 +43,7 @@ class SimData
   private:
 
     ParticleVector fParticles;
+    Particle fCurrentParticle;
     unsigned int fTotalNumberOfParticles = 0;
 
     DetectorSimData fDetectorSimData;
