@@ -238,6 +238,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
 		G4WCDSimulator::currentParticle = *it;
+		simData.SetCurrentParticle(*it);
 		// Run simulation
 		fRunManager->BeamOn(1);
 		nParticle+=1;
