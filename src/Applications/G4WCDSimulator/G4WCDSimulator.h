@@ -44,7 +44,8 @@ class G4WCDSimulator
 		int fVerbosity = 1;
 		std::string fRenderFile = "VRML2FILE";
     std::string fPhysicsName = "QGSP_BERT_HP";
-
+    std::string fSimulationMode;
+    
   	friend class G4WCDDetectorConstructor;
   	friend class G4WCDPrimaryGenerator;
 };

@@ -38,13 +38,13 @@ class OptDevice
 		void SetThickness(double thi) { fOptDeviceThickness = thi; }
 
 		
-
 		// response stuff
 		bool IsPhotonDetected(double energy);
 		double GetQuantumEfficiency(double wl, OptDevice::DeviceType t);
 		void SPEPulse(std::vector<double> &amplitude, double fBinTime, size_t fStartPulse);
 		double GetSPEPulseDuration() { return fPulseDuration; }
 
+		std::vector<double> GetOpticalRange();
 
 
 	private:
@@ -66,8 +66,10 @@ class OptDevice
 		double fPMTLength 		= 1.3;
 		double fPMTWidth  		= 1.3;
 		double fPMTThickness = 0.1;
+		std::vector<double> fOpticalRange;
 		// add quantum efficiency
 		double fQEScaleParameter = 0.31;
+		// probability of photo-electrons to land on the first dynode (>70%-80%) 
 		double fPMTCollectionEfficiency = 0.7;
 
 		// sipm SPE pulse parameters

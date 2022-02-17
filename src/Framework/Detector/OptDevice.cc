@@ -179,7 +179,7 @@ OptDevice::GetQuantumEfficiency(double waveLength, OptDevice::DeviceType type)
       else if(waveLength >= 600. && waveLength < 650.)
         qeff = 0.03;
       else if(waveLength >= 650. && waveLength < 700.)
-        qeff = 0.06;
+        qeff = 0.01;
 
 #if 0
         // photonis-XP1805
@@ -256,5 +256,31 @@ OptDevice::GetQuantumEfficiency(double waveLength, OptDevice::DeviceType type)
   } // end switch
 
   return qeff;
+
+}
+
+
+std::vector<double>
+OptDevice::GetOpticalRange()
+{
+
+  DeviceType t = GetType();
+  switch(t) {
+    case eSiPM:
+      fOpticalRange = {0., 0.};
+    break;
+
+    case eMChPMT:
+      fOpticalRange = {0., 0.};
+    break;
+
+    case ePMT:
+      fOpticalRange = {1.77 ,4.96};
+    break;
+
+  }
+
+  return fOpticalRange;
+
 
 }

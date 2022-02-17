@@ -3,6 +3,7 @@
 
 #include "Particle.h"
 #include "DetectorSimData.h"
+#include <string>
 #include <vector>
 #include <map>
 
@@ -23,6 +24,9 @@ class SimData
 
     Particle& GetCurrentParticle() { return fCurrentParticle; }
     void SetCurrentParticle(Particle particle) { fCurrentParticle = particle; }
+
+    void SetSimulationMode(const std::string simMode) { fSimulationMode = simMode; }
+    const std::string GetSimulationMode() const;
 
     // DetectorSimData getters
     void MakeDetectorSimData(unsigned int id);
@@ -45,6 +49,7 @@ class SimData
     ParticleVector fParticles;
     Particle fCurrentParticle;
     unsigned int fTotalNumberOfParticles = 0;
+    std::string fSimulationMode;
 
     DetectorSimData fDetectorSimData;
     std::map<int, DetectorSimData> fDetectorSimDataMap;

@@ -1,6 +1,7 @@
 {
 	"InputFile" : "./vertical_muon.txt",
 	"OutputFile" : "./output.dat",
+	"SimulationMode" : "FAST_SIMULATION",
 	"GeoVisOn" : true,
 	"TrajVisOn" : false,
 	"Verbosity" : 1,

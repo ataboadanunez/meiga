@@ -11,6 +11,7 @@
 #include "G4WCDSimulator.h"
 #include "G4WCDConstruction.h"
 #include "G4WCDPrimaryGeneratorAction.h"
+#include "G4WCDStackingAction.h"
 #include "G4WCDEventAction.h"
 #include "G4WCDRunAction.h"
 #include "G4WCDTrackingAction.h"
@@ -110,15 +111,17 @@ G4WCDSimulator::Initialize(Event& theEvent, string fileName)
 
 	ptree root;
 	read_json(fileName, root);
-#warning "JSON parser of input config file should be a method of ConfigManager"
+
 	fInputFile = root.get<string>("InputFile");
 	fOutputFile = root.get<string>("OutputFile");
+	fSimulationMode = root.get<string>("SimulationMode");
 	fDetectorList = root.get<string>("DetectorList");
 	fGeoVisOn = root.get<bool>("GeoVisOn");
 	fTrajVisOn = root.get<bool>("TrajVisOn");
 	fVerbosity = root.get<int>("Verbosity");
 	fRenderFile = root.get<string>("RenderFile");
 	fPhysicsName = root.get<string>("PhysicsName");
+	
 	// Creates event from file reader
 	theEvent = ReadParticleFile::EventFileReader(fInputFile);
 
@@ -133,12 +136,14 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 {
 
 	SimData& simData = theEvent.GetSimData();
+	simData.SetSimulationMode(fSimulationMode);
+	cout << "[INFO] G4WCDSimulator::RunSimulation: Simulation mode selected = " << fSimulationMode << endl;
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
 
-	cout << "[INFO] Event::SimData: Total number of particles in file = " << NumberOfParticles << endl;
+	cout << "[INFO] G4WCDSimulator::RunSimulation: Total number of particles in file = " << NumberOfParticles << endl;
 	
 	if (!NumberOfParticles) {
-		cerr << "ERROR! No Particles in the Event! Exiting..." << endl;
+		cerr << "[ERROR] G4WCDSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
 		return false;
 	}
 	
@@ -151,7 +156,6 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 	G4long myseed = time(NULL);
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
 	G4Random::setTheSeed(myseed);
-	cout << "Seed for random generation: " << myseed << endl;
 
 	G4VisManager* fVisManager = nullptr;
 	
@@ -169,6 +173,9 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 	G4WCDPrimaryGeneratorAction *fPrimaryGenerator = new G4WCDPrimaryGeneratorAction();
 	fRunManager->SetUserAction(fPrimaryGenerator);
 	
+	G4WCDStackingAction *fStackingAction = new G4WCDStackingAction(theEvent);
+	fRunManager->SetUserAction(fStackingAction);
+
 	G4WCDRunAction *fRunAction = new G4WCDRunAction();
 	fRunManager->SetUserAction(fRunAction);
 	
@@ -243,7 +250,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 		fRunManager->BeamOn(1);
 		nParticle+=1;
 
-		cout << "Simulated " << nParticle << " particle(s) out of " << NumberOfParticles << endl;
+		//cout << "Simulated " << nParticle << " particle(s) out of " << NumberOfParticles << endl;
 	}
 
 
@@ -272,7 +279,7 @@ G4WCDSimulator::WriteEventInfo(Event& theEvent)
 		DetectorSimData& detSimData = simData.GetDetectorSimData(detId);
 		// get number of optical devices in the detector
 		int nOptDev = currDet.GetNOptDevice();
-		cout << "G4WCDSimulator::WriteEventInfo: Accessing data of detector " << detId << " with " << nOptDev << " optical devices" << endl;
+		cout << "[INFO] G4WCDSimulator::WriteEventInfo: Accessing data of detector " << detId << " with " << nOptDev << " optical devices" << endl;
 
 		// loop over optical devices
 		for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
@@ -280,7 +287,7 @@ G4WCDSimulator::WriteEventInfo(Event& theEvent)
 			int odId = currOd.GetId();
 
 			OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(odId);
-			cout << "G4WCDSimulator::WriteEventInfo: Accessing signal of " << currOd.GetName() << " " << odId << " from Detector " << detId << endl;
+			cout << "[INFO] G4WCDSimulator::WriteEventInfo: Accessing signal of " << currOd.GetName() << " " << odId << " from Detector " << detId << endl;
 
 			// checking signal at optical devices
 			const auto *peTimeDistributionRange = odSimData.PETimeDistributionRange();
