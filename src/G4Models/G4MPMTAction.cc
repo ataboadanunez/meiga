@@ -33,7 +33,7 @@ void
 G4MPMTAction::Initialize(G4HCofThisEvent* const /*hce*/)
 {
   
-  NumCerenkovPhotons = 0;
+
   NumPE = 0;
   fPETime = new std::vector<double>();
 
@@ -53,37 +53,33 @@ G4MPMTAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 G4bool
 G4MPMTAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHist*/)
 {
+  
   // reject particle in case it is not a photon
-
   if (step->GetTrack()->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition())
     return true;
 
-  NumCerenkovPhotons += 1;
+  // get time and energy of photons
+  const double time = step->GetPreStepPoint()->GetGlobalTime() / CLHEP::second;
+  if (time >= 1*CLHEP::second)
+    return true;
 
+  auto& pmt = fEvent.GetDetector(fDetectorId).GetOptDevice(fOptDeviceId);
+  double energy = step->GetPreStepPoint()->GetKineticEnergy() / CLHEP::eV;
+  // kill if photon energy is out of PMT range
+  if (energy < pmt.GetOpticalRange()[0]  || energy > pmt.GetOpticalRange()[1]) 
+    return true; 
 
   SimData& simData = fEvent.GetSimData();
-  auto& pmt = fEvent.GetDetector(fDetectorId).GetOptDevice(fOptDeviceId);
-  const double time = step->GetPreStepPoint()->GetGlobalTime() / CLHEP::second;
-  double energy = step->GetPreStepPoint()->GetKineticEnergy() / CLHEP::eV;
-
-  // cout << "[DEBUG] G4Models::G4MPMTAction: Photon with Energy " << energy << " and time " << time << " arrived to PMT" << endl;
-
-  if (time >= 1*CLHEP::second) {
-    return true;
-  }
-
-  if (pmt.IsPhotonDetected(energy)) 
-  {
-    DetectorSimData& detSimData = simData.GetDetectorSimData(fDetectorId);
-    OptDeviceSimData& OptDeviceSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
-    //cout << "[DEBUG] G4Models::G4MPMTAction: Photon was detected!" << endl;
-    OptDeviceSimData.AddPhotonEnergy(energy);
-    OptDeviceSimData.AddPhotonTime(time);
-    fPETime->push_back(time);
-    NumPE += 1;
-
+  if (simData.GetSimulationMode() == "FULL_SIMULATION") {
+    
+    // kill according to PMT quantum efficiency
+    if (!pmt.IsPhotonDetected(energy)) 
+      return true;
   }
   
+  
+  // add photon time to SimData
+  fPETime->push_back(time);
   return true;
 
 }
