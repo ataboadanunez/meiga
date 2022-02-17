@@ -453,8 +453,10 @@ Materials::CreateMaterials()
 	pyrexPT->AddProperty("ABSLENGTH", pmtPhotonEnergy, pmtAbsLength, pmtArrEntries);
 	Pyrex->SetMaterialPropertiesTable(pyrexPT);
 
-
-	// HDPE for WCD material
+	// --------------------------------------------------------------------
+	// HDPE for WCD liner material
+	// --------------------------------------------------------------------
+	// 
 	HDPE = new G4Material("HDPE", 0.94 * g/cm3, 2);
 	HDPE->AddElement(elC, 2);
 	HDPE->AddElement(elH, 4);
