@@ -1,5 +1,4 @@
 #include "CorsikaUtilities.h"
-#include "Particle.h"
 
 #include <map>
 #include <sstream>
@@ -95,7 +94,7 @@ namespace {
 }
 
 
-int
+Particle::Type
 Corsika::CorsikaToPDG(const int corsikaCode)
 {
   if (corsikaCode < 100) {
@@ -105,13 +104,13 @@ Corsika::CorsikaToPDG(const int corsikaCode)
 
     const auto index = gCorsikaToPDGMap.find(corsikaCode);
 
-    return (index != gCorsikaToPDGMap.end()) ? index->second : Particle::eUndefined;
+    return (index != gCorsikaToPDGMap.end()) ? static_cast<Particle::Type>(index->second) : Particle::eUndefined;
 
   } else if (corsikaCode < 9900) {                   // nucleus
 
     const unsigned int z = corsikaCode % 100;
     const unsigned int a = corsikaCode / 100;
-    return Particle::NucleusCode(z, a);
+    return static_cast<Particle::Type>(Particle::NucleusCode(z, a));
 
   } else                                             // Cherenkov
     return Particle::eUndefined;
