@@ -3,6 +3,7 @@
 #include "DetectorSimData.h"
 #include "OptDeviceSimData.h"
 #include "OptDevice.h"
+#include "CorsikaUtilities.h"
 
 #include <G4Step.hh>
 #include <G4TouchableHistory.hh>
@@ -46,7 +47,19 @@ G4MPMTAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
   // gets current particle in the event to stream the number of PE for each particle
   Particle currentParticle = fEvent.GetSimData().GetCurrentParticle();
   int partId = currentParticle.GetParticleId();
-  cout << "Particle_ID " << partId << " PE " << NumPE << endl;
+  // time distribution for different particles
+
+  Particle::Type particleType = Corsika::CorsikaToPDG(partId);
+  Particle::Component particleComponent = currentParticle.GetComponent(particleType);
+
+  cout << "[DEBUG] G4Models::G4MPMTAction: Adding PE time distribution to particle: " << endl;
+  cout << "[DEBUG] G4Models::G4MPMTAction: Particle_ID        = " << partId << endl;
+  cout << "[DEBUG] G4Models::G4MPMTAction: Particle_Type      = " << particleType << endl;
+  cout << "[DEBUG] G4Models::G4MPMTAction: Particle_Component = " << particleComponent << endl;
+
+  fEvent.GetSimData().GetDetectorSimData(fDetectorId).GetOptDeviceSimData(fOptDeviceId).AddPETimeDistribution(particleComponent, fPETimeComp);
+
+  fPETimeComp.clear();
 
 }
 
@@ -80,6 +93,7 @@ G4MPMTAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHist
   
   // add photon time to SimData
   fPETime->push_back(time);
+  fPETimeComp.push_back(time);
   return true;
 
 }
