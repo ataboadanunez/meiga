@@ -6,6 +6,7 @@
 
 // particle mass defined as static
 std::map<int, double> Particle::gParticleMassMap;
+std::map<Particle::Type, Particle::Component> Particle::gComponentMap;
 
 Particle::Particle(int id, std::vector<double>& position, std::vector<double>& momentum) :
   fId(id),
@@ -123,9 +124,95 @@ Particle::SetMomentum(const std::vector<double>& momentum)
 int
 Particle::NucleusCode(const unsigned int charge,
                       const unsigned int atomicNumber)
-  {
-    return
-        kNucleusBase
-      + kChargeFactor       * charge
-      + kAtomicNumberFactor * atomicNumber;
+{
+  return kNucleusBase + kChargeFactor * charge + kAtomicNumberFactor * atomicNumber;
+}
+
+
+void
+Particle::InsertComponent(const Particle::Type type, const Particle::Component comp)
+{
+  const auto ite = gComponentMap.insert(std::make_pair(type, comp));
+  if (!ite.second) {
+    std::ostringstream err;
+    err << "Particle with type " << type << " already inserted.";
+    throw err;
   }
+
+}
+
+void 
+Particle::InitComponentMap()
+{
+  InsertComponent(Type::eUndefined, Component::eUnknown);
+  // electromagnetic component
+  InsertComponent(Type::ePhoton, Component::eElectromagnetic);
+  InsertComponent(Type::eElectron, Component::eElectromagnetic);
+  InsertComponent(Type::ePositron, Component::eElectromagnetic);
+  // muonic component
+  InsertComponent(Type::eMuon, Component::eMuonic);
+  InsertComponent(Type::eAntiMuon, Component::eMuonic);
+  InsertComponent(Type::eDecayedMuon, Component::eMuonic);
+  InsertComponent(Type::eDecayedAntiMuon, Component::eMuonic);
+  // hadronic component 
+  InsertComponent(Type::ePiZero, Component::eHadronic);
+  InsertComponent(Type::ePiPlus, Component::eHadronic);
+  InsertComponent(Type::ePiMinus, Component::eHadronic);
+  InsertComponent(Type::eKaon0L, Component::eHadronic);
+  InsertComponent(Type::eKaonPlus, Component::eHadronic);
+  InsertComponent(Type::eKaonMinus, Component::eHadronic);
+  
+  InsertComponent(Type::eNeutron, Component::eHadronic);
+  InsertComponent(Type::eProton, Component::eHadronic);
+  InsertComponent(Type::eAntiProton, Component::eHadronic);
+  InsertComponent(Type::eKaon0S, Component::eHadronic);
+  InsertComponent(Type::eEta, Component::eHadronic);
+  InsertComponent(Type::eLambda, Component::eHadronic);
+  InsertComponent(Type::eSigmaPlus, Component::eHadronic);
+  InsertComponent(Type::eSigmaZero, Component::eHadronic);
+  InsertComponent(Type::eSigmaMinus, Component::eHadronic);
+  InsertComponent(Type::eXiZero, Component::eHadronic);
+  InsertComponent(Type::eXiMinus, Component::eHadronic);
+  InsertComponent(Type::eOmegaMinus, Component::eHadronic);
+  InsertComponent(Type::eAntiNeutron, Component::eHadronic);
+  InsertComponent(Type::eAntiLambda, Component::eHadronic);
+  InsertComponent(Type::eAntiSigmaPlus, Component::eHadronic);
+  InsertComponent(Type::eAntiSigmaZero, Component::eHadronic);
+  InsertComponent(Type::eAntiSigmaMinus, Component::eHadronic);
+  InsertComponent(Type::eAntiXiZero, Component::eHadronic);
+  InsertComponent(Type::eAntiXiMinus, Component::eHadronic);
+  InsertComponent(Type::eAntiOmegaMinus, Component::eHadronic);
+
+  InsertComponent(Type::ePhi, Component::eHadronic);
+  InsertComponent(Type::eOmegaMeson, Component::eHadronic);
+  InsertComponent(Type::eRhoZero, Component::eHadronic);
+  InsertComponent(Type::eRhoPlus, Component::eHadronic);
+  InsertComponent(Type::eRhoMinus, Component::eHadronic);
+  InsertComponent(Type::eDeltaPlusPlus, Component::eHadronic);
+  InsertComponent(Type::eDeltaPlus, Component::eHadronic);
+  InsertComponent(Type::eDeltaZero, Component::eHadronic);
+  InsertComponent(Type::eDeltaMinus, Component::eHadronic);
+  InsertComponent(Type::eAntiDeltaMinusMinus, Component::eHadronic);
+  InsertComponent(Type::eAntiDeltaMinus, Component::eHadronic);
+  InsertComponent(Type::eAntiDeltaZero, Component::eHadronic);
+  InsertComponent(Type::eAntiDeltaPlus, Component::eHadronic);
+  InsertComponent(Type::eKaonStarZero, Component::eHadronic);
+  InsertComponent(Type::eKaonStarPlus, Component::eHadronic);
+  InsertComponent(Type::eAntiKaonStarMinus, Component::eHadronic);
+  InsertComponent(Type::eAntiKaonStarZero, Component::eHadronic);
+  // hadronic? muonic? em?... would be nice to detect Nu though... ;)
+  InsertComponent(Type::eNuElectron, Component::eHadronic);
+  InsertComponent(Type::eAntiNuElectron, Component::eHadronic);
+  InsertComponent(Type::eNuMuon, Component::eHadronic);
+  InsertComponent(Type::eAntiNuMuon, Component::eHadronic);
+  
+}
+
+Particle::Component
+Particle::GetComponent(const Particle::Type type)
+{
+  if (gComponentMap.empty())
+    InitComponentMap();
+  const auto index = gComponentMap.find(type);
+  return (index != gComponentMap.end()) ? static_cast<Particle::Component>(index->second) : Particle::Component::eUnknown;
+}
