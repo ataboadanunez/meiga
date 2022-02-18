@@ -1,4 +1,5 @@
 #include "OptDeviceSimData.h"
+#include "CorsikaUtilities.h"
 
 OptDeviceSimData::OptDeviceSimData(const unsigned int id) : fId(id)
 {
@@ -24,6 +25,17 @@ OptDeviceSimData::AddPETimeDistribution(std::vector<double>* peTimeDist)
 {
 	fPETimeDistribution->push_back(peTimeDist);
 }
+
+
+// time distribution for particle components
+void
+OptDeviceSimData::AddPETimeDistribution(Particle::Component comp, const std::vector<double>& peTimeDist)
+{
+	auto it = particleMap.emplace(std::make_pair(comp, std::vector<std::vector<double> >()));
+	it.first->second.push_back(peTimeDist);
+
+}
+
 
 
 std::vector<double>

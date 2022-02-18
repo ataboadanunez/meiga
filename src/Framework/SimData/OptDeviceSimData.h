@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include "SiPM.h"
+#include "Particle.h"
 
 /*
 	class OptDeviceSimData
@@ -33,10 +34,15 @@ class OptDeviceSimData
 		void AddPhotonEnergy(const double energy);
 		std::vector<double> GetPhotonEnergy() { return fPhotonEnergy; }
 
-
+		// general
 		void AddPETimeDistribution(std::vector<double>* peTimeDist);
 		std::vector<std::vector<double>*>* PETimeDistributionRange() { return fPETimeDistribution; }
+		// for particle components
+		void AddPETimeDistribution(Particle::Component comp, const std::vector<double>& peTimeDist);
+		const std::vector<std::vector<double>>& PETimeDistributionRange(Particle::Component comp) { return particleMap.at(comp); }
 
+		// for SiPM pulse calculation.
+		// this function needs to be generalized for each type of optical device
 		std::vector<double> CalculatePulse(const double fBinSize, const std::vector<double>& peTime, const double pulseLenght = 500.);
 		
 	private:
@@ -50,7 +56,7 @@ class OptDeviceSimData
 		// for PE time distribution
 		std::vector<std::vector<double>*>* fPETimeDistribution;
 		// add PE time distribution for different components
-
+		std::map<Particle::Component, std::vector<std::vector<double>> > particleMap;
 		// access to detector members
 		SiPM fDetSiPM;
 		// PMT, MChPMT
