@@ -36,22 +36,11 @@ class Event
     // interface to fwk/Detector
     Detector& GetDetector() { return fDetector; }
     Detector& GetDetector(unsigned int id) { return fDetectorMap[id]; }
-    int GetNDetectors() {return fNDetectors; }
-
-#warning "Implementar HasDetector() MakeDetector()!!"
-    /*
-    
-    // HasDetector() and MakeDetector() methods are needed when iterating over the detector list by the ConfigManager::ReadDetectorList()
-    
-    */
-
     bool HasDetector(unsigned int id);
     void MakeDetector(unsigned int id);
 
-    //void MakeModule(unsigned int id);
-    //Module& GetModule() { return fModule; }
-    //Module& GetModule(unsigned int id) { return fModuleMap[id]; }
-    
+    int GetNDetectors() {return fNDetectors; }
+
     std::map<int, Detector>& DetectorRange() { return fDetectorMap; }
     const std::map<int, Detector>& DetectorRange() const { return fDetectorMap; }
 
