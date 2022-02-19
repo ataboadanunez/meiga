@@ -2,6 +2,7 @@
 #define OptDevice_h 1
 
 //#include "SiPM.h"
+#include "G4LogicalVolume.hh"
 #include <vector>
 #include <string>
 
@@ -43,9 +44,13 @@ class OptDevice
 		double GetQuantumEfficiency(double wl, OptDevice::DeviceType t);
 		void SPEPulse(std::vector<double> &amplitude, double fBinTime, size_t fStartPulse);
 		double GetSPEPulseDuration() { return fPulseDuration; }
-
 		std::vector<double> GetOpticalRange();
 
+
+		// Setters & Getters for Geant4 logical volumes
+		void SetLogicalVolume(std::string volName, G4LogicalVolume* log);
+		G4LogicalVolume* GetLogicalVolume(std::string volName) { return fLogicalVolumeMap[volName]; }
+		bool HasLogicalVolume(std::string volName);
 
 	private:
 		int fOptDeviceId = 0;
@@ -78,7 +83,9 @@ class OptDevice
 		double fT0 = -1.160; // ns
 		double fTr = 2.679; // ns
 		double fTf = 0.329; // ns
-	
+		
+
+		std::map<std::string, G4LogicalVolume*> fLogicalVolumeMap;
 };
 
 #endif

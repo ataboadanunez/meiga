@@ -282,5 +282,17 @@ OptDevice::GetOpticalRange()
 
   return fOpticalRange;
 
+}
 
+
+void
+OptDevice::SetLogicalVolume(string volName, G4LogicalVolume* log)
+{
+  fLogicalVolumeMap.emplace(volName, log);
+}
+
+bool
+OptDevice::HasLogicalVolume(string volName)
+{ 
+  return fLogicalVolumeMap.find(volName) != fLogicalVolumeMap.end();
 }

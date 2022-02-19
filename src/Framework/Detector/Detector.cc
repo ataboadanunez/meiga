@@ -6,6 +6,7 @@
 #include <map>
 #include <iostream>
 using std::map;
+using namespace std;
 
 // Detector
 // Detector::MakeOptDevice(int id, OptDevice::DeviceType type)
@@ -44,4 +45,22 @@ Detector::MakeOptDevice(int id, OptDevice::DeviceType type)
 {
 	fOptDeviceMap.emplace(id, OptDevice(id, type));
 	fNOptDevices = fOptDeviceMap.size();
+}
+
+bool
+Detector::HasOptDevice(int id)
+{
+	return fOptDeviceMap.find(id) != fOptDeviceMap.end();
+}
+
+void
+Detector::SetLogicalVolume(string volName, G4LogicalVolume* log)
+{
+	fLogicalVolumeMap.emplace(volName, log);
+}
+
+bool
+Detector::HasLogicalVolume(string volName)
+{	
+	return fLogicalVolumeMap.find(volName) != fLogicalVolumeMap.end();
 }

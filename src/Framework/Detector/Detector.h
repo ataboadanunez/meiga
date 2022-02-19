@@ -85,24 +85,27 @@ class Detector
 		void SetCladdingThickness(double cladThickness) { fCladdingThickness = cladThickness; }
 
 		// Optical device
-		//static Detector MakeOptDevice(int id, OptDevice::DeviceType type);
+		OptDevice& GetOptDevice() { return fOptDevice; } // to access OptDevice class members
+		// Make, Get and Has optical device by its id
 		void MakeOptDevice(int id, OptDevice::DeviceType type);
-
-		OptDevice& GetOptDevice() { return fOptDevice; }
 		OptDevice& GetOptDevice(int id) { return fOptDeviceMap[id]; }
-		OptDevice GetOptDevice(OptDevice::DeviceType type) { return OptDevice(type); }
+		bool HasOptDevice(int id);
 
+		OptDevice GetOptDevice(OptDevice::DeviceType type) { return OptDevice(type); }
+		
 		std::map<int, OptDevice>& OptDeviceRange() { return fOptDeviceMap; }
 		const std::map<int, OptDevice>& OptDeviceRange() const { return fOptDeviceMap; }
 		int GetNOptDevice() const { return fNOptDevices; }
-		//void MakeModule(unsigned int id);
-		//Module& GetModule() { return fModule; }
-		//Module& GetModule(unsigned int id) { return fModuleMap[id]; }
-		 
-		//int GetNModules() const { return fNModules; }
 		
 		
 		// WCD ?
+
+
+
+		// Setters & Getters for Geant4 logical volumes
+		void SetLogicalVolume(std::string volName, G4LogicalVolume* log);
+		G4LogicalVolume* GetLogicalVolume(std::string volName) { return fLogicalVolumeMap[volName]; }
+		bool HasLogicalVolume(std::string volName);
 
 	private:
 
@@ -126,6 +129,8 @@ class Detector
 		OptDevice fOptDevice;
 		std::map<int, OptDevice> fOptDeviceMap;
 		std::map<OptDevice::DeviceType, OptDevice> fOptDeviceMapT;
+
+		std::map<std::string, G4LogicalVolume*> fLogicalVolumeMap;
 
 };
 
