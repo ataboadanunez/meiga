@@ -77,12 +77,12 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	int detectorId = detector.GetId();
 
 	OptDevice pmt = detector.GetOptDevice(OptDevice::eMChPMT);
-	
+
 	ostringstream namedetector;
 	namedetector.str("");
 	namedetector << "Mudulus";
-	cout << "G4Models::Mudulus: Building detector " << namedetector.str();
-	cout << " (" << detectorId << ")";
+	cout << "[INFO] G4Models::Mudulus: Building detector " << namedetector.str();
+	cout << " (ID = " << detectorId << ")";
 	cout << " with " << pmt.GetName() << ". " << endl;
 
 	/*************************************************
