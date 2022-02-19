@@ -37,9 +37,13 @@ class OptDeviceSimData
 		// general
 		void AddPETimeDistribution(std::vector<double>* peTimeDist);
 		std::vector<std::vector<double>*>* PETimeDistributionRange() { return fPETimeDistribution; }
+		// for particle types
+		void AddPETimeDistribution(Particle::Type type, const std::vector<double>& peTimeDist);
+		const std::vector<std::vector<double>>& PETimeDistributionRange(Particle::Type type) { return particleTypeMap.at(type); }
+
 		// for particle components
 		void AddPETimeDistribution(Particle::Component comp, const std::vector<double>& peTimeDist);
-		const std::vector<std::vector<double>>& PETimeDistributionRange(Particle::Component comp) { return particleMap.at(comp); }
+		const std::vector<std::vector<double>>& PETimeDistributionRange(Particle::Component comp) { return particleCompMap.at(comp); }
 
 		// for SiPM pulse calculation.
 		// this function needs to be generalized for each type of optical device
@@ -55,8 +59,10 @@ class OptDeviceSimData
 
 		// for PE time distribution
 		std::vector<std::vector<double>*>* fPETimeDistribution;
-		// add PE time distribution for different components
-		std::map<Particle::Component, std::vector<std::vector<double>> > particleMap;
+		// add PE time distribution for different particle types
+		std::map<Particle::Type, std::vector<std::vector<double>> > particleTypeMap;
+		// add PE time distribution for different particle components
+		std::map<Particle::Component, std::vector<std::vector<double>> > particleCompMap;
 		// access to detector members
 		SiPM fDetSiPM;
 		// PMT, MChPMT

@@ -26,12 +26,21 @@ OptDeviceSimData::AddPETimeDistribution(std::vector<double>* peTimeDist)
 	fPETimeDistribution->push_back(peTimeDist);
 }
 
+// time distribution for particle types
+void
+OptDeviceSimData::AddPETimeDistribution(Particle::Type type, const std::vector<double>& peTimeDist)
+{
+	auto it = particleTypeMap.emplace(std::make_pair(type, std::vector<std::vector<double> >()));
+	it.first->second.push_back(peTimeDist);
+
+}
+
 
 // time distribution for particle components
 void
 OptDeviceSimData::AddPETimeDistribution(Particle::Component comp, const std::vector<double>& peTimeDist)
 {
-	auto it = particleMap.emplace(std::make_pair(comp, std::vector<std::vector<double> >()));
+	auto it = particleCompMap.emplace(std::make_pair(comp, std::vector<std::vector<double> >()));
 	it.first->second.push_back(peTimeDist);
 
 }
