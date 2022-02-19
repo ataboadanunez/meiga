@@ -36,17 +36,6 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	G4LogicalVolume* logicFiber = nullptr;
 
 	G4LogicalVolume* logicSiPM = nullptr;
-
-	// physical volumes
-	G4PVPlacement* physCasing = nullptr;
-	G4PVPlacement* physCoating = nullptr;
-	G4PVPlacement* physScinBar = nullptr;
-
-	G4PVPlacement* physClad2 = nullptr;
-	G4PVPlacement* physClad1 = nullptr;
-	G4PVPlacement* physFiber = nullptr;
-
-	G4PVPlacement* physSiPM = nullptr;
 	
 	// detector properties 
 	const G4double fCasingThickness = detector.GetCasingThickness() * CLHEP::mm;
@@ -93,7 +82,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	// Casing
 	solidCasing = new G4Box("Casing", fCasingSizeX, fCasingSizeY, fCasingSizeZ);
 	logicCasing = new G4LogicalVolume(solidCasing, Materials().Air, "Casing", 0, 0, 0);
-	physCasing  = new G4PVPlacement(nullptr, detectorPos, logicCasing, "Casing", logMother, false, detectorId, fCheckOverlaps);
+	new G4PVPlacement(nullptr, detectorPos, logicCasing, "Casing", logMother, false, detectorId, fCheckOverlaps);
 	// Bars: Coating + Scintillator bar
 	solidCoating  	= new G4Box("BarCoating", fCoatingThickness + fBarLength/2, fCoatingThickness + fBarWidth/2, fCoatingThickness + fBarThickness/2);
 	solidScinBar   	= new G4Box("BarScin", fBarLength/2, fBarWidth/2, fBarThickness/2);
@@ -161,17 +150,17 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 		logicSiPM->SetVisAttributes(blue); 
 
 		// physical volumes
-		physCoating  = new G4PVPlacement(nullptr, G4ThreeVector(fPosTopX, yp, fPosTopZ), logicCoating, 
+		new G4PVPlacement(nullptr, G4ThreeVector(fPosTopX, yp, fPosTopZ), logicCoating, 
 			nameCoating, logicCasing, false, barId, fCheckOverlaps);
-		physScinBar   = new G4PVPlacement(nullptr, G4ThreeVector(), logicScinBar, 
+		new G4PVPlacement(nullptr, G4ThreeVector(), logicScinBar, 
 			nameScinBar, logicCoating, false, barId, fCheckOverlaps);
-		physClad2 = new G4PVPlacement(rotationFiber, G4ThreeVector(0, 0, fFiberTopPosZ), logicClad2, 
+		new G4PVPlacement(rotationFiber, G4ThreeVector(0, 0, fFiberTopPosZ), logicClad2, 
 			nameClad2, logicScinBar, true, barId, fCheckOverlaps);
-		physClad1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
+		new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
 			nameClad1, logicClad2, false, barId, fCheckOverlaps);
-		physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
+		new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
 			nameFiber, logicClad1, false, barId, fCheckOverlaps); 
-		physSiPM  = new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberTopPosX, 0, fFiberTopPosZ), logicSiPM, 
+		new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberTopPosX, 0, fFiberTopPosZ), logicSiPM, 
 			nameSiPM, logicScinBar, false, barId, fCheckOverlaps);
 
 		// registration of SiPM as a Sensitive Volume
@@ -214,17 +203,17 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 		logicSiPM->SetVisAttributes(blue);
 		
 		// physical volumes
-		physCoating  = new G4PVPlacement(rotationBot, G4ThreeVector(xp, fPosBotY, fPosBotZ), logicCoating, 
+		new G4PVPlacement(rotationBot, G4ThreeVector(xp, fPosBotY, fPosBotZ), logicCoating, 
 			nameCoating, logicCasing, false, barId, fCheckOverlaps);
-		physScinBar   = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicScinBar,
+		new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicScinBar,
 			nameScinBar, logicCoating, false, barId, fCheckOverlaps);
-		physClad2 = new G4PVPlacement(rotationFiber, G4ThreeVector(0, 0, fFiberBotPosZ), logicClad2, 
+		new G4PVPlacement(rotationFiber, G4ThreeVector(0, 0, fFiberBotPosZ), logicClad2, 
 			nameClad2, logicScinBar, true, barId, fCheckOverlaps);
-		physClad1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
+		new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
 			nameClad1, logicClad2, false, barId, fCheckOverlaps);
-		physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
+		new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
 			nameFiber, logicClad1, false, barId, fCheckOverlaps); 
-		physSiPM  = new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberTopPosX, 0, fFiberBotPosZ), logicSiPM, 
+		new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberTopPosX, 0, fFiberBotPosZ), logicSiPM, 
 		nameSiPM, logicScinBar, false, barId, fCheckOverlaps);
 
 		// registration of SiPM as a Sensitive Volume
