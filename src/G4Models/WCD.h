@@ -25,7 +25,7 @@ class WCD {
 
 public:
   static void BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps = true);
-
+  
 private:
   WCD();
   virtual ~WCD();
