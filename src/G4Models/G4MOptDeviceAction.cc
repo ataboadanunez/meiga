@@ -52,37 +52,16 @@ G4MOptDeviceAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*
 
 	SimData& simData = fEvent.GetSimData();
 
-	/*
-		Retrieve current physical volumen and its mother (OptDevice and module IDs)
-		According to DetectorConstructor, OptDevice has its mother volume in the Scintillator Bar.
-		therefore in order to get the Module ID we need to do GetVolume(3) of the step
-
-		Module Casing (3)  -> Bar Coating (2) -> Scintillator bar (1) -> OptDevice (0)
-	*/
-
-	// for OptDevice
-	G4VPhysicalVolume* const currentPhysVol = step->GetPreStepPoint()->GetPhysicalVolume();
-	// for Module (Casing)
-#warning "Avoid hard-coded numbers. Look for better way to retrieve mother volume!"
-	G4VPhysicalVolume* const motherPhysVol = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume(3);
-	const G4int OptDeviceId = currentPhysVol->GetCopyNo();
-	const G4int moduleId = motherPhysVol->GetCopyNo();
-
 	G4double photonEnergy = step->GetTrack()->GetTotalEnergy() / (1*CLHEP::eV);
-#warning "Add SiPM / PMT cases"
-	OptDevice& OptDevice = fEvent.GetDetector(fDetectorId).GetOptDevice(fOptDeviceId);
+	OptDevice& optDevice = fEvent.GetDetector(fDetectorId).GetOptDevice(fOptDeviceId);
 
-	if (true/*OptDevice.IsPhotonDetected(photonEnergy)*/) {
-		// get detector sim data by module ID
-		std::cout << "[DEBUG] G4Models::G4MOptDeviceAction: Photon arrived to " << OptDevice.GetName() << " " << fOptDeviceId << " from bar " << moduleId << std::endl;
+	// check if photon is detected according to its energy and quantum efficiency
+	if (optDevice.IsPhotonDetected(photonEnergy)) {
 		DetectorSimData& detSimData = simData.GetDetectorSimData(fDetectorId);
-		//detSimData.MakeOptDeviceSimData(OptDeviceId);
-		OptDeviceSimData& OptDeviceSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
-		//unsigned int OptDeviceIdFwk = OptDeviceSimData.GetId();
+		OptDeviceSimData& optDeviceSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
 		const double time = step->GetPreStepPoint()->GetGlobalTime() / (1*CLHEP::ns);
-#warning "Add SiPM / PMT cases"
-		OptDeviceSimData.AddPhotonEnergy(photonEnergy);
-		OptDeviceSimData.AddPhotonTime(time);
+		optDeviceSimData.AddPhotonEnergy(photonEnergy);
+		optDeviceSimData.AddPhotonTime(time);
 		
 		fPETime->push_back(time);
 
