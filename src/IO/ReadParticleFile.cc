@@ -95,7 +95,7 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
               >> primaryTheta
               >> primaryPhi)){
       
-      cerr << "ReadParticleFile: Malformed line !!!" << endl;
+      cerr << "[ERROR] Event::ReadParticleFile: Malformed line !!!" << endl;
       break;
     }
 
