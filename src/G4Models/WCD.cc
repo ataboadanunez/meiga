@@ -41,23 +41,21 @@ void WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 	G4double fTankHeight = detector.GetTankHeight();
 	G4double fTankHalfHeight = 0.5 * fTankHeight;
 	G4double fTankThickness = 12.7 * CLHEP::mm;
-	// photonis-XP1805
-	G4double fPMTSemiX = 10.1 * CLHEP::cm;
-	G4double fPMTSemiZ = 6.5  * CLHEP::cm;
+	// PMT properties photonis-XP1805
+	OptDevice pmt = detector.GetOptDevice(OptDevice::ePMT);
+	G4double fPMTSemiX = pmt.GetSemiAxisX() * CLHEP::cm;
+	G4double fPMTSemiY = pmt.GetSemiAxisY() * CLHEP::cm;
+	G4double fPMTSemiZ = pmt.GetSemiAxisZ() * CLHEP::cm;
 
 	G4ThreeVector detectorPos = Geometry::ToG4Vector(detector.GetDetectorPosition(), 1.);
 	G4double fTankPosX = detectorPos.getX();
 	G4double fTankPosY = detectorPos.getY();
 	G4double fTankPosZ = detectorPos.getZ();
-
-	int detectorId = detector.GetId();
-
-	// this detector has a (large) PMT
-	OptDevice pmt = detector.GetOptDevice(OptDevice::ePMT);
+	
 	// define PMT position as the center of the tank
 	G4ThreeVector fTankCenter = detectorPos + G4ThreeVector(0, 0, fTankHalfHeight + fTankThickness);
-	// for now, only one PMT
-	int pmtId = 0;
+	int detectorId = detector.GetId();
+	int pmtId = 9;
 	ostringstream namedetector;
 	namedetector.str("");
 	namedetector << "WCD";
@@ -89,7 +87,7 @@ void WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 	solidSide = new G4Tubs("Side", fTankRadius, fTankRadius + fTankThickness, fTankHalfHeight, 0, 360*deg);
 
 	// pmt solids 
-	solidPMT = new G4Ellipsoid("PMT", fPMTSemiX, fPMTSemiX, fPMTSemiZ, -fPMTSemiZ, 0);
+	solidPMT = new G4Ellipsoid("PMT", fPMTSemiX, fPMTSemiY, fPMTSemiZ, -fPMTSemiZ, 0);
 
 	// assemble WCD 
 	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
@@ -119,14 +117,17 @@ void WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 	new G4PVPlacement(nullptr, G4ThreeVector(0, 0, fTankHalfHeight), logPMT, "physPMT", logTank, false, pmtId, fCheckOVerlaps);
 
 	// register PMT in the Detector
-	if (!detector.HasOptDevice(pmtId))
+	if (!detector.HasOptDevice(pmtId)) {
 		detector.MakeOptDevice(pmtId, OptDevice::ePMT);
+		cout << "[DEBUG] Adding PMT id = " << pmtId << endl;
+	}
 	OptDevice optDevice = detector.GetOptDevice(pmtId);
+	cout << "[DEBUG] Getting " << optDevice.GetName() << " with id " << optDevice.GetId() << endl;
 	// register PMT logical volume
-	if (!optDevice.HasLogicalVolume(logName))
-		optDevice.SetLogicalVolume(logName, logPMT);
+	//if (!optDevice.HasLogicalVolume(logName))
+		//optDevice.SetLogicalVolume(logName, logPMT);
 
-	string optName = optDevice.GetName();
+	string optName = pmt.GetName();
 	ostringstream fullName;
 	fullName.str("");
 	fullName << "/WCD/" << optName;

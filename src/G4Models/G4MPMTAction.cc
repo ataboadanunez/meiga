@@ -20,7 +20,7 @@ G4MPMTAction::G4MPMTAction(const G4String& name, const G4int dId, const G4int oI
 
   { 
     
-    cout << "[INFO] G4Models::G4MPMTAction: Registering PMT " << name << endl;
+    cout << "[INFO] G4Models::G4MPMTAction: Registering Sensitive Detector " << name << endl;
     SimData& simData = fEvent.GetSimData();
     DetectorSimData& detSimData = simData.GetDetectorSimData(fDetectorId);
     detSimData.MakeOptDeviceSimData(fOptDeviceId);
