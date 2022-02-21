@@ -39,6 +39,7 @@ class G4ExSimulator
 		std::string fInputFile;
 		std::string fOutputFile;
     std::string fDetectorList;
+    std::string fSimulationMode;
 		bool fGeoVisOn = true;
 		bool fTrajVisOn = false;
 		int fVerbosity = 1;

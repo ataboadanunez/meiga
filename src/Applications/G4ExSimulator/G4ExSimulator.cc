@@ -32,7 +32,7 @@
 #include "ReadParticleFile.h"
 #include "Event.h"
 #include "SimData.h"
-#include "SiPMSimData.h"
+#include "OptDeviceSimData.h"
 #include "Detector.h"
 #include "OptDevice.h"
 #include "G4MPhysicsList.h"
@@ -61,18 +61,17 @@ namespace
 	void ProgramUsage() 
 	{
 		cerr << " Program Usage: " << endl;
-		cerr << " ./Executable [ -c ConfigFile.json ] " << endl;
+		cerr << " ./exeMeigaApp [ -c ConfigFile.json ] " << endl;
 	}
 
 }
-
 
 int main(int argc, char** argv) 
 {
 
 	if (argc < 3) {
 		ProgramUsage();
-		throw invalid_argument("Config file needed! (See Program Usage)");
+		throw invalid_argument("[ERROR] G4ExSimulator::main: A configuration file is needed!");
 	}
 
 	for (int i=1; i<argc; i=i+2) {
@@ -80,6 +79,11 @@ int main(int argc, char** argv)
 		if (sarg == "-c")
 			fCfgFile = argv[i+1];
 	}
+	
+	// for program time calculation
+  time_t start, end;
+  time(&start);
+
 
 	Event theEvent;
 	fG4ExSimulator = new G4ExSimulator();
@@ -92,8 +96,14 @@ int main(int argc, char** argv)
 
 	**************************************************/
 	fG4ExSimulator->WriteEventInfo(theEvent);
-	
-	
+	time(&end);
+
+	// Calculating total time taken by the program.
+    double time_taken = double(end - start);
+    cout << "Time taken by program is : " << fixed
+         << time_taken << setprecision(5);
+    cout << " sec " << endl;
+
 	return 0;
 
 }
@@ -102,7 +112,8 @@ void
 G4ExSimulator::Initialize(Event& theEvent, string fileName)
 {
 
-	cout << "... Initialize ..." << endl;
+	cout << "[INFO] G4ExSimulator::Initialize" << endl;
+	cout << "[INFO] G4ExSimulator::Initialize: Reading configuration file " << fileName << endl;
 	// set value of flags according to cfg file
 	// reading cfg file using boost
 	// eventually as input of executable main(char** fConfig)
@@ -112,15 +123,18 @@ G4ExSimulator::Initialize(Event& theEvent, string fileName)
 
 	ptree root;
 	read_json(fileName, root);
-#warning "JSON parser of input config file should be a method of ConfigManager"
+
 	fInputFile = root.get<string>("InputFile");
 	fOutputFile = root.get<string>("OutputFile");
+	// for this example application simulation mode is kept to FULL by default
+	fSimulationMode = root.get<string>("SimulationMode");
 	fDetectorList = root.get<string>("DetectorList");
 	fGeoVisOn = root.get<bool>("GeoVisOn");
 	fTrajVisOn = root.get<bool>("TrajVisOn");
 	fVerbosity = root.get<int>("Verbosity");
 	fRenderFile = root.get<string>("RenderFile");
 	fPhysicsName = root.get<string>("PhysicsName");
+	
 	// Creates event from file reader
 	theEvent = ReadParticleFile::EventFileReader(fInputFile);
 
@@ -134,13 +148,16 @@ bool
 G4ExSimulator::RunSimulation(Event& theEvent)
 {
 
+	cout << "[INFO] G4ExSimulator::RunSimulation" << endl;
 	SimData& simData = theEvent.GetSimData();
+	simData.SetSimulationMode(fSimulationMode);
+  cout << "[INFO] G4ExSimulator::RunSimulation: Simulation mode selected = " << fSimulationMode << endl;
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
 
-	cout << "[INFO] Event::SimData: Total number of particles in file = " << NumberOfParticles << endl;
+	cout << "[INFO] G4ExSimulator::RunSimulation: Total number of particles in file = " << NumberOfParticles << endl;
 	
 	if (!NumberOfParticles) {
-		cerr << "ERROR! No Particles in the Event! Exiting..." << endl;
+		cerr << "[ERROR] G4ExSimulator::RunSimulation: No Particles in the Event! Exiting..." << endl;
 		return false;
 	}
 	
@@ -153,7 +170,6 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	G4long myseed = time(NULL);
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
 	G4Random::setTheSeed(myseed);
-	cout << "Seed for random generation: " << myseed << endl;
 
 	G4VisManager* fVisManager = nullptr;
 	
@@ -236,15 +252,11 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	}
 	
 
-	int nParticle = 0;
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
 		G4ExSimulator::currentParticle = *it;
 		// Run simulation
 		fRunManager->BeamOn(1);
-		nParticle+=1;
-
-		cout << "Simulated " << nParticle << " particle(s) out of " << NumberOfParticles << endl;
 	}
 
 
@@ -259,7 +271,7 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 void
 G4ExSimulator::WriteEventInfo(Event& theEvent)
 {
-	cout << "... WriteEventInfo ..." << endl;
+	cout << "[INFO] G4ExSimulator::WriteEventInfo" << endl;
 
 	// for accessing Simulated Data at Detector/Event level
 	SimData& simData = theEvent.GetSimData();
@@ -273,15 +285,15 @@ G4ExSimulator::WriteEventInfo(Event& theEvent)
 		DetectorSimData& detSimData = simData.GetDetectorSimData(detId);
 		// get number of optical devices in the detector
 		int nOptDev = currDet.GetNOptDevice();
-		cout << "G4ExSimulator::WriteEventInfo: Accessing data of detector " << detId << " with " << nOptDev << " optical devices" << endl;
+		cout << "[INFO] G4ExSimulator::WriteEventInfo: Accessing data of detector " << detId << " with " << nOptDev << " optical devices." << endl;
 
 		// loop over optical devices
 		for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
 			auto& currOd = odIt->second;
 			int odId = currOd.GetId();
 
-			SiPMSimData& odSimData = detSimData.GetSiPMSimData(odId);
-			cout << "G4ExSimulator::WriteEventInfo: Accessing signal of " << currOd.GetName() << " " << odId << " from Detector " << detId << endl;
+			OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(odId);
+			cout << "[INFO] G4ExSimulator::WriteEventInfo: Accessing signal of " << currOd.GetName() << " " << odId << " from Detector " << detId << endl;
 
 			// checking signal at optical devices
 			const auto *peTimeDistributionRange = odSimData.PETimeDistributionRange();
@@ -290,13 +302,15 @@ G4ExSimulator::WriteEventInfo(Event& theEvent)
 				continue;
 			}
 
+			cout << "[INFO] G4ExSimulator::WriteEventInfo: Number of photo-electrons = ";
 			for (auto peTime = peTimeDistributionRange->begin(); peTime != peTimeDistributionRange->end(); ++peTime) {
 
 				size_t npe = (*peTime)->size();
-				cout << "Number of photo-electrons = " << npe << endl;
+				cout << npe << " ";
 				// write pulses to output file
-
 			}
+
+			cout << endl;
 
 
 		}
