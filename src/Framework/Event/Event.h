@@ -38,6 +38,7 @@ class Event
     Detector& GetDetector(unsigned int id) { return fDetectorMap[id]; }
     bool HasDetector(unsigned int id);
     void MakeDetector(unsigned int id);
+    void MakeDetector(unsigned int id, Detector::DetectorType type);
 
     int GetNDetectors() {return fNDetectors; }
 

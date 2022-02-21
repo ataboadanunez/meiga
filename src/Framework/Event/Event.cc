@@ -17,9 +17,9 @@ Event::~Event()
 }
 
 void
-Event::MakeDetector(unsigned int id)
+Event::MakeDetector(const unsigned int id, const Detector::DetectorType type)
 {
-	fDetectorMap.emplace(id, Detector(id));
+	fDetectorMap.emplace(id, Detector(id, type));
 	fNDetectors = fDetectorMap.size();
 }
 
