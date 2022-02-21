@@ -1,9 +1,8 @@
 #ifndef Detector_h
 #define Detector_h
 
-//#include "Module.h"
-//#include "G4SystemOfUnits.hh"
 #include "OptDevice.h"
+#include "G4SystemOfUnits.hh"
 #include "G4LogicalVolume.hh"
 
 #include <vector>
@@ -41,7 +40,7 @@ class Detector
 
 
 		Detector(){ ; }
-		Detector(const unsigned int id) : fDetectorId(id) { ; }
+		Detector(const unsigned int id, const DetectorType type);
 		virtual ~Detector() { }
 
 		int GetId() const { return fDetectorId; }
@@ -56,10 +55,6 @@ class Detector
 		// Mechanical properties
 		double GetCasingThickness() const { return fCasingThickness; }
 		void SetCasingThickness(double casingThickness) { fCasingThickness = casingThickness; }
-		double GetHeight() const { return fHeight; }
-		void SetHeight(double h) { fHeight = h; }
-		double GetRadius() const { return fRadius; }
-		void SetRadius(double r) { fRadius = r; }
 
 		// scintillator-type detector properties
 		int GetNBars() const { return fNBars; }
@@ -81,8 +76,21 @@ class Detector
 		double GetFiberRadius() const { return fFiberRadius; }
 		void SetFiberRadius(double fiberRad) { fFiberRadius = fiberRad; }
 
+		double GetFiberLength() const { return fFiberLength; }
+		void SetFiberLength(double fiberLength) { fFiberLength = fiberLength; }
+
 		double GetCladdingThickness() const { return fCladdingThickness; }
 		void SetCladdingThickness(double cladThickness) { fCladdingThickness = cladThickness; }
+
+		// WCD 
+		double GetTankHeight() const { return fTankHeight; }
+		void SetTankHeight(double h) { fTankHeight = h; }
+		
+		double GetTankRadius() const { return fTankRadius; }
+		void SetTankRadius(double r) { fTankRadius = r; }
+
+		double GetTankThickness() const { return fTankThickness; }
+		void SetTankThickness(double t) { fTankThickness = t; }
 
 		// Optical device
 		OptDevice& GetOptDevice() { return fOptDevice; } // to access OptDevice class members
@@ -97,16 +105,14 @@ class Detector
 		const std::map<int, OptDevice>& OptDeviceRange() const { return fOptDeviceMap; }
 		int GetNOptDevice() const { return fNOptDevices; }
 		
-		
-		// WCD ?
-
-
-
 		// Setters & Getters for Geant4 logical volumes
 		void SetLogicalVolume(std::string volName, G4LogicalVolume* log);
 		G4LogicalVolume* GetLogicalVolume(std::string volName) { return fLogicalVolumeMap[volName]; }
 		bool HasLogicalVolume(std::string volName);
 
+		DetectorType StringToType(const std::string name);
+		void SetDetectorProperties(const DetectorType type);
+		//std::map<std::string, DetectorType> conversion;
 	private:
 
 		int fDetectorId = 0;
@@ -114,16 +120,20 @@ class Detector
 		int fNBars = 0;
 		int fNOptDevices = 0;
 
-		double fBarWidth = 41;
-		double fBarLength = 82;
-		double fBarThickness = 10;
-		double fCasingThickness = 2;
-		double fFiberRadius = 1.2;
-		double fCladdingThickness = 0.10;
-		double fCoatingThickness  = 0.25;
+		// 
 
-		double fHeight = 0;
-		double fRadius = 0;
+		double fBarWidth;
+		double fBarLength;
+		double fBarThickness;
+		double fCasingThickness;
+		double fFiberLength;
+		double fFiberRadius;
+		double fCladdingThickness;
+		double fCoatingThickness;
+
+		double fTankHeight;
+		double fTankRadius;
+		double fTankThickness;
 		
 		std::vector<double> fDetectorPosition;
 		OptDevice fOptDevice;
@@ -131,6 +141,10 @@ class Detector
 		std::map<OptDevice::DeviceType, OptDevice> fOptDeviceMapT;
 
 		std::map<std::string, G4LogicalVolume*> fLogicalVolumeMap;
+		// configuration file with detector properties
+		std::string fDetectorProperties = "./DetectorProperties.xml";
+
+
 
 };
 
