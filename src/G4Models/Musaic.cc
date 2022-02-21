@@ -41,14 +41,14 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	const G4double fCasingThickness = detector.GetCasingThickness() * CLHEP::mm;
 	
 	// scintillator bar properties
-	const G4double fBarWidth  = detector.GetBarWidth() * CLHEP::mm;
-	const G4double fBarLength = detector.GetBarLength() * CLHEP::mm;
-	const G4double fBarThickness = detector.GetBarThickness() * CLHEP::mm;
-	const G4double fCoatingThickness = detector.GetBarCoatingThickness() * CLHEP::mm;
+	const G4double fBarWidth  = detector.GetBarWidth();
+	const G4double fBarLength = detector.GetBarLength();
+	const G4double fBarThickness = detector.GetBarThickness();
+	const G4double fCoatingThickness = detector.GetBarCoatingThickness();
 
 	// fiber properties
-	const G4double fCladdingThickness = detector.GetCladdingThickness() * CLHEP::mm;
-	const G4double fFiberRadius = detector.GetFiberRadius() * CLHEP::mm;
+	const G4double fCladdingThickness = detector.GetCladdingThickness();
+	const G4double fFiberRadius = detector.GetFiberRadius();
 
 	// Optical device properties
 	OptDevice sipm = detector.GetOptDevice(OptDevice::eSiPM);

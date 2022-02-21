@@ -37,8 +37,8 @@ void WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 	G4PVPlacement* physSide = nullptr;
 
 	// WCD dimensions
-	G4double fTankRadius = 105 * CLHEP::cm;
-	G4double fTankHeight = 90 * CLHEP::cm;
+	G4double fTankRadius = detector.GetTankRadius();
+	G4double fTankHeight = detector.GetTankHeight();
 	G4double fTankHalfHeight = 0.5 * fTankHeight;
 	G4double fTankThickness = 12.7 * CLHEP::mm;
 	// photonis-XP1805
@@ -58,14 +58,15 @@ void WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 	G4ThreeVector fTankCenter = detectorPos + G4ThreeVector(0, 0, fTankHalfHeight + fTankThickness);
 	// for now, only one PMT
 	int pmtId = 0;
-	int numberOfPMT = detector.GetNOptDevice();
 	ostringstream namedetector;
 	namedetector.str("");
 	namedetector << "WCD";
 	cout << "[INFO] G4Models::WCD: Building detector " << namedetector.str();
 	cout << " (ID = " << detectorId << ")";
-	cout << " with " << numberOfPMT << pmt.GetName() << ". " << endl;
-
+	cout << " with " << pmt.GetName() << ". " << endl;
+	cout << "[INFO] G4Models::WCD: Detector Dimensions:" << endl;
+	cout << "Tank Radius = " << fTankRadius / CLHEP::cm << " cm " << endl;
+	cout << "Tank Height = " << fTankHeight / CLHEP::cm << " cm " << endl;
 	/****************************************************************
 		
 		Geant4 Volume construction
