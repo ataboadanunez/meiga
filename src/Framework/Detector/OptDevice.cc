@@ -9,72 +9,52 @@ OptDevice::OptDevice(int id, OptDevice::DeviceType type) :
   fType(type)
 { 
 
-  switch(type) {
-
-    case eSiPM:
-      SetWidth(fSiPMWidth);
-      SetLength(fSiPMLength);
-      SetThickness(fSiPMThickness);
-    break;
-
-    case ePMT:
-      SetWidth(fPMTWidth);
-      SetLength(fPMTLength);
-      SetThickness(fPMTThickness);
-    break;
-  }
+  SetProperties(type);
 }
 
 OptDevice::OptDevice(OptDevice::DeviceType type) : 
   fType(type)
 { 
+  SetProperties(type);
+}
 
+
+void
+OptDevice::SetProperties(OptDevice::DeviceType type)
+{
   // switch cases for setting device properties
 
   switch(type) {
 
     case eSiPM:
-      SetWidth(fSiPMWidth);
-      SetLength(fSiPMLength);
-      SetThickness(fSiPMThickness);
-    break;
-
-    case ePMT:
-      SetWidth(fPMTWidth);
-      SetLength(fPMTLength);
-      SetThickness(fPMTThickness);
-    break;
-  }
-
-
-}
-
-const string
-OptDevice::GetName()
-{
-  
-  string name;
-  DeviceType t = GetType();
-
-  switch(t) {
-    case eSiPM:
-      name = "SiPM";
+      // represented in G4Models as a G4Box
+      SetWidth(1.3);
+      SetLength(1.3);
+      SetThickness(0.1);
+      SetName("SiPM");
     break;
 
     case eMChPMT:
-      name = "Multi-Channel_PMT";
+    // represented in G4Models as a G4Box
+      SetWidth(1.3);
+      SetLength(1.3);
+      SetThickness(0.1);
+      SetName("Multi-Channel_PMT");
     break;
 
     case ePMT:
-      name = "PMT";
+      // represented in G4Models as a G4Ellipsoid
+      SetSemiAxisX(10.1);
+      SetSemiAxisY(10.1);
+      SetSemiAxisZ(6.5);
+      SetName("PMT");
     break;
 
+    case eUnknown:
+      throw std::invalid_argument( "Unknown Optical Device type!" );
+    break;
   }
-
-  return name;
-
 }
-
 
 void
 OptDevice::SPEPulse(std::vector<double> &amplitude, double fBinTime, size_t fStartPulse)
@@ -252,6 +232,10 @@ OptDevice::GetQuantumEfficiency(double waveLength, OptDevice::DeviceType type)
         qeff *= fPMTCollectionEfficiency;
       }
       break;
+      
+      case eUnknown:
+        throw std::invalid_argument( "Unknown Optical Device type!" );
+      break;
 
   } // end switch
 
@@ -276,6 +260,10 @@ OptDevice::GetOpticalRange()
 
     case ePMT:
       fOpticalRange = {1.77 ,4.96};
+    break;
+
+    case eUnknown:
+      throw std::invalid_argument( "Unknown Optical Device type!" );
     break;
 
   }

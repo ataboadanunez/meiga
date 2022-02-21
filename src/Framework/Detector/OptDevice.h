@@ -10,6 +10,7 @@ class OptDevice
 {
 	public:
 		enum DeviceType {
+			eUnknown,
 			eSiPM,
 			eMChPMT,
 			ePMT
@@ -20,6 +21,7 @@ class OptDevice
 		OptDevice(OptDevice::DeviceType type);
 		virtual ~OptDevice() { }
 
+		void SetProperties(OptDevice::DeviceType type);
 		
 		// Generic OptDevice stuff
 		int GetId() { return fOptDeviceId; }
@@ -27,8 +29,11 @@ class OptDevice
 
 		DeviceType GetType() { return fType; }
 		void SetType(OptDevice::DeviceType type) { fType = type; }
-		const std::string GetName();
+		void SetName(std::string name) { fName = name; }
+		const std::string GetName() { return fName; }
 
+		// for "squared-shape" optical devices
+		// SiPM and Multi-Channel PMT are pixels, i.e., boxes
 		double GetLength() { return fOptDeviceLength; }
 		void SetLength(double len) { fOptDeviceLength = len; }
 
@@ -38,7 +43,16 @@ class OptDevice
 		double GetThickness() { return fOptDeviceThickness; }
 		void SetThickness(double thi) { fOptDeviceThickness = thi; }
 
+		// for semi-spherical optical devices (large PMTs)
+		double GetSemiAxisX() { return fPMTSemiX; }
+		void SetSemiAxisX(double semiX) { fPMTSemiX = semiX; }
 		
+		double GetSemiAxisY() { return fPMTSemiY; }
+		void SetSemiAxisY(double semiY) { fPMTSemiY = semiY; }
+		
+		double GetSemiAxisZ() { return fPMTSemiZ; }
+		void SetSemiAxisZ(double semiZ) { fPMTSemiZ = semiZ; }
+
 		// response stuff
 		bool IsPhotonDetected(double energy);
 		double GetQuantumEfficiency(double wl, OptDevice::DeviceType t);
@@ -53,24 +67,33 @@ class OptDevice
 		bool HasLogicalVolume(std::string volName);
 
 	private:
-		int fOptDeviceId = 0;
-		DeviceType fType; 
+		int fOptDeviceId;
+		DeviceType fType;
+		std::string fName; 
 
-		// this sould be placed in a config file
-		double fOptDeviceLength = 0.0;
-		double fOptDeviceWidth  = 0.0;
-		double fOptDeviceThickness = 0.0;
+		double fOptDeviceLength;
+		double fOptDeviceWidth;
+		double fOptDeviceThickness;
+
+		// the following variables should be placed in a config file
+		// as it is done for the Detector properties
 
 		// SiPM properties
-		double fSiPMLength 		= 1.3;
-		double fSiPMWidth  		= 1.3;
-		double fSiPMThickness = 0.1;
+		double fSiPMLength; // 1.3 mm
+		double fSiPMWidth; // 1.3 mm
+		double fSiPMThickness; // 1.3 mm
 		// add quantum efficiency
 
-		// PMT properties
-		double fPMTLength 		= 1.3;
-		double fPMTWidth  		= 1.3;
-		double fPMTThickness = 0.1;
+		// MCh-PMT properties
+		double fPMTLength; // 1.3 mm
+		double fPMTWidth; // 1.3 mm 
+		double fPMTThickness; // 1.3 mm
+
+		// large PMT
+		double fPMTSemiX; // 10.1 cm
+		double fPMTSemiY; // 10.1 cm
+		double fPMTSemiZ; // 6.5 cm
+
 		std::vector<double> fOpticalRange;
 		// add quantum efficiency
 		double fQEScaleParameter = 0.31;

@@ -93,7 +93,7 @@ class Detector
 		void SetTankThickness(double t) { fTankThickness = t; }
 
 		// Optical device
-		OptDevice& GetOptDevice() { return fOptDevice; } // to access OptDevice class members
+		//OptDevice& GetOptDevice() { return fOptDevice; } // to access OptDevice class members
 		// Make, Get and Has optical device by its id
 		void MakeOptDevice(int id, OptDevice::DeviceType type);
 		OptDevice& GetOptDevice(int id) { return fOptDeviceMap[id]; }
