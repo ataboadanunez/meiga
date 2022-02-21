@@ -8,25 +8,12 @@
 using boost::property_tree::ptree;
 using namespace std;
 
-static map<string, enum Detector::DetectorType> conversion;
-
-static void initConversionMap() {
-	static bool isInitialized = false;
-	if (isInitialized) return;
-	isInitialized = true;
-	conversion.clear();
-	conversion["eUnknown"] = Detector::eUnknown;
-	conversion["eMusaic"]  = Detector::eMusaic;
-	conversion["eMudulus"] = Detector::eMudulus;
-	conversion["eWCD"]     = Detector::eWCD;
-}
-
 void
 ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 {
-	initConversionMap();
-	cout << "ConfigManager::ReadDetectorList: Reading Detector Configuration from file " << fDetectorList << endl;
-	//Detector& detector = theEvent.GetDetector();
+
+	cout << "[INFO] ConfigManager::ReadDetectorList: Reading Detector Configuration from file " << fDetectorList << endl;
+	
 	int nDetectors = 0;
 
 	// read XML with detector positions
@@ -36,19 +23,26 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 		ptree subtree;
 		string name;
 		tie(name, subtree) = i;
-#warning "add detector cases"
-		// do this for type cases
+
 		if (name != "detector")
 			continue;
 
 		vector<double> detPosition;
 		string detIdstr = subtree.get<string>("<xmlattr>.id");
+		string detTypestr = subtree.get<string>("<xmlattr>.type");
 		int detId = stoi(detIdstr);
+		Detector::DetectorType detType = theEvent.GetDetector().StringToType(detTypestr);
+
 		detPosition.clear();
 
-		// create and get detector
+		cout << "[DEBUG] ConfigManager::ReadDetectorList: Reading configuration of detector " << detTypestr << " with ID = " << detId << endl;
+		// register detector in the Event
 		if (!theEvent.HasDetector(detId)) {
-			theEvent.MakeDetector(detId);
+			theEvent.MakeDetector(detId, detType);
+		}
+		else {
+			cout << "[WARNING] ConfigManager::ReadDetectorList: A Detector " << " with ID = " << detId << " already registered! IDs must be unique, please check your DetectorList.xml!" << endl;
+			continue;
 		}
 		
 		Detector& detector = theEvent.GetDetector(detId);
@@ -61,35 +55,10 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 				string value = v.second.data();
 				boost::algorithm::trim(value);
 
-				if (label == "type") {
-					std::cout << " reading detector type " << std::endl;
-					try {
-						cout << value << endl;
-						auto detType = conversion[value];
-						detector.SetType(detType);
-					}
-					catch (out_of_range &e) {
-						cerr << "Detector type " << value << " does not exist!" << endl;
-						detector.SetType(Detector::eUnknown);
-					}
-				}	
-				else if (label == "barsInPanel") {
-					int nBarsInPanel = stoi(value);
-					detector.SetNBars(nBarsInPanel);
-				}
-				else if (label == "barLength") {
-					cout << value << endl;
-					double barLength = stod(value);
-					string unit = v.second.get<string>("<xmlattr>.unit");
-					double unitG4 = G4UnitDefinition::GetValueOf(unit);
-					detector.SetBarLength(barLength*unitG4);
-				}
-				else {
-					cout << value << endl;
 					double dValue = stod(value);
 					string unit = v.second.get<string>("<xmlattr>.unit");
 					detPosition.push_back(dValue*G4UnitDefinition::GetValueOf(unit));
-				}
+				
 			}
 		}
 		
