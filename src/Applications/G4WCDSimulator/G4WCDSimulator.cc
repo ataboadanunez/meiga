@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
   if (argc < 3) {
     ProgramUsage();
-    throw invalid_argument("A config file is needed!");
+    throw invalid_argument("[ERROR] G4WCDSimulator::main: A configuration file is needed!");
   }
 
   for (int i=1; i<argc; i=i+2) {
@@ -111,7 +111,8 @@ void
 G4WCDSimulator::Initialize(Event& theEvent, string fileName)
 {
 
-  cout << "... Initialize ..." << endl;
+  cout << "[INFO] G4WCDSimulator::Initialize" << endl;
+  cout << "[INFO] G4WCDSimulator::Initialize: Reading configuration file " << fileName << endl;
   // set value of flags according to cfg file
   // reading cfg file using boost
   // eventually as input of executable main(char** fConfig)
@@ -145,6 +146,7 @@ bool
 G4WCDSimulator::RunSimulation(Event& theEvent)
 {
 
+  cout << "[INFO] G4WCDSimulator::RunSimulation" << endl;
   SimData& simData = theEvent.GetSimData();
   simData.SetSimulationMode(fSimulationMode);
   cout << "[INFO] G4WCDSimulator::RunSimulation: Simulation mode selected = " << fSimulationMode << endl;
@@ -251,16 +253,12 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
   }
   
 
-  int nParticle = 0;
   // loop over particle vector
   for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
     G4WCDSimulator::currentParticle = *it;
     simData.SetCurrentParticle(*it);
     // Run simulation
     fRunManager->BeamOn(1);
-    nParticle+=1;
-
-    //cout << "Simulated " << nParticle << " particle(s) out of " << NumberOfParticles << endl;
   }
 
 
@@ -275,11 +273,11 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 void
 G4WCDSimulator::WriteEventInfo(Event& theEvent)
 {
-  cout << "... WriteEventInfo ..." << endl;
+  cout << "[INFO] G4WCDSimulator::WriteEventInfo" << endl;
 
   // for accessing Simulated Data at Detector/Event level
   SimData& simData = theEvent.GetSimData();
-  
+  cout << "[INFO] G4WCDSimulator::WriteEventInfo: Accessing DetectorSimData" << endl;
   // loop over detector range
   for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 
@@ -289,7 +287,7 @@ G4WCDSimulator::WriteEventInfo(Event& theEvent)
     DetectorSimData& detSimData = simData.GetDetectorSimData(detId);
     // get number of optical devices in the detector
     int nOptDev = currDet.GetNOptDevice();
-    cout << "[INFO] G4WCDSimulator::WriteEventInfo: Accessing data of detector " << detId << " with " << nOptDev << " optical devices" << endl;
+    cout << "[INFO] G4WCDSimulator::WriteEventInfo: Accessing data of detector " << detId << " with " << nOptDev << " optical devices." << endl;
 
     // loop over optical devices
     for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
@@ -305,17 +303,6 @@ G4WCDSimulator::WriteEventInfo(Event& theEvent)
         cerr << "No Time for this channel!" << endl;
         continue;
       }
-
-
-      // // accessing signals (photo-electrons)
-      // cout << "[INFO] G4WCDSimulator::WriteEventInfo: Number of photo-electrons at " << currOd.GetName() << endl; 
-      // for (auto peTime = peTimeDistributionRange->begin(); peTime != peTimeDistributionRange->end(); ++peTime) {
-
-      //   size_t npe = (*peTime)->size();
-      //   cout << npe << " ";
-      //   // write pulses to output file
-
-      // }
 
       cout << endl;
       // accessing signals for different particle components
@@ -333,7 +320,7 @@ G4WCDSimulator::WriteEventInfo(Event& theEvent)
           }
 
           ofstream* fPEFile = new ofstream();
-          fPEFile->open("photoelectrons_"+std::to_string(detId)+"_PMT_"+std::to_string(odId)+std::to_string(particleComponent)+".dat");
+          fPEFile->open("photoelectrons_"+std::to_string(detId)+"_PMT_"+std::to_string(odId)+"_"+std::to_string(particleComponent)+".dat");
           for (auto peTime = peTimeDistributionRangeComp.begin(); peTime != peTimeDistributionRangeComp.end(); ++peTime) {
             size_t npe = peTime->size();
             (*fPEFile) << npe << " ";
@@ -357,6 +344,5 @@ G4WCDSimulator::WriteEventInfo(Event& theEvent)
 
 
   }
-
 
 }

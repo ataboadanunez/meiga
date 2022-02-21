@@ -55,7 +55,6 @@ void
 G4WCDConstruction::PlaceDetector(Event& theEvent)
 {
 	
-	int nDetectors = theEvent.GetNDetectors();
 	// loop in detector vector
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 		auto& currentDet = detIt->second;
