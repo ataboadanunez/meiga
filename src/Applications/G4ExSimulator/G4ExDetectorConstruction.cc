@@ -2,11 +2,8 @@
 #include <iostream>
 
 #include "G4ExDetectorConstruction.h"
-// include detector models (should be in separate header)
+// include Materials from G4Models
 #include "Materials.h"
-#include "Musaic.h"
-#include "Mudulus.h"
-//#include "RCDetector.h"
 
 #include "G4UnitsTable.hh"
 
