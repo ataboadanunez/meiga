@@ -35,7 +35,8 @@ class Detector
 			eUnknown = 0,
 			eMusaic = 1,
 			eMudulus = 2,
-			eWCD = 3
+			eWCD = 3,
+			eScintillator
 		};
 
 
