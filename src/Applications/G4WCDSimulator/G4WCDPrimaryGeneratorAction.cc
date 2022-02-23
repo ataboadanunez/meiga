@@ -55,13 +55,13 @@ G4WCDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
       return;
     }
   
-  double mass = currParticle.GetMass();
-  double fMomentum = currParticle.GetMomentum();
+  //double mass = currParticle.GetMass();
+  //double fMomentum = currParticle.GetMomentum();
   double fKineticEnergy = currParticle.GetKineticEnergy();
 
   const std::vector<double> particleMomentumDirection = currParticle.GetDirection();
   
- 	double fPx = particleMomentumDirection.at(0);
+  double fPx = particleMomentumDirection.at(0);
   double fPy = particleMomentumDirection.at(1);
   double fPz = particleMomentumDirection.at(2);
   
