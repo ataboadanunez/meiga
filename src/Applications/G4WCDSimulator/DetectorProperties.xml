@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ISO-8859-1'?>
 <!-- default detector properties -->
-<detectorProperties xmlns="http://tempuri.org/po.xsd" orderDate="1999-10-20">
+<detectorList xmlns="http://tempuri.org/po.xsd" orderDate="1999-10-20">
 	
 	<detector type="eWCD">
 		<tankRadius unit="cm"> 105 </tankRadius>
