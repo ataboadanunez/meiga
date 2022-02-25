@@ -316,29 +316,30 @@ G4WCDSimulator::WriteEventInfo(Event& theEvent)
         Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
         // using currentParticle to get the component name. its ugly but should do the trick
         auto componentName = G4WCDSimulator::currentParticle.GetComponentName(particleComponent);
-        cout << "[INFO] G4WCDSimulator::WriteEventInfo: Accessing signals of particle component " << componentName << endl;
+        cout << "[INFO] G4WCDSimulator::WriteEventInfo: Accessing signals of particle component " << componentName << " (" << particleComponent << ")" <<  endl;
         try 
         { 
           const auto peTimeDistributionRangeComp = odSimData.PETimeDistributionRange(particleComponent);
           if (!peTimeDistributionRange) {
-            cerr << "No time distribution for particle component " << componentName << endl;
+            cerr << "[INFO] No time distribution for particle component " << componentName << endl;
             continue;
           }
 
           ofstream* fPEFile = new ofstream();
-          fPEFile->open("photoelectrons_"+std::to_string(detId)+"_PMT_"+std::to_string(odId)+"_"+std::to_string(particleComponent)+".dat");
+          string outputfileName = "photoelectrons_"+std::to_string(detId)+"_PMT_"+std::to_string(odId)+"_"+std::to_string(particleComponent)+".dat";
+          fPEFile->open(outputfileName);
           for (auto peTime = peTimeDistributionRangeComp.begin(); peTime != peTimeDistributionRangeComp.end(); ++peTime) {
             size_t npe = peTime->size();
             (*fPEFile) << npe << " ";
           }
           
           (*fPEFile) << endl;
-          cout << "[INFO] G4WCDSimulator::WriteEventInfo: Signals coppied!" << endl;
+          cout << "[INFO] G4WCDSimulator::WriteEventInfo: Signals of component " << componentName << " copied to file: " << outputfileName << endl;
           fPEFile->close();
         }
         catch (std::out_of_range &e)
         {
-          cerr << "No time distribution for particle component " << componentName << "! (Exception: " << e.what() << " )." << endl;
+          cerr << "[INFO] No time distribution for particle component " << componentName << "! (Exception: " << e.what() << " )." << endl;
         }
         
         
