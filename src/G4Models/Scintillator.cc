@@ -45,17 +45,12 @@ Scintillator::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Even
 	G4LogicalVolume* logicCoating = nullptr;
 	G4LogicalVolume* logicScinBar = nullptr;
 
-	// physical volumes
-	G4PVPlacement* physCoating = nullptr;
-	G4PVPlacement* physScinBar = nullptr;
-
 	// following variables are read from Detector class
-	G4double fCoatingThickness = 0.25 * CLHEP::mm;
-
-	G4double fBarWidth = 4 * CLHEP::cm;
-	G4double fBarLength = 50 * CLHEP::cm;
-	G4double fBarThickness = 1 * CLHEP::cm;
-	G4int fNBars = 10;
+	G4double fCoatingThickness = detector.GetBarCoatingThickness();
+	G4double fBarWidth = detector.GetBarWidth();
+	G4double fBarLength = detector.GetBarLength();
+	G4double fBarThickness = detector.GetBarThickness();
+	G4int fNBars = detector.GetNBars();
 	G4double fHalfWidth = 0.5*fBarWidth*fNBars; 
 
 	//G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
