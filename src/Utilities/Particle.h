@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <string>
 
 // start using namespaces?
 
@@ -82,6 +83,7 @@ class Particle {
 		void InsertComponent(const Particle::Type type, const Particle::Component comp);
 		void InitComponentMap();
 		Particle::Component GetComponent(const Particle::Type type);
+		std::string GetComponentName(Particle::Component type);
 
 		// particle momentum
 		const std::vector<double>& GetDirection() const { return fDirection; }
