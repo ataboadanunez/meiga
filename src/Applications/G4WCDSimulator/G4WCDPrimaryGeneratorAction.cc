@@ -81,11 +81,16 @@ G4WCDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 
   // check injection according to detector dimensions
   auto& detector = fEvent.GetDetector(0);
-  const G4double injRadius = detector.GetTankRadius();
-  const G4double injHeight = detector.GetTankHeight() + 10*CLHEP::cm; // slightly above tank height
-  const G4double rand = RandFlat::shoot(0., 1.);
-  const G4double r = injRadius*sqrt(rand);
-  const G4double phi = RandFlat::shoot(0., CLHEP::twopi);
+  
+  double tankHeight = detector.GetTankHeight();
+  double tankRadius = detector.GetTankRadius();
+  double maxHeight  = fEvent.GetMaximumHeight();
+  
+  G4double injRadius = tankRadius;
+  G4double injHeight = ( tankHeight > maxHeight ? tankHeight : maxHeight) + 10*CLHEP::cm; // slightly above detector height
+  G4double rand = RandFlat::shoot(0., 1.);
+  G4double r = injRadius*sqrt(rand);
+  G4double phi = RandFlat::shoot(0., CLHEP::twopi);
 
   G4double x0 = r*cos(phi);
   G4double y0 = r*sin(phi);
