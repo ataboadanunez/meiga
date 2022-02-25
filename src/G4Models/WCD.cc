@@ -56,7 +56,7 @@ WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEve
 	// define PMT position as the center of the tank
 	G4ThreeVector fTankCenter = detectorPos + G4ThreeVector(0, 0, fTankHalfHeight + fTankThickness);
 	int detectorId = detector.GetId();
-	int pmtId = 9;
+	int pmtId = 0;
 	ostringstream namedetector;
 	namedetector.str("");
 	namedetector << "WCD";
