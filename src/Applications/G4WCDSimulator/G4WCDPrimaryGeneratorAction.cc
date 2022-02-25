@@ -5,7 +5,7 @@
 #include "G4WCDSimulator.h"
 #include "G4WCDPrimaryGeneratorAction.h"
 #include "G4WCDConstruction.h"
-
+#include "Detector.h"
 
 #include "G4RunManager.hh"
 #include "G4ParticleGun.hh"
@@ -21,9 +21,10 @@
 using CLHEP::RandFlat;
 using namespace std;
 
-G4WCDPrimaryGeneratorAction::G4WCDPrimaryGeneratorAction(/*Event& theEvent, const Particle &theParticle*/) : 
+G4WCDPrimaryGeneratorAction::G4WCDPrimaryGeneratorAction(Event& theEvent) : 
   G4VUserPrimaryGeneratorAction(),
-  fParticleGun(new G4ParticleGun(1))
+  fParticleGun(new G4ParticleGun(1)),
+  fEvent(theEvent)
   
 {  
 
@@ -79,8 +80,9 @@ G4WCDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   currParticle.SetZenith(particleZenith);
 
   // check injection according to detector dimensions
-  const G4double injRadius = 105 * CLHEP::cm;
-  const G4double injHeight = 90 * CLHEP::cm + 10*CLHEP::cm; // slightly above tank  
+  auto& detector = fEvent.GetDetector(0);
+  const G4double injRadius = detector.GetTankRadius();
+  const G4double injHeight = detector.GetTankHeight() + 10*CLHEP::cm; // slightly above tank height
   const G4double rand = RandFlat::shoot(0., 1.);
   const G4double r = injRadius*sqrt(rand);
   const G4double phi = RandFlat::shoot(0., CLHEP::twopi);
@@ -88,6 +90,8 @@ G4WCDPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   G4double x0 = r*cos(phi);
   G4double y0 = r*sin(phi);
   G4double z0 = injHeight;
+
+  cout << "[DEBUG] G4WCDPrimaryGeneratorAction::GeneratePrimaries: Injection Height = " << z0 / CLHEP::cm << endl;
   
   const std::vector<double> injectionPosition = {x0, y0, z0};
   currParticle.SetInjectionPosition(injectionPosition);

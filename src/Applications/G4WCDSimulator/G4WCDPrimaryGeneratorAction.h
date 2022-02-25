@@ -7,11 +7,11 @@
 #include "G4ParticleGun.hh"
 #include "globals.hh"
 
-#include <iostream>
-
 #include "G4WCDConstruction.h"
 #include "Particle.h"
 #include "Event.h"
+
+#include <iostream>
 
 class G4ParticleGun;
 class G4Event;
@@ -21,7 +21,7 @@ class G4Event;
 class G4WCDPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction 
 {
   public:
-    G4WCDPrimaryGeneratorAction(/*Event& theEvent, const Particle &theParticle*/);
+    G4WCDPrimaryGeneratorAction(Event& theEvent);
     virtual ~G4WCDPrimaryGeneratorAction();
 
     // method from the base class
@@ -40,6 +40,7 @@ class G4WCDPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     const G4WCDConstruction *fDetectorConstructor;
 
   	friend class G4WCDConstruction;
+    Event fEvent;
 };  
 
 #endif

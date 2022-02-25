@@ -182,7 +182,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
   //fRunManager->SetUserInitialization(physicsList);
   fRunManager->SetUserInitialization(new G4MPhysicsList(fPhysicsName));
 
-  G4WCDPrimaryGeneratorAction *fPrimaryGenerator = new G4WCDPrimaryGeneratorAction();
+  G4WCDPrimaryGeneratorAction *fPrimaryGenerator = new G4WCDPrimaryGeneratorAction(theEvent);
   fRunManager->SetUserAction(fPrimaryGenerator);
   
   G4WCDStackingAction *fStackingAction = new G4WCDStackingAction(theEvent);
