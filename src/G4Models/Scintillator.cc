@@ -82,7 +82,7 @@ Scintillator::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Even
 		logicScinBar = new G4LogicalVolume(solidScinBar, Materials().ScinPlastic, nameScinBar, 0, 0, 0);
 
 		// physical volumes
-		new G4PVPlacement(nullptr, G4ThreeVector(0, yPos, detectorPos.getZ()), logicCoating, 
+		new G4PVPlacement(nullptr, G4ThreeVector(detectorPos.getX(), yPos, detectorPos.getZ()), logicCoating, 
 			nameCoating, logMother, false, barId, fCheckOverlaps);
 		new G4PVPlacement(nullptr, G4ThreeVector(), logicScinBar, 
 			nameScinBar, logicCoating, false, barId, fCheckOverlaps);
