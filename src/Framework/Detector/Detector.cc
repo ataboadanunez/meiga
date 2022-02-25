@@ -94,7 +94,7 @@ Detector::HasLogicalVolume(string volName)
 }
 
 void
-Detector::SetDetectorProperties(const DetectorType type)
+Detector::SetDetectorProperties(const DetectorType type, string detList)
 {
 	// set default values for different detector types
 	// read XML with detector parameters
@@ -105,9 +105,9 @@ Detector::SetDetectorProperties(const DetectorType type)
 
 	ptree tree;
 	
-	cout << "[DEBUG] Detector::SetDetectorProperties: Reading detector properties from file = " << fDetectorProperties << endl;
-	read_xml(fDetectorProperties, tree);
-	for (const auto& i : tree.get_child("detectorProperties")) {
+	cout << "[INFO] Detector::SetDetectorProperties: Reading detector properties from file = " << detList << endl;
+	read_xml(detList, tree);
+	for (const auto& i : tree.get_child("detectorList")) {
 		ptree subtree;
 		string name;
 		tie(name, subtree) = i;
@@ -121,7 +121,7 @@ Detector::SetDetectorProperties(const DetectorType type)
 		if (type != detType)
 			continue;
 
-		cout << "[DEBUG] Detector::SetDetectorProperties: Detector type " << detType << endl;
+		cout << "[INFO] Detector::SetDetectorProperties: Detector type " << detType << endl;
 
 		for (const auto& v : subtree.get_child("")) {
 			string xmlLabel = v.first;
