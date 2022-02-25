@@ -14,7 +14,6 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 
 	cout << "[INFO] ConfigManager::ReadDetectorList: Reading Detector Configuration from file " << fDetectorList << endl;
 	
-	int nDetectors = 0;
 	// used to determine maximum value of Z coordinate of current detectors in file
 	double maxHeight = 0.;
 	
@@ -47,31 +46,37 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 		}
 		
 		Detector& detector = theEvent.GetDetector(detId);
-		// search for detector properties in the DetectorList.xml
-		detector.SetDetectorProperties(detType, fDetectorList);
-
-		nDetectors+=1;
-
+		// set detector position
 		for (const auto &v : subtree.get_child("")) {
 			string label = v.first;
-			if ( label != "<xmlattr>" ) {
-				string value = v.second.data();
-				boost::algorithm::trim(value);
-				cout << "[DEBUG] ConfigManager::ReadDetectorList: Label = " << label << endl;
-				double dValue = stod(value);
-				string unit = v.second.get<string>("<xmlattr>.unit");
-				double coord = G4UnitDefinition::GetValueOf(unit) * dValue;
-				detPosition.push_back(coord);
+			
 
-				if ((label == "z") && (coord > maxHeight))
-					maxHeight = coord;
+			if ( label != "<xmlattr>" ) {
+				cout << "[DEBUG] ConfigManager::ReadDetectorList: label = " << label << endl;
+				if ((label == "x") || (label == "y") || (label == "z")) {
+					string value = v.second.data();
+					boost::algorithm::trim(value);
+					double dValue = stod(value);
+					string unit = v.second.get<string>("<xmlattr>.unit");
+					double coord = G4UnitDefinition::GetValueOf(unit) * dValue;
+					detPosition.push_back(coord);
+					// compute maximum height according to Z coordinate
+					if ((label == "z") && (coord > maxHeight))
+						maxHeight = coord;	
+				}
+				
 				
 			}
 		}
 		
-		cout << "[DEBUG] ConfigManager::ReadDetectorList: Found maximum height of detectors = " << maxHeight / CLHEP::cm << " cm " << endl;
+		// shouldn't be part of DetectorSimData?
 		theEvent.SetMaximumHeight(maxHeight);
 		detector.SetDetectorPosition(detPosition);
+
+		// search for another detector properties in the DetectorList.xml
+		detector.SetDetectorProperties(detType, fDetectorList);
 	}
+
+	
 
 }
