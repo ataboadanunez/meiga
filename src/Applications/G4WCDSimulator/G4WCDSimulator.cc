@@ -95,11 +95,12 @@ int main(int argc, char** argv)
 
   **************************************************/
   fG4WCDSimulator->WriteEventInfo(theEvent);
+  cout << "[INFO] G4WCDSimulator: End of the run!" << endl;
   time(&end);
 
   // Calculating total time taken by the program.
     double time_taken = double(end - start);
-    cout << "Time taken by program is : " << fixed
+    cout << "[INFO] G4WCDSimulator: Time taken by program is : " << fixed
          << time_taken << setprecision(5);
     cout << " sec " << endl;
   
@@ -138,6 +139,7 @@ G4WCDSimulator::Initialize(Event& theEvent, string fileName)
 
   // Read Detector Configuration
   ConfigManager::ReadDetectorList(fDetectorList, theEvent);
+
   
 }            
 
@@ -182,7 +184,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
   //fRunManager->SetUserInitialization(physicsList);
   fRunManager->SetUserInitialization(new G4MPhysicsList(fPhysicsName));
 
-  G4WCDPrimaryGeneratorAction *fPrimaryGenerator = new G4WCDPrimaryGeneratorAction();
+  G4WCDPrimaryGeneratorAction *fPrimaryGenerator = new G4WCDPrimaryGeneratorAction(theEvent);
   fRunManager->SetUserAction(fPrimaryGenerator);
   
   G4WCDStackingAction *fStackingAction = new G4WCDStackingAction(theEvent);
@@ -265,6 +267,8 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
   delete fVisManager;
   delete fRunManager;
 
+  cout << "[INFO] G4WCDSimulator::RunSimulation: Geant4 Simulation ended successfully! " << endl;
+
   return true;
 
 }
@@ -310,29 +314,32 @@ G4WCDSimulator::WriteEventInfo(Event& theEvent)
       for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
         
         Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
-        cout << "[INFO] G4WCDSimulator::WriteEventInfo: Accessing signals of particle component " << particleComponent << endl;
+        // using currentParticle to get the component name. its ugly but should do the trick
+        auto componentName = G4WCDSimulator::currentParticle.GetComponentName(particleComponent);
+        cout << "[INFO] G4WCDSimulator::WriteEventInfo: Accessing signals of particle component " << componentName << " (" << particleComponent << ")" <<  endl;
         try 
         { 
           const auto peTimeDistributionRangeComp = odSimData.PETimeDistributionRange(particleComponent);
           if (!peTimeDistributionRange) {
-            cerr << "No time distribution for particle component " << particleComponent << endl;
+            cerr << "[INFO] No time distribution for particle component " << componentName << endl;
             continue;
           }
 
           ofstream* fPEFile = new ofstream();
-          fPEFile->open("photoelectrons_"+std::to_string(detId)+"_PMT_"+std::to_string(odId)+"_"+std::to_string(particleComponent)+".dat");
+          string outputfileName = "photoelectrons_"+std::to_string(detId)+"_PMT_"+std::to_string(odId)+"_"+std::to_string(particleComponent)+".dat";
+          fPEFile->open(outputfileName);
           for (auto peTime = peTimeDistributionRangeComp.begin(); peTime != peTimeDistributionRangeComp.end(); ++peTime) {
             size_t npe = peTime->size();
             (*fPEFile) << npe << " ";
           }
           
           (*fPEFile) << endl;
-          cout << "[INFO] G4WCDSimulator::WriteEventInfo: Signals coppied!" << endl;
+          cout << "[INFO] G4WCDSimulator::WriteEventInfo: Signals of component " << componentName << " copied to file: " << outputfileName << endl;
           fPEFile->close();
         }
         catch (std::out_of_range &e)
         {
-          cerr << "No time distribution for particle component " << particleComponent << "! (Exception: " << e.what() << " )." << endl;
+          cerr << "[INFO] No time distribution for particle component " << componentName << "! (Exception: " << e.what() << " )." << endl;
         }
         
         

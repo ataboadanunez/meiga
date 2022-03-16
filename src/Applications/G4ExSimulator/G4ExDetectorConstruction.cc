@@ -2,11 +2,8 @@
 #include <iostream>
 
 #include "G4ExDetectorConstruction.h"
-// include detector models (should be in separate header)
+// include Materials from G4Models
 #include "Materials.h"
-#include "Musaic.h"
-#include "Mudulus.h"
-//#include "RCDetector.h"
 
 #include "G4UnitsTable.hh"
 
@@ -58,22 +55,10 @@ void
 G4ExDetectorConstruction::PlaceDetector(Event& theEvent)
 {
 	
-	//Detector& detector = theEvent.GetDetector();
-	int nDetectors = theEvent.GetNDetectors();
 	// loop in Detectors Range
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 		auto& currentDet = detIt->second;
-		cout << "[DEBUG] G4ExDetectorConstruction: Detector Type = " << currentDet.GetType() << endl;
-#if 0
-		Detector::DetectorType detType = currentDet.GetType();
-		if (detType == Detector::DetectorType::eMusaic)
-			Musaic().BuildDetector(logicGround, currentDet, theEvent);
-		else if (detType == Detector::DetectorType::eMudulus)
-			Mudulus::BuildDetector(logicGround, currentDet, theEvent);
-		else
-			cout << "[WARNING] Unknown detector type!" << endl;
-#endif
-		BuildDetector(logicWorld, currentDet, theEvent, false);
+		BuildDetector(logicWorld, currentDet, theEvent, true);
 
 	}
 

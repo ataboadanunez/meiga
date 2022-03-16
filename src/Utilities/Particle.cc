@@ -216,3 +216,18 @@ Particle::GetComponent(const Particle::Type type)
   const auto index = gComponentMap.find(type);
   return (index != gComponentMap.end()) ? static_cast<Particle::Component>(index->second) : Particle::Component::eUnknown;
 }
+
+std::string
+Particle::GetComponentName(Particle::Component type)
+{
+  
+  if (type == Particle::eElectromagnetic)
+    return "eElectromagnetic";
+  else if (type == Particle::eMuonic)
+    return "eMuonic";
+  else if (type == Particle::eHadronic)
+    return "eHadronic";
+  else 
+    return "eUnknown";
+  
+}

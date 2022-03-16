@@ -35,7 +35,8 @@ class Detector
 			eUnknown = 0,
 			eMusaic = 1,
 			eMudulus = 2,
-			eWCD = 3
+			eWCD = 3,
+			eScintillator
 		};
 
 
@@ -111,7 +112,7 @@ class Detector
 		bool HasLogicalVolume(std::string volName);
 
 		DetectorType StringToType(const std::string name);
-		void SetDetectorProperties(const DetectorType type);
+		void SetDetectorProperties(const DetectorType type, std::string detList = "./DetectorProperties.xml");
 		//std::map<std::string, DetectorType> conversion;
 	private:
 

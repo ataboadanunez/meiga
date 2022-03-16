@@ -8,30 +8,20 @@
 		<tankThickness unit="mm"> 12 </tankThickness> 
 	</detector>
 
-	<detector type="eMusaic">
-		<barsInPanel> 2 </barsInPanel>
-		<barLength unit="mm"> 82 </barLength>
-		<barWidth unit="mm"> 41 </barWidth> 
-		<barThickness unit="mm"> 10 </barThickness>
-		<coatingThickness unit="mm"> 0.25 </coatingThickness>
-		<casingThickness unit="mm"> 2 </casingThickness>
-		<fiberLength unit="mm"> 82 </fiberLength>
-		<fiberRadius unit="mm"> 1.2 </fiberRadius>
-		<claddingThickness unit="mm"> 0.10 </claddingThickness>
-	</detector>
-
-	<detector type="eMudulus">
+	<detector type="eScintillator">
 		<barsInPanel> 12 </barsInPanel>
-		<barLength unit="mm"> 495 </barLength>
-		<barWidth unit="mm"> 41 </barWidth> 
+		<barLength unit="mm"> 500 </barLength>
+		<barWidth unit="mm"> 40 </barWidth> 
 		<barThickness unit="mm"> 10 </barThickness>
 		<coatingThickness unit="mm"> 0.25 </coatingThickness>
 		<casingThickness unit="mm"> 2 </casingThickness>
-		<fiberLength unit="mm"> 1970 </fiberLength>
+		<fiberLength unit="mm"> 500 </fiberLength>
 		<fiberRadius unit="mm"> 1.2 </fiberRadius>
 		<claddingThickness unit="mm"> 0.10 </claddingThickness>
 	</detector>
-
-
 
 </detectorList>
+
+
+
+

@@ -41,7 +41,8 @@ class Event
     void MakeDetector(unsigned int id, Detector::DetectorType type);
 
     int GetNDetectors() {return fNDetectors; }
-
+    void SetMaximumHeight(double maxH) { fMaximumHeight = maxH; }
+    double GetMaximumHeight() { return fMaximumHeight; }
     std::map<int, Detector>& DetectorRange() { return fDetectorMap; }
     const std::map<int, Detector>& DetectorRange() const { return fDetectorMap; }
 
@@ -52,6 +53,7 @@ class Event
 
     std::map<int, Detector> fDetectorMap;
     int fNDetectors = 0;
+    double fMaximumHeight;
 };
 
 

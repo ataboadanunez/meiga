@@ -1,7 +1,8 @@
 #include "Detector.h"
-#include "Mudulus.h"
-#include "Musaic.h"
+//#include "Mudulus.h"
+//#include "Musaic.h"
 #include "WCD.h"
+#include "Scintillator.h"
 
 #include "G4UnitsTable.hh"
 
@@ -18,29 +19,14 @@ using std::map;
 using namespace std;
 using boost::property_tree::ptree;
 
-// static map<string, enum Detector::DetectorType> conversion;
-
-// static void InitConversionMap() {
-// 	static bool isInitialized = false;
-// 	if (isInitialized) return;
-// 	isInitialized = true;
-// 	conversion.clear();
-// 	conversion["eUnknown"] = Detector::eUnknown;
-// 	conversion["eMusaic"]  = Detector::eMusaic;
-// 	conversion["eMudulus"] = Detector::eMudulus;
-// 	conversion["eWCD"]     = Detector::eWCD;
-// }
-
 // function to be used when calling a detector type from an XML file
 Detector::DetectorType
 Detector::StringToType(string name)
 {
 	if (name == "eWCD")
 		return Detector::eWCD;
-	else if (name == "eMusaic")
-		return Detector::eMusaic;
-	else if (name == "eMudulus")
-		return Detector::eMudulus;
+	else if (name == "eScintillator")
+		return Detector::eScintillator;
 	else
 		return Detector::eUnknown;
 }
@@ -54,22 +40,28 @@ Detector::Detector(const unsigned int id, DetectorType type) :
 }
 
 
-//AS: Mapa que va de enum Detector::DetectorType a función BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps = false);
-static map<enum Detector::DetectorType, void(*)(G4LogicalVolume*, Detector&, Event&, G4bool)> enumToBuild;
+// this is used to map from the Detector type to its corresponding BuildDetector function in G4Models
+static map<enum Detector::DetectorType, void(*)(G4LogicalVolume*, Detector&, Event&, G4bool)> TypeToBuild;
 
-static void initEnumToBuild() {
+static void 
+InitTypeToBuild() {
 	static bool isInitialized = false;
-	if (isInitialized) return;
+	if (isInitialized) 
+		return;
+	// fills map with corresponding BuildDetector function
 	isInitialized = true;
-	enumToBuild[Detector::eMudulus] = Mudulus::BuildDetector;
-	enumToBuild[Detector::eMusaic]  = Musaic::BuildDetector;
-	enumToBuild[Detector::eWCD]			= WCD::BuildDetector;
+	TypeToBuild[Detector::eWCD]			     = WCD::BuildDetector;
+	TypeToBuild[Detector::eScintillator] = Scintillator::BuildDetector;
+
 }
 
 void BuildDetector(G4LogicalVolume *logMother, Detector &det, Event &evt, G4bool overlaps) {
-	initEnumToBuild();
+	
+	// initialize map
+	InitTypeToBuild();
+	
 	try {
-		enumToBuild[det.GetType()](logMother, det, evt, overlaps);
+		TypeToBuild[det.GetType()](logMother, det, evt, overlaps);
 	}
 	catch (std::out_of_range &e) {
 		std::cerr << "No BuildDetector for DetectorType " << det.GetType() << std::endl;
@@ -102,7 +94,7 @@ Detector::HasLogicalVolume(string volName)
 }
 
 void
-Detector::SetDetectorProperties(const DetectorType type)
+Detector::SetDetectorProperties(const DetectorType type, string detList)
 {
 	// set default values for different detector types
 	// read XML with detector parameters
@@ -112,8 +104,10 @@ Detector::SetDetectorProperties(const DetectorType type)
 	// e.g., SetRadius() { fRadius = GetData("tankRadius"); }
 
 	ptree tree;
-	read_xml(fDetectorProperties, tree);
-	for (const auto& i : tree.get_child("detectorProperties")) {
+	
+	cout << "[INFO] Detector::SetDetectorProperties: Reading detector properties from file = " << detList << endl;
+	read_xml(detList, tree);
+	for (const auto& i : tree.get_child("detectorList")) {
 		ptree subtree;
 		string name;
 		tie(name, subtree) = i;
@@ -127,7 +121,7 @@ Detector::SetDetectorProperties(const DetectorType type)
 		if (type != detType)
 			continue;
 
-		cout << "[DEBUG] Detector::SetDetectorProperties: Detector type " << detType << endl;
+		cout << "[INFO] Detector::SetDetectorProperties: Detector type " << detType << endl;
 
 		for (const auto& v : subtree.get_child("")) {
 			string xmlLabel = v.first;
