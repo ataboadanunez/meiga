@@ -153,9 +153,7 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	simData.SetSimulationMode(fSimulationMode);
   cout << "[INFO] G4ExSimulator::RunSimulation: Simulation mode selected = " << fSimulationMode << endl;
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
-
 	cout << "[INFO] G4ExSimulator::RunSimulation: Total number of particles in file = " << NumberOfParticles << endl;
-	
 	if (!NumberOfParticles) {
 		cerr << "[ERROR] G4ExSimulator::RunSimulation: No Particles in the Event! Exiting..." << endl;
 		return false;
@@ -163,7 +161,7 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	
 	/***************
 
-		Geant4 Setup    
+	Geant4 Setup    
 
 	*****************/
 
