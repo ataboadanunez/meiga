@@ -1,7 +1,7 @@
 #ifndef WCD_h
 #define WCD_h 1
 
-// framework classes
+// Meiga classes
 #include "Event.h"
 #include "Detector.h"
 #include "Materials.h"
@@ -21,17 +21,15 @@ class G4LogicalVolume;
 class G4OpticalSkinSurface;
 
 class WCD {
-  // description
-
+  // Basic Geant4 model for a Water-Cerenkov Detector
+  
 public:
-  static void BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps = true);
+  static void BuildDetector(G4LogicalVolume* logMother, Detector& detector, 
+                            Event& theEvent, G4bool fCheckOverlaps = true);
   
 private:
   WCD();
   virtual ~WCD();
-
-
-
 
 };
 

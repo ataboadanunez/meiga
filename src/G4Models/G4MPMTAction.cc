@@ -52,11 +52,6 @@ G4MPMTAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
   Particle::Type particleType = Corsika::CorsikaToPDG(partId);
   Particle::Component particleComponent = currentParticle.GetComponent(particleType);
 
-  cout << "[DEBUG] G4Models::G4MPMTAction: Adding PE time distribution to particle: " << endl;
-  cout << "[DEBUG] G4Models::G4MPMTAction: Particle_ID        = " << partId << endl;
-  cout << "[DEBUG] G4Models::G4MPMTAction: Particle_Type      = " << particleType << endl;
-  cout << "[DEBUG] G4Models::G4MPMTAction: Particle_Component = " << particleComponent << endl;
-
   fEvent.GetSimData().GetDetectorSimData(fDetectorId).GetOptDeviceSimData(fOptDeviceId).AddPETimeDistribution(particleComponent, fPETimeComp);
 
   fPETimeComp.clear();
