@@ -1,8 +1,9 @@
 #include "Detector.h"
-//#include "Mudulus.h"
-//#include "Musaic.h"
+
 #include "WCD.h"
 #include "Scintillator.h"
+#include "Musaic.h"
+#include "Mudulus.h"
 
 #include "G4UnitsTable.hh"
 
@@ -27,6 +28,10 @@ Detector::StringToType(string name)
 		return Detector::eWCD;
 	else if (name == "eScintillator")
 		return Detector::eScintillator;
+	else if (name == "eMusaic")
+		return Detector::eMusaic;
+	else if (name == "eMudulus")
+		return Detector::eMudulus;
 	else
 		return Detector::eUnknown;
 }
@@ -52,6 +57,8 @@ InitTypeToBuild() {
 	isInitialized = true;
 	TypeToBuild[Detector::eWCD]			     = WCD::BuildDetector;
 	TypeToBuild[Detector::eScintillator] = Scintillator::BuildDetector;
+	TypeToBuild[Detector::eMusaic]       = Musaic::BuildDetector;
+	TypeToBuild[Detector::eMudulus]      = Mudulus::BuildDetector;
 
 }
 
