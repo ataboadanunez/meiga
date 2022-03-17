@@ -99,10 +99,10 @@ int main(int argc, char** argv)
   time(&end);
 
   // Calculating total time taken by the program.
-    double time_taken = double(end - start);
-    cout << "[INFO] G4WCDSimulator: Time taken by program is : " << fixed
-         << time_taken << setprecision(5);
-    cout << " sec " << endl;
+  double time_taken = double(end - start);
+  cout << "[INFO] G4WCDSimulator: Time taken by program is : " << fixed
+       << time_taken << setprecision(5);
+  cout << " sec " << endl;
   
   return 0;
 
@@ -114,9 +114,6 @@ G4WCDSimulator::Initialize(Event& theEvent, string fileName)
 
   cout << "[INFO] G4WCDSimulator::Initialize" << endl;
   cout << "[INFO] G4WCDSimulator::Initialize: Reading configuration file " << fileName << endl;
-  // set value of flags according to cfg file
-  // reading cfg file using boost
-  // eventually as input of executable main(char** fConfig)
   
   fInputFile.clear();
   fOutputFile.clear();

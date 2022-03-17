@@ -38,13 +38,13 @@ class G4WCDSimulator
 		// flags for configuration (see .json file)
 		std::string fInputFile;
 		std::string fOutputFile;
-    std::string fDetectorList;
+    		std::string fDetectorList;
 		bool fGeoVisOn = true;
 		bool fTrajVisOn = false;
 		int fVerbosity = 1;
 		std::string fRenderFile = "VRML2FILE";
-    std::string fPhysicsName = "QGSP_BERT_HP";
-    std::string fSimulationMode;
+    		std::string fPhysicsName = "QGSP_BERT_HP";
+		std::string fSimulationMode;
     
   	friend class G4WCDDetectorConstructor;
   	friend class G4WCDPrimaryGenerator;
