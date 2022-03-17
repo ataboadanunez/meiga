@@ -24,7 +24,7 @@ G4MudulusDetectorConstruction::CreateDetector()
 {
 
 	CreateWorld();
-  CreateGround();
+  //CreateGround();
 	PlaceDetector(fEvent);
   /***
    The function PlaceDetector() should be a replacement of ReadModuleList in G4RockSimulator.
@@ -41,8 +41,8 @@ G4MudulusDetectorConstruction::CreateWorld()
 
 
 	solidWorld 	= new G4Box("World", fWorldSizeX/2, fWorldSizeY/2, fWorldSizeZ/2);
-	logicWorld = new G4LogicalVolume(solidWorld, Materials().Air, "World");
-	physWorld	 =  new G4PVPlacement(nullptr, G4ThreeVector(), "World", logicWorld, 0, false, 0, fCheckOverlaps);
+	logicWorld  = new G4LogicalVolume(solidWorld, Materials().Air, "World");
+	physWorld	  =  new G4PVPlacement(nullptr, G4ThreeVector(), "World", logicWorld, 0, false, 0, fCheckOverlaps);
 
 }
 

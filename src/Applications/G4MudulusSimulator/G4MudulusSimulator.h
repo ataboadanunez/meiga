@@ -43,8 +43,10 @@ class G4MudulusSimulator
 		bool fGeoVisOn = true;
 		bool fTrajVisOn = false;
 		int fVerbosity = 1;
+
 		std::string fRenderFile = "VRML2FILE";
     std::string fPhysicsName = "QGSP_BERT_HP";
+    std::string fSimulationMode;
 
   	friend class G4MudulusDetectorConstructor;
   	friend class G4MudulusPrimaryGenerator;

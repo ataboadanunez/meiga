@@ -1,6 +1,7 @@
 /* 
 	
-	Main script of an example application using Geant4
+	A Meiga application for simulating the Mudulus Detector
+  (see G4Models/Mudulus.h)
 
 	author: alvaro taboada
 	date: 15 Sep 2021
@@ -32,10 +33,9 @@
 #include "ReadParticleFile.h"
 #include "Event.h"
 #include "SimData.h"
-#include "SiPMSimData.h"
+#include "OptDeviceSimData.h"
 #include "Detector.h"
-#include "Module.h"
-#include "SiPM.h"
+#include "OptDevice.h"
 #include "G4MPhysicsList.h"
 
 // boost libraries
@@ -62,7 +62,7 @@ namespace
 	void ProgramUsage() 
 	{
 		cerr << " Program Usage: " << endl;
-		cerr << " ./Mudulusecutable [ -c ConfigFile.json ] " << endl;
+		cerr << " ./exeMeigaApp [ -c ConfigFile.json ] " << endl;
 	}
 
 }
@@ -72,8 +72,8 @@ int main(int argc, char** argv)
 {
 
   if (argc < 3) {
-  	ProgramUsage();
-  	throw invalid_argument("Config file needed! (See Program Usage)");
+    ProgramUsage();
+    throw invalid_argument("[ERROR] G4MudulusSimulator::main: A configuration file is needed!");
   }
 
   for (int i=1; i<argc; i=i+2) {
@@ -81,7 +81,10 @@ int main(int argc, char** argv)
   	if (sarg == "-c")
   		fCfgFile = argv[i+1];
   }
-  cout << "Argc = " << argc << endl;
+  
+  // for program time calculation
+  time_t start, end;
+  time(&start);
 
   Event theEvent;
   fG4MudulusSimulator = new G4MudulusSimulator();
@@ -94,7 +97,14 @@ int main(int argc, char** argv)
 
   **************************************************/
   fG4MudulusSimulator->WriteEventInfo(theEvent);
-  
+  cout << "[INFO] G4MudulusSimulator: End of the run!" << endl;
+  time(&end);
+
+  // Calculating total time taken by the program.
+  double time_taken = double(end - start);
+  cout << "[INFO] G4MudulusSimulator: Time taken by program is : " << fixed
+       << time_taken << setprecision(5);
+  cout << " sec " << endl;
   
   return 0;
 
@@ -104,25 +114,25 @@ void
 G4MudulusSimulator::Initialize(Event& theEvent, string fileName)
 {
 
-  cout << "... Initialize ..." << endl;
-	// set value of flags according to cfg file
-  // reading cfg file using boost
-  // eventually as input of executable main(char** fConfig)
+  cout << "[INFO] G4MudulusSimulator::Initialize" << endl;
+  cout << "[INFO] G4MudulusSimulator::Initialize: Reading configuration file " << fileName << endl;
   
 	fInputFile.clear();
 	fOutputFile.clear();
 
 	ptree root;
 	read_json(fileName, root);
-#warning "JSON parser of input config file should be a method of ConfigManager"
+
 	fInputFile = root.get<string>("InputFile");
 	fOutputFile = root.get<string>("OutputFile");
+  fSimulationMode = root.get<string>("SimulationMode");
   fDetectorList = root.get<string>("DetectorList");
 	fGeoVisOn = root.get<bool>("GeoVisOn");
 	fTrajVisOn = root.get<bool>("TrajVisOn");
   fVerbosity = root.get<int>("Verbosity");
   fRenderFile = root.get<string>("RenderFile");
   fPhysicsName = root.get<string>("PhysicsName");
+
   // Creates event from file reader
   theEvent = ReadParticleFile::EventFileReader(fInputFile);
 
@@ -136,13 +146,15 @@ bool
 G4MudulusSimulator::RunSimulation(Event& theEvent)
 {
 
+  cout << "[INFO] G4MudulusSimulator::RunSimulation" << endl;
   SimData& simData = theEvent.GetSimData();
+  cout << "[INFO] G4MudulusSimulator::RunSimulation: Simulation mode selected = " << fSimulationMode << endl;
   const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
 
-  std::cout << "[INFO] Event::SimData: Total number of particles in file = " << NumberOfParticles << std::endl;
+  cout << "[INFO] G4MudulusSimulator::RunSimulation: Total number of particles in file = " << NumberOfParticles << std::endl;
   
   if (!NumberOfParticles) {
-    std::cerr << "ERROR! No Particles in the Event! Mudulusiting..." << std::endl;
+    std::cerr << "[ERROR] G4MudulusSimulator::RunSimulation: No Particles in the Event! Exiting." << std::endl;
     return false;
   }
   
@@ -155,7 +167,6 @@ G4MudulusSimulator::RunSimulation(Event& theEvent)
   G4long myseed = time(NULL);
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
   G4Random::setTheSeed(myseed);
-  G4cout << "Seed for random generation: " << myseed << G4endl;
 
   G4VisManager* fVisManager = nullptr;
   
@@ -233,22 +244,27 @@ G4MudulusSimulator::RunSimulation(Event& theEvent)
   if (fTrajVisOn) {
     fUImanager->ApplyCommand("/tracking/storeTrajectory 1");
     fUImanager->ApplyCommand("/vis/scene/add/trajectories");
+    
+    fUImanager->ApplyCommand("/vis/filtering/trajectories/create/chargeFilter");
+    fUImanager->ApplyCommand("/vis/filtering/trajectories/chargeFilter-0/add -1");
+    fUImanager->ApplyCommand("/vis/filtering/trajectories/chargeFilter-0/add +1");
+    //fUImanager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
   }
 
-  int nParticle = 0;
+
   // loop over particle vector
   for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
     G4MudulusSimulator::currentParticle = *it;
     // Run simulation
     fRunManager->BeamOn(1);
-    nParticle+=1;
 
-    cout << "Simulated " << nParticle << " particle(s) out of " << NumberOfParticles << endl;
   }
 
 
   delete fVisManager;
   delete fRunManager;
+
+  cout << "[INFO] G4MudulusSimulator::RunSimulation: Geant4 Simulation ended successfully! " << endl;
 
   return true;
 
@@ -258,7 +274,7 @@ G4MudulusSimulator::RunSimulation(Event& theEvent)
 void
 G4MudulusSimulator::WriteEventInfo(Event& theEvent)
 {
-	cout << "... WriteEventInfo ..." << endl;
+	cout << "[INFO] G4MudulusSimulator::WriteEventInfo" << endl;
 
 	cout << "Still nothing to write :(" << endl;
 

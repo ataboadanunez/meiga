@@ -1,4 +1,3 @@
-// implementation of the G4MudulusSteppingAction class
 #include "G4MudulusSimulator.h"
 #include "G4MudulusSteppingAction.h"
 #include "G4MudulusDetectorConstruction.h"
@@ -12,9 +11,7 @@
 #include "G4OpticalPhoton.hh"
 
 #include "SimData.h"
-#include "SiPMSimData.h"
 #include "Detector.h"
-#include "Module.h"
 
 G4MudulusSteppingAction::G4MudulusSteppingAction(const G4MudulusDetectorConstruction* det, G4MudulusEventAction* G4event, Event& MSevent)
 	: G4UserSteppingAction(),
