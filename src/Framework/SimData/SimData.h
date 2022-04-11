@@ -10,52 +10,96 @@
 
 class SimData
 {
-  public:
-    SimData();
-    ~SimData();
+	public:
+		SimData();
+		~SimData();
 
-    typedef std::vector<Particle> ParticleVector;
-    const ParticleVector& GetParticleVector() const { return fParticles; }
-    ParticleVector& GetParticleVector()  { return fParticles; }
-    void InsertParticle(Particle& particle) { fParticles.push_back(particle); }
+		enum SimulationMode {
+			eFull = 0,
+			eFast = 1
+		};
 
-    unsigned int GetTotalNumberOfParticles() const { return fTotalNumberOfParticles; }
-    void SetTotalNumberOfParticles(const unsigned int n) { fTotalNumberOfParticles = n; }
+		enum InjectionMode {
+			eUnknown = 0,
+			eRandom = 1,
+			ePositionFromFile = 2,
+			// specific case when particles are injected inside the detector (e.g. muon decay inside WCD)
+			eInsideDetector
+		};
 
-    Particle& GetCurrentParticle() { return fCurrentParticle; }
-    void SetCurrentParticle(Particle particle) { fCurrentParticle = particle; }
 
-    void SetSimulationMode(const std::string simMode) { fSimulationMode = simMode; }
-    const std::string GetSimulationMode() const;
+		typedef std::vector<Particle> ParticleVector;
+		const ParticleVector& GetParticleVector() const { return fParticles; }
+		ParticleVector& GetParticleVector()  { return fParticles; }
+		void InsertParticle(Particle& particle) { fParticles.push_back(particle); }
 
-    // DetectorSimData getters
-    void MakeDetectorSimData(unsigned int id);
-    DetectorSimData& GetDetectorSimData() { return fDetectorSimData; }
-    DetectorSimData& GetDetectorSimData(unsigned int id) { return fDetectorSimDataMap[id]; }
-    
-    /***
-    void MakeSiPMSimData(unsigned int id);
-    SiPMSimData& GetSiPMSimData() { return fSiPMSimData; }
-    
-    // get SiPMSimData passing SiPM id
-    // eventually create SiPM class and GetSiPMSimData as a member of SiPM
-    // here would be GetSiPM(unsigned int id)... blablabla 
-    SiPMSimData& GetSiPMSimData(unsigned int id) { return fSiPMSimMap[id]; }
-    */
-    
+		unsigned int GetTotalNumberOfParticles() const { return fTotalNumberOfParticles; }
+		void SetTotalNumberOfParticles(const unsigned int n) { fTotalNumberOfParticles = n; }
 
-  private:
+		Particle& GetCurrentParticle() { return fCurrentParticle; }
+		void SetCurrentParticle(Particle particle) { fCurrentParticle = particle; }
 
-    ParticleVector fParticles;
-    Particle fCurrentParticle;
-    unsigned int fTotalNumberOfParticles = 0;
-    std::string fSimulationMode;
+		// Simulation mode
+		SimulationMode ModeConversion(const std::string name);
+		void SetSimulationMode(const SimulationMode simMode) { fSimulationMode = simMode; }
+		SimulationMode GetSimulationMode() const { return fSimulationMode; }
+		std::string GetSimulationModeName() const { return fSimulationModeName; }
 
-    DetectorSimData fDetectorSimData;
-    std::map<int, DetectorSimData> fDetectorSimDataMap;
-    //SiPMSimData fSiPMSimData;
-    // precio que hay que pagar por no usar punteros? 
-    //std::map<int, SiPMSimData> fSiPMSimMap;
+		// Particle injection mode
+		InjectionMode InjectionConversion(const std::string name);
+		void SetInjectionMode(const InjectionMode injMode) { fInjectionMode = injMode; }
+		InjectionMode GetInjectionMode() const { return fInjectionMode; }
+		std::string GetInjectionModeName() const { return fInjectionModeName; }
+		// Visualization settings
+		void SetVisualizationGeometry(const bool geovis) { fGeoVis = geovis; }
+		bool VisualizeGeometry() const { return fGeoVis; }
+		
+		void SetVisualizationTrajectory(const bool trajvis) { fTrajVis = trajvis; }
+		bool VisualizeTrajectory() const { return fTrajVis; }
+
+		// Other simulation settings
+		void SetInputFileName(const std::string name) { fInputFileName = name; }
+		const std::string GetInputFileName() const { return fInputFileName; }
+
+		void SetOutputFileName(const std::string name) { fOutputFileName = name; }
+		const std::string GetOutputFileName() const { return fOutputFileName; }
+
+		void SetDetectorList(const std::string name) { fDetectorList = name; }
+		const std::string GetDetectorList() const { return fDetectorList; }
+
+		void SetRenderName(const std::string name) { fRenderName = name; }
+		const std::string GetRenderName() const { return fRenderName; }
+
+		void SetPhysicsListName(const std::string name) { fPhysicsListName = name; }
+		const std::string GetPhysicsListName() const {return fPhysicsListName; }
+
+		// DetectorSimData getters
+		void MakeDetectorSimData(unsigned int id);
+		DetectorSimData& GetDetectorSimData() { return fDetectorSimData; }
+		DetectorSimData& GetDetectorSimData(unsigned int id) { return fDetectorSimDataMap[id]; }
+		
+
+	private:
+
+		ParticleVector fParticles;
+		Particle fCurrentParticle;
+		unsigned int fTotalNumberOfParticles = 0;
+
+		DetectorSimData fDetectorSimData;
+		std::map<int, DetectorSimData> fDetectorSimDataMap;
+		
+		SimulationMode fSimulationMode;
+		std::string fSimulationModeName;
+		InjectionMode  fInjectionMode;
+		std::string fInjectionModeName;
+
+		bool fGeoVis = false;
+		bool fTrajVis = false;
+		std::string fRenderName;
+		std::string fPhysicsListName;
+		std::string fInputFileName;
+		std::string fOutputFileName;
+		std::string fDetectorList; 
 
 };
 
