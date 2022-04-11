@@ -73,7 +73,7 @@ Scintillator::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Even
 		G4String nameScinBar = "BarScin_"+to_string(barId);
 		
 		// place bars along the y-axis
-		G4double yPos = i*(fBarWidth + 2*fCoatingThickness);
+		G4double yPos = detectorPos.getY() + i*(fBarWidth + 2*fCoatingThickness);
 		// shift each bar position by 1/2 of the panel width to center the detector
 		yPos -= fHalfWidth;
 
