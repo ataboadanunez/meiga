@@ -16,11 +16,11 @@
 #include "Detector.h"
 #include "Module.h"
 
-G4CasposoSteppingAction::G4CasposoSteppingAction(const G4CasposoDetectorConstruction* det, G4CasposoEventAction* G4event, Event& MSevent)
+G4CasposoSteppingAction::G4CasposoSteppingAction(const G4CasposoDetectorConstruction* det, G4CasposoEventAction* G4event, Event& theEvent)
 	: G4UserSteppingAction(),
 		fDetectorConstruction(det),
 		fEventAction(G4event),
-    fEvent(MSevent)
+    fEvent(theEvent)
 {
 }
 
