@@ -32,8 +32,10 @@ Detector::StringToType(string name)
 		return Detector::eMusaic;
 	else if (name == "eMudulus")
 		return Detector::eMudulus;
-	else
+	else {
+		cout << "[WARNING] Detector::StringToType: Unknown detector type!" << endl;
 		return Detector::eUnknown;
+	}
 }
 
 
