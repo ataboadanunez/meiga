@@ -227,6 +227,8 @@ Particle::GetComponentName(Particle::Component type)
     return "eMuonic";
   else if (type == Particle::eHadronic)
     return "eHadronic";
+  else if (type == Particle::eMuonDecay)
+    return "eMuonDecay";
   else 
     return "eUnknown";
   

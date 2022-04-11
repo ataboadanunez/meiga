@@ -66,6 +66,7 @@ class Particle {
 			eElectromagnetic = 1,
 			eMuonic = 2,
 			eHadronic = 3,
+			eMuonDecay = 4,
 			// for iterating over enum elements
 			eEnd
 		};
