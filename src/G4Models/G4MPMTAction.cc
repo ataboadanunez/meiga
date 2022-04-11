@@ -52,9 +52,15 @@ G4MPMTAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
   Particle::Type particleType = Corsika::CorsikaToPDG(partId);
   Particle::Component particleComponent = currentParticle.GetComponent(particleType);
 
-  fEvent.GetSimData().GetDetectorSimData(fDetectorId).GetOptDeviceSimData(fOptDeviceId).AddPETimeDistribution(particleComponent, fPETimeComp);
+  DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData(fDetectorId);
+
+  OptDeviceSimData& optSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
+  optSimData.AddPETimeDistribution(particleComponent, fPETimeComp);
+
+  optSimData.AddPETimeDistribution(Particle::eMuonDecay, fPETimeMuDecay);
 
   fPETimeComp.clear();
+  fPETimeMuDecay.clear();
 
 }
 
@@ -65,6 +71,9 @@ G4MPMTAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHist
   // reject particle in case it is not a photon
   if (step->GetTrack()->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition())
     return true;
+
+  // for RICH paper: get ParentID of photons
+  int parentId = step->GetTrack()->GetParentID();
 
   // get time and energy of photons
   const double time = step->GetPreStepPoint()->GetGlobalTime() / CLHEP::second;
@@ -78,7 +87,7 @@ G4MPMTAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHist
     return true; 
 
   SimData& simData = fEvent.GetSimData();
-  if (simData.GetSimulationMode() == "FULL_SIMULATION") {
+  if (simData.GetSimulationMode() == SimData::eFull) {
     
     // kill according to PMT quantum efficiency
     if (!pmt.IsPhotonDetected(energy)) 
@@ -86,6 +95,19 @@ G4MPMTAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHist
   }
   
   
+  DetectorSimData& detSimData = simData.GetDetectorSimData();
+  const auto& muDecayIDs = detSimData.GetMuonDecayID();
+
+  if (muDecayIDs.find(parentId) != muDecayIDs.end()) {
+    //cout << "[DEBUG] G4Models::G4MPMTAction: Photon from MUON DECAY was detected! " << endl;
+    fPETimeMuDecay.push_back(time);
+    NumPEMuDecay += 1;
+  }
+
+  string procName = step->GetTrack()->GetCreatorProcess()->GetProcessName();
+  if (procName != "Cerenkov")
+    cout << "[DEBUG] G4Models::G4MPMTAction: Photon created via " << procName << endl;
+
   // add photon time to SimData
   fPETime->push_back(time);
   fPETimeComp.push_back(time);
