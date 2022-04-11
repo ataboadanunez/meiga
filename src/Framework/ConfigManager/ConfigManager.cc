@@ -1,18 +1,61 @@
+// Meiga headers
 #include "ConfigManager.h"
+#include "ReadParticleFile.h"
+// Geant4 headers
 #include "G4UnitsTable.hh"
+// c++ headers
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <map>
 #include <string>
 
 using boost::property_tree::ptree;
 using namespace std;
 
+
+Event
+ConfigManager::ReadConfiguration(string fConfigFile)
+{
+	
+	Event theEvent;
+	ptree tree;
+	read_json(fConfigFile, tree);
+
+	// reads the input file and fills the Event
+	string fInputFileName = tree.get<string>("InputFile");
+	ReadParticleFile::EventFileReader(fInputFileName, theEvent);
+
+	SimData& simData = theEvent.GetSimData();
+	simData.SetInputFileName(fInputFileName);
+	string fOutputFileName = tree.get<string>("OutputFile");
+	simData.SetOutputFileName(fOutputFileName);
+	string fDetectorList = tree.get<string>("DetectorList");
+	simData.SetDetectorList(fDetectorList);
+	string fSimulationMode = tree.get<string>("SimulationMode");
+	SimData::SimulationMode simMode = simData.ModeConversion(fSimulationMode);
+	simData.SetSimulationMode(simMode);
+	string fInjectionMode = tree.get<string>("InjectionMode");
+	SimData::InjectionMode injMode = simData.InjectionConversion(fInjectionMode);
+	simData.SetInjectionMode(injMode);
+	bool fGeoVis = tree.get<bool>("GeoVisOn");
+	simData.SetVisualizationGeometry(fGeoVis);
+	bool fTrajVis = tree.get<bool>("TrajVisOn");
+	simData.SetVisualizationTrajectory(fTrajVis);
+	string fRenderFile = tree.get<string>("RenderFile");
+	simData.SetRenderName(fRenderFile);
+	string fPhysicsListName = tree.get<string>("PhysicsName");
+	simData.SetPhysicsListName(fPhysicsListName);
+
+
+	return theEvent;
+
+}
+
 void
 ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 {
-
-	cout << "[INFO] ConfigManager::ReadDetectorList: Reading Detector Configuration from file " << fDetectorList << endl;
 	
 	// used to determine maximum value of Z coordinate of current detectors in file
 	double maxHeight = 0.;
@@ -35,7 +78,7 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 		Detector::DetectorType detType = theEvent.GetDetector().StringToType(detTypestr);
 		detPosition.clear();
 
-		cout << "[DEBUG] ConfigManager::ReadDetectorList: Reading configuration of detector " << detTypestr << " with ID = " << detId << endl;
+		cout << "[INFO] ConfigManager::ReadDetectorList: Reading configuration of detector " << detTypestr << " with ID = " << detId << endl;
 		// register detector in the Event
 		if (!theEvent.HasDetector(detId)) {
 			theEvent.MakeDetector(detId, detType);
@@ -52,7 +95,6 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 			
 
 			if ( label != "<xmlattr>" ) {
-				cout << "[DEBUG] ConfigManager::ReadDetectorList: label = " << label << endl;
 				if ((label == "x") || (label == "y") || (label == "z")) {
 					string value = v.second.data();
 					boost::algorithm::trim(value);
@@ -77,6 +119,5 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 		detector.SetDetectorProperties(detType, fDetectorList);
 	}
 
-	
 
 }

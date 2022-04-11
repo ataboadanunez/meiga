@@ -2,6 +2,7 @@
 #define ConfigManager_h 1
 
 #include "Event.h"
+#include "SimData.h"
 #include "Detector.h"
 #include "Module.h"
 
@@ -20,6 +21,7 @@ class ConfigManager
 		ConfigManager() { }
 		~ConfigManager() { }
 
+		static Event ReadConfiguration(std::string filename);
 		static void ReadDetectorList(std::string filename, Event& theEvent);
 
 
