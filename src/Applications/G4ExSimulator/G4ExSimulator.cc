@@ -29,7 +29,6 @@
 // Framework libraries
 #include "ConfigManager.h"
 #include "CorsikaUtilities.h"
-#include "ReadParticleFile.h"
 #include "Event.h"
 #include "SimData.h"
 #include "OptDeviceSimData.h"
@@ -37,14 +36,6 @@
 #include "OptDevice.h"
 #include "G4MPhysicsList.h"
 
-// boost libraries
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/info_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
-
-using namespace boost::property_tree;
 using namespace std;
 
 Particle G4ExSimulator::currentParticle;
@@ -61,7 +52,7 @@ namespace
 	void ProgramUsage() 
 	{
 		cerr << " Program Usage: " << endl;
-		cerr << " ./exeMeigaApp [ -c ConfigFile.json ] " << endl;
+		cerr << " ./G4ExSimulator [ -c ConfigFile.json ] " << endl;
 	}
 
 }
@@ -83,10 +74,10 @@ int main(int argc, char** argv)
 	// for program time calculation
   time_t start, end;
   time(&start);
-
-
-	Event theEvent;
+  
 	fG4ExSimulator = new G4ExSimulator();
+	// Create Event object
+	Event theEvent;
 	fG4ExSimulator->Initialize(theEvent, fCfgFile);
 	fG4ExSimulator->RunSimulation(theEvent);
 	/*************************************************
@@ -100,7 +91,7 @@ int main(int argc, char** argv)
 
 	// Calculating total time taken by the program.
     double time_taken = double(end - start);
-    cout << "Time taken by program is : " << fixed
+    cout << "[INFO] G4ExSimulator: Time taken by program is : " << fixed
          << time_taken << setprecision(5);
     cout << " sec " << endl;
 
@@ -109,34 +100,37 @@ int main(int argc, char** argv)
 }
 
 void
-G4ExSimulator::Initialize(Event& theEvent, string fileName)
+G4ExSimulator::Initialize(Event& theEvent, string cfgFile)
 {
 
 	cout << "[INFO] G4ExSimulator::Initialize" << endl;
-	cout << "[INFO] G4ExSimulator::Initialize: Reading configuration file " << fileName << endl;
-	// set value of flags according to cfg file
-	// reading cfg file using boost
-	// eventually as input of executable main(char** fConfig)
-	
-	fInputFile.clear();
-	fOutputFile.clear();
+	cout << "[INFO] G4ExSimulator::Initialize: Reading configuration file " << cfgFile << endl;
 
-	ptree root;
-	read_json(fileName, root);
+	// Fill Event object from configuration file
+	// Read Simulation configuration
+	theEvent = ConfigManager::ReadConfiguration(cfgFile);
+	// get simulation simulation settings
+	SimData& simData = theEvent.GetSimData();
+	fInputFile = simData.GetInputFileName();
+	fOutputFile = simData.GetOutputFileName();
+	fDetectorList = simData.GetDetectorList();
+	fSimulationMode = simData.GetSimulationMode();
+	fInjectionMode  = simData.GetInjectionMode();
+	fGeoVisOn = simData.VisualizeGeometry();
+	fTrajVisOn = simData.VisualizeTrajectory();
+	fPhysicsName = simData.GetPhysicsListName();
 
-	fInputFile = root.get<string>("InputFile");
-	fOutputFile = root.get<string>("OutputFile");
-	// for this example application simulation mode is kept to FULL by default
-	fSimulationMode = root.get<string>("SimulationMode");
-	fDetectorList = root.get<string>("DetectorList");
-	fGeoVisOn = root.get<bool>("GeoVisOn");
-	fTrajVisOn = root.get<bool>("TrajVisOn");
-	fVerbosity = root.get<int>("Verbosity");
-	fRenderFile = root.get<string>("RenderFile");
-	fPhysicsName = root.get<string>("PhysicsName");
-	
-	// Creates event from file reader
-	theEvent = ReadParticleFile::EventFileReader(fInputFile);
+	cout << "[INFO] G4ExSimulator::Initialize: Using the following configuration:" << endl;
+	cout << "[INFO] InputFile = " << fInputFile << endl;
+	cout << "[INFO] OutputFile = " << fOutputFile << endl;
+	cout << "[INGO] DetectorList = " << fDetectorList << endl;
+	cout << "[INFO] SimulationMode = " << simData.GetSimulationModeName() << endl;
+	cout << "[INFO] InjectionMode = " << simData.GetInjectionModeName() << endl;
+	cout << "[INFO] VisualizeGeometry = " << (fGeoVisOn ? "yes" : "no") << endl;
+	cout << "[INFO] VisualizeTrajectory = " << (fTrajVisOn ? "yes" : "no") << endl;
+	cout << "[INFO] RenderFile = " << fRenderFile << endl;
+	cout << "[INFO] PhysicsList = " << fPhysicsName << endl;
+
 
 	// Read Detector Configuration
 	ConfigManager::ReadDetectorList(fDetectorList, theEvent);
@@ -149,12 +143,11 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 {
 
 	cout << "[INFO] G4ExSimulator::RunSimulation" << endl;
+	
 	SimData& simData = theEvent.GetSimData();
-	simData.SetSimulationMode(fSimulationMode);
-  cout << "[INFO] G4ExSimulator::RunSimulation: Simulation mode selected = " << fSimulationMode << endl;
-	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
-	cout << "[INFO] G4ExSimulator::RunSimulation: Total number of particles in file = " << NumberOfParticles << endl;
-	if (!NumberOfParticles) {
+	const unsigned int numberOfParticles = simData.GetTotalNumberOfParticles();
+	cout << "[INFO] G4ExSimulator::RunSimulation: Number of particles to be simulated = " << numberOfParticles << endl;
+	if (!numberOfParticles) {
 		cerr << "[ERROR] G4ExSimulator::RunSimulation: No Particles in the Event! Exiting..." << endl;
 		return false;
 	}
@@ -178,8 +171,6 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	auto fDetConstruction = new G4ExDetectorConstruction(theEvent);
 	fRunManager->SetUserInitialization(fDetConstruction);
 	
-	//G4VModularPhysicsList* physicsList = new FTFP_BERT;
-	//fRunManager->SetUserInitialization(physicsList);
 	fRunManager->SetUserInitialization(new G4MPhysicsList(fPhysicsName));
 
 	G4ExPrimaryGeneratorAction *fPrimaryGenerator = new G4ExPrimaryGeneratorAction();
@@ -260,6 +251,8 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 
 	delete fVisManager;
 	delete fRunManager;
+
+	cout << "[INFO] G4ExSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
 
 	return true;
 

@@ -58,9 +58,14 @@ G4ExPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   double mass = currParticle.GetMass();
   double fMomentum = currParticle.GetMomentum();
   double fKineticEnergy = currParticle.GetKineticEnergy();
+  auto& particlePosition = currParticle.GetParticlePosition();
 
+  double posX = particlePosition.at(0);
+  double posY = particlePosition.at(1);
+  double posZ = particlePosition.at(2);
+
+  cout << "[DEBUG] G4ExPrimaryGeneratorAction::GeneratePrimaries: Reading particle position = (" << posX / cm << ", " << posY / cm << ", " << posZ / cm << ") cm" << endl;
   const std::vector<double> particleMomentumDirection = currParticle.GetDirection();
-  
  	double fPx = particleMomentumDirection.at(0);
   double fPy = particleMomentumDirection.at(1);
   double fPz = particleMomentumDirection.at(2);
@@ -88,13 +93,13 @@ G4ExPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   G4double x0 = r*cos(phi);
   G4double y0 = r*sin(phi);
   G4double z0 = injHeight;
-  
+
   const std::vector<double> injectionPosition = {x0, y0, z0};
   currParticle.SetInjectionPosition(injectionPosition);
   
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(fPx, fPy, -1*fPz));
   //fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
-  fParticleGun->SetParticlePosition(G4ThreeVector(20*cm,20*cm, 1.5*m));
+  fParticleGun->SetParticlePosition(G4ThreeVector(posX, posY, z0));
   fParticleGun->SetParticleEnergy(fKineticEnergy);
 
   fParticleGun->GeneratePrimaryVertex(event);

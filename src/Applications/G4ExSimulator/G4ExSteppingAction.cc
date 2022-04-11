@@ -14,11 +14,11 @@
 #include "OptDeviceSimData.h"
 #include "Detector.h"
 
-G4ExSteppingAction::G4ExSteppingAction(const G4ExDetectorConstruction* det, G4ExEventAction* G4event, Event& MSevent)
+G4ExSteppingAction::G4ExSteppingAction(const G4ExDetectorConstruction* det, G4ExEventAction* G4event, Event& theEvent)
 	: G4UserSteppingAction(),
 		fDetectorConstruction(det),
 		fEventAction(G4event),
-    fEvent(MSevent)
+    fEvent(theEvent)
 {
 }
 
