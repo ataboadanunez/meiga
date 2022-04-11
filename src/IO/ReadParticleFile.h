@@ -20,7 +20,7 @@ class ReadParticleFile
 	  ReadParticleFile();
 	  virtual ~ReadParticleFile();
 
-    static Event EventFileReader(const std::string &fileName);
+    static void EventFileReader(const std::string &fileName, Event& theEvent);
 
 
 
