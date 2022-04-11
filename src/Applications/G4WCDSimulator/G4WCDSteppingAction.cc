@@ -14,11 +14,11 @@
 #include "SimData.h"
 #include "Detector.h"
 
-G4WCDSteppingAction::G4WCDSteppingAction(const G4WCDConstruction* det, G4WCDEventAction* G4event, Event& MSevent)
+G4WCDSteppingAction::G4WCDSteppingAction(const G4WCDConstruction* det, G4WCDEventAction* G4event, Event& theEvent)
 	: G4UserSteppingAction(),
 		fDetectorConstruction(det),
 		fEventAction(G4event),
-    fEvent(MSevent)
+    fEvent(theEvent)
 {
 }
 
