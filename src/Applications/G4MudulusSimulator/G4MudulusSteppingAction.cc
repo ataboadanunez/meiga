@@ -13,11 +13,11 @@
 #include "SimData.h"
 #include "Detector.h"
 
-G4MudulusSteppingAction::G4MudulusSteppingAction(const G4MudulusDetectorConstruction* det, G4MudulusEventAction* G4event, Event& MSevent)
+G4MudulusSteppingAction::G4MudulusSteppingAction(const G4MudulusDetectorConstruction* det, G4MudulusEventAction* G4event, Event& theEvent)
 	: G4UserSteppingAction(),
 		fDetectorConstruction(det),
 		fEventAction(G4event),
-    fEvent(MSevent)
+    fEvent(theEvent)
 {
 }
 
