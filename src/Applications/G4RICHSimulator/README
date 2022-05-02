@@ -1,0 +1,18 @@
+Application created for the study of Michel Electrons (electrons from the decay of a muon) 
+based on simulations on a Water-Cherenkov Detector.
+
+This application is essentially the G4WCDSimulator with some modifications:
+
+1. InjectionMode.
+	InjectionMode = 0 (standard way). Particles are injected outside the detector (eg., secondary flux).
+	InjectionMode = 1. Particles are injected inside the detectors (eg., sample of electrons)
+
+2. Geometry.
+	The geometry of the tank is chosen to be r=780 mm and h=1580 mm (Nahuelito, LAGO)
+
+3. Actions.
+	3.1. 
+
+The outcome of this analysis will be presented at the RICH 22 conference.
+
+
