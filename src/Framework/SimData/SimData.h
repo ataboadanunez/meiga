@@ -73,6 +73,22 @@ class SimData
 		void SetPhysicsListName(const std::string name) { fPhysicsListName = name; }
 		const std::string GetPhysicsListName() const {return fPhysicsListName; }
 
+		// getters and setters for ground dimensions
+		/*
+			in Geant4 coordinate system
+			Lenght    along x-axis
+			Width     " " 	y-axis
+			Thickness " " 	z-axis
+		*/
+		void SetGroundLength(const double l) { fGroundLength = l; }
+		double GetGroundLength() { return fGroundLength; }
+
+		void SetGroundWidth(const double w) { fGroundWidth = w; }
+		double GetGroundWidth() { return fGroundWidth; }
+
+		void SetGroundThickness(const double t) { fGroundThickness = t; }
+		double GetGroundThickness() { return fGroundThickness; }
+
 		// DetectorSimData getters
 		void MakeDetectorSimData(unsigned int id);
 		DetectorSimData& GetDetectorSimData() { return fDetectorSimData; }
@@ -101,6 +117,9 @@ class SimData
 		std::string fOutputFileName;
 		std::string fDetectorList; 
 
+		double fGroundLength;
+		double fGroundWidth;
+		double fGroundThickness;
 };
 
 #endif
