@@ -1,4 +1,3 @@
-// implementation of the G4CasposoPrimaryGeneratorAction class
 #include "CorsikaUtilities.h"
 #include "Geometry.h"
 
@@ -21,10 +20,10 @@
 using CLHEP::RandFlat;
 using namespace std;
 
-G4CasposoPrimaryGeneratorAction::G4CasposoPrimaryGeneratorAction(/*Event& theEvent, const Particle &theParticle*/) : 
+G4CasposoPrimaryGeneratorAction::G4CasposoPrimaryGeneratorAction(Event& theEvent) : 
   G4VUserPrimaryGeneratorAction(),
-  fParticleGun(new G4ParticleGun(1))
-  
+  fParticleGun(new G4ParticleGun(1)),
+  fEvent(theEvent)
 {  
 
 	fDetectorConstructor = static_cast<const G4CasposoDetectorConstruction*> (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
@@ -55,12 +54,26 @@ G4CasposoPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
       return;
     }
   
-  double mass = currParticle.GetMass();
-  double fMomentum = currParticle.GetMomentum();
+  // 
+  auto& simData = fEvent.GetSimData();
+  SimData::InjectionMode injectionMode = simData.GetInjectionMode();
+  
+  // particle injection on ground surface
+  auto& detector = fEvent.GetDetector(0);
+  // get ground thickness (depth, along z-axis)
+  double groundThickness = simData.GetGroundThickness();
+  cout << "[DEBUG] G4CasposoPrimaryGeneratorAction::GeneratePrimaries: GroundThickness = " << groundThickness / CLHEP::m << endl;
+  double injHeight = 0.5*groundThickness + 1*CLHEP::m;
+  double injWidth  = 1 * CLHEP::m;
+
+  double x0 = RandFlat::shoot(-injWidth, injWidth);
+  double y0 = RandFlat::shoot(-injWidth, injWidth);
+  double z0 = injHeight;
+
+  // get particle energy and momentum direction
   double fKineticEnergy = currParticle.GetKineticEnergy();
 
-  const std::vector<double> particleMomentumDirection = currParticle.GetDirection();
-  
+  const std::vector<double> particleMomentumDirection = currParticle.GetDirection(); 
  	double fPx = particleMomentumDirection.at(0);
   double fPy = particleMomentumDirection.at(1);
   double fPz = particleMomentumDirection.at(2);
@@ -78,21 +91,9 @@ G4CasposoPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   currParticle.SetAzimuth(particleAzimut);
   currParticle.SetZenith(particleZenith);
 
-  // check injection according to detector dimensions
-  const G4double injRadius = 0.25*m;
-  const G4double injHeight = 1.5*m;  
-  const G4double rand = RandFlat::shoot(0., 1.);
-  const G4double r = injRadius*sqrt(rand);
-  const G4double phi = RandFlat::shoot(0., CLHEP::twopi);
-
-  G4double x0 = r*cos(phi);
-  G4double y0 = r*sin(phi);
-  G4double z0 = injHeight;
-  x0 = 0 * CLHEP::mm;
-  y0 = 0 * CLHEP::mm;
   const std::vector<double> injectionPosition = {x0, y0, z0};
   currParticle.SetInjectionPosition(injectionPosition);
-  
+  cout << "[DEBUG] InjectionPosition = (" << x0 / CLHEP::m << ", " << y0 / CLHEP::m << ", " << z0 / CLHEP::m << ") m" << endl;
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(fPx, fPy, -1*fPz));
   fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
   fParticleGun->SetParticleEnergy(fKineticEnergy);

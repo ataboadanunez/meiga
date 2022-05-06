@@ -39,6 +39,9 @@ class G4CasposoSimulator
     std::string fInputFile;
     std::string fOutputFile;
     std::string fDetectorList;
+    SimData::SimulationMode fSimulationMode;
+    SimData::InjectionMode fInjectionMode;
+
     bool fGeoVisOn = true;
     bool fTrajVisOn = false;
     int fVerbosity = 1;

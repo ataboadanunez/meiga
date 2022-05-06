@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+
+<detectorList xmlns="http://tempuri.org/po.xsd" orderDate="1999-10-20">
+	
+	<detector id="0" type="eScintillator">
+		<x unit="cm"> 0.0 </x>
+		<y unit="cm"> 0.0 </y>
+		<z unit="cm"> 0.0 </z>
+	</detector>
+
+
+</detectorList>

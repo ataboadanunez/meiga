@@ -12,9 +12,8 @@
 #include "G4OpticalPhoton.hh"
 
 #include "SimData.h"
-#include "SiPMSimData.h"
+#include "OptDeviceSimData.h"
 #include "Detector.h"
-#include "Module.h"
 
 G4CasposoSteppingAction::G4CasposoSteppingAction(const G4CasposoDetectorConstruction* det, G4CasposoEventAction* G4event, Event& theEvent)
 	: G4UserSteppingAction(),
@@ -35,10 +34,6 @@ G4CasposoSteppingAction::UserSteppingAction(const G4Step* step)
   // kill non-primary particles to speed up 
 	auto track = step->GetTrack();
 	if (track->GetParentID() != 0) {
-		if (track->GetParticleDefinition()->GetParticleName() != "opticalphoton") {
-			// G4cout << "[DEBUG] G4CasposoSteppingAction: Secondary Particle " << track->GetParticleDefinition()->GetParticleName() << " was killed! " << G4endl;
 		track->SetTrackStatus(fStopAndKill);	
-		}
-		
 	}
 }

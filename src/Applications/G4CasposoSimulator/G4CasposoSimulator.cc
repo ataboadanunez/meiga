@@ -1,15 +1,12 @@
 /* 
 	
-	Main script of an example application using Geant4
+	Application for simulating Muography experiment at
+	Mina Casposo, San Juan, Argentina
 
 	author: alvaro taboada
-	date: 15 Sep 2021
+	date: 6 May 2022
 
-	$Id:$
-
-*/
-
-//Meiga files ended with .h and G4 files with .hh
+ */
 
 // Headers of this particular application
 #include "G4CasposoSimulator.h"
@@ -22,7 +19,7 @@
 #include "G4CasposoPhysicsList.h" 
 
 // Geant4 headers
-#include "FTFP_BERT.hh" //Physics list
+#include "FTFP_BERT.hh"
 #include "G4RunManagerFactory.hh"
 #include "G4UImanager.hh"
 #include "G4VisExecutive.hh"
@@ -35,19 +32,11 @@
 #include "ReadParticleFile.h"
 #include "Event.h"
 #include "SimData.h"
-#include "SiPMSimData.h"
+#include "OptDeviceSimData.h"
 #include "Detector.h"
 #include "OptDevice.h"
 #include "G4MPhysicsList.h"
 
-// boost libraries
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/info_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/foreach.hpp>
-
-using namespace boost::property_tree;
 using namespace std;
 
 Particle G4CasposoSimulator::currentParticle;
@@ -64,7 +53,7 @@ namespace
 	void ProgramUsage() 
 	{
 		cerr << " Program Usage: " << endl;
-		cerr << " ./Executable [ -c ConfigFile.json ] " << endl;
+		cerr << " ./G4RICHSimulator [ -c ConfigFile.json ] " << endl;
 	}
 
 }
@@ -75,7 +64,7 @@ int main(int argc, char** argv)
 
 	if (argc < 3) {
 		ProgramUsage();
-		throw invalid_argument("Config file needed! (See Program Usage)");
+		throw invalid_argument("[ERROR] G4RICHSimulator::main: A configuration file is needed!");
 	}
 
 	for (int i=1; i<argc; i=i+2) {
@@ -84,8 +73,13 @@ int main(int argc, char** argv)
 			fCfgFile = argv[i+1];
 	}
 
-	Event theEvent;
+	// for program time calculation
+	time_t start, end;
+	time(&start);
+
 	fG4CasposoSimulator = new G4CasposoSimulator();
+	// Create Event object
+	Event theEvent;
 	fG4CasposoSimulator->Initialize(theEvent, fCfgFile);
 	fG4CasposoSimulator->RunSimulation(theEvent);
 	/*************************************************
@@ -95,37 +89,49 @@ int main(int argc, char** argv)
 
 	**************************************************/
 	fG4CasposoSimulator->WriteEventInfo(theEvent);
+	time(&end);
 	
-	
+	// Calculating total time taken by the program.
+	double time_taken = double(end - start);
+	cout << "[INFO] G4CasposoSimulator: Time taken by program is : " << fixed
+			 << time_taken << setprecision(5);
+	cout << " sec " << endl;
+
 	return 0;
 
 }
 
 void
-G4CasposoSimulator::Initialize(Event& theEvent, string fileName)
+G4CasposoSimulator::Initialize(Event& theEvent, string cfgFile)
 {
 
-	cout << "... Initialize ..." << endl;
-	// set value of flags according to cfg file
-	// reading cfg file using boost
-	// eventually as input of executable main(char** fConfig)
-	
-	fInputFile.clear();
-	fOutputFile.clear();
+	cout << "[INFO] G4CasposoSimulator::Initialize" << endl;
+	cout << "[INFO] G4CasposoSimulator::Initialize: Reading configuration file " << cfgFile << endl;
+	// Fill Event object from configuration file
+	// Read Simulation configuration
+	theEvent = ConfigManager::ReadConfiguration(cfgFile);
+	// get simulation simulation settings
+	SimData& simData = theEvent.GetSimData();
+	fInputFile = simData.GetInputFileName();
+	fOutputFile = simData.GetOutputFileName();
+	fDetectorList = simData.GetDetectorList();
+	fSimulationMode = simData.GetSimulationMode();
+	fInjectionMode  = simData.GetInjectionMode();
+	fGeoVisOn = simData.VisualizeGeometry();
+	fTrajVisOn = simData.VisualizeTrajectory();
+	fPhysicsName = simData.GetPhysicsListName();
 
-	ptree root;
-	read_json(fileName, root);
-#warning "JSON parser of input config file should be a method of ConfigManager"
-	fInputFile = root.get<string>("InputFile");
-	fOutputFile = root.get<string>("OutputFile");
-	fDetectorList = root.get<string>("DetectorList");
-	fGeoVisOn = root.get<bool>("GeoVisOn");
-	fTrajVisOn = root.get<bool>("TrajVisOn");
-	fVerbosity = root.get<int>("Verbosity");
-	fRenderFile = root.get<string>("RenderFile");
-	fPhysicsName = root.get<string>("PhysicsName");
-	// Creates event from file reader
-	theEvent = ReadParticleFile::EventFileReader(fInputFile);
+	cout << "[INFO] G4CasposoSimulator::Initialize: Using the following configuration:" << endl;
+	cout << "[INFO] InputFile = " << fInputFile << endl;
+	cout << "[INFO] OutputFile = " << fOutputFile << endl;
+	cout << "[INGO] DetectorList = " << fDetectorList << endl;
+	cout << "[INFO] SimulationMode = " << simData.GetSimulationModeName() << endl;
+	cout << "[INFO] InjectionMode = " << simData.GetInjectionModeName() << endl;
+	cout << "[INFO] VisualizeGeometry = " << (fGeoVisOn ? "yes" : "no") << endl;
+	cout << "[INFO] VisualizeTrajectory = " << (fTrajVisOn ? "yes" : "no") << endl;
+	cout << "[INFO] RenderFile = " << fRenderFile << endl;
+	cout << "[INFO] PhysicsList = " << fPhysicsName << endl;
+
 
 	// Read Detector Configuration
 	ConfigManager::ReadDetectorList(fDetectorList, theEvent);
@@ -137,16 +143,22 @@ bool
 G4CasposoSimulator::RunSimulation(Event& theEvent)
 {
 
+	cout << "[INFO] G4CasposoSimulator::RunSimulation" << endl;
+
 	SimData& simData = theEvent.GetSimData();
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
+	cout << "[INFO] G4CasposoSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
 
-	cout << "[INFO] Event::SimData: Total number of particles in file = " << NumberOfParticles << endl;
 	
 	if (!NumberOfParticles) {
-		cerr << "ERROR! No Particles in the Event! Exiting..." << endl;
+		cerr << "[ERROR] G4CasposoSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
 		return false;
 	}
 	
+	simData.SetInjectionMode(fInjectionMode);
+	if (fInjectionMode == SimData::eInsideDetector)
+		cout << "[INFO] G4CasposoSimulator::RunSimulation: Partilces injected INSIDE the detector (InjectionMode = " << fInjectionMode << "). " << endl;
+
 	/***************
 
 		Geant4 Setup    
@@ -169,7 +181,7 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 	
 	fRunManager->SetUserInitialization(new G4CasposoPhysicsList(fPhysicsName));  
  
-	G4CasposoPrimaryGeneratorAction *fPrimaryGenerator = new G4CasposoPrimaryGeneratorAction();
+	G4CasposoPrimaryGeneratorAction *fPrimaryGenerator = new G4CasposoPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
 	
 	G4CasposoRunAction *fRunAction = new G4CasposoRunAction();
@@ -240,14 +252,15 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 		G4CasposoSimulator::currentParticle = *it;
 		// Run simulation
 		fRunManager->BeamOn(1);
-		nParticle+=1;
 
-		cout << "Simulated " << nParticle << " particle(s) out of " << NumberOfParticles << endl;
 	}
 
 
 	delete fVisManager;
 	delete fRunManager;
+
+	cout << "[INFO] G4CasposoSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
+
 
 	return true;
 
@@ -257,7 +270,8 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 void
 G4CasposoSimulator::WriteEventInfo(Event& theEvent)
 {
-	cout << "... WriteEventInfo ..." << endl;
+	(void) theEvent;
+	cout << "[INFO] G4CasposoSimulator::WriteEventInfo" << endl;
 
 	cout << "Still nothing to write :(" << endl;
 
