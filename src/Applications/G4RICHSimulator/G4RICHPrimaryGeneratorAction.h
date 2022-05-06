@@ -39,8 +39,8 @@ class G4RICHPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 
     const G4RICHConstruction *fDetectorConstructor;
 
-  	friend class G4RICHConstruction;
-    Event fEvent;
+    friend class G4RICHConstruction;
+    Event& fEvent;
 };  
 
 #endif

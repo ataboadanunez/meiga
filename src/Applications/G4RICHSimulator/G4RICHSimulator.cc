@@ -104,8 +104,8 @@ void
 G4RICHSimulator::Initialize(Event& theEvent, string cfgFile)
 {
 
-	cout << "[INFO] G4ExSimulator::Initialize" << endl;
-	cout << "[INFO] G4ExSimulator::Initialize: Reading configuration file " << cfgFile << endl;
+	cout << "[INFO] G4RICHSimulator::Initialize" << endl;
+	cout << "[INFO] G4RICHSimulator::Initialize: Reading configuration file " << cfgFile << endl;
 
 	// Fill Event object from configuration file
 	// Read Simulation configuration
@@ -156,8 +156,8 @@ G4RICHSimulator::RunSimulation(Event& theEvent)
 	}
 	
 	simData.SetInjectionMode(fInjectionMode);
-	if (fInjectionMode)
-		cout << "[INFO] G4RICHSimulator::RunSimulation: Partilces injected INSIDE the detector (SimulationMode = " << fSimulationMode << "). " << endl;
+	if (fInjectionMode == SimData::eInsideDetector)
+		cout << "[INFO] G4RICHSimulator::RunSimulation: Partilces injected INSIDE the detector (InjectionMode = " << fInjectionMode << "). " << endl;
 
 	/***************
 

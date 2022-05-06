@@ -1,4 +1,3 @@
-// implementation of the G4RICHPrimaryGeneratorAction class
 #include "G4RICHSimulator.h"
 #include "G4RICHPrimaryGeneratorAction.h"
 #include "G4RICHConstruction.h"
@@ -59,7 +58,7 @@ G4RICHPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 	
 	fParticleGun->SetParticleDefinition(particleDef);
 
-	// check injection according to detector dimensions and injection mode
+	// particle injection according to detector dimensions and injection mode
 	auto& simData = fEvent.GetSimData();
 	SimData::InjectionMode injectionMode = simData.GetInjectionMode();
 	
@@ -75,7 +74,6 @@ G4RICHPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 	G4double x0, y0, z0;
 
 	// get particle energy and momentum direction
-
 	double fKineticEnergy = currParticle.GetKineticEnergy();
 	const std::vector<double> particleMomentumDirection = currParticle.GetDirection();
 	
