@@ -39,8 +39,8 @@ class G4WCDPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 
     const G4WCDConstruction *fDetectorConstructor;
 
-  	friend class G4WCDConstruction;
-    Event fEvent;
+    friend class G4WCDConstruction;
+    Event& fEvent;
 };  
 
 #endif
