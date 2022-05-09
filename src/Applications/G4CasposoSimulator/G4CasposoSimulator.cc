@@ -246,7 +246,7 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 		fUImanager->ApplyCommand("/vis/scene/add/trajectories");
 	}
 
-	int nParticle = 0;
+
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
 		G4CasposoSimulator::currentParticle = *it;

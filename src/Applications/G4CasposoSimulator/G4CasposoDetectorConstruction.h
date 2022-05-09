@@ -62,9 +62,9 @@ class G4CasposoDetectorConstruction : public G4VUserDetectorConstruction {
 		G4PVPlacement*   physGround  = nullptr;
 
 		// size definitions
-		G4double fGroundSizeX = 15 * CLHEP::m;
-		G4double fGroundSizeY = 15 * CLHEP::m;
-		G4double fGroundSizeZ = 15 * CLHEP::m;
+		G4double fGroundSizeX = 100 * CLHEP::m;
+		G4double fGroundSizeY = 100 * CLHEP::m;
+		G4double fGroundSizeZ = 300 * CLHEP::m;
 
 		G4double fWorldSizeX = fGroundSizeX + 5 * CLHEP::m;
 		G4double fWorldSizeY = fGroundSizeY + 5 * CLHEP::m;

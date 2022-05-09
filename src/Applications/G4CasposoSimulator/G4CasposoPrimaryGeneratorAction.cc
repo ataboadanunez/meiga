@@ -56,13 +56,11 @@ G4CasposoPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   
   // 
   auto& simData = fEvent.GetSimData();
-  SimData::InjectionMode injectionMode = simData.GetInjectionMode();
   
   // particle injection on ground surface
-  auto& detector = fEvent.GetDetector(0);
   // get ground thickness (depth, along z-axis)
   double groundThickness = simData.GetGroundThickness();
-  cout << "[DEBUG] G4CasposoPrimaryGeneratorAction::GeneratePrimaries: GroundThickness = " << groundThickness / CLHEP::m << endl;
+  cout << "[DEBUG] G4CasposoPrimaryGeneratorAction::GeneratePrimaries: GroundThickness = " << groundThickness / CLHEP::m << " m " << endl;
   double injHeight = 0.5*groundThickness + 1*CLHEP::m;
   double injWidth  = 1 * CLHEP::m;
 

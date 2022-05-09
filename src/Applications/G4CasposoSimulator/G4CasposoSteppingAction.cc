@@ -31,9 +31,25 @@ void
 G4CasposoSteppingAction::UserSteppingAction(const G4Step* step)
 {
   
+	//Particle& currParticle = G4CasposoSimulator::currentParticle;
+	SimData& simData = fEvent.GetSimData();
+	double groundThickness = simData.GetGroundThickness();
+	double depth = -0.5*groundThickness;
   // kill non-primary particles to speed up 
-	auto track = step->GetTrack();
+	G4Track* track = step->GetTrack();
 	if (track->GetParentID() != 0) {
 		track->SetTrackStatus(fStopAndKill);	
+	}
+	else {
+		// here we are left with primary particles (muons)
+		double currentEnergy = track->GetTotalEnergy();
+		G4ThreeVector trackPosition = track->GetPosition();
+		
+		double posZ = trackPosition[2];
+		// get muon energy at last step in ground
+		G4String stepVolumeName = track->GetVolume()->GetName();
+		if (stepVolumeName == "Ground" && step->IsLastStepInVolume())
+			std::cout << "LastStepEnergy_GeV " << currentEnergy / CLHEP::GeV << " depth_m " << posZ / CLHEP::m << std::endl;
+
 	}
 }
