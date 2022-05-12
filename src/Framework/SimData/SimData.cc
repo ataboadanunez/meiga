@@ -24,6 +24,8 @@ SimData::InjectionConversion(string name)
 		return SimData::eRandom;
 	else if (name == "ePositionFromFile")
 		return SimData::ePositionFromFile;
+	else if (name == "eVertical")
+		return SimData::eVertical;
 	else if (name == "eInsideDetector")
 		return SimData::eInsideDetector;
 	else {

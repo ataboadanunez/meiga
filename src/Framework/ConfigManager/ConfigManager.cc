@@ -47,7 +47,8 @@ ConfigManager::ReadConfiguration(string fConfigFile)
 	simData.SetRenderName(fRenderFile);
 	string fPhysicsListName = tree.get<string>("PhysicsName");
 	simData.SetPhysicsListName(fPhysicsListName);
-
+	int fVerbosity = tree.get<int>("Verbosity");
+	simData.SetVerbosity(fVerbosity);
 
 	return theEvent;
 

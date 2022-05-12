@@ -23,6 +23,7 @@ class SimData
 			eUnknown = 0,
 			eRandom = 1,
 			ePositionFromFile = 2,
+			eVertical = 3,
 			// specific case when particles are injected inside the detector (e.g. muon decay inside WCD)
 			eInsideDetector
 		};
@@ -59,19 +60,22 @@ class SimData
 
 		// Other simulation settings
 		void SetInputFileName(const std::string name) { fInputFileName = name; }
-		const std::string GetInputFileName() const { return fInputFileName; }
+		std::string GetInputFileName() const { return fInputFileName; }
 
 		void SetOutputFileName(const std::string name) { fOutputFileName = name; }
-		const std::string GetOutputFileName() const { return fOutputFileName; }
+		std::string GetOutputFileName() const { return fOutputFileName; }
 
 		void SetDetectorList(const std::string name) { fDetectorList = name; }
-		const std::string GetDetectorList() const { return fDetectorList; }
+		std::string GetDetectorList() const { return fDetectorList; }
 
 		void SetRenderName(const std::string name) { fRenderName = name; }
-		const std::string GetRenderName() const { return fRenderName; }
+		std::string GetRenderName() const { return fRenderName; }
 
 		void SetPhysicsListName(const std::string name) { fPhysicsListName = name; }
-		const std::string GetPhysicsListName() const {return fPhysicsListName; }
+		std::string GetPhysicsListName() const { return fPhysicsListName; }
+
+		void SetVerbosity(const int verb) { fVerbosity = verb; }
+		int GetVerbosity() const { return fVerbosity; }
 
 		// getters and setters for ground dimensions
 		/*
@@ -116,6 +120,7 @@ class SimData
 		std::string fInputFileName;
 		std::string fOutputFileName;
 		std::string fDetectorList; 
+		int fVerbosity = 0;
 
 		double fGroundLength;
 		double fGroundWidth;
