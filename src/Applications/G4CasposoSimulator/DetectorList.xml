@@ -6,6 +6,7 @@
 		<x unit="cm"> 0.0 </x>
 		<y unit="cm"> 0.0 </y>
 		<z unit="cm"> 0.0 </z>
+		<barsInPanel> 0 </barsInPanel>
 	</detector>
 
 
