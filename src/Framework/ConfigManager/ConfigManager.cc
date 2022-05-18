@@ -3,13 +3,6 @@
 #include "ReadParticleFile.h"
 // Geant4 headers
 #include "G4UnitsTable.hh"
-// c++ headers
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <map>
-#include <string>
 
 using boost::property_tree::ptree;
 using namespace std;
@@ -23,7 +16,7 @@ ConfigManager::ReadConfiguration(string fConfigFile)
 	ptree tree;
 	read_json(fConfigFile, tree);
 
-	// reads the input file and fills the Event
+	// reads the input file and fills the Event with particles
 	string fInputFileName = tree.get<string>("InputFile");
 	ReadParticleFile::EventFileReader(fInputFileName, theEvent);
 
