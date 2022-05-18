@@ -48,6 +48,8 @@ class G4MuDecSimulator
     std::string fRenderFile = "VRML2FILE";
     std::string fPhysicsName = "QGSP_BERT_HP";
     
+    bool fCountCerenkov = false;
+
   	friend class G4MuDecDetectorConstructor;
   	friend class G4MuDecPrimaryGenerator;
 };

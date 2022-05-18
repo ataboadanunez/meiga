@@ -16,7 +16,7 @@ class G4MuDecEventAction;
 class G4MuDecSteppingAction : public G4UserSteppingAction
 {
 	public:
-		G4MuDecSteppingAction(const G4MuDecConstruction* det, G4MuDecEventAction* event, Event& theEvent);
+		G4MuDecSteppingAction(const G4MuDecConstruction* det, G4MuDecEventAction* event, Event& theEvent, bool countCerenkov);
 			virtual ~G4MuDecSteppingAction();
 			virtual void UserSteppingAction(const G4Step* step);
 
@@ -26,10 +26,7 @@ class G4MuDecSteppingAction : public G4UserSteppingAction
 		std::ofstream* fOutputFile;
 		Event& fEvent;
 
-		G4double fSiPMTime;
-		G4double fScinTime;
-		G4String stepVolume;
-		G4String trackVolume;
+		bool fCountCerenkov;
 };
 
 #endif

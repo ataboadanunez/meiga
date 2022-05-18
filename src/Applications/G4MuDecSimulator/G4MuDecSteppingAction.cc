@@ -18,11 +18,12 @@
 #include "SimData.h"
 #include "Detector.h"
 
-G4MuDecSteppingAction::G4MuDecSteppingAction(const G4MuDecConstruction* det, G4MuDecEventAction* G4event, Event& theEvent)
+G4MuDecSteppingAction::G4MuDecSteppingAction(const G4MuDecConstruction* det, G4MuDecEventAction* G4event, Event& theEvent, bool countCerenkov)
 	:	G4UserSteppingAction(),
 		fDetectorConstruction(det),
 		fEventAction(G4event),
-		fEvent(theEvent)
+		fEvent(theEvent),
+		fCountCerenkov(countCerenkov)
 {
 
 }
@@ -35,35 +36,44 @@ void
 G4MuDecSteppingAction::UserSteppingAction(const G4Step* step)
 {
 		
-	DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData();
-	auto& muonDecayIDs = detSimData.GetMuonDecayID();
+	// DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData();
+	// auto& muonDecayIDs = detSimData.GetMuonDecayID();
 
 	// 1. Detect if parent muons stop in water
 	// 2. Track electrons / positrons in water
 
 	auto track = step->GetTrack();
+	int parentId = track->GetParentID();
+	int trackId = track->GetTrackID();
+
 	const G4ParticleDefinition* particle = track->GetParticleDefinition();
 
 	// reject photons
 	if (particle == G4OpticalPhoton::OpticalPhotonDefinition())
 		return;
 
-	int trackId = track->GetTrackID();
-	int parentId = track->GetParentID();
+	// get step-length of muons inside water volume
+	if (fCountCerenkov) {
+		if ((trackId == 1) && (track->GetVolume()->GetName() == "physTank")) {
 
+			double stepLength = step->GetStepLength();
+			fEventAction->AddStepLength(stepLength);
+		}	
+	}
+	
 	// get physical volume name
 	//G4String physVolName = track->GetVolume()->GetName();
 
 
-	if ( (particle->GetParticleName() == "e-" || particle->GetParticleName() == "e+") && parentId == 1) {
-		const auto* process = track->GetCreatorProcess();
-		if (process->GetProcessType() == fDecay) {
-			// std::cout << "[DEBUG] G4MuDecSteppingAction: This " << particle->GetParticleName() << " (" << trackId << ") was produced via " << process->GetProcessName() << " from parent ID " << parentId << std::endl;
-			//double electronEnergy = track->GetTotalEnergy();
-			//std::cout << "Michel_Electron " << trackId << " Energy " << electronEnergy / CLHEP::MeV << std::endl; 
-			muonDecayIDs.insert(trackId);
+	// if ( (particle->GetParticleName() == "e-" || particle->GetParticleName() == "e+") && parentId == 1) {
+	// 	const auto* process = track->GetCreatorProcess();
+	// 	if (process->GetProcessType() == fDecay) {
+	// 		// std::cout << "[DEBUG] G4MuDecSteppingAction: This " << particle->GetParticleName() << " (" << trackId << ") was produced via " << process->GetProcessName() << " from parent ID " << parentId << std::endl;
+	// 		//double electronEnergy = track->GetTotalEnergy();
+	// 		//std::cout << "Michel_Electron " << trackId << " Energy " << electronEnergy / CLHEP::MeV << std::endl; 
+	// 		muonDecayIDs.insert(trackId);
 		
-		}
-	}
+	// 	}
+	// }
 }
 

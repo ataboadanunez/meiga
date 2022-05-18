@@ -133,6 +133,11 @@ G4MuDecSimulator::Initialize(Event& theEvent, string cfgFile)
 	cout << "[INFO] RenderFile = " << fRenderFile << endl;
 	cout << "[INFO] PhysicsList = " << fPhysicsName << endl;
 
+	// Aditional configuration flags of this application
+	boost::property_tree::ptree tree;
+	read_json(cfgFile, tree);
+	fCountCerenkov = tree.get<bool>("CountCerenkov");
+	cout << "[INFO] Count Cerenkov Photons = " << (fCountCerenkov ? "yes" : "no") << endl;
 
 	// Read Detector Configuration
 	ConfigManager::ReadDetectorList(fDetectorList, theEvent);
@@ -193,9 +198,9 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 	G4MuDecEventAction *fEventAction = new G4MuDecEventAction(theEvent);
 	fRunManager->SetUserAction(fEventAction);
 
-	fRunManager->SetUserAction(new G4MuDecTrackingAction(fEventAction, true));
+	fRunManager->SetUserAction(new G4MuDecTrackingAction(fEventAction, theEvent, fCountCerenkov));
 
-	G4MuDecSteppingAction *fSteppingAction = new G4MuDecSteppingAction(fDetConstruction, fEventAction, theEvent);
+	G4MuDecSteppingAction *fSteppingAction = new G4MuDecSteppingAction(fDetConstruction, fEventAction, theEvent, fCountCerenkov);
 	fRunManager->SetUserAction(fSteppingAction);
 	
 	// initialize G4 kernel
