@@ -21,15 +21,14 @@ class G4LogicalVolume;
 class G4OpticalSkinSurface;
 
 class WCD {
-  // Basic Geant4 model for a Water-Cerenkov Detector
-  
+	// Basic Geant4 model for a Water-Cerenkov Detector
+	
 public:
-  static void BuildDetector(G4LogicalVolume* logMother, Detector& detector, 
-                            Event& theEvent, G4bool fCheckOverlaps = true);
-  
+	static void BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps = true);
+	
 private:
-  WCD();
-  virtual ~WCD();
+	WCD();
+	virtual ~WCD();
 
 };
 

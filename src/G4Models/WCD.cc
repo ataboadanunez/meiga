@@ -23,7 +23,6 @@ WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEve
 	// pmt solids
 	G4Ellipsoid* solidPMT = nullptr;
 
-
 	// logical volumes
 	G4LogicalVolume* logTank = nullptr;
 	G4LogicalVolume* logTop  = nullptr;
