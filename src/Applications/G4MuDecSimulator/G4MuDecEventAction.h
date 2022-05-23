@@ -30,14 +30,22 @@ class G4MuDecEventAction : public G4UserEventAction
 
     void AddStepLength(double len) { fStepLength += len; }
     double GetTrackLength() { return fStepLength; }
+
+    void AddEnergyDeposit(double edep) { fEnergyDeposit+= edep; }
+    double GetEnergyDeposit() { return fEnergyDeposit; }
+
   private:
+
     Event& fEvent;
     // counter of Cerenkov photons produced by primary particle
     int fNumCerenkov = 0;
     // counter of Cerenkov photons produced by secondaries inside water (e.g. delta rays)
     int fNumCerenkovDelta = 0;
     double fStepLength = 0;
+    double fEnergyDeposit = 0;
+
     double trackLength;
+
 };
 
 #endif

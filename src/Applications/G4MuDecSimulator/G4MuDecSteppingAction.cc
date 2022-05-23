@@ -52,28 +52,16 @@ G4MuDecSteppingAction::UserSteppingAction(const G4Step* step)
 	if (particle == G4OpticalPhoton::OpticalPhotonDefinition())
 		return;
 
+	// get energy deposit of primaries in water
+	if ((trackId == 1) && (track->GetVolume()->GetName() == "physTank")) {
+		double depE = step->GetTotalEnergyDeposit();
+		fEventAction->AddEnergyDeposit(depE);
 	// get step-length of muons inside water volume
 	if (fCountCerenkov) {
-		if ((trackId == 1) && (track->GetVolume()->GetName() == "physTank")) {
-
 			double stepLength = step->GetStepLength();
 			fEventAction->AddStepLength(stepLength);
 		}	
 	}
 	
-	// get physical volume name
-	//G4String physVolName = track->GetVolume()->GetName();
-
-
-	// if ( (particle->GetParticleName() == "e-" || particle->GetParticleName() == "e+") && parentId == 1) {
-	// 	const auto* process = track->GetCreatorProcess();
-	// 	if (process->GetProcessType() == fDecay) {
-	// 		// std::cout << "[DEBUG] G4MuDecSteppingAction: This " << particle->GetParticleName() << " (" << trackId << ") was produced via " << process->GetProcessName() << " from parent ID " << parentId << std::endl;
-	// 		//double electronEnergy = track->GetTotalEnergy();
-	// 		//std::cout << "Michel_Electron " << trackId << " Energy " << electronEnergy / CLHEP::MeV << std::endl; 
-	// 		muonDecayIDs.insert(trackId);
-		
-	// 	}
-	// }
 }
 
