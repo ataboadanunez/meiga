@@ -28,6 +28,8 @@ SimData::InjectionConversion(string name)
 		return SimData::eVertical;
 	else if (name == "eInsideDetector")
 		return SimData::eInsideDetector;
+	else if (name == "eCircle")
+		return SimData::eCircle;
 	else {
 		cout << "[WARNING] SimData::StringToType: Unknown injection type!" << endl;
 		return SimData::eUnknown;
