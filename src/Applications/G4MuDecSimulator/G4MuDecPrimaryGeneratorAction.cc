@@ -168,10 +168,43 @@ G4MuDecPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 	else if (injectionMode == SimData::eCircle) {
 
 		// position of circle slightly above detector height
-		injHeight = ( tankHeight > maxHeight ? tankHeight : maxHeight) + 10*CLHEP::cm; 
+		injHeight = ( tankHeight > maxHeight ? tankHeight : maxHeight) + 2*CLHEP::cm; 
+		
+		
+		// How radius is calculated:
+		/*
+             :---d---: injection circle	of radius "d"
+		------------------ 
+      
+      \   ------   / tank of radius r, height h.
+       \	|	   |  / 
+        \	|    | /
+         \------/
+
+    The radius of the injection circle is calculated
+    using the tank diagonal, l
+    
+    l = sqrt(h^2 + 4r^2)
+
+    Assuming the circle is slightly above the tank,
+    its radius is 
+
+    d = r + l * sin(a), where
+
+    a = atan(2r / h)
+
+    is the angle between the zenith and the tank diagonal.
+	
+		*/
+
+		G4double l = sqrt(sqr(injHeight) + 4*sqr(tankRadius + tankThickness));
+		G4double alpha = atan2(2*tankRadius, tankHeight);
+		injRadius = tankRadius+tankThickness + l * sin(alpha);
+
+		// particle position is chosen according randomly distributed over the circle.
+		std::cout << "[INFO] G4MuDecPrimaryGeneratorAction::GeneratePrimaries: Particles injected over circle of radius = " << injRadius / cm << "  cm. " << std::endl;
 		G4double rand = RandFlat::shoot(0., 1.);
-		// circle radius 
-		r = 5*injRadius*sqrt(rand);
+		r = injRadius*sqrt(rand);
 		phi = RandFlat::shoot(0., CLHEP::twopi);
 		
 		x0 = r*cos(phi);
