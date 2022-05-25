@@ -162,9 +162,23 @@ G4MuDecPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 			z0 = injHeight * rand4;
 
 		}
-
 		
 	} 
+	// injection over a circle on top of WCD
+	else if (injectionMode == SimData::eCircle) {
+
+		// position of circle slightly above detector height
+		injHeight = ( tankHeight > maxHeight ? tankHeight : maxHeight) + 10*CLHEP::cm; 
+		G4double rand = RandFlat::shoot(0., 1.);
+		// circle radius 
+		r = 5*injRadius*sqrt(rand);
+		phi = RandFlat::shoot(0., CLHEP::twopi);
+		
+		x0 = r*cos(phi);
+		y0 = r*sin(phi);
+		z0 = injHeight;
+
+	}
 
 	
 	const std::vector<double> injectionPosition = {x0, y0, z0};

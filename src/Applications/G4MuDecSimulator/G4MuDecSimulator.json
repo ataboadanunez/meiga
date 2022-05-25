@@ -4,10 +4,10 @@
 	"DetectorList" : "./DetectorList.xml",
 	"SimulationMode" : "eFast",
 	"InjectionMode" : "eRandom",
-	"GeoVisOn" : true,
+	"GeoVisOn" : false,
 	"TrajVisOn" : false,
 	"Verbosity" : 1,
 	"RenderFile" : "VRML2FILE",
 	"PhysicsName" : "QGSP_BERT_HP",
-	"CountCerenkov" : false // count Cerenkov photons produced in the tank
+	"CountCerenkov" : false 
 }

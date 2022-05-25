@@ -59,11 +59,10 @@ class G4MuDecConstruction : public G4VUserDetectorConstruction {
 		
 		G4LogicalVolume* logicGround = nullptr;
 		G4PVPlacement*   physGround  = nullptr;
-
+#warning "temporary fix. Ground and World size should be set by DetectorSimData"
 		// size definitions
-		
-		G4double fGroundSizeX = 5 * CLHEP::m;
-		G4double fGroundSizeY = 5 * CLHEP::m;
+		G4double fGroundSizeX = 10 * CLHEP::m;
+		G4double fGroundSizeY = 10 * CLHEP::m;
 		G4double fGroundSizeZ = 1 * CLHEP::m;
 
 		G4double fWorldSizeX = fGroundSizeX + 0.5 * CLHEP::m;
