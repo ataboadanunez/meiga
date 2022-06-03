@@ -41,8 +41,11 @@ class Event
     void MakeDetector(unsigned int id, Detector::DetectorType type);
 
     int GetNDetectors() {return fNDetectors; }
+
+#warning "move to DetectorSimData!"
     void SetMaximumHeight(double maxH) { fMaximumHeight = maxH; }
     double GetMaximumHeight() { return fMaximumHeight; }
+    
     std::map<int, Detector>& DetectorRange() { return fDetectorMap; }
     const std::map<int, Detector>& DetectorRange() const { return fDetectorMap; }
 
