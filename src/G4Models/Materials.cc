@@ -120,9 +120,11 @@ static G4double pmtRefIndex[] = {1.47, 1.47};
 static G4double pmtAbsLength[] = {0.0005*mm, 0.0005*mm};
 G4int pmtArrEntries = sizeof(pmtPhotonEnergy) / sizeof(G4double);
 
+// ------------------- Water 1 (Pierre Auger Offline Framework) -------------------------------
+
 // array of photon energies for Cerenkov processes in WCD tanks
 // this energy range corresponds to the efficiency region of Auger WCD large PMTs
-static G4double waterPhotonEnergy[] = {
+static G4double water1PhotonEnergy[] = {
 	2.08*eV,  2.16*eV,  2.19*eV,  2.23*eV,  2.27*eV,  2.32*eV,
 	2.36*eV,  2.41*eV,  2.46*eV,  2.50*eV,  2.56*eV,  2.61*eV,
 	2.67*eV,  2.72*eV,  2.79*eV,  2.85*eV,  2.92*eV,  2.99*eV,
@@ -130,10 +132,10 @@ static G4double waterPhotonEnergy[] = {
 	3.59*eV,  3.70*eV,  3.81*eV,  3.94*eV,  4.07*eV,  4.20*eV
 };
 
-G4int waterArrEntries = sizeof(waterPhotonEnergy) / sizeof(G4double);
+G4int water1ArrEntries = sizeof(water1PhotonEnergy) / sizeof(G4double);
 G4double scaleAbsLen = 100*m;
 
-static G4double waterAbsLen[] = {
+static G4double water1AbsLen[] = {
 	0.092*scaleAbsLen, 0.133*scaleAbsLen, 0.180*scaleAbsLen, 0.203*scaleAbsLen, 0.226*scaleAbsLen, 0.258*scaleAbsLen,
 	0.284*scaleAbsLen, 0.302*scaleAbsLen, 0.403*scaleAbsLen, 0.560*scaleAbsLen, 0.735*scaleAbsLen, 0.818*scaleAbsLen,
 	0.923*scaleAbsLen, 0.923*scaleAbsLen, 0.993*scaleAbsLen, 0.993*scaleAbsLen, 1.000*scaleAbsLen, 0.941*scaleAbsLen,
@@ -141,8 +143,82 @@ static G4double waterAbsLen[] = {
 	0.311*scaleAbsLen, 0.257*scaleAbsLen, 0.212*scaleAbsLen, 0.171*scaleAbsLen, 0.137*scaleAbsLen, 0.102*scaleAbsLen
 };
 
-static G4double waterPhotonEnergyShort[] = {2.08*eV, 4.20*eV};
-static G4double waterRefIndex[] = {1.33, 1.33};
+
+static G4double water1PhotonEnergyShort[] = {2.08*eV, 4.20*eV};
+static G4double water1RefIndex[] = {1.33, 1.33};
+
+
+// ---------------------- Water 2 (Geant4 OpNovice example) ----------------------
+
+// arrays from Geant4 OpNovice example
+static G4double water2PhotonEnergy[] = {
+		2.034 * eV, 2.068 * eV, 2.103 * eV, 2.139 * eV, 2.177 * eV, 2.216 * eV,
+		2.256 * eV, 2.298 * eV, 2.341 * eV, 2.386 * eV, 2.433 * eV, 2.481 * eV,
+		2.532 * eV, 2.585 * eV, 2.640 * eV, 2.697 * eV, 2.757 * eV, 2.820 * eV,
+		2.885 * eV, 2.954 * eV, 3.026 * eV, 3.102 * eV, 3.181 * eV, 3.265 * eV,
+		3.353 * eV, 3.446 * eV, 3.545 * eV, 3.649 * eV, 3.760 * eV, 3.877 * eV,
+		4.002 * eV, 4.136 * eV
+	};
+
+static G4double water2RefIndex[] = {
+		1.3435, 1.344,  1.3445, 1.345,  1.3455, 1.346,  1.3465, 1.347,
+		1.3475, 1.348,  1.3485, 1.3492, 1.35,   1.3505, 1.351,  1.3518,
+		1.3522, 1.3530, 1.3535, 1.354,  1.3545, 1.355,  1.3555, 1.356,
+		1.3568, 1.3572, 1.358,  1.3585, 1.359,  1.3595, 1.36,   1.3608
+	};
+
+G4double scaleAbsLen2 = 0.2*m;
+static G4double water2AbsLen[] = {
+		3.448*scaleAbsLen2,  4.082*scaleAbsLen2,  6.329*scaleAbsLen2,  9.174*scaleAbsLen2,  12.346*scaleAbsLen2, 13.889*scaleAbsLen2,
+		15.152*scaleAbsLen2, 17.241*scaleAbsLen2, 18.868*scaleAbsLen2, 20.000*scaleAbsLen2, 26.316*scaleAbsLen2, 35.714*scaleAbsLen2,
+		45.455*scaleAbsLen2, 47.619*scaleAbsLen2, 52.632*scaleAbsLen2, 52.632*scaleAbsLen2, 55.556*scaleAbsLen2, 52.632*scaleAbsLen2,
+		52.632*scaleAbsLen2, 47.619*scaleAbsLen2, 45.455*scaleAbsLen2, 41.667*scaleAbsLen2, 37.037*scaleAbsLen2, 33.333*scaleAbsLen2,
+		30.000*scaleAbsLen2, 28.500*scaleAbsLen2, 27.000*scaleAbsLen2, 24.500*scaleAbsLen2, 22.000*scaleAbsLen2, 19.500*scaleAbsLen2,
+		17.500*scaleAbsLen2, 14.500*scaleAbsLen2
+	};
+
+
+static G4double water2PhotonEnergyMie[] = {
+		1.56962 * eV, 1.58974 * eV, 1.61039 * eV, 1.63157 * eV, 1.65333 * eV,
+		1.67567 * eV, 1.69863 * eV, 1.72222 * eV, 1.74647 * eV, 1.77142 * eV,
+		1.7971 * eV,  1.82352 * eV, 1.85074 * eV, 1.87878 * eV, 1.90769 * eV,
+		1.93749 * eV, 1.96825 * eV, 1.99999 * eV, 2.03278 * eV, 2.06666 * eV,
+		2.10169 * eV, 2.13793 * eV, 2.17543 * eV, 2.21428 * eV, 2.25454 * eV,
+		2.29629 * eV, 2.33962 * eV, 2.38461 * eV, 2.43137 * eV, 2.47999 * eV,
+		2.53061 * eV, 2.58333 * eV, 2.63829 * eV, 2.69565 * eV, 2.75555 * eV,
+		2.81817 * eV, 2.88371 * eV, 2.95237 * eV, 3.02438 * eV, 3.09999 * eV,
+		3.17948 * eV, 3.26315 * eV, 3.35134 * eV, 3.44444 * eV, 3.54285 * eV,
+		3.64705 * eV, 3.75757 * eV, 3.87499 * eV, 3.99999 * eV, 4.13332 * eV,
+		4.27585 * eV, 4.42856 * eV, 4.59258 * eV, 4.76922 * eV, 4.95999 * eV,
+		5.16665 * eV, 5.39129 * eV, 5.63635 * eV, 5.90475 * eV, 6.19998 * eV
+	};
+
+// Rayleigh scattering length calculated by G4OpRayleigh
+
+// assumes 100 times larger than Rayleigh scattering length
+static G4double water2Mie[] = {
+		167024.4 * m, 158726.7 * m, 150742 * m,   143062.5 * m, 135680.2 * m,
+		128587.4 * m, 121776.3 * m, 115239.5 * m, 108969.5 * m, 102958.8 * m,
+		97200.35 * m, 91686.86 * m, 86411.33 * m, 81366.79 * m, 76546.42 * m,
+		71943.46 * m, 67551.29 * m, 63363.36 * m, 59373.25 * m, 55574.61 * m,
+		51961.24 * m, 48527.00 * m, 45265.87 * m, 42171.94 * m, 39239.39 * m,
+		36462.50 * m, 33835.68 * m, 31353.41 * m, 29010.30 * m, 26801.03 * m,
+		24720.42 * m, 22763.36 * m, 20924.88 * m, 19200.07 * m, 17584.16 * m,
+		16072.45 * m, 14660.38 * m, 13343.46 * m, 12117.33 * m, 10977.70 * m,
+		9920.416 * m, 8941.407 * m, 8036.711 * m, 7202.470 * m, 6434.927 * m,
+		5730.429 * m, 5085.425 * m, 4496.467 * m, 3960.210 * m, 3473.413 * m,
+		3032.937 * m, 2635.746 * m, 2278.907 * m, 1959.588 * m, 1675.064 * m,
+		1422.710 * m, 1200.004 * m, 1004.528 * m, 833.9666 * m, 686.1063 * m
+	};
+
+G4int water2ArrEntries = sizeof(water2PhotonEnergy) / sizeof(G4double);
+
+// gforward, gbackward, forward backward ratio
+static G4double water2MieConst[3] = { 0.99, 0.99, 0.8 };
+
+
+
+// ----------- Liner (Tyvek) --------------------------
 
 static G4double linerAbsLen[] = {
 	10*m,  10*m,  10*m,  10*m,  10*m,  10*m,
@@ -279,25 +355,25 @@ Materials::CreateCompounds()
 	Na2O->AddElement(elO, 1);
 
 	// Polystyrene for the scintillator bars Dow STYRON 663 W
-  Polystyrene = new G4Material("Polystrene", 1.04 * g/cm3, 2);
-  Polystyrene->AddElement(elC, 8);
-  Polystyrene->AddElement(elH, 8);
+	Polystyrene = new G4Material("Polystrene", 1.04 * g/cm3, 2);
+	Polystyrene->AddElement(elC, 8);
+	Polystyrene->AddElement(elH, 8);
 
 	// dopant materials for scintillator bars
-  /* Scintillator made of Polystyrene ( C6H5-CH-CH2 ) + PPO + POPOP
-      Plastic:
-      Is a replication on an aromatic ring (C6H5) with one out of the six H
-      replaced by a CH bond with another CH2.
+	/* Scintillator made of Polystyrene ( C6H5-CH-CH2 ) + PPO + POPOP
+			Plastic:
+			Is a replication on an aromatic ring (C6H5) with one out of the six H
+			replaced by a CH bond with another CH2.
 								CH2
-                //
-                CH
-                |
-               / \
-       C6H5:  |   |
-               \ /
-  */
+								//
+								CH
+								|
+							 / \
+			 C6H5:  |   |
+							 \ /
+	*/
 
-  // PPO:
+	// PPO:
 	PPO = new G4Material("PPO", 1.060 * g/cm3, 4);
 	PPO->AddElement(elC, 15);
 	PPO->AddElement(elH, 11);
@@ -330,10 +406,24 @@ Materials::CreateMaterials()
 	Water->AddElement(elH, 2);
 	Water->AddElement(elO, 1);
 
-	G4MaterialPropertiesTable* waterPT = new G4MaterialPropertiesTable();
-	waterPT->AddProperty("RINDEX", waterPhotonEnergyShort, waterRefIndex, 2);
-	waterPT->AddProperty("ABSLENGTH", waterPhotonEnergy, waterAbsLen, waterArrEntries);
-	Water->SetMaterialPropertiesTable(waterPT);
+	// Define different PropertiesTable for different water "types"
+
+	G4MaterialPropertiesTable* waterPT1 = new G4MaterialPropertiesTable();
+	waterPT1->AddProperty("RINDEX", water1PhotonEnergyShort, water1RefIndex, 2);
+	waterPT1->AddProperty("ABSLENGTH", water1PhotonEnergy, water1AbsLen, water1ArrEntries);
+	
+	// --- Material Properties Table from Geant4 OpNovice example.
+	G4MaterialPropertiesTable* waterPT2 = new G4MaterialPropertiesTable();
+	waterPT2->AddProperty("RINDEX", water2PhotonEnergy, water2RefIndex, water2ArrEntries);
+	waterPT2->AddProperty("ABSLENGTH", water2PhotonEnergy, water2AbsLen, water2ArrEntries);
+	waterPT2->AddProperty("MIEHG", water2PhotonEnergyMie, water2Mie, water2ArrEntries);
+  waterPT2->AddConstProperty("MIEHG_FORWARD", water2MieConst[0]);
+  waterPT2->AddConstProperty("MIEHG_BACKWARD", water2MieConst[1]);
+  waterPT2->AddConstProperty("MIEHG_FORWARD_RATIO", water2MieConst[2]);
+
+	// function to set waterPT from configuration file
+	Water->SetMaterialPropertiesTable(waterPT1);
+
 
 	// --------------------------------------------------------------------
 	// Rocks
@@ -358,28 +448,28 @@ Materials::CreateMaterials()
 	// Add scintillator property table
 	G4MaterialPropertiesTable* scinPT = new G4MaterialPropertiesTable();
 	scinPT->AddProperty("RINDEX", scinPhotonEnergy, scinRefIndex, scinArrEntries);
-  scinPT->AddProperty("ABSLENGTH", scinPhotonEnergy, scinAbsLen, scinArrEntries);
-  scinPT->AddProperty("FASTCOMPONENT", scinPhotonEnergy, scinFastComp, scinArrEntries);
-  scinPT->AddProperty("SLOWCOMPONENT", scinPhotonEnergy, scinSlowComp, scinArrEntries);
-  scinPT->AddConstProperty("SCINTILLATIONYIELD", fScintillationYield);
-  scinPT->AddConstProperty("RESOLUTIONSCALE", 1);
-  scinPT->AddConstProperty("FASTTIMECONSTANT", fScinFastTime);
-  scinPT->AddConstProperty("SLOWTIMECONSTANT", fScinSlowTime);
-  scinPT->AddConstProperty("YIELDRATIO", 1);
-  ScinPlastic->SetMaterialPropertiesTable(scinPT);
+	scinPT->AddProperty("ABSLENGTH", scinPhotonEnergy, scinAbsLen, scinArrEntries);
+	scinPT->AddProperty("FASTCOMPONENT", scinPhotonEnergy, scinFastComp, scinArrEntries);
+	scinPT->AddProperty("SLOWCOMPONENT", scinPhotonEnergy, scinSlowComp, scinArrEntries);
+	scinPT->AddConstProperty("SCINTILLATIONYIELD", fScintillationYield);
+	scinPT->AddConstProperty("RESOLUTIONSCALE", 1);
+	scinPT->AddConstProperty("FASTTIMECONSTANT", fScinFastTime);
+	scinPT->AddConstProperty("SLOWTIMECONSTANT", fScinSlowTime);
+	scinPT->AddConstProperty("YIELDRATIO", 1);
+	ScinPlastic->SetMaterialPropertiesTable(scinPT);
 
-  // Add optical skin properties of scintillator (coating)
-  ScinOptSurf = new G4OpticalSurface("ScinOptSurf", glisur, ground, dielectric_metal, fExtrusionPolish);
+	// Add optical skin properties of scintillator (coating)
+	ScinOptSurf = new G4OpticalSurface("ScinOptSurf", glisur, ground, dielectric_metal, fExtrusionPolish);
 
-  G4MaterialPropertiesTable* scinOptSurfPT = new G4MaterialPropertiesTable();
-  scinOptSurfPT->AddProperty("REFLECTIVITY", scinPhotonEnergy, scinOptSurfRefIndex, scinArrEntries);
-  scinOptSurfPT->AddProperty("EFFICIENCY", scinPhotonEnergy, scinOptSurfEff, scinArrEntries);
-  ScinOptSurf->SetMaterialPropertiesTable(scinOptSurfPT);
+	G4MaterialPropertiesTable* scinOptSurfPT = new G4MaterialPropertiesTable();
+	scinOptSurfPT->AddProperty("REFLECTIVITY", scinPhotonEnergy, scinOptSurfRefIndex, scinArrEntries);
+	scinOptSurfPT->AddProperty("EFFICIENCY", scinPhotonEnergy, scinOptSurfEff, scinArrEntries);
+	ScinOptSurf->SetMaterialPropertiesTable(scinOptSurfPT);
 
-  // --------------------------------------------------------------------
+	// --------------------------------------------------------------------
 	// PMMA (for WLS fibers)
 	// --------------------------------------------------------------------
-  
+	
 
 	PMMA = new G4Material("PMMA", 1.190 * g/cm3, 3);
 	PMMA->AddElement(elC, 5);
@@ -429,17 +519,17 @@ Materials::CreateMaterials()
 	// Borosilicate glass "Pyrex" (for SiPM & PMT active surfaces)
 	// --------------------------------------------------------------------
 	/*
-    NOTE : The "face" is actually an ellipsoidal surface
-    The active area (photocathode) covers 90% of it.
-    The refractive index is the same as the dome
-    refractive index. The absorption length is set
-    so that no photons propagate through the
-    photocathode.
-  */
+		NOTE : The "face" is actually an ellipsoidal surface
+		The active area (photocathode) covers 90% of it.
+		The refractive index is the same as the dome
+		refractive index. The absorption length is set
+		so that no photons propagate through the
+		photocathode.
+	*/
 
-  // from PDG:
-  // 80% SiO2 + 13% B2O2 + 7% Na2O
-  // by fractional mass?
+	// from PDG:
+	// 80% SiO2 + 13% B2O2 + 7% Na2O
+	// by fractional mass?
 
 	Pyrex = new G4Material("Pyrex", 2.23 * g/cm3, 3);
 	Pyrex->AddMaterial(SiO2, 0.80);
@@ -461,23 +551,23 @@ Materials::CreateMaterials()
 	HDPE->AddElement(elC, 2);
 	HDPE->AddElement(elH, 4);
 
-	G4MaterialPropertiesTable* linerPT = new G4MaterialPropertiesTable();
-	linerPT->AddProperty("ABSLENGTH", waterPhotonEnergy, linerAbsLen, waterArrEntries);
-	HDPE->SetMaterialPropertiesTable(linerPT);
+	G4MaterialPropertiesTable* linerPT1 = new G4MaterialPropertiesTable();
+	linerPT1->AddProperty("ABSLENGTH", water1PhotonEnergy, linerAbsLen, water1ArrEntries);
+	HDPE->SetMaterialPropertiesTable(linerPT1);
 
 	// Liner optical surface properties
 	G4MaterialPropertiesTable* linerOpticalPT = new G4MaterialPropertiesTable();
 	linerOpticalPT->AddProperty("SPECULARLOBECONSTANT", specularLobePhotonEnergy, specularLobe, 3);
 	linerOpticalPT->AddProperty("SPECULARSPIKECONSTANT", specularLobePhotonEnergy, specularSpike, 3);
-	linerOpticalPT->AddProperty("REFLECTIVITY", waterPhotonEnergy, linerReflectivity, waterArrEntries);
-	linerOpticalPT->AddProperty("BACKSCATTERCONSTANT", waterPhotonEnergy, linerBackScatter, waterArrEntries);
-	linerOpticalPT->AddProperty("RINDEX", waterPhotonEnergy, linerRefIndex, waterArrEntries);
+	linerOpticalPT->AddProperty("REFLECTIVITY", water1PhotonEnergy, linerReflectivity, water1ArrEntries);
+	linerOpticalPT->AddProperty("BACKSCATTERCONSTANT", water1PhotonEnergy, linerBackScatter, water1ArrEntries);
+	linerOpticalPT->AddProperty("RINDEX", water1PhotonEnergy, linerRefIndex, water1ArrEntries);
 
-  LinerOptSurf =  new G4OpticalSurface("WallSurface");
-  LinerOptSurf->SetModel(unified);
-  LinerOptSurf->SetType(dielectric_metal);
-  LinerOptSurf->SetFinish(ground);
-  LinerOptSurf->SetSigmaAlpha(fSigmaAlpha);
-  LinerOptSurf->SetMaterialPropertiesTable(linerOpticalPT);
+	LinerOptSurf =  new G4OpticalSurface("WallSurface");
+	LinerOptSurf->SetModel(unified);
+	LinerOptSurf->SetType(dielectric_metal);
+	LinerOptSurf->SetFinish(ground);
+	LinerOptSurf->SetSigmaAlpha(fSigmaAlpha);
+	LinerOptSurf->SetMaterialPropertiesTable(linerOpticalPT);
 
 }
