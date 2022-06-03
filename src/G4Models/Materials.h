@@ -54,6 +54,7 @@ public:
 	static G4Material* HDPE;
 	static G4OpticalSurface* ScinOptSurf;
 	static G4OpticalSurface* LinerOptSurf;
+	static G4OpticalSurface* LinerOptSurf2;
 
 	const G4double* GetScinPhotonEnergyArray() const;
 	const G4double* GetScinRefIndexArray() const;

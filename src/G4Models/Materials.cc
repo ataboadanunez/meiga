@@ -178,10 +178,10 @@ static G4double linerReflectivity[] = {
 };
 
 // sigmaAlpha is used to model specular reflections from the surface
-static G4double fSigmaAlpha = 0.17;
+static G4double fSigmaAlpha = 0.17; // 0.23 in doi = 10.1364/OE.19.004199
 static G4double specularLobePhotonEnergy[] = {2.08*eV, 3.0*eV, 4.20*eV};
 // fraction of light reflected in a lobe with width characterized by sigmaAlpha
-static G4double specularLobe[] = {0.2, 0.2, 0.2};
+static G4double specularLobe[] = {0.2, 0.2, 0.2}; // same value in doi = 10.1364/OE.19.004199
 static G4double specularSpike[] = {0, 0, 0};
 
 
@@ -217,6 +217,7 @@ G4Material* Materials::Pyrex;
 G4Material* Materials::HDPE;
 G4OpticalSurface* Materials::ScinOptSurf;
 G4OpticalSurface* Materials::LinerOptSurf;
+G4OpticalSurface* Materials::LinerOptSurf2;
 
 Materials::Materials() 
 {
@@ -454,7 +455,7 @@ Materials::CreateMaterials()
 	Pyrex->SetMaterialPropertiesTable(pyrexPT);
 
 	// --------------------------------------------------------------------
-	// HDPE for WCD liner material
+	// HDPE for WCD liner material (Tyvek®)
 	// --------------------------------------------------------------------
 	// 
 	HDPE = new G4Material("HDPE", 0.94 * g/cm3, 2);
@@ -479,5 +480,13 @@ Materials::CreateMaterials()
   LinerOptSurf->SetFinish(ground);
   LinerOptSurf->SetSigmaAlpha(fSigmaAlpha);
   LinerOptSurf->SetMaterialPropertiesTable(linerOpticalPT);
+
+  // LAGO WCD parameters
+  LinerOptSurf2 =  new G4OpticalSurface("WallSurface");
+  LinerOptSurf2->SetType(dielectric_LUT);
+  LinerOptSurf2->SetFinish(groundtyvekair);
+  LinerOptSurf2->SetModel(LUT);
+
+  
 
 }
