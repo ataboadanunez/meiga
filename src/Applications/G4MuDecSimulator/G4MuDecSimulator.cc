@@ -311,14 +311,17 @@ G4MuDecSimulator::WriteEventInfo(Event& theEvent)
 			}
 
 			cout << endl;
-			// accessing signals for different particle components
 
+			// loop over particle components to access data
 			for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
 				
 				Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
 				// using currentParticle to get the component name. its ugly but should do the trick
+				
 				auto componentName = G4MuDecSimulator::currentParticle.GetComponentName(particleComponent);
+				
 				cout << "[INFO] G4MuDecSimulator::WriteEventInfo: Accessing signals of particle component " << componentName << " (" << particleComponent << ")" <<  endl;
+				
 				try 
 				{ 
 					const auto peTimeDistributionRangeComp = odSimData.PETimeDistributionRange(particleComponent);
@@ -327,15 +330,27 @@ G4MuDecSimulator::WriteEventInfo(Event& theEvent)
 						continue;
 					}
 
+
 					ofstream* fPEFile = new ofstream();
 					string outputfileName = "photoelectrons_"+std::to_string(detId)+"_PMT_"+std::to_string(odId)+"_"+std::to_string(particleComponent)+".dat";
 					fPEFile->open(outputfileName);
+
+					// loop over photo-electron time distributions of that particle component
 					for (auto peTime = peTimeDistributionRangeComp.begin(); peTime != peTimeDistributionRangeComp.end(); ++peTime) {
+						
+						// total number of photo-electrons
 						size_t npe = peTime->size();
-						(*fPEFile) << npe << " ";
+						//(*fPEFile) << npe << " ";
+
+						// photo-electron time iterator: dump PE arrival time
+						for (size_t peIt=0; peIt<npe; peIt++) {
+							(*fPEFile) << (*peTime).at(peIt) << " ";
+						}
+						// separate PE time distributions
+						(*fPEFile) << endl;
 					}
 					
-					(*fPEFile) << endl;
+					
 					cout << "[INFO] G4MuDecSimulator::WriteEventInfo: Signals of component " << componentName << " copied to file: " << outputfileName << endl;
 					fPEFile->close();
 				}
