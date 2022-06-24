@@ -25,7 +25,10 @@ ConfigManager::ReadConfiguration(string fConfigFile)
 	string fOutputFileName = tree.get<string>("OutputFile");
 	simData.SetOutputFileName(fOutputFileName);
 	string fDetectorList = tree.get<string>("DetectorList");
-	simData.SetDetectorList(fDetectorList);
+	simData.SetDetectorListFile(fDetectorList);
+	string fDetectorProperties = tree.get<string>("DetectorProperties");
+	simData.SetDetectorPropertiesFile(fDetectorProperties);
+
 	string fSimulationMode = tree.get<string>("SimulationMode");
 	SimData::SimulationMode simMode = simData.ModeConversion(fSimulationMode);
 	simData.SetSimulationMode(simMode);
@@ -83,6 +86,12 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 		}
 		
 		Detector& detector = theEvent.GetDetector(detId);
+		SimData& simData = theEvent.GetSimData();
+		string fPropertiesFile = simData.GetDetectorPropertiesFile();
+
+		// default detector properties
+		detector.SetDetectorProperties(detType, fPropertiesFile);
+
 		// set detector position
 		for (const auto &v : subtree.get_child("")) {
 			string label = v.first;
