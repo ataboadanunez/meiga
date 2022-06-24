@@ -43,7 +43,7 @@ Detector::Detector(const unsigned int id, DetectorType type) :
 	fDetectorId(id),
 	fType(type)
 {
-	SetDetectorProperties(type);
+	//SetDetectorProperties(type);
 }
 
 
