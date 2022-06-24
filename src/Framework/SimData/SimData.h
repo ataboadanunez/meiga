@@ -66,8 +66,8 @@ class SimData
 		void SetOutputFileName(const std::string name) { fOutputFileName = name; }
 		std::string GetOutputFileName() const { return fOutputFileName; }
 
-		void SetDetectorList(const std::string name) { fDetectorList = name; }
-		std::string GetDetectorList() const { return fDetectorList; }
+		void SetDetectorListFile(const std::string name) { fDetectorList = name; }
+		std::string GetDetectorListFile() const { return fDetectorList; }
 
 		void SetRenderName(const std::string name) { fRenderName = name; }
 		std::string GetRenderName() const { return fRenderName; }
@@ -77,6 +77,9 @@ class SimData
 
 		void SetVerbosity(const int verb) { fVerbosity = verb; }
 		int GetVerbosity() const { return fVerbosity; }
+
+		void SetDetectorPropertiesFile(const std::string file) { fDetectorProperties = file; }
+		std::string GetDetectorPropertiesFile() const { return fDetectorProperties; }
 
 		// getters and setters for ground dimensions
 		/*
@@ -121,6 +124,7 @@ class SimData
 		std::string fInputFileName;
 		std::string fOutputFileName;
 		std::string fDetectorList; 
+		std::string fDetectorProperties;
 		int fVerbosity = 0;
 
 		double fGroundLength;
