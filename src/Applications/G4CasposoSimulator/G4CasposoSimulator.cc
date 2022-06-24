@@ -114,7 +114,8 @@ G4CasposoSimulator::Initialize(Event& theEvent, string cfgFile)
 	SimData& simData = theEvent.GetSimData();
 	fInputFile = simData.GetInputFileName();
 	fOutputFile = simData.GetOutputFileName();
-	fDetectorList = simData.GetDetectorList();
+	fDetectorList = simData.GetDetectorListFile();
+	fDetectorProperties = simData.GetDetectorPropertiesFile();
 	fSimulationMode = simData.GetSimulationMode();
 	fInjectionMode  = simData.GetInjectionMode();
 	fGeoVisOn = simData.VisualizeGeometry();
@@ -124,7 +125,8 @@ G4CasposoSimulator::Initialize(Event& theEvent, string cfgFile)
 	cout << "[INFO] G4CasposoSimulator::Initialize: Using the following configuration:" << endl;
 	cout << "[INFO] InputFile = " << fInputFile << endl;
 	cout << "[INFO] OutputFile = " << fOutputFile << endl;
-	cout << "[INGO] DetectorList = " << fDetectorList << endl;
+	cout << "[INFO] DetectorList = " << fDetectorList << endl;
+	cout << "[INFO] DetectorProperties = " << fDetectorProperties << endl;
 	cout << "[INFO] SimulationMode = " << simData.GetSimulationModeName() << endl;
 	cout << "[INFO] InjectionMode = " << simData.GetInjectionModeName() << endl;
 	cout << "[INFO] VisualizeGeometry = " << (fGeoVisOn ? "yes" : "no") << endl;

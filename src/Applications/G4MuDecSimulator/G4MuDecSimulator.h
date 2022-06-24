@@ -39,6 +39,7 @@ class G4MuDecSimulator
     std::string fInputFile;
     std::string fOutputFile;
     std::string fDetectorList;
+    std::string fDetectorProperties;
     SimData::SimulationMode fSimulationMode;
     SimData::InjectionMode fInjectionMode;
 
