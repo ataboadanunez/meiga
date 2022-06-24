@@ -167,7 +167,7 @@ static G4double water2RefIndex[] = {
 		1.3568, 1.3572, 1.358,  1.3585, 1.359,  1.3595, 1.36,   1.3608
 	};
 
-G4double scaleAbsLen2 = 0.2*m;
+G4double scaleAbsLen2 = 1.0*m;
 static G4double water2AbsLen[] = {
 		3.448*scaleAbsLen2,  4.082*scaleAbsLen2,  6.329*scaleAbsLen2,  9.174*scaleAbsLen2,  12.346*scaleAbsLen2, 13.889*scaleAbsLen2,
 		15.152*scaleAbsLen2, 17.241*scaleAbsLen2, 18.868*scaleAbsLen2, 20.000*scaleAbsLen2, 26.316*scaleAbsLen2, 35.714*scaleAbsLen2,
@@ -418,9 +418,9 @@ Materials::CreateMaterials()
 	waterPT2->AddProperty("RINDEX", water2PhotonEnergy, water2RefIndex, water2ArrEntries);
 	waterPT2->AddProperty("ABSLENGTH", water2PhotonEnergy, water2AbsLen, water2ArrEntries);
 	waterPT2->AddProperty("MIEHG", water2PhotonEnergyMie, water2Mie, water2ArrEntries);
-  waterPT2->AddConstProperty("MIEHG_FORWARD", water2MieConst[0]);
-  waterPT2->AddConstProperty("MIEHG_BACKWARD", water2MieConst[1]);
-  waterPT2->AddConstProperty("MIEHG_FORWARD_RATIO", water2MieConst[2]);
+  	waterPT2->AddConstProperty("MIEHG_FORWARD", water2MieConst[0]);
+  	waterPT2->AddConstProperty("MIEHG_BACKWARD", water2MieConst[1]);
+  	waterPT2->AddConstProperty("MIEHG_FORWARD_RATIO", water2MieConst[2]);
 
 	// function to set waterPT from configuration file
 	Water->SetMaterialPropertiesTable(waterPT1);
