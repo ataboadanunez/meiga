@@ -283,6 +283,15 @@ G4MuDecSimulator::WriteEventInfo(Event& theEvent)
 {
 	cout << "[INFO] G4MuDecSimulator::WriteEventInfo" << endl;
 
+
+	// preparing tree, output file
+	boost::property_tree::ptree data;
+	
+
+	//fOutputFile
+
+
+
 	// for accessing Simulated Data at Detector/Event level
 	SimData& simData = theEvent.GetSimData();
 	cout << "[INFO] G4MuDecSimulator::WriteEventInfo: Accessing DetectorSimData" << endl;
@@ -314,6 +323,9 @@ G4MuDecSimulator::WriteEventInfo(Event& theEvent)
 
 			cout << endl;
 
+			// ptree to store pulses for that particle componet
+			boost::property_tree::ptree componentTree;
+
 			// loop over particle components to access data
 			for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
 				
@@ -321,14 +333,14 @@ G4MuDecSimulator::WriteEventInfo(Event& theEvent)
 				// using currentParticle to get the component name. its ugly but should do the trick
 				
 				auto componentName = G4MuDecSimulator::currentParticle.GetComponentName(particleComponent);
-				
+
 				cout << "[INFO] G4MuDecSimulator::WriteEventInfo: Accessing signals of particle component " << componentName << " (" << particleComponent << ")" <<  endl;
 				
 				try 
 				{ 
 					const auto peTimeDistributionRangeComp = odSimData.PETimeDistributionRange(particleComponent);
 					if (!peTimeDistributionRange) {
-						cerr << "[INFO] No time distribution for particle component " << componentName << endl;
+						cout << "[INFO] No time distribution for particle component " << componentName << endl;
 						continue;
 					}
 
@@ -336,35 +348,58 @@ G4MuDecSimulator::WriteEventInfo(Event& theEvent)
 					ofstream* fPEFile = new ofstream();
 					string outputfileName = "photoelectrons_"+std::to_string(detId)+"_PMT_"+std::to_string(odId)+"_"+std::to_string(particleComponent)+".dat";
 					fPEFile->open(outputfileName);
+					boost::property_tree::ptree pulses;
 
 					// loop over photo-electron time distributions of that particle component
 					for (auto peTime = peTimeDistributionRangeComp.begin(); peTime != peTimeDistributionRangeComp.end(); ++peTime) {
 						
+						// ptree for that photo-electron time distribution (pulse)
+						boost::property_tree::ptree pulse;
+
 						// total number of photo-electrons
 						size_t npe = peTime->size();
 						//(*fPEFile) << npe << " ";
-
 						// photo-electron time iterator: dump PE arrival time
 						for (size_t peIt=0; peIt<npe; peIt++) {
+							
+							double pet = (*peTime).at(peIt);
+							boost::property_tree::ptree child;
+							child.put<double>("", pet);
+							pulse.push_back(std::make_pair("", child));
+
 							(*fPEFile) << (*peTime).at(peIt) << " ";
+
 						}
+
+						//pulsesTree.add_child("", pulse);
+
 						// separate PE time distributions
 						(*fPEFile) << endl;
+
+						// store pulse in the ptree of that component
+						//peTimeDistribution.push_back(std::make_pair("signal_component_"+std::to_string(particleComponent), pulse));
+
+						pulses.add_child("pulses", pulse);
+
 					}
 					
-					
+					componentTree.put_child("component_"+std::to_string(particleComponent), pulses);
+
 					cout << "[INFO] G4MuDecSimulator::WriteEventInfo: Signals of component " << componentName << " copied to file: " << outputfileName << endl;
 					fPEFile->close();
+
+
 				}
 				catch (std::out_of_range &e)
 				{
 					cerr << "[INFO] No time distribution for particle component " << componentName << "! (Exception: " << e.what() << " )." << endl;
 				}
 				
-				
+				data.put_child("signals_pmt_"+std::to_string(odId), componentTree);
 			
 			}
 
+			write_json(fOutputFile, data);
 
 		}
 
