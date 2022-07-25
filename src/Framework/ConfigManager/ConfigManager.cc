@@ -88,14 +88,12 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 		Detector& detector = theEvent.GetDetector(detId);
 		SimData& simData = theEvent.GetSimData();
 		string fPropertiesFile = simData.GetDetectorPropertiesFile();
-
 		// default detector properties
-		detector.SetDetectorProperties(detType, fPropertiesFile);
-
+		detector.SetDefaultProperties(fPropertiesFile);
+		
 		// set detector position
 		for (const auto &v : subtree.get_child("")) {
 			string label = v.first;
-			
 
 			if ( label != "<xmlattr>" ) {
 				if ((label == "x") || (label == "y") || (label == "z")) {
@@ -119,7 +117,7 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 		detector.SetDetectorPosition(detPosition);
 
 		// search for another detector properties in the DetectorList.xml
-		detector.SetDetectorProperties(detType, fDetectorList);
+		detector.SetDetectorProperties(/*detType,*/ subtree);
 	}
 
 

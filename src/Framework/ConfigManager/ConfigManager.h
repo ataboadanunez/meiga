@@ -23,14 +23,16 @@ class ConfigManager
 
 	public:
 
-		ConfigManager() { }
+		ConfigManager() {
+			//TODO: Mapa que entre por detectorType y entregue una clase con las propiedades por defecto
+		}
 		~ConfigManager() { }
 
 		static Event ReadConfiguration(std::string filename);
 		static void ReadDetectorList(std::string filename, Event& theEvent);
 
-
+	private:
+		// static void ActuallyReadDetectorXML(std::string filename, Event& theEvent);
 };
-
 
 #endif
