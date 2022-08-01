@@ -114,26 +114,50 @@ Detector::SetDefaultProperties(const string file)
 		if (name != "detector")
 			continue;
 
-		SetDetectorProperties(subtree);
+		//SetDetectorProperties(subtree);
 	}	
 }
 
 void
-Detector::SetDetectorProperties(/*const DetectorType type,*/ const ptree &tree)
+Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 {
-	// set default values for different detector types
-	// read XML with detector parameters
-	// NOTE: there should be a better way to implement 
-	// the detector configuration, for example writing a function
-	// that gets the specific tag of the XML for the desired parameter
-	// e.g., SetRadius() { fRadius = GetData("tankRadius"); }
+	
+
+	/*	setting the default property values in the Detector:
+			these values are load from the DetectorProperties.xml
+			in Framework/ConfigManager/DefaultProperties.cc 
+	*/
+	SetTankRadius(defProp.gTankRadius);
+	SetTankHeight(defProp.gTankHeight);
+	SetTankThickness(defProp.gTankThickness);
+
+	SetNBars(defProp.gNumberOfBars);
+	SetBarWidth(defProp.gBarWidth);
+	SetBarLength(defProp.gBarLength);
+	SetBarThickness(defProp.gBarThickness);
+	SetBarCoatingThickness(defProp.gCoatingThickness);
+	SetCasingThickness(defProp.gCasingThickness);
+	SetFiberLength(defProp.gFiberLength);
+	SetFiberRadius(defProp.gFiberRadius);
+	SetCladdingThickness(defProp.gCladdingThickness);
+
+	/*
+		Now that the default properties are set, look for a property
+		in the DetectorList.xml and override in case of exist. 
+	*/
+
+	double var = tree.get<double>("barsInPanel", defProp.gNumberOfBars);
+	cout << "[DEBUG] Detector::SetDetectorProperties: Number of bars = " << var << endl;
+
+
 
 	for (const auto& v : tree.get_child("")) {
 		string xmlLabel = v.first;
+
 		if (xmlLabel != "<xmlattr>") {
 			string xmlValue = v.second.data();
 			// loop over XML tags to set the corresponding value
-
+			cout << "[DEBUG] xmlLabel = " << xmlLabel << endl;
 			// WCD parameters
 			if (xmlLabel == "tankRadius") {
 				double value = stod(xmlValue);

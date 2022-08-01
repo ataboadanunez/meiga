@@ -7,9 +7,11 @@
 using boost::property_tree::ptree;
 using namespace std;
 
+/** Static class member definition **/
+DefaultProperties ConfigManager::defProp;
 
 Event
-ConfigManager::ReadConfiguration(string fConfigFile)
+ConfigManager::ReadConfiguration(const string &fConfigFile)
 {
 	
 	Event theEvent;
@@ -28,7 +30,8 @@ ConfigManager::ReadConfiguration(string fConfigFile)
 	simData.SetDetectorListFile(fDetectorList);
 	string fDetectorProperties = tree.get<string>("DetectorProperties");
 	simData.SetDetectorPropertiesFile(fDetectorProperties);
-
+	// here the detector default properties (from DetectorProperties.xml) are set
+	defProp.SetDefaultProperties(fDetectorProperties);
 	string fSimulationMode = tree.get<string>("SimulationMode");
 	SimData::SimulationMode simMode = simData.ModeConversion(fSimulationMode);
 	simData.SetSimulationMode(simMode);
@@ -51,7 +54,7 @@ ConfigManager::ReadConfiguration(string fConfigFile)
 }
 
 void
-ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
+ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 {
 	
 	// used to determine maximum value of Z coordinate of current detectors in file
@@ -89,7 +92,8 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 		SimData& simData = theEvent.GetSimData();
 		string fPropertiesFile = simData.GetDetectorPropertiesFile();
 		// default detector properties
-		detector.SetDefaultProperties(fPropertiesFile);
+		// esta desaparece.
+		//detector.SetDefaultProperties(fPropertiesFile);
 		
 		// set detector position
 		for (const auto &v : subtree.get_child("")) {
@@ -117,7 +121,7 @@ ConfigManager::ReadDetectorList(string fDetectorList, Event& theEvent)
 		detector.SetDetectorPosition(detPosition);
 
 		// search for another detector properties in the DetectorList.xml
-		detector.SetDetectorProperties(/*detType,*/ subtree);
+		detector.SetDetectorProperties(subtree, defProp);
 	}
 
 

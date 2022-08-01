@@ -5,6 +5,7 @@
 #include "Event.h"
 #include "SimData.h"
 #include "Detector.h"
+#include "DefaultProperties.h"
 
 // c++ headers
 #include <map>
@@ -28,11 +29,12 @@ class ConfigManager
 		}
 		~ConfigManager() { }
 
-		static Event ReadConfiguration(std::string filename);
-		static void ReadDetectorList(std::string filename, Event& theEvent);
+		static Event ReadConfiguration(const std::string &filename);
+		static void ReadDetectorList(const std::string &filename, Event& theEvent);
 
 	private:
 		// static void ActuallyReadDetectorXML(std::string filename, Event& theEvent);
+		static DefaultProperties defProp;
 };
 
 #endif

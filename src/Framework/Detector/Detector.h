@@ -2,6 +2,8 @@
 #define Detector_h
 
 #include "OptDevice.h"
+#include "DefaultProperties.h"
+
 #include "G4SystemOfUnits.hh"
 #include "G4LogicalVolume.hh"
 
@@ -59,8 +61,8 @@ class Detector
 		void SetCasingThickness(double casingThickness) { fCasingThickness = casingThickness; }
 
 		// scintillator-type detector properties
-		int GetNBars() const { return fNBars; }
-		void SetNBars(int nBars) { fNBars = nBars; }
+		int GetNBars() const { return fNumberOfBars; }
+		void SetNBars(int nBars) { fNumberOfBars = nBars; }
 
 		double GetBarLength() const { return fBarLength; }
 		void SetBarLength(double barLength) { fBarLength = barLength; }
@@ -114,13 +116,12 @@ class Detector
 
 		DetectorType StringToType(const std::string name);
 		void SetDefaultProperties(const std::string file);
-		void SetDetectorProperties(/*const DetectorType type,*/ const boost::property_tree::ptree &det);
+		void SetDetectorProperties(const boost::property_tree::ptree &det, DefaultProperties &defProp);
 		//std::map<std::string, DetectorType> conversion;
 	private:
 
 		int fDetectorId = 0;
 		DetectorType fType;
-		int fNBars = 0;
 		int fNOptDevices = 0;
 
 		// 
@@ -133,6 +134,7 @@ class Detector
 		double fFiberRadius;
 		double fCladdingThickness;
 		double fCoatingThickness;
+		int    fNumberOfBars;
 
 		double fTankHeight;
 		double fTankRadius;
