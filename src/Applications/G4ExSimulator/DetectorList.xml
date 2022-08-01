@@ -1,13 +1,19 @@
 <?xml version='1.0' encoding='ISO-8859-1'?>
 
-<detectorList xmlns="http://tempuri.org/po.xsd" orderDate="1999-10-20">
+<detectorList>
 	
 	<detector id="0" type="eScintillator">
 		<x unit="cm"> 0.0 </x>
 		<y unit="cm"> 0.0 </y>
-		<z unit="cm"> 0.0 </z>
+		<z unit="cm"> 200.0 </z>
 		<barsInPanel> 1 </barsInPanel>
 	</detector>
 
+<detector id="1" type="eWCD">
+		<x unit="cm"> 0.0 </x>
+		<y unit="cm"> 0.0 </y>
+		<z unit="cm"> 0.0 </z>
+		<tankHeight unit="cm"> 100 </tankHeight>
+	</detector>
 
 </detectorList>

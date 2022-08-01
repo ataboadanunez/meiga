@@ -1,26 +1,23 @@
 <?xml version='1.0' encoding='ISO-8859-1'?>
 <!-- default detector properties -->
-<detectorList xmlns="http://tempuri.org/po.xsd" orderDate="1999-10-20">
+<detectorProperties>
 	
-	<detector type="eWCD">
-		<tankRadius unit="cm"> 105 </tankRadius>
-		<tankHeight unit="cm"> 90 </tankHeight>
-		<tankThickness unit="mm"> 12 </tankThickness> 
-	</detector>
+	
+	<tankRadius unit="cm"> 105 </tankRadius>
+	<tankHeight unit="cm"> 90 </tankHeight>
+	<tankThickness unit="mm"> 12 </tankThickness> 
 
-	<detector type="eScintillator">
-		<barsInPanel> 12 </barsInPanel>
-		<barLength unit="mm"> 500 </barLength>
-		<barWidth unit="mm"> 40 </barWidth> 
-		<barThickness unit="mm"> 10 </barThickness>
-		<coatingThickness unit="mm"> 0.25 </coatingThickness>
-		<casingThickness unit="mm"> 2 </casingThickness>
-		<fiberLength unit="mm"> 500 </fiberLength>
-		<fiberRadius unit="mm"> 1.2 </fiberRadius>
-		<claddingThickness unit="mm"> 0.10 </claddingThickness>
-	</detector>
+	<barsInPanel> 12 </barsInPanel>
+	<barLength unit="mm"> 500 </barLength>
+	<barWidth unit="mm"> 40 </barWidth> 
+	<barThickness unit="mm"> 10 </barThickness>
+	<coatingThickness unit="mm"> 0.25 </coatingThickness>
+	<casingThickness unit="mm"> 2 </casingThickness>
+	<fiberLength unit="mm"> 500 </fiberLength>
+	<fiberRadius unit="mm"> 1.2 </fiberRadius>
+	<claddingThickness unit="mm"> 0.10 </claddingThickness>
 
 
 
 
-</detectorList>
+</detectorProperties>
