@@ -2,8 +2,14 @@
 #define DataWriter_h_1
 
 #include "Event.h"
-#include <string>
 
-// start with AsciiWriter function
+class DataWriter {
+	
+	public:
+		DataWriter();
+		virtual ~DataWriter();
+
+		static void FileWriter(Event& theEvent);
+};
 
 #endif
