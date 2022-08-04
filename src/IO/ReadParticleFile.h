@@ -16,11 +16,11 @@ class Event;
 
 class ReadParticleFile 
 {
-  public:
-	  ReadParticleFile();
-	  virtual ~ReadParticleFile();
+	public:
+		ReadParticleFile();
+		virtual ~ReadParticleFile();
 
-    static void EventFileReader(const std::string &fileName, Event& theEvent);
+		static void ParticleFileReader(const std::string &fileName, Event& theEvent);
 
 
 

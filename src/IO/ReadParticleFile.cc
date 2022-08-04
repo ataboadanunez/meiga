@@ -24,7 +24,7 @@ ReadParticleFile::~ReadParticleFile()
 }
 
 void
-ReadParticleFile::EventFileReader(const std::string &fileName, Event& theEvent)
+ReadParticleFile::ParticleFileReader(const std::string &fileName, Event& theEvent)
 {
   /*
   This function gets as input a file with particle information.
