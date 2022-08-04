@@ -47,7 +47,7 @@ class Detector
 		Detector(const unsigned int id, const DetectorType type);
 		virtual ~Detector() { }
 
-		int GetId() const { return fDetectorId; }
+		unsigned int GetId() const { return fDetectorId; }
 		void SetId(int id) { fDetectorId = id; }
 
 		DetectorType GetType() const { return fType; }
@@ -120,7 +120,7 @@ class Detector
 		//std::map<std::string, DetectorType> conversion;
 	private:
 
-		int fDetectorId = 0;
+		unsigned int fDetectorId = 0;
 		DetectorType fType;
 		int fNOptDevices = 0;
 
