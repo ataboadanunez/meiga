@@ -20,7 +20,7 @@ ConfigManager::ReadConfiguration(const string &fConfigFile)
 
 	// reads the input file and fills the Event with particles
 	string fInputFileName = tree.get<string>("InputFile");
-	ReadParticleFile::EventFileReader(fInputFileName, theEvent);
+	ReadParticleFile::ParticleFileReader(fInputFileName, theEvent);
 
 	SimData& simData = theEvent.GetSimData();
 	simData.SetInputFileName(fInputFileName);
