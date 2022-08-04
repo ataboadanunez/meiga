@@ -49,7 +49,8 @@ class OptDeviceSimData
 		// this function needs to be generalized for each type of optical device
 		std::vector<double> CalculatePulse(const double fBinSize, const std::vector<double>& peTime, const double pulseLenght = 500.);
 		
-		bool HasPETimeDistribution(Particle::Component comp) const { return !particleCompMap.at(comp).empty(); }
+		// bool HasPETimeDistribution(Particle::Component comp) const { return !particleCompMap.at(comp).empty(); }
+		bool HasPETimeDistribution(Particle::Component comp) const { return particleCompMap.count(comp); }
 		bool HasPETimeDistribution(Particle::Type type) const { return !particleTypeMap.at(type).empty(); }
 	private:
 
