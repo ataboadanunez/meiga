@@ -25,12 +25,12 @@ class DetectorSimData
 		DetectorSimData(const unsigned int id) : fId(id) { }
 		virtual ~DetectorSimData() { }
 
-		unsigned int GetModuleId() const { return fId; }
 
-		// SiPMSimData calls from Detector
+		// OptDeviceSimData calls from Detector
 		void MakeOptDeviceSimData(unsigned int id);
 		OptDeviceSimData& GetOptDeviceSimData() { return fOptDeviceSimData; }
 		OptDeviceSimData& GetOptDeviceSimData(unsigned int id) { return fOptDeviceSimMap[id]; }
+		bool HasOptDeviceSimData(unsigned int id) { return fOptDeviceSimMap.count(id) != 0; }
 
 		std::set<uint64_t>& GetMuonDecayID() { return fMuonDecayID; }
 		const std::set<uint64_t>& GetMuonDecayID() const { return fMuonDecayID; }
@@ -38,14 +38,21 @@ class DetectorSimData
 		std::map<uint64_t, std::vector<uint64_t>>& GetPhotoElectronParentID() { return fPEParentID; }
 		const std::map<uint64_t, std::vector<uint64_t>>& GetPhotoElectronParentID() const { return fPEParentID; }
 
+		void SetEnergyDeposit(const double eDep);
+		std::vector<double> GetEnergyDeposit() { return fEnergyDeposit; }
+
 	private:
 
 		int fId = 0;
 		OptDeviceSimData fOptDeviceSimData;
 		std::map<int, OptDeviceSimData> fOptDeviceSimMap;
 
+		// specific holders for muon decay analysis
 		std::set<uint64_t> fMuonDecayID;
 		std::map<uint64_t, std::vector<uint64_t> > fPEParentID;
+
+		// data holders at detector level
+		std::vector<double> fEnergyDeposit;
 };
 
 #endif
