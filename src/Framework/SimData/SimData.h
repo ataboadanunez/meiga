@@ -101,7 +101,7 @@ class SimData
 		void MakeDetectorSimData(unsigned int id);
 		DetectorSimData& GetDetectorSimData() { return fDetectorSimData; }
 		DetectorSimData& GetDetectorSimData(unsigned int id) { return fDetectorSimDataMap[id]; }
-		
+		bool HasDetectorSimData(unsigned int id) const { return fDetectorSimDataMap.count(id) != 0; }
 
 	private:
 
