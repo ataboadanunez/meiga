@@ -2,7 +2,9 @@
 
 #include "WCD.h"
 #include "Geometry.h"
+#include "G4MDetectorAction.h"
 #include "G4MPMTAction.h"
+
 
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
@@ -107,9 +109,9 @@ WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEve
 	physSide = new G4PVPlacement(nullptr, G4ThreeVector(fTankPosX, fTankPosY, fTankPosZ + fTankHalfHeight + fTankThickness), logSide, "physSide", logMother, false, 0, fCheckOVerlaps);
 
 	// tank liner surface
-	new G4LogicalBorderSurface("TopSurface", physTank, physTop, Materials().LinerOptSurf2);
-	new G4LogicalBorderSurface("BotSurface", physTank, physBot, Materials().LinerOptSurf2);
-	new G4LogicalBorderSurface("SideSurface", physTank, physSide, Materials().LinerOptSurf2);
+	new G4LogicalBorderSurface("TopSurface", physTank, physTop, Materials().LinerOptSurf);
+	new G4LogicalBorderSurface("BotSurface", physTank, physBot, Materials().LinerOptSurf);
+	new G4LogicalBorderSurface("SideSurface", physTank, physSide, Materials().LinerOptSurf);
 
 	// PMT
 	string logName = "logPMT_"+to_string(pmtId);
@@ -134,5 +136,11 @@ WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEve
 	G4MPMTAction* const pmtSD = new G4MPMTAction(fullName.str().c_str(), detectorId, pmtId, theEvent);
 	sdMan->AddNewDetector(pmtSD);
 	logPMT->SetSensitiveDetector(pmtSD);
+
+
+	// register water volume as sensitive detector
+	G4MDetectorAction* const waterSD = new G4MDetectorAction("physTank", detectorId, theEvent);
+	sdMan->AddNewDetector(waterSD);
+	logTank->SetSensitiveDetector(waterSD);
 	
 }
