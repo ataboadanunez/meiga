@@ -8,55 +8,88 @@
 #include <string>
 
 /**
-  MuSim Event Class
+	MuSim Event Class
 
-  This class is intended to store methods and variables
-  that will be handled during the simulation / reconstruction
-  processes. 
+	This class is intended to store methods and variables
+	that will be handled during the simulation / reconstruction
+	processes. 
 
-  todo: Description about "event" concept.
+	todo: Description about "event" concept.
 
-  author: Alvaro Taboada
-  date: 16 June 2021
+	author: Alvaro Taboada
+	date: 16 June 2021
 
-  $Id:$
+	$Id:$
 */
 
 
 class Event 
 {
-  public:
-    
-    Event();
-    virtual ~Event();
 
-    // interface to fwk/SimData
-    SimData& GetSimData() { return fSimData; }
+	public:
+		
+		Event();
+		virtual ~Event();
 
-    // interface to fwk/Detector
-    Detector& GetDetector() { return fDetector; }
-    Detector& GetDetector(unsigned int id) { return fDetectorMap[id]; }
-    bool HasDetector(unsigned int id);
-    void MakeDetector(unsigned int id);
-    void MakeDetector(unsigned int id, Detector::DetectorType type);
+		// interface to fwk/SimData
+		SimData& GetSimData() { return fSimData; }
 
-    int GetNDetectors() {return fNDetectors; }
+		// interface to fwk/Detector
+		Detector& GetDetector() { return fDetector; }
+		Detector& GetDetector(unsigned int id) { return fDetectorMap[id]; }
+		bool HasDetector(unsigned int id);
+		void MakeDetector(unsigned int id);
+		void MakeDetector(unsigned int id, Detector::DetectorType type);
+
+		int GetNDetectors() {return fNDetectors; }
 
 #warning "move to DetectorSimData!"
-    void SetMaximumHeight(double maxH) { fMaximumHeight = maxH; }
-    double GetMaximumHeight() { return fMaximumHeight; }
-    
-    std::map<int, Detector>& DetectorRange() { return fDetectorMap; }
-    const std::map<int, Detector>& DetectorRange() const { return fDetectorMap; }
+		void SetMaximumHeight(double maxH) { fMaximumHeight = maxH; }
+		double GetMaximumHeight() { return fMaximumHeight; }
+		
+		std::map<int, Detector>& DetectorRange() { return fDetectorMap; }
+		const std::map<int, Detector>& DetectorRange() const { return fDetectorMap; }
 
-  private:
+		struct Config {
+	
+		// program configuration variables
 
-    SimData fSimData;
-    Detector fDetector;
+		// input variables
+		std::string fInputFileName;
+		std::string fDetectorList;
+		std::string fDetectorProperties;
 
-    std::map<int, Detector> fDetectorMap;
-    int fNDetectors = 0;
-    double fMaximumHeight;
+		// simulation variables
+		std::string fSimulationMode;
+		std::string fInjectionMode;
+		bool fGeoVis;
+		bool fTrajVis;
+		std::string fRenderFile;
+		std::string fPhysicsListName;
+		int fVerbosity;
+
+		// output variables
+		std::string fOutputFileName;
+		// add more stuff below in case is needed
+
+
+		};
+
+		Config& GetConfig() { return cfg; }
+		const Config& GetConfig() const { return cfg; }
+		void SetConfig(const Event::Config &ncfg) { cfg = ncfg; }
+
+	private:
+
+		Config cfg;
+		SimData fSimData;
+		Detector fDetector;
+
+		std::map<int, Detector> fDetectorMap;
+		int fNDetectors = 0;
+		double fMaximumHeight;
+
+
 };
 
 
