@@ -11,10 +11,11 @@ using namespace std;
 DefaultProperties ConfigManager::defProp;
 
 Event
-ConfigManager::ReadConfiguration(const string &fConfigFile)
+ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 {
 	
 	Event theEvent;
+	Event::Config &cfg = theEvent.GetConfig();
 	ptree tree;
 	read_json(fConfigFile, tree);
 
@@ -22,6 +23,24 @@ ConfigManager::ReadConfiguration(const string &fConfigFile)
 	string fInputFileName = tree.get<string>("InputFile");
 	ReadParticleFile::ParticleFileReader(fInputFileName, theEvent);
 
+	// SetConfiguration(theEvent, tree);
+
+	cfg.fInputFileName = tree.get<string>("InputFile");
+	cfg.fDetectorList  = tree.get<string>("DetectorList");
+	cfg.fDetectorProperties = tree.get<string>("DetectorProperties");
+
+	cfg.fSimulationMode = tree.get<string>("SimulationMode");
+	cfg.fInjectionMode  = tree.get<string>("InjectionMode");
+	cfg.fGeoVis  = tree.get<bool>("GeoVisOn");
+	cfg.fTrajVis = tree.get<bool>("TrajVisOn");
+	cfg.fRenderFile = tree.get<string>("RenderFile");
+	cfg.fPhysicsListName = tree.get<string>("PhysicsName");
+	cfg.fVerbosity = tree.get<int>("Verbosity");
+
+	cfg.fOutputFileName = tree.get<string>("OutputFile");
+
+
+	// hasta ahora
 	SimData& simData = theEvent.GetSimData();
 	simData.SetInputFileName(fInputFileName);
 	string fOutputFileName = tree.get<string>("OutputFile");
@@ -91,9 +110,6 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 		Detector& detector = theEvent.GetDetector(detId);
 		SimData& simData = theEvent.GetSimData();
 		string fPropertiesFile = simData.GetDetectorPropertiesFile();
-		// default detector properties
-		// esta desaparece.
-		//detector.SetDefaultProperties(fPropertiesFile);
 		
 		// set detector position
 		for (const auto &v : subtree.get_child("")) {
@@ -124,5 +140,12 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 		detector.SetDetectorProperties(subtree, defProp);
 	}
 
+}
+
+void
+ConfigManager::SetConfiguration(Event &theEvent, ptree &tree)
+{
+
+	
 
 }
