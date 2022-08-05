@@ -108,7 +108,7 @@ G4ExSimulator::Initialize(Event& theEvent, string cfgFile)
 
 	// Fill Event object from configuration file
 	// Read Simulation configuration
-	theEvent = ConfigManager::ReadConfiguration(cfgFile);
+	theEvent = ConfigManager::ReadConfigurationFile(cfgFile);
 	// get simulation simulation settings
 	SimData& simData = theEvent.GetSimData();
 	fInputFile = simData.GetInputFileName();
