@@ -37,6 +37,7 @@ DataWriter::FileWriter(Event& theEvent)
 	// prepare json data holder
 	json jData;
 	json jEnergyDeposit;
+	json jEnergyDepositComponent;
 	// loop over detector range
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 
@@ -53,8 +54,25 @@ DataWriter::FileWriter(Event& theEvent)
 
 		/* at this level one could access energy deposit, particle counters, etc... and this should be managed by a configuration
 		*/
-		std::vector<double> energyDeposit = detSimData.GetEnergyDeposit();
+		vector<double> energyDeposit = detSimData.GetEnergyDeposit();
 		jEnergyDeposit["EnergyDeposit"] = energyDeposit;
+
+		for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
+
+				Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
+				string componentName = aParticle.GetComponentName(particleComponent);
+
+				if (!detSimData.HasEnergyDeposit(particleComponent)) {
+					cout << "[INFO] DataWriter::FileWriter: Detector " << detId << " has no energy deposits of component " << componentName << endl;
+					continue;
+				}
+
+				vector<double> energyDepositComponent = detSimData.GetEnergyDeposit(particleComponent);
+
+				jEnergyDepositComponent[componentName] = energyDepositComponent;
+
+			} // end loop particle components
+
 
 		const int nOptDev = currDet.GetNOptDevice();
 		cout << "[INFO] DataWriter::FileWriter: Detector ID: " << detId << " has " << nOptDev << " optical device(s)" << endl; 
@@ -108,6 +126,7 @@ DataWriter::FileWriter(Event& theEvent)
 		} // end loop over optical devices
 
 		jData["Detector_"+to_string(detId)]["DetectorSimData"] = jEnergyDeposit;
+		jData["Detector_"+to_string(detId)]["DetectorSimData"]["EnergyDeposit_components"] = jEnergyDepositComponent;
 
 	} // end loop over detectors
 

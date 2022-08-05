@@ -12,3 +12,10 @@ DetectorSimData::SetEnergyDeposit(const double eDep)
 {
 	fEnergyDeposit.push_back(eDep);
 }
+
+void
+DetectorSimData::SetEnergyDeposit(Particle::Component comp, const double eDep)
+{
+	auto it = fEDepComponentMap.emplace(std::make_pair(comp, double()));
+	it.first->second.push_back(eDep);
+}

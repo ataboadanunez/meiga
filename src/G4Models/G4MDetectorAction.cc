@@ -32,12 +32,16 @@ void
 G4MDetectorAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 {
 
-	//cout << "[DEBUG] G4Models::G4MDetectorAction: End of event" << endl;
+	
 	DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData(fDetectorId);
+	// get current particle in the event
+	Particle currentParticle = fEvent.GetSimData().GetCurrentParticle();
+	int partId = currentParticle.GetParticleId();
+	Particle::Type particleType = Corsika::CorsikaToPDG(partId);
+	Particle::Component particleComp = currentParticle.GetComponent(particleType);
 
-	fEdep /= CLHEP::MeV;
-	cout << "[DEBUG] G4Models::G4MDetectorAction: Energy deposit = " << fEdep << endl;
 	detSimData.SetEnergyDeposit(fEdep);
+	detSimData.SetEnergyDeposit(particleComp, fEdep);
 
 }
 

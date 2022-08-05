@@ -40,6 +40,14 @@ class DetectorSimData
 
 		void SetEnergyDeposit(const double eDep);
 		std::vector<double> GetEnergyDeposit() { return fEnergyDeposit; }
+		// energy deposit for particle component
+		void SetEnergyDeposit(Particle::Component comp, const double eDep);
+		std::vector<double> GetEnergyDeposit(Particle::Component comp) { return fEDepComponentMap.at(comp); } 
+		// a Has method is needed before requesting information to the map
+		bool HasEnergyDeposit(Particle::Component comp) { return fEDepComponentMap.count(comp) != 0; }
+
+
+
 
 	private:
 
@@ -53,6 +61,7 @@ class DetectorSimData
 
 		// data holders at detector level
 		std::vector<double> fEnergyDeposit;
+		std::map<Particle::Component, std::vector<double>> fEDepComponentMap;
 };
 
 #endif
