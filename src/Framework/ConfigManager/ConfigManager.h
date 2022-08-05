@@ -29,11 +29,12 @@ class ConfigManager
 		}
 		~ConfigManager() { }
 
-		static Event ReadConfiguration(const std::string &filename);
+		static Event ReadConfigurationFile(const std::string &filename);
 		static void ReadDetectorList(const std::string &filename, Event& theEvent);
 
 	private:
 		// static void ActuallyReadDetectorXML(std::string filename, Event& theEvent);
+		void SetConfiguration(Event &theEvent, boost::property_tree::ptree &tree);
 		static DefaultProperties defProp;
 };
 
