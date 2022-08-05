@@ -34,24 +34,28 @@ class OptDeviceSimData
 		void AddPhotonEnergy(const double energy);
 		std::vector<double> GetPhotonEnergy() { return fPhotonEnergy; }
 
-		// general
+		// photo-electron time distribution
 		void AddPETimeDistribution(std::vector<double>* peTimeDist);
 		std::vector<std::vector<double>*>* PETimeDistributionRange() { return fPETimeDistribution; }
+		
 		// for particle types
 		void AddPETimeDistribution(Particle::Type type, const std::vector<double>& peTimeDist);
 		const std::vector<std::vector<double>>& PETimeDistributionRange(Particle::Type type) { return particleTypeMap.at(type); }
+		bool HasPETimeDistribution(Particle::Type type) const { return !particleTypeMap.count(type); }
 
 		// for particle components
 		void AddPETimeDistribution(Particle::Component comp, const std::vector<double>& peTimeDist);
 		const std::vector<std::vector<double>>& PETimeDistributionRange(Particle::Component comp) { return particleCompMap.at(comp); }
+		bool HasPETimeDistribution(Particle::Component comp) const { return particleCompMap.count(comp); }
+		
+
+		// charge (number of photo-electrons) holders needed
+
 
 		// for SiPM pulse calculation.
 		// this function needs to be generalized for each type of optical device
 		std::vector<double> CalculatePulse(const double fBinSize, const std::vector<double>& peTime, const double pulseLenght = 500.);
-		
-		// bool HasPETimeDistribution(Particle::Component comp) const { return !particleCompMap.at(comp).empty(); }
-		bool HasPETimeDistribution(Particle::Component comp) const { return particleCompMap.count(comp); }
-		bool HasPETimeDistribution(Particle::Type type) const { return !particleTypeMap.at(type).empty(); }
+
 	private:
 
 		int fId = 0;
