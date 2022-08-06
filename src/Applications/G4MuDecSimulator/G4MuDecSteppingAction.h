@@ -16,7 +16,7 @@ class G4MuDecEventAction;
 class G4MuDecSteppingAction : public G4UserSteppingAction
 {
 	public:
-		G4MuDecSteppingAction(const G4MuDecConstruction* det, G4MuDecEventAction* event, Event& theEvent, bool countCerenkov);
+		G4MuDecSteppingAction(const G4MuDecConstruction* det, G4MuDecEventAction* event, Event& theEvent);
 			virtual ~G4MuDecSteppingAction();
 			virtual void UserSteppingAction(const G4Step* step);
 
@@ -26,7 +26,6 @@ class G4MuDecSteppingAction : public G4UserSteppingAction
 		std::ofstream* fOutputFile;
 		Event& fEvent;
 
-		bool fCountCerenkov;
 };
 
 #endif

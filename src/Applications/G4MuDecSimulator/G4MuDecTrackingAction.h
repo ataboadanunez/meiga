@@ -11,7 +11,7 @@ class G4Track;
 
 class G4MuDecTrackingAction : public G4UserTrackingAction {
 	public:
-		G4MuDecTrackingAction(G4MuDecEventAction* G4Event, Event& theEvent, const bool countCerenkov);
+		G4MuDecTrackingAction(G4MuDecEventAction* G4Event, Event& theEvent);
 		virtual ~G4MuDecTrackingAction() { }
 
 		virtual void PreUserTrackingAction(const G4Track*  track) override;

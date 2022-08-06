@@ -37,9 +37,6 @@
 #include "G4MPhysicsList.h"
 #include "DataWriter.h"
 
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
 using namespace std;
 
 Particle G4MuDecSimulator::currentParticle;
@@ -109,51 +106,17 @@ G4MuDecSimulator::Initialize(Event& theEvent, string cfgFile)
 {
 
 	cout << "[INFO] G4MuDecSimulator::Initialize" << endl;
-	cout << "[INFO] G4MuDecSimulator::Initialize: Reading configuration file " << cfgFile << endl;
+	cout << "[INFO] Reading configuration file " << cfgFile << endl;
 
 	// Fill Event object from configuration file
 	// Read Simulation configuration
 	theEvent = ConfigManager::ReadConfigurationFile(cfgFile);
 	// get simulation simulation settings
 	const Event::Config &cfg = theEvent.GetConfig();
-
-	cout << "[DEBUG] G4MuDecSimulator::RunSimulation: input file from cfg " << cfg.fInputFileName << endl;
-
-
-	SimData& simData = theEvent.GetSimData();
-	fInputFile = simData.GetInputFileName();
-	fOutputFile = simData.GetOutputFileName();
-	fDetectorList = simData.GetDetectorListFile();
-	fDetectorProperties = simData.GetDetectorPropertiesFile();
-	fSimulationMode = simData.GetSimulationMode();
-	fVerbosity = simData.GetVerbosity();
-	fInjectionMode  = simData.GetInjectionMode();
-	fGeoVisOn = simData.VisualizeGeometry();
-	fTrajVisOn = simData.VisualizeTrajectory();
-	fPhysicsName = simData.GetPhysicsListName();
-
-	cout << "[INFO] G4MuDecSimulator::Initialize: Using the following configuration:" << endl;
-	cout << "[INFO] InputFile = " << fInputFile << endl;
-	cout << "[INFO] OutputFile = " << fOutputFile << endl;
-	cout << "[INFO] DetectorList = " << fDetectorList << endl;
-	cout << "[INFO] DetectorProperties = " << fDetectorProperties << endl;
-	cout << "[INFO] SimulationMode = " << simData.GetSimulationModeName() << endl;
-	cout << "[INFO] InjectionMode = " << simData.GetInjectionModeName() << endl;
-	cout << "[INFO] VisualizeGeometry = " << (fGeoVisOn ? "yes" : "no") << endl;
-	cout << "[INFO] VisualizeTrajectory = " << (fTrajVisOn ? "yes" : "no") << endl;
-	cout << "[INFO] RenderFile = " << fRenderFile << endl;
-	cout << "[INFO] PhysicsList = " << fPhysicsName << endl;
-
-	// Aditional configuration flags of this application
-	boost::property_tree::ptree tree;
-	read_json(cfgFile, tree);
-	fCountCerenkov = tree.get<bool>("CountCerenkov");
-	cout << "[INFO] Count Cerenkov Photons = " << (fCountCerenkov ? "yes" : "no") << endl;
-
+	ConfigManager::PrintConfig(cfg);
 	// Read Detector Configuration
-	ConfigManager::ReadDetectorList(fDetectorList, theEvent);
+	ConfigManager::ReadDetectorList(cfg.fDetectorList, theEvent);
 
-	
 }            
 
 
@@ -163,6 +126,7 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 
 	cout << "[INFO] G4MuDecSimulator::RunSimulation" << endl;
 	
+	const Event::Config &cfg = theEvent.GetConfig();
 	SimData& simData = theEvent.GetSimData();
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
 	cout << "[INFO] G4MuDecSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
@@ -171,10 +135,8 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 		cerr << "[ERROR] G4MuDecSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
 		return false;
 	}
-	
-	simData.SetInjectionMode(fInjectionMode);
-	if (fInjectionMode == SimData::eInsideDetector)
-		cout << "[INFO] G4MuDecSimulator::RunSimulation: Partilces injected INSIDE the detector (InjectionMode = " << fInjectionMode << "). " << endl;
+
+
 
 	/***************
 
@@ -195,7 +157,7 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 	auto fDetConstruction = new G4MuDecConstruction(theEvent);
 	fRunManager->SetUserInitialization(fDetConstruction);
 	
-	fRunManager->SetUserInitialization(new G4MPhysicsList(fPhysicsName));
+	fRunManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
 
 	G4MuDecPrimaryGeneratorAction *fPrimaryGenerator = new G4MuDecPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
@@ -209,21 +171,21 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 	G4MuDecEventAction *fEventAction = new G4MuDecEventAction(theEvent);
 	fRunManager->SetUserAction(fEventAction);
 
-	fRunManager->SetUserAction(new G4MuDecTrackingAction(fEventAction, theEvent, fCountCerenkov));
+	fRunManager->SetUserAction(new G4MuDecTrackingAction(fEventAction, theEvent));
 
-	G4MuDecSteppingAction *fSteppingAction = new G4MuDecSteppingAction(fDetConstruction, fEventAction, theEvent, fCountCerenkov);
+	G4MuDecSteppingAction *fSteppingAction = new G4MuDecSteppingAction(fDetConstruction, fEventAction, theEvent);
 	fRunManager->SetUserAction(fSteppingAction);
 	
 	// initialize G4 kernel
 	fRunManager->Initialize();
 
 	// initialize visualization
-	if ((fGeoVisOn || fTrajVisOn) && !fVisManager)
+	if ((cfg.fGeoVis || cfg.fTrajVis) && !fVisManager)
 		fVisManager = new G4VisExecutive;
 
 	// get the pointer to the UI manager and set verbosities
 	G4UImanager* fUImanager = G4UImanager::GetUIpointer();
-	switch (fVerbosity) {
+	switch (cfg.fVerbosity) {
 		case 1:
 			fUImanager->ApplyCommand("/run/verbose 1");
 			fUImanager->ApplyCommand("/event/verbose 0");
@@ -245,9 +207,9 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 			fUImanager->ApplyCommand("/tracking/verbose 0");
 		}
 	
-	if (fGeoVisOn || fTrajVisOn) {
+	if (cfg.fGeoVis || cfg.fTrajVis) {
 		fVisManager->Initialize();
-		fUImanager->ApplyCommand(("/vis/open " + fRenderFile).c_str());
+		fUImanager->ApplyCommand(("/vis/open " + cfg.fRenderFile).c_str());
 		fUImanager->ApplyCommand("/vis/scene/create");
 		fUImanager->ApplyCommand("/vis/sceneHandler/attach");
 		fUImanager->ApplyCommand("/vis/scene/add/volume");
@@ -262,7 +224,7 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 
 	}
 
-	if (fTrajVisOn) {
+	if (cfg.fTrajVis) {
 			fUImanager->ApplyCommand("/tracking/storeTrajectory 1");
 			fUImanager->ApplyCommand("/vis/scene/add/trajectories");
 	}

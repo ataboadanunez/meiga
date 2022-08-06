@@ -9,14 +9,10 @@
 #include "Particle.h"
 
 
-G4MuDecTrackingAction::G4MuDecTrackingAction(G4MuDecEventAction* G4event, Event& theEvent, const bool countCerenkov) : 
+G4MuDecTrackingAction::G4MuDecTrackingAction(G4MuDecEventAction* G4event, Event& theEvent) : 
 	fEventAction(G4event),
-	fEvent(theEvent),
-	fCountCerenkov(countCerenkov)
+	fEvent(theEvent)
 	{
-
-		if (fCountCerenkov)
-			std::cout << "[INFO] G4MuDecTrackingAction: Counting Cerenkov photons." << std::endl;
 
 	}
 
@@ -42,21 +38,8 @@ G4MuDecTrackingAction::PreUserTrackingAction(const G4Track* track)
 			muonDecayIDs.insert(trackId);
 		}
 	}
-
-	// in case of Cerenkov analysis activated, handle optical photons
-	if (fCountCerenkov && (particle == G4OpticalPhoton::OpticalPhotonDefinition())) {
-		// check if photons are within energy range
-		double phEnergy = track->GetTotalEnergy() / CLHEP::eV;
-		double phWaveLength = 1240 / phEnergy;
-		if ((300 <= phWaveLength) && (phWaveLength <= 570)) {
-			if (parentId != 1)
-				fEventAction->AddCerenkovDelta();
-			else 
-				fEventAction->AddCerenkov();
-		}	
-	}
-	else
-		return;
+	
+	return;
 
 }	 
 

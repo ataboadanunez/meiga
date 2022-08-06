@@ -35,22 +35,6 @@ class G4MuDecSimulator
 
   private:
 
-		// flags for configuration (see .json file)
-    std::string fInputFile;
-    std::string fOutputFile;
-    std::string fDetectorList;
-    std::string fDetectorProperties;
-    SimData::SimulationMode fSimulationMode;
-    SimData::InjectionMode fInjectionMode;
-
-    bool fGeoVisOn = true;
-    bool fTrajVisOn = false;
-    int fVerbosity = 1;
-    std::string fRenderFile = "VRML2FILE";
-    std::string fPhysicsName = "QGSP_BERT_HP";
-    
-    bool fCountCerenkov = false;
-
   	friend class G4MuDecDetectorConstructor;
   	friend class G4MuDecPrimaryGenerator;
 };
