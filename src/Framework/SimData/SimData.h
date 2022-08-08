@@ -42,13 +42,13 @@ class SimData
 		void SetCurrentParticle(Particle particle) { fCurrentParticle = particle; }
 
 		// Simulation mode
-		SimulationMode ModeConversion(const std::string name);
+		SimulationMode ModeConversion(std::string name);
 		void SetSimulationMode(const SimulationMode simMode) { fSimulationMode = simMode; }
 		SimulationMode GetSimulationMode() const { return fSimulationMode; }
 		std::string GetSimulationModeName() const { return fSimulationModeName; }
 
 		// Particle injection mode
-		InjectionMode InjectionConversion(const std::string name);
+		InjectionMode InjectionConversion(std::string name);
 		void SetInjectionMode(const InjectionMode injMode) { fInjectionMode = injMode; }
 		InjectionMode GetInjectionMode() const { return fInjectionMode; }
 		std::string GetInjectionModeName() const { return fInjectionModeName; }

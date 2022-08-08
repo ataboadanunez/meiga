@@ -61,7 +61,7 @@ G4MuDecPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   // particle injection according to detector dimensions and injection mode
   auto& simData = fEvent.GetSimData();
   SimData::InjectionMode injectionMode = simData.GetInjectionMode();
-  
+  cout << "[DEBUG] G4MuDecPrimaryGeneratorAction::GeneratePrimaries: injection mode = " << injectionMode << endl;
   auto& detector = fEvent.GetDetector(0);
   double tankHeight = detector.GetTankHeight();
   double tankRadius = detector.GetTankRadius();

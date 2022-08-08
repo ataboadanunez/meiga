@@ -28,13 +28,14 @@ class ConfigManager
 			//TODO: Mapa que entre por detectorType y entregue una clase con las propiedades por defecto
 		}
 		~ConfigManager() { }
-
+		// public and static to be called within the applications 'without object'
 		static Event ReadConfigurationFile(const std::string &filename);
 		static void ReadDetectorList(const std::string &filename, Event& theEvent);
+		static void PrintConfig(const Event::Config &cfg);
 
 	private:
 		// static void ActuallyReadDetectorXML(std::string filename, Event& theEvent);
-		void SetConfiguration(Event &theEvent, boost::property_tree::ptree &tree);
+		
 		static DefaultProperties defProp;
 };
 

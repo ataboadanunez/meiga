@@ -23,14 +23,16 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	string fInputFileName = tree.get<string>("InputFile");
 	ReadParticleFile::ParticleFileReader(fInputFileName, theEvent);
 
-	// SetConfiguration(theEvent, tree);
+	SimData& simData = theEvent.GetSimData();
 
 	cfg.fInputFileName = tree.get<string>("InputFile");
 	cfg.fDetectorList  = tree.get<string>("DetectorList");
 	cfg.fDetectorProperties = tree.get<string>("DetectorProperties");
 
 	cfg.fSimulationMode = tree.get<string>("SimulationMode");
+	simData.SetSimulationMode(simData.ModeConversion(cfg.fSimulationMode));
 	cfg.fInjectionMode  = tree.get<string>("InjectionMode");
+	simData.SetInjectionMode(simData.InjectionConversion(cfg.fInjectionMode));
 	cfg.fGeoVis  = tree.get<bool>("GeoVisOn");
 	cfg.fTrajVis = tree.get<bool>("TrajVisOn");
 	cfg.fRenderFile = tree.get<string>("RenderFile");
@@ -39,34 +41,6 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 
 	cfg.fOutputFileName = tree.get<string>("OutputFile");
 
-
-	// hasta ahora
-	SimData& simData = theEvent.GetSimData();
-	simData.SetInputFileName(fInputFileName);
-	string fOutputFileName = tree.get<string>("OutputFile");
-	simData.SetOutputFileName(fOutputFileName);
-	string fDetectorList = tree.get<string>("DetectorList");
-	simData.SetDetectorListFile(fDetectorList);
-	string fDetectorProperties = tree.get<string>("DetectorProperties");
-	simData.SetDetectorPropertiesFile(fDetectorProperties);
-	// here the detector default properties (from DetectorProperties.xml) are set
-	defProp.SetDefaultProperties(fDetectorProperties);
-	string fSimulationMode = tree.get<string>("SimulationMode");
-	SimData::SimulationMode simMode = simData.ModeConversion(fSimulationMode);
-	simData.SetSimulationMode(simMode);
-	string fInjectionMode = tree.get<string>("InjectionMode");
-	SimData::InjectionMode injMode = simData.InjectionConversion(fInjectionMode);
-	simData.SetInjectionMode(injMode);
-	bool fGeoVis = tree.get<bool>("GeoVisOn");
-	simData.SetVisualizationGeometry(fGeoVis);
-	bool fTrajVis = tree.get<bool>("TrajVisOn");
-	simData.SetVisualizationTrajectory(fTrajVis);
-	string fRenderFile = tree.get<string>("RenderFile");
-	simData.SetRenderName(fRenderFile);
-	string fPhysicsListName = tree.get<string>("PhysicsName");
-	simData.SetPhysicsListName(fPhysicsListName);
-	int fVerbosity = tree.get<int>("Verbosity");
-	simData.SetVerbosity(fVerbosity);
 
 	return theEvent;
 
@@ -143,9 +117,20 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 }
 
 void
-ConfigManager::SetConfiguration(Event &theEvent, ptree &tree)
+ConfigManager::PrintConfig(const Event::Config &cfg)
 {
-
+	cout << "[INFO] ConfigManager::PrintConfig:" << endl;
+	cout << "[INFO] Using the following configuration:" << endl;
+	cout << "[INFO] InputFile = " << cfg.fInputFileName << endl;
+	cout << "[INFO] OutputFile = " << cfg.fOutputFileName << endl;
+	cout << "[INFO] DetectorList = " << cfg.fDetectorList << endl;
+	cout << "[INFO] DetectorProperties = " << cfg.fDetectorProperties << endl;
+	cout << "[INFO] SimulationMode = " << cfg.fSimulationMode << endl;
+	cout << "[INFO] InjectionMode = " << cfg.fInjectionMode << endl;
+	cout << "[INFO] VisualizeGeometry = " << (cfg.fGeoVis ? "yes" : "no") << endl;
+	cout << "[INFO] VisualizeTrajectory = " << (cfg.fTrajVis ? "yes" : "no") << endl;
+	cout << "[INFO] RenderFile = " << cfg.fRenderFile << endl;
+	cout << "[INFO] PhysicsList = " << cfg.fPhysicsListName << endl;
 	
 
 }

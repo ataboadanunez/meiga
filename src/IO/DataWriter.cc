@@ -24,8 +24,9 @@ void
 DataWriter::FileWriter(Event& theEvent)
 {	
 
-	SimData& simData = theEvent.GetSimData();
-	const string& outFileName = simData.GetOutputFileName();
+	Event::Config &cfg = theEvent.GetConfig();
+	
+	const string& outFileName = cfg.fOutputFileName;
 
 	cout << "[INFO] DataWriter::FileWriter: Writing output to file " << outFileName << endl;
 
@@ -38,6 +39,9 @@ DataWriter::FileWriter(Event& theEvent)
 	json jData;
 	json jEnergyDeposit;
 	json jEnergyDepositComponent;
+
+	SimData& simData = theEvent.GetSimData();
+
 	// loop over detector range
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 

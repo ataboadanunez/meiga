@@ -146,19 +146,12 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 		in the DetectorList.xml and override in case of exist. 
 	*/
 
-	double var = tree.get<double>("barsInPanel", defProp.gNumberOfBars);
-	cout << "[DEBUG] Detector::SetDetectorProperties: Number of bars = " << var << endl;
-
-
-
 	for (const auto& v : tree.get_child("")) {
 		string xmlLabel = v.first;
 
 		if (xmlLabel != "<xmlattr>") {
 			string xmlValue = v.second.data();
 			// loop over XML tags to set the corresponding value
-			cout << "[DEBUG] xmlLabel = " << xmlLabel << endl;
-			// WCD parameters
 			if (xmlLabel == "tankRadius") {
 				double value = stod(xmlValue);
 				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
@@ -174,8 +167,7 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
 				SetTankThickness(value * unit);
 			}
-
-			// scintillator detectors
+			
 			else if (xmlLabel == "barsInPanel") {
 				int value = stoi(xmlValue);
 				SetNBars(value);

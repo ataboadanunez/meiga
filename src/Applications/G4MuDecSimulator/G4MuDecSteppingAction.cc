@@ -18,12 +18,11 @@
 #include "SimData.h"
 #include "Detector.h"
 
-G4MuDecSteppingAction::G4MuDecSteppingAction(const G4MuDecConstruction* det, G4MuDecEventAction* G4event, Event& theEvent, bool countCerenkov)
+G4MuDecSteppingAction::G4MuDecSteppingAction(const G4MuDecConstruction* det, G4MuDecEventAction* G4event, Event& theEvent)
 	:	G4UserSteppingAction(),
 		fDetectorConstruction(det),
 		fEventAction(G4event),
-		fEvent(theEvent),
-		fCountCerenkov(countCerenkov)
+		fEvent(theEvent)
 {
 
 }
@@ -35,33 +34,6 @@ G4MuDecSteppingAction::~G4MuDecSteppingAction()
 void
 G4MuDecSteppingAction::UserSteppingAction(const G4Step* step)
 {
-		
-	// DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData();
-	// auto& muonDecayIDs = detSimData.GetMuonDecayID();
-
-	// 1. Detect if parent muons stop in water
-	// 2. Track electrons / positrons in water
-
-	auto track = step->GetTrack();
-	int parentId = track->GetParentID();
-	int trackId = track->GetTrackID();
-
-	const G4ParticleDefinition* particle = track->GetParticleDefinition();
-
-	// reject photons
-	if (particle == G4OpticalPhoton::OpticalPhotonDefinition())
-		return;
-
-	// get energy deposit of primaries in water
-	if ((trackId == 1) && (track->GetVolume()->GetName() == "physTank")) {
-		double depE = step->GetTotalEnergyDeposit();
-		fEventAction->AddEnergyDeposit(depE);
-	// get step-length of muons inside water volume
-	if (fCountCerenkov) {
-			double stepLength = step->GetStepLength();
-			fEventAction->AddStepLength(stepLength);
-		}	
-	}
 	
 }
 

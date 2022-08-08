@@ -42,7 +42,7 @@ ReadParticleFile::ParticleFileReader(const std::string &fileName, Event& theEven
 
   */
   
-  cout << "[INFO] Event::ReadParticleFile: Reading Input File " << fileName << endl;
+  cout << "[INFO] ReadParticleFile::ParticleFileReader: Reading Input File " << fileName << endl;
   string errmsg;
   string info;
 
