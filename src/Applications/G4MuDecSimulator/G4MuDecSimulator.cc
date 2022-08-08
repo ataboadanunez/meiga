@@ -113,6 +113,7 @@ G4MuDecSimulator::Initialize(Event& theEvent, string cfgFile)
 	theEvent = ConfigManager::ReadConfigurationFile(cfgFile);
 	// get simulation simulation settings
 	const Event::Config &cfg = theEvent.GetConfig();
+	ConfigManager::PrintConfig(cfg);
 	// Read Detector Configuration
 	ConfigManager::ReadDetectorList(cfg.fDetectorList, theEvent);
 
