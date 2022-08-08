@@ -418,9 +418,9 @@ Materials::CreateMaterials()
 	waterPT2->AddProperty("RINDEX", water2PhotonEnergy, water2RefIndex, water2ArrEntries);
 	waterPT2->AddProperty("ABSLENGTH", water2PhotonEnergy, water2AbsLen, water2ArrEntries);
 	waterPT2->AddProperty("MIEHG", water2PhotonEnergyMie, water2Mie, water2ArrEntries);
-  	waterPT2->AddConstProperty("MIEHG_FORWARD", water2MieConst[0]);
-  	waterPT2->AddConstProperty("MIEHG_BACKWARD", water2MieConst[1]);
-  	waterPT2->AddConstProperty("MIEHG_FORWARD_RATIO", water2MieConst[2]);
+	waterPT2->AddConstProperty("MIEHG_FORWARD", water2MieConst[0]);
+	waterPT2->AddConstProperty("MIEHG_BACKWARD", water2MieConst[1]);
+	waterPT2->AddConstProperty("MIEHG_FORWARD_RATIO", water2MieConst[2]);
 
 	// function to set waterPT from configuration file
 	Water->SetMaterialPropertiesTable(waterPT1);
@@ -571,12 +571,12 @@ Materials::CreateMaterials()
 	LinerOptSurf->SetSigmaAlpha(fSigmaAlpha);
 	LinerOptSurf->SetMaterialPropertiesTable(linerOpticalPT);
 
-  // LAGO WCD parameters
-  LinerOptSurf2 =  new G4OpticalSurface("WallSurface");
-  LinerOptSurf2->SetType(dielectric_LUT);
-  LinerOptSurf2->SetFinish(groundtyvekair);
-  LinerOptSurf2->SetModel(LUT);
+	// LAGO WCD parameters
+	LinerOptSurf2 =  new G4OpticalSurface("WallSurface");
+	LinerOptSurf2->SetType(dielectric_LUT);
+	LinerOptSurf2->SetFinish(groundtyvekair);
+	LinerOptSurf2->SetModel(LUT);
 
-  
+	
 
 }
