@@ -35,6 +35,7 @@
 #include "Detector.h"
 #include "OptDevice.h"
 #include "G4MPhysicsList.h"
+#include "DataWriter.h"
 
 using namespace std;
 
@@ -110,32 +111,10 @@ G4ExSimulator::Initialize(Event& theEvent, string cfgFile)
 	// Read Simulation configuration
 	theEvent = ConfigManager::ReadConfigurationFile(cfgFile);
 	// get simulation simulation settings
-	SimData& simData = theEvent.GetSimData();
-	fInputFile = simData.GetInputFileName();
-	fOutputFile = simData.GetOutputFileName();
-	fDetectorList = simData.GetDetectorListFile();
-	fDetectorProperties = simData.GetDetectorPropertiesFile();
-	fSimulationMode = simData.GetSimulationMode();
-	fInjectionMode  = simData.GetInjectionMode();
-	fGeoVisOn = simData.VisualizeGeometry();
-	fTrajVisOn = simData.VisualizeTrajectory();
-	fPhysicsName = simData.GetPhysicsListName();
-
-	cout << "[INFO] G4ExSimulator::Initialize: Using the following configuration:" << endl;
-	cout << "[INFO] InputFile = " << fInputFile << endl;
-	cout << "[INFO] OutputFile = " << fOutputFile << endl;
-	cout << "[INFO] DetectorListFile = " << fDetectorList << endl;
-	cout << "[INFO] DetectorPropertiesFile = " << fDetectorProperties << endl;
-	cout << "[INFO] SimulationMode = " << simData.GetSimulationModeName() << endl;
-	cout << "[INFO] InjectionMode = " << simData.GetInjectionModeName() << endl;
-	cout << "[INFO] VisualizeGeometry = " << (fGeoVisOn ? "yes" : "no") << endl;
-	cout << "[INFO] VisualizeTrajectory = " << (fTrajVisOn ? "yes" : "no") << endl;
-	cout << "[INFO] RenderFile = " << fRenderFile << endl;
-	cout << "[INFO] PhysicsList = " << fPhysicsName << endl;
-
-
+	const Event::Config &cfg = theEvent.GetConfig();
+	ConfigManager::PrintConfig(cfg);
 	// Read Detector Configuration
-	ConfigManager::ReadDetectorList(fDetectorList, theEvent);
+	ConfigManager::ReadDetectorList(cfg.fDetectorList, theEvent);
 	
 }            
 
@@ -175,7 +154,7 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	
 	fRunManager->SetUserInitialization(new G4MPhysicsList(fPhysicsName));
 
-	G4ExPrimaryGeneratorAction *fPrimaryGenerator = new G4ExPrimaryGeneratorAction();
+	G4ExPrimaryGeneratorAction *fPrimaryGenerator = new G4ExPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
 	
 	G4ExRunAction *fRunAction = new G4ExRunAction();
@@ -266,50 +245,8 @@ G4ExSimulator::WriteEventInfo(Event& theEvent)
 {
 	cout << "[INFO] G4ExSimulator::WriteEventInfo" << endl;
 
-	// for accessing Simulated Data at Detector/Event level
-	SimData& simData = theEvent.GetSimData();
-	
-	// loop over detector range
-	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
+	DataWriter::FileWriter(theEvent);
 
-		auto& currDet = detIt->second;
-		int detId = currDet.GetId();
-
-		DetectorSimData& detSimData = simData.GetDetectorSimData(detId);
-		// get number of optical devices in the detector
-		int nOptDev = currDet.GetNOptDevice();
-		cout << "[INFO] G4ExSimulator::WriteEventInfo: Accessing data of detector " << detId << " with " << nOptDev << " optical devices." << endl;
-
-		// loop over optical devices
-		for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
-			auto& currOd = odIt->second;
-			int odId = currOd.GetId();
-
-			OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(odId);
-			cout << "[INFO] G4ExSimulator::WriteEventInfo: Accessing signal of " << currOd.GetName() << " " << odId << " from Detector " << detId << endl;
-
-			// checking signal at optical devices
-			const auto *peTimeDistributionRange = odSimData.PETimeDistributionRange();
-			if (!peTimeDistributionRange) {
-				cerr << "No Time for this channel!" << endl;
-				continue;
-			}
-
-			cout << "[INFO] G4ExSimulator::WriteEventInfo: Number of photo-electrons = ";
-			for (auto peTime = peTimeDistributionRange->begin(); peTime != peTimeDistributionRange->end(); ++peTime) {
-
-				size_t npe = (*peTime)->size();
-				cout << npe << " ";
-				// write pulses to output file
-			}
-
-			cout << endl;
-
-
-		}
-
-
-	}
-
+	return;
 
 }

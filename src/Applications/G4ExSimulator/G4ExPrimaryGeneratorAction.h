@@ -21,7 +21,7 @@ class G4Event;
 class G4ExPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction 
 {
   public:
-    G4ExPrimaryGeneratorAction(/*Event& theEvent, const Particle &theParticle*/);
+    G4ExPrimaryGeneratorAction(Event& theEvent);
     virtual ~G4ExPrimaryGeneratorAction();
 
     // method from the base class
@@ -36,7 +36,7 @@ class G4ExPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
   private:
 
     G4ParticleGun* fParticleGun;
-
+    Event& fEvent;
     const G4ExDetectorConstruction *fDetectorConstructor;
 
   	friend class G4ExDetectorConstruction;

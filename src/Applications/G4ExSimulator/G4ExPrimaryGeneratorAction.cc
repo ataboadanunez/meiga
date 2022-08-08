@@ -21,9 +21,10 @@
 using CLHEP::RandFlat;
 using namespace std;
 
-G4ExPrimaryGeneratorAction::G4ExPrimaryGeneratorAction(/*Event& theEvent, const Particle &theParticle*/) : 
+G4ExPrimaryGeneratorAction::G4ExPrimaryGeneratorAction(Event& theEvent) : 
   G4VUserPrimaryGeneratorAction(),
-  fParticleGun(new G4ParticleGun(1))
+  fParticleGun(new G4ParticleGun(1)),
+  fEvent(theEvent)
   
 {  
 
@@ -55,6 +56,9 @@ G4ExPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
       return;
     }
   
+  double maxHeight = fEvent.GetMaximumHeight();
+
+
   double mass = currParticle.GetMass();
   double fMomentum = currParticle.GetMomentum();
   double fKineticEnergy = currParticle.GetKineticEnergy();
@@ -85,7 +89,7 @@ G4ExPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 
   // check injection according to detector dimensions
   const G4double injRadius = 0.5*m;
-  const G4double injHeight = 10*cm;  
+  const G4double injHeight = maxHeight;  
   const G4double rand = RandFlat::shoot(0., 1.);
   const G4double r = injRadius*sqrt(rand);
   const G4double phi = RandFlat::shoot(0., CLHEP::twopi);
@@ -98,8 +102,7 @@ G4ExPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   currParticle.SetInjectionPosition(injectionPosition);
   
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(fPx, fPy, -1*fPz));
-  //fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
-  fParticleGun->SetParticlePosition(G4ThreeVector(posX, posY, z0));
+  fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
   fParticleGun->SetParticleEnergy(fKineticEnergy);
 
   fParticleGun->GeneratePrimaryVertex(event);
