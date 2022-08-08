@@ -37,9 +37,6 @@
 #include "G4MPhysicsList.h"
 #include "DataWriter.h"
 
-#include <nlohmann/json.hpp>
-
-using json = nlohmann::json;
 using namespace std;
 
 Particle G4MuDecSimulator::currentParticle;
