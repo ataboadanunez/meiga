@@ -52,9 +52,9 @@ G4MuDecPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   G4ParticleDefinition* particleDef = particleTable->FindParticle(fParticleId);
 
   if (!particleDef) {
-      cout << "[WARNING] G4MuDecPrimaryGeneratorAction::GeneratePrimaries: Undefined particle with Corsika ID: " << currParticleID << endl;
-      return;
-    }
+    cout << "[WARNING] G4MuDecPrimaryGeneratorAction::GeneratePrimaries: Undefined particle with Corsika ID: " << currParticleID << endl;
+    return;
+  }
   
   fParticleGun->SetParticleDefinition(particleDef);
 
@@ -82,8 +82,9 @@ G4MuDecPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   double fPz = particleMomentumDirection.at(2);
   
   // change direction in the Z axis in case of standard injection mode
-  if (injectionMode != SimData::eInsideDetector)
+  if (injectionMode != SimData::eInsideDetector) {
     fPz = -1*fPz; 
+  }
 
   G4double px2 = fPx*fPx;
   G4double py2 = fPy*fPy;
@@ -97,10 +98,10 @@ G4MuDecPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 
   // injection of particles randomly, vertical, on top of the detector
   if (injectionMode == SimData::eVertical) {
-    injHeight = ( tankHeight > maxHeight ? tankHeight : maxHeight) + 10*CLHEP::cm; // slightly above detector height
-    G4double rand2 = RandFlat::shoot(0., 1.); 
+    injHeight = (tankHeight > maxHeight ? tankHeight : maxHeight) + 10*CLHEP::cm; // slightly above detector height
+    G4double rand2 = RandFlat::shoot(); 
     r = injRadius * sqrt(rand2);
-    phi = RandFlat::shoot(0., CLHEP::twopi);
+    phi = RandFlat::shoot(CLHEP::twopi);
 
     x0 = r * cos(phi);
     y0 = r * sin(phi);
@@ -124,20 +125,20 @@ G4MuDecPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   else if (injectionMode == SimData::eRandom) {
   
     // dimensions of virtual cylinder
-    injHeight = ( tankHeight > maxHeight ? tankHeight : maxHeight) + 10*CLHEP::cm; // slightly above detector height
+    injHeight = (tankHeight > maxHeight ? tankHeight : maxHeight) + 10*CLHEP::cm; // slightly above detector height
     G4double EffTopArea = CLHEP::pi * sqr(injRadius) * cos(particleZenith);
     G4double EffSideArea = 2 * injRadius * injHeight * sin(particleZenith);
     
     // compute probability according to particle zenith angle
     G4double probSeeTop = EffTopArea / (EffSideArea + EffTopArea);
-    G4double rand1 = RandFlat::shoot(0., 1.);
+    G4double rand1 = RandFlat::shoot();
 
     // particle injected on the top
     if (rand1 <= probSeeTop) {
 
-      G4double rand2 = RandFlat::shoot(0., 1.); 
+      G4double rand2 = RandFlat::shoot(); 
       r = injRadius * sqrt(rand2);
-      phi = RandFlat::shoot(0., CLHEP::twopi);
+      phi = RandFlat::shoot(CLHEP::twopi);
 
       x0 = r * cos(phi);
       y0 = r * sin(phi);
@@ -147,15 +148,17 @@ G4MuDecPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     // particle injected on the side
     else {
 
-      G4double rand3 = RandFlat::shoot(0., 1.);
-      G4double rand4 = RandFlat::shoot(0., 1.);
+      G4double rand3 = RandFlat::shoot();
+      G4double rand4 = RandFlat::shoot();
 
       // correct azimuth distribution
       phi = particleAzimut + asin(1-2*rand3);
-      if (phi > CLHEP::twopi)
+      if (phi > CLHEP::twopi) {
         phi -= CLHEP::pi;
-      else if (phi < 0)
+      }
+      else if (phi < 0) {
         phi += CLHEP::pi;
+      }
 
       x0 = injRadius * cos(phi);
       y0 = injRadius * sin(phi);
@@ -163,12 +166,12 @@ G4MuDecPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 
     }
     
-  } 
+  }
   // injection over a circle on top of WCD
   else if (injectionMode == SimData::eCircle) {
 
     // position of circle slightly above detector height
-    injHeight = ( tankHeight > maxHeight ? tankHeight : maxHeight) + 2*CLHEP::cm; 
+    injHeight = (tankHeight > maxHeight ? tankHeight : maxHeight) + 2*CLHEP::cm; 
     
     
     // How radius is calculated:
@@ -203,18 +206,21 @@ G4MuDecPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 
     // particle position is chosen according randomly distributed over the circle.
     std::cout << "[INFO] G4MuDecPrimaryGeneratorAction::GeneratePrimaries: Particles injected over circle of radius = " << injRadius / cm << "  cm. " << std::endl;
-    G4double rand = RandFlat::shoot(0., 1.);
+    G4double rand = RandFlat::shoot();
     r = injRadius*sqrt(rand);
-    phi = RandFlat::shoot(0., CLHEP::twopi);
+    phi = RandFlat::shoot(CLHEP::twopi);
     
     x0 = r*cos(phi);
     y0 = r*sin(phi);
     z0 = injHeight;
-
+    std::cout << "[DEBUG] Random_Numbers: r = " << rand << " phi = " << phi << std::endl;
+  }
+  else {
+    x0 = y0 = z0 = 0.;
   }
 
   
-  const std::vector<double> injectionPosition = {x0, y0, z0};
+  const std::vector<double> injectionPosition({x0, y0, z0});
   currParticle.SetInjectionPosition(injectionPosition);
   
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(fPx, fPy, fPz));
