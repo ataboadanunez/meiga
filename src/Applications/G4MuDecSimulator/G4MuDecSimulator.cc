@@ -114,9 +114,6 @@ G4MuDecSimulator::Initialize(Event& theEvent, string cfgFile)
 	// get simulation simulation settings
 	const Event::Config &cfg = theEvent.GetConfig();
 
-	cout << "[DEBUG] G4MuDecSimulator::RunSimulation: input file from cfg " << cfg.fInputFileName << endl;
-
-
 	SimData& simData = theEvent.GetSimData();
 	fInputFile = simData.GetInputFileName();
 	fOutputFile = simData.GetOutputFileName();
