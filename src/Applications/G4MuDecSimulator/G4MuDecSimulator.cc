@@ -113,41 +113,6 @@ G4MuDecSimulator::Initialize(Event& theEvent, string cfgFile)
 	theEvent = ConfigManager::ReadConfigurationFile(cfgFile);
 	// get simulation simulation settings
 	const Event::Config &cfg = theEvent.GetConfig();
-<<<<<<< HEAD
-
-	SimData& simData = theEvent.GetSimData();
-	fInputFile = simData.GetInputFileName();
-	fOutputFile = simData.GetOutputFileName();
-	fDetectorList = simData.GetDetectorListFile();
-	fDetectorProperties = simData.GetDetectorPropertiesFile();
-	fSimulationMode = simData.GetSimulationMode();
-	fVerbosity = simData.GetVerbosity();
-	fInjectionMode  = simData.GetInjectionMode();
-	fGeoVisOn = simData.VisualizeGeometry();
-	fTrajVisOn = simData.VisualizeTrajectory();
-	fPhysicsName = simData.GetPhysicsListName();
-
-	cout << "[INFO] G4MuDecSimulator::Initialize: Using the following configuration:" << endl;
-	cout << "[INFO] InputFile = " << fInputFile << endl;
-	cout << "[INFO] OutputFile = " << fOutputFile << endl;
-	cout << "[INFO] DetectorList = " << fDetectorList << endl;
-	cout << "[INFO] DetectorProperties = " << fDetectorProperties << endl;
-	cout << "[INFO] SimulationMode = " << simData.GetSimulationModeName() << endl;
-	cout << "[INFO] InjectionMode = " << simData.GetInjectionModeName() << endl;
-	cout << "[INFO] VisualizeGeometry = " << (fGeoVisOn ? "yes" : "no") << endl;
-	cout << "[INFO] VisualizeTrajectory = " << (fTrajVisOn ? "yes" : "no") << endl;
-	cout << "[INFO] RenderFile = " << fRenderFile << endl;
-	cout << "[INFO] PhysicsList = " << fPhysicsName << endl;
-
-	// Aditional configuration flags of this application
-	boost::property_tree::ptree tree;
-	read_json(cfgFile, tree);
-	fCountCerenkov = tree.get<bool>("CountCerenkov");
-	cout << "[INFO] Count Cerenkov Photons = " << (fCountCerenkov ? "yes" : "no") << endl;
-
-=======
-	ConfigManager::PrintConfig(cfg);
->>>>>>> 624a84dcbe340a07c011315b56111a9191351f97
 	// Read Detector Configuration
 	ConfigManager::ReadDetectorList(cfg.fDetectorList, theEvent);
 

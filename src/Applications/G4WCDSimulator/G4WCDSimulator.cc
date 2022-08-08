@@ -34,6 +34,7 @@
 #include "Detector.h"
 #include "OptDevice.h"
 #include "G4MPhysicsList.h"
+#include "DataWriter.h"
 
 using namespace std;
 
@@ -110,32 +111,10 @@ G4WCDSimulator::Initialize(Event& theEvent, string cfgFile)
 	// Read Simulation configuration
 	theEvent = ConfigManager::ReadConfigurationFile(cfgFile);
 	// get simulation simulation settings
-	SimData& simData = theEvent.GetSimData();
-	fInputFile = simData.GetInputFileName();
-	fOutputFile = simData.GetOutputFileName();
-	fDetectorList = simData.GetDetectorListFile();
-	fDetectorProperties = simData.GetDetectorPropertiesFile();
-	fSimulationMode = simData.GetSimulationMode();
-	fInjectionMode  = simData.GetInjectionMode();
-	fGeoVisOn = simData.VisualizeGeometry();
-	fTrajVisOn = simData.VisualizeTrajectory();
-	fPhysicsName = simData.GetPhysicsListName();
-
-	cout << "[INFO] G4WCDSimulator::Initialize: Using the following configuration:" << endl;
-	cout << "[INFO] InputFile = " << fInputFile << endl;
-	cout << "[INFO] OutputFile = " << fOutputFile << endl;
-	cout << "[INFO] DetectorListFile = " << fDetectorList << endl;
-	cout << "[INFO] DetectorPropertiesFile = " << fDetectorProperties << endl;
-	cout << "[INFO] SimulationMode = " << simData.GetSimulationModeName() << endl;
-	cout << "[INFO] InjectionMode = " << simData.GetInjectionModeName() << endl;
-	cout << "[INFO] VisualizeGeometry = " << (fGeoVisOn ? "yes" : "no") << endl;
-	cout << "[INFO] VisualizeTrajectory = " << (fTrajVisOn ? "yes" : "no") << endl;
-	cout << "[INFO] RenderFile = " << fRenderFile << endl;
-	cout << "[INFO] PhysicsList = " << fPhysicsName << endl;
-
-
+	const Event::Config &cfg = theEvent.GetConfig();
+	ConfigManager::PrintConfig(cfg);
 	// Read Detector Configuration
-	ConfigManager::ReadDetectorList(fDetectorList, theEvent);
+	ConfigManager::ReadDetectorList(cfg.fDetectorList, theEvent);
 	
 }                 
 
@@ -271,77 +250,8 @@ G4WCDSimulator::WriteEventInfo(Event& theEvent)
 {
 	cout << "[INFO] G4WCDSimulator::WriteEventInfo" << endl;
 
-	// for accessing Simulated Data at Detector/Event level
-	SimData& simData = theEvent.GetSimData();
-	cout << "[INFO] G4WCDSimulator::WriteEventInfo: Accessing DetectorSimData" << endl;
-	// loop over detector range
-	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
+	DataWriter::FileWriter(theEvent);
 
-		auto& currDet = detIt->second;
-		int detId = currDet.GetId();
-
-		DetectorSimData& detSimData = simData.GetDetectorSimData(detId);
-		// get number of optical devices in the detector
-		int nOptDev = currDet.GetNOptDevice();
-		cout << "[INFO] G4WCDSimulator::WriteEventInfo: Accessing data of detector " << detId << " with " << nOptDev << " optical devices." << endl;
-
-		// loop over optical devices
-		for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
-			auto& currOd = odIt->second;
-			int odId = currOd.GetId();
-
-			OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(odId);
-			cout << "[INFO] G4WCDSimulator::WriteEventInfo: Accessing signal of " << currOd.GetName() << " " << odId << " from Detector " << detId << endl;
-
-			// checking signal at optical devices
-			const auto *peTimeDistributionRange = odSimData.PETimeDistributionRange();
-			if (!peTimeDistributionRange) {
-				cerr << "No Time for this channel!" << endl;
-				continue;
-			}
-
-			cout << endl;
-			// accessing signals for different particle components
-
-			for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
-				
-				Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
-				// using currentParticle to get the component name. its ugly but should do the trick
-				auto componentName = G4WCDSimulator::currentParticle.GetComponentName(particleComponent);
-				cout << "[INFO] G4WCDSimulator::WriteEventInfo: Accessing signals of particle component " << componentName << " (" << particleComponent << ")" <<  endl;
-				try 
-				{ 
-					const auto peTimeDistributionRangeComp = odSimData.PETimeDistributionRange(particleComponent);
-					if (!peTimeDistributionRange) {
-						cerr << "[INFO] No time distribution for particle component " << componentName << endl;
-						continue;
-					}
-
-					ofstream* fPEFile = new ofstream();
-					string outputfileName = "photoelectrons_"+std::to_string(detId)+"_PMT_"+std::to_string(odId)+"_"+std::to_string(particleComponent)+".dat";
-					fPEFile->open(outputfileName);
-					for (auto peTime = peTimeDistributionRangeComp.begin(); peTime != peTimeDistributionRangeComp.end(); ++peTime) {
-						size_t npe = peTime->size();
-						(*fPEFile) << npe << " ";
-					}
-					
-					(*fPEFile) << endl;
-					cout << "[INFO] G4WCDSimulator::WriteEventInfo: Signals of component " << componentName << " copied to file: " << outputfileName << endl;
-					fPEFile->close();
-				}
-				catch (std::out_of_range &e)
-				{
-					cerr << "[INFO] No time distribution for particle component " << componentName << "! (WCDception: " << e.what() << " )." << endl;
-				}
-				
-				
-			
-			}
-
-
-		}
-
-
-	}
+	return;
 
 }
