@@ -109,7 +109,7 @@ G4CasposoSimulator::Initialize(Event& theEvent, string cfgFile)
 	cout << "[INFO] G4CasposoSimulator::Initialize: Reading configuration file " << cfgFile << endl;
 	// Fill Event object from configuration file
 	// Read Simulation configuration
-	theEvent = ConfigManager::ReadConfiguration(cfgFile);
+	theEvent = ConfigManager::ReadConfigurationFile(cfgFile);
 	// get simulation simulation settings
 	SimData& simData = theEvent.GetSimData();
 	fInputFile = simData.GetInputFileName();
@@ -186,7 +186,7 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 	G4CasposoPrimaryGeneratorAction *fPrimaryGenerator = new G4CasposoPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
 	
-	G4CasposoRunAction *fRunAction = new G4CasposoRunAction();
+	G4CasposoRunAction *fRunAction = new G4CasposoRunAction(theEvent);
 	fRunManager->SetUserAction(fRunAction);
 	
 	G4CasposoEventAction *fEventAction = new G4CasposoEventAction();
@@ -272,10 +272,48 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 void
 G4CasposoSimulator::WriteEventInfo(Event& theEvent)
 {
-	(void) theEvent;
-	cout << "[INFO] G4CasposoSimulator::WriteEventInfo" << endl;
 
-	cout << "Still nothing to write :(" << endl;
+	cout << "[INFO] G4CasposoSimulator::WriteEventInfo" << endl;
+	// should go in separate class / method (IO/DataWriter...)
+	// json jdata;
+
+	// for accessing Simulated Data at Detector/Event level
+	SimData& simData = theEvent.GetSimData();
+	cout << "[INFO] G4CasposoSimulator::WriteEventInfo: Accessing DetectorSimData" << endl;
+	// loop over detector range
+	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
+
+		auto& currDet = detIt->second;
+		int detId = currDet.GetId();
+
+		// access DetectorSimData
+
+		DetectorSimData& detSimData = simData.GetDetectorSimData(detId);
+
+		// get number of optical devices in the detector
+		int nOptDev = currDet.GetNOptDevice();
+		cout << "[INFO] G4CasposoSimulator::WriteEventInfo: Acessing data of detector " << detId << " with " << nOptDev << " optical devices." << endl;
+
+		// loop over optical devices (PMT chanels)
+		for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
+
+			auto& currOd = odIt->second;
+			int odId = currOd.GetId();
+
+			OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(odId);
+
+			// checking signal at optical devices
+			const auto *peTimeDistributionRange = odSimData.PETimeDistributionRange();
+			if (!peTimeDistributionRange) {
+				cerr << "No Time for this channel!" << endl;
+				continue;
+			}
+
+
+
+		}
+
+	}
 
 
 }
