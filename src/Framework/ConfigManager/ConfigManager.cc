@@ -28,6 +28,7 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	cfg.fInputFileName = tree.get<string>("InputFile");
 	cfg.fDetectorList  = tree.get<string>("DetectorList");
 	cfg.fDetectorProperties = tree.get<string>("DetectorProperties");
+	defProp.SetDefaultProperties(cfg.fDetectorProperties);
 
 	cfg.fSimulationMode = tree.get<string>("SimulationMode");
 	simData.SetSimulationMode(simData.ModeConversion(cfg.fSimulationMode));
