@@ -36,6 +36,7 @@
 #include "Detector.h"
 #include "OptDevice.h"
 #include "G4MPhysicsList.h"
+#include "DataWriter.h"
 
 using namespace std;
 
@@ -107,36 +108,15 @@ G4CasposoSimulator::Initialize(Event& theEvent, string cfgFile)
 
 	cout << "[INFO] G4CasposoSimulator::Initialize" << endl;
 	cout << "[INFO] G4CasposoSimulator::Initialize: Reading configuration file " << cfgFile << endl;
+
 	// Fill Event object from configuration file
 	// Read Simulation configuration
 	theEvent = ConfigManager::ReadConfigurationFile(cfgFile);
 	// get simulation simulation settings
-	SimData& simData = theEvent.GetSimData();
-	fInputFile = simData.GetInputFileName();
-	fOutputFile = simData.GetOutputFileName();
-	fDetectorList = simData.GetDetectorListFile();
-	fDetectorProperties = simData.GetDetectorPropertiesFile();
-	fSimulationMode = simData.GetSimulationMode();
-	fInjectionMode  = simData.GetInjectionMode();
-	fGeoVisOn = simData.VisualizeGeometry();
-	fTrajVisOn = simData.VisualizeTrajectory();
-	fPhysicsName = simData.GetPhysicsListName();
-
-	cout << "[INFO] G4CasposoSimulator::Initialize: Using the following configuration:" << endl;
-	cout << "[INFO] InputFile = " << fInputFile << endl;
-	cout << "[INFO] OutputFile = " << fOutputFile << endl;
-	cout << "[INFO] DetectorList = " << fDetectorList << endl;
-	cout << "[INFO] DetectorProperties = " << fDetectorProperties << endl;
-	cout << "[INFO] SimulationMode = " << simData.GetSimulationModeName() << endl;
-	cout << "[INFO] InjectionMode = " << simData.GetInjectionModeName() << endl;
-	cout << "[INFO] VisualizeGeometry = " << (fGeoVisOn ? "yes" : "no") << endl;
-	cout << "[INFO] VisualizeTrajectory = " << (fTrajVisOn ? "yes" : "no") << endl;
-	cout << "[INFO] RenderFile = " << fRenderFile << endl;
-	cout << "[INFO] PhysicsList = " << fPhysicsName << endl;
-
-
+	const Event::Config &cfg = theEvent.GetConfig();
+	ConfigManager::PrintConfig(cfg);
 	// Read Detector Configuration
-	ConfigManager::ReadDetectorList(fDetectorList, theEvent);
+	ConfigManager::ReadDetectorList(cfg.fDetectorList, theEvent);
 	
 }            
 
@@ -274,46 +254,9 @@ G4CasposoSimulator::WriteEventInfo(Event& theEvent)
 {
 
 	cout << "[INFO] G4CasposoSimulator::WriteEventInfo" << endl;
-	// should go in separate class / method (IO/DataWriter...)
-	// json jdata;
+	
+	DataWriter::FileWriter(theEvent);
 
-	// for accessing Simulated Data at Detector/Event level
-	SimData& simData = theEvent.GetSimData();
-	cout << "[INFO] G4CasposoSimulator::WriteEventInfo: Accessing DetectorSimData" << endl;
-	// loop over detector range
-	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
-
-		auto& currDet = detIt->second;
-		int detId = currDet.GetId();
-
-		// access DetectorSimData
-
-		DetectorSimData& detSimData = simData.GetDetectorSimData(detId);
-
-		// get number of optical devices in the detector
-		int nOptDev = currDet.GetNOptDevice();
-		cout << "[INFO] G4CasposoSimulator::WriteEventInfo: Acessing data of detector " << detId << " with " << nOptDev << " optical devices." << endl;
-
-		// loop over optical devices (PMT chanels)
-		for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
-
-			auto& currOd = odIt->second;
-			int odId = currOd.GetId();
-
-			OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(odId);
-
-			// checking signal at optical devices
-			const auto *peTimeDistributionRange = odSimData.PETimeDistributionRange();
-			if (!peTimeDistributionRange) {
-				cerr << "No Time for this channel!" << endl;
-				continue;
-			}
-
-
-
-		}
-
-	}
-
+	return;
 
 }

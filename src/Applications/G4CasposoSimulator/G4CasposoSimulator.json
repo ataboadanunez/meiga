@@ -1,6 +1,6 @@
 {
 	"InputFile" : "./vertical_muon.txt",
-	"OutputFile" : "./output.dat",
+	"OutputFile" : "./output.json",
 	"DetectorList" : "./DetectorList.xml",
 	"DetectorProperties" : "./DetectorProperties.xml",
 	"SimulationMode" : "eFast",
