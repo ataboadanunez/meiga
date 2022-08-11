@@ -17,11 +17,11 @@
 #include "Detector.h"
 #include "Module.h"
 
-G4RockSteppingAction::G4RockSteppingAction(const G4RockDetectorConstruction* det, G4RockEventAction* G4event, Event& MSevent)
+G4RockSteppingAction::G4RockSteppingAction(const G4RockDetectorConstruction* det, G4RockEventAction* G4event, Event& theEvent)
 	: G4UserSteppingAction(),
 		fDetectorConstruction(det),
 		fEventAction(G4event),
-    fEvent(MSevent)
+    fEvent(theEvent)
 {
 }
 
