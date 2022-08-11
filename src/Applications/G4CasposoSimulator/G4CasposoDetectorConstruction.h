@@ -48,7 +48,7 @@ class G4CasposoDetectorConstruction : public G4VUserDetectorConstruction {
 		void PlaceDetector(Event& theEvent);
 		G4VPhysicalVolume* CreateDetector();
 		
-		bool fCheckOverlaps = true;
+		bool fCheckOverlaps = false;
 
 		// solids
 		G4Box* solidWorld = nullptr;
@@ -62,9 +62,9 @@ class G4CasposoDetectorConstruction : public G4VUserDetectorConstruction {
 		G4PVPlacement*   physGround  = nullptr;
 
 		// size definitions
-		G4double fGroundSizeX = 100 * CLHEP::m;
-		G4double fGroundSizeY = 100 * CLHEP::m;
-		G4double fGroundSizeZ = 300 * CLHEP::m;
+		G4double fGroundSizeX = 2 * CLHEP::m;
+		G4double fGroundSizeY = 2 * CLHEP::m;
+		G4double fGroundSizeZ = 1 * CLHEP::m;
 
 		G4double fWorldSizeX = fGroundSizeX + 5 * CLHEP::m;
 		G4double fWorldSizeY = fGroundSizeY + 5 * CLHEP::m;

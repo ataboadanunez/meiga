@@ -60,14 +60,12 @@ G4CasposoPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   // particle injection on ground surface
   // get ground thickness (depth, along z-axis)
   double groundThickness = simData.GetGroundThickness();
-  cout << "[DEBUG] G4CasposoPrimaryGeneratorAction::GeneratePrimaries: GroundThickness = " << groundThickness / CLHEP::m << " m " << endl;
-  double injHeight = 0.5*groundThickness + 1*CLHEP::m;
-  double injWidth  = 1 * CLHEP::m;
+  double injHeight = 3*CLHEP::m;
+  double injWidth  = 0.5 * CLHEP::m;
 
-  double x0 = RandFlat::shoot(-injWidth, injWidth);
-  double y0 = RandFlat::shoot(-injWidth, injWidth);
-  double z0 = injHeight;
-
+  const double x0 = RandFlat::shoot(-injWidth, injWidth);
+  const double y0 = RandFlat::shoot(-injWidth, injWidth);
+  const double z0 = injHeight;
   // get particle energy and momentum direction
   double fKineticEnergy = currParticle.GetKineticEnergy();
 

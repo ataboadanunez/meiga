@@ -38,7 +38,7 @@ G4CasposoSteppingAction::UserSteppingAction(const G4Step* step)
   // kill non-primary particles to speed up 
 	G4Track* track = step->GetTrack();
 	if (track->GetParentID() != 0) {
-		track->SetTrackStatus(fStopAndKill);	
+		//track->SetTrackStatus(fStopAndKill);	
 	}
 	else {
 		// here we are left with primary particles (muons)

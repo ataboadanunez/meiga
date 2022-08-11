@@ -1,29 +1,28 @@
-// implementation of the G4CasposoEventAction class
-
 #include "G4CasposoEventAction.h"
-
-#include "G4Track.hh"
+#include "SimData.h"
+#include "DetectorSimData.h"
+#include "OptDeviceSimData.h"
 
 G4CasposoEventAction::G4CasposoEventAction() : G4UserEventAction()
 {
-  G4cout << "...G4CasposoEventAction..." << G4endl;
 
 }
 
 G4CasposoEventAction::~G4CasposoEventAction()
 {
-
+	
 }
 
 void
 G4CasposoEventAction::BeginOfEventAction(const G4Event*)
 {
-
+	
 }
 
 void 
-G4CasposoEventAction::EndOfEventAction(const G4Event* )
+G4CasposoEventAction::EndOfEventAction(const G4Event*)
 {
-  
+
+
 }
 

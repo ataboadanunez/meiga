@@ -55,7 +55,7 @@ G4CasposoDetectorConstruction::CreateGround()
 	G4VisAttributes brown(G4Colour::Brown());
 	logicGround = new G4LogicalVolume(solidGround, Materials().StdRock, "Ground");
 	logicGround->SetVisAttributes(brown);
-	physGround  =  new G4PVPlacement(nullptr, G4ThreeVector(), logicGround, "Ground", logicWorld, false, 0, fCheckOverlaps);
+	//physGround  =  new G4PVPlacement(nullptr, G4ThreeVector(), logicGround, "Ground", logicWorld, false, 0, fCheckOverlaps);
 }
 
 
@@ -66,7 +66,7 @@ G4CasposoDetectorConstruction::PlaceDetector(Event& theEvent)
 	// loop in detector vector
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 		auto& currentDet = detIt->second;
-		BuildDetector(logicGround, currentDet, theEvent, true);
+		BuildDetector(logicWorld, currentDet, theEvent, true);
 	}
 
 }
