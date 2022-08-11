@@ -22,7 +22,7 @@ BEGIN {
   GeV = 1 / 1000
   n = '$n'
   pid = '$pid'
-  #momentum = "100 200 300 400 500 600 700 800 900 1000"
+  #momentum = "3e-1 4e-1 5e-1 6e-1 7e-1 8e-1 9e-1 10e-1"
   momentum = "1" # in GeV
   split(momentum, p, " ")
   for (pi = 1; pi <= length(p); ++pi) {
