@@ -129,8 +129,8 @@ DataWriter::FileWriter(Event& theEvent)
 
 		} // end loop over optical devices
 
-		jData["Detector_"+to_string(detId)]["DetectorSimData"] = jEnergyDeposit;
-		jData["Detector_"+to_string(detId)]["DetectorSimData"]["EnergyDeposit_components"] = jEnergyDepositComponent;
+		// jData["Detector_"+to_string(detId)]["DetectorSimData"] = jEnergyDeposit;
+		// jData["Detector_"+to_string(detId)]["DetectorSimData"]["EnergyDeposit_components"] = jEnergyDepositComponent;
 
 	} // end loop over detectors
 
