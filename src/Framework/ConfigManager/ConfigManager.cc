@@ -30,18 +30,20 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	cfg.fDetectorProperties = tree.get<string>("DetectorProperties");
 	defProp.SetDefaultProperties(cfg.fDetectorProperties);
 
-	cfg.fSimulationMode = tree.get<string>("SimulationMode");
+	cfg.fSimulationMode = tree.get<string>("Simulation.SimulationMode");
 	simData.SetSimulationMode(simData.ModeConversion(cfg.fSimulationMode));
-	cfg.fInjectionMode  = tree.get<string>("InjectionMode");
+	cfg.fInjectionMode  = tree.get<string>("Simulation.InjectionMode");
 	simData.SetInjectionMode(simData.InjectionConversion(cfg.fInjectionMode));
-	cfg.fGeoVis  = tree.get<bool>("GeoVisOn");
-	cfg.fTrajVis = tree.get<bool>("TrajVisOn");
-	cfg.fRenderFile = tree.get<string>("RenderFile");
-	cfg.fPhysicsListName = tree.get<string>("PhysicsName");
-	cfg.fVerbosity = tree.get<int>("Verbosity");
+	cfg.fGeoVis  = tree.get<bool>("Simulation.GeoVisOn");
+	cfg.fTrajVis = tree.get<bool>("Simulation.TrajVisOn");
+	cfg.fRenderFile = tree.get<string>("Simulation.RenderFile");
+	cfg.fPhysicsListName = tree.get<string>("Simulation.PhysicsName");
+	cfg.fVerbosity = tree.get<int>("Simulation.Verbosity");
 
-	cfg.fOutputFileName = tree.get<string>("OutputFile");
-
+	cfg.fOutputFileName = tree.get<string>("Output.OutputFile");
+	cfg.fCompressOutput = tree.get<bool>("Output.CompressOutput");
+	cfg.fSaveTraces     = tree.get<bool>("Output.SaveTraces");
+	cfg.fSaveEnergy     = tree.get<bool>("Output.SaveEnergy");
 
 	return theEvent;
 
@@ -124,6 +126,9 @@ ConfigManager::PrintConfig(const Event::Config &cfg)
 	cout << "[INFO] Using the following configuration:" << endl;
 	cout << "[INFO] InputFile = " << cfg.fInputFileName << endl;
 	cout << "[INFO] OutputFile = " << cfg.fOutputFileName << endl;
+	cout << "[INFO] Compress Output = " << (cfg.fCompressOutput ? "yes" : "no") << endl;
+	cout << "[INFO] Save Traces = " << (cfg.fSaveTraces ? "yes" : "no") << endl;
+	cout << "[INFO] Save Energy = " << (cfg.fSaveEnergy ? "yes" : "no") << endl;
 	cout << "[INFO] DetectorList = " << cfg.fDetectorList << endl;
 	cout << "[INFO] DetectorProperties = " << cfg.fDetectorProperties << endl;
 	cout << "[INFO] SimulationMode = " << cfg.fSimulationMode << endl;
@@ -132,6 +137,5 @@ ConfigManager::PrintConfig(const Event::Config &cfg)
 	cout << "[INFO] VisualizeTrajectory = " << (cfg.fTrajVis ? "yes" : "no") << endl;
 	cout << "[INFO] RenderFile = " << cfg.fRenderFile << endl;
 	cout << "[INFO] PhysicsList = " << cfg.fPhysicsListName << endl;
-	
 
 }
