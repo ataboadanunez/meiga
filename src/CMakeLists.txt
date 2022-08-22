@@ -22,7 +22,8 @@ endif()
 include(${Geant4_USE_FILE})
 
 # Find boost package
-find_package(Boost 1.34 ${Boost_is_REQUIRED})
+#find_package(Boost 1.34 ${Boost_is_REQUIRED})
+find_package(Boost 1.34 REQUIRED COMPONENTS system filesystem iostreams)
 
 # Find nlohman for json parser
 find_package(nlohmann_json 3.2.0 REQUIRED)
