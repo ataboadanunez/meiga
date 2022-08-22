@@ -1,11 +1,22 @@
 {
 	"InputFile" : "./vertical_muon.txt",
-	"OutputFile" : "./output.dat",
-	"SimulationMode" : "FULL",
-	"GeoVisOn" : false,
-	"TrajVisOn" : false,
-	"Verbosity" : 1,
-	"RenderFile" : "VRML2FILE",
-	"PhysicsName" : "QGSP_BERT_HP",
-	"DetectorList" : "./DetectorList.xml"
+	"Output" : 
+	{
+		"OutputFile" : "./output.json",
+		"CompressOutput" : true,
+		"SaveTraces" : true,
+		"SaveEnergy" : false
+	},
+	"DetectorList" : "./DetectorList.xml",
+	"DetectorProperties" : "./DetectorProperties.xml",
+	"Simulation" :
+	{
+		"SimulationMode" : "eFast",
+		"InjectionMode" : "eCircle",
+		"GeoVisOn" : false,
+		"TrajVisOn" : false,
+		"Verbosity" : 1,
+		"RenderFile" : "VRML2FILE",
+		"PhysicsName" : "QGSP_BERT_HP"
+	}
 }

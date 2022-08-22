@@ -4,7 +4,6 @@
 #include "Detector.h"
 #include "OptDevice.h"
 
-#include "SimData.h"
 #include "DetectorSimData.h"
 #include "OptDeviceSimData.h"
 
@@ -13,9 +12,18 @@
 #include <fstream>
 #include <sstream>
 
-#include <nlohmann/json.hpp>
+
+#include <boost/iostreams/device/file_descriptor.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 
 using json = nlohmann::json;
+using boost::iostreams::filtering_stream;
+using boost::iostreams::filtering_streambuf;
+using boost::iostreams::file_descriptor;
+using boost::iostreams::output;
 using namespace std;
 
 Particle aParticle;
@@ -24,21 +32,17 @@ void
 DataWriter::FileWriter(Event& theEvent)
 {	
 
+
+	// load configuration	
 	Event::Config &cfg = theEvent.GetConfig();
 	
-	const string& outFileName = cfg.fOutputFileName;
+	string& outFileName = cfg.fOutputFileName;
+	const bool& compressOutput = cfg.fCompressOutput;
 
 	cout << "[INFO] DataWriter::FileWriter: Writing output to file " << outFileName << endl;
 
-	/*
-		Configuration for output is needed in order to save
-		desired data.
-	*/	
-
 	// prepare json data holder
 	json jData;
-	json jEnergyDeposit;
-	json jEnergyDepositComponent;
 
 	SimData& simData = theEvent.GetSimData();
 
@@ -56,26 +60,14 @@ DataWriter::FileWriter(Event& theEvent)
 
 		DetectorSimData& detSimData = simData.GetDetectorSimData(detId);
 
-		/* at this level one could access energy deposit, particle counters, etc... and this should be managed by a configuration
+		/* 
+			at this level one could access energy deposit, particle counters, etc... 
+			this is set in the configuration
 		*/
-		vector<double> energyDeposit = detSimData.GetEnergyDeposit();
-		jEnergyDeposit["EnergyDeposit"] = energyDeposit;
-
-		for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
-
-				Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
-				string componentName = aParticle.GetComponentName(particleComponent);
-
-				if (!detSimData.HasEnergyDeposit(particleComponent)) {
-					cout << "[INFO] DataWriter::FileWriter: Detector " << detId << " has no energy deposits of component " << componentName << endl;
-					continue;
-				}
-
-				vector<double> energyDepositComponent = detSimData.GetEnergyDeposit(particleComponent);
-
-				jEnergyDepositComponent[componentName] = energyDepositComponent;
-
-			} // end loop particle components
+		if (cfg.fSaveEnergy) {
+			SaveEnergy(jData, simData, detId);
+		}
+		
 
 
 		const int nOptDev = currDet.GetNOptDevice();
@@ -129,12 +121,58 @@ DataWriter::FileWriter(Event& theEvent)
 
 		} // end loop over optical devices
 
-		// jData["Detector_"+to_string(detId)]["DetectorSimData"] = jEnergyDeposit;
-		// jData["Detector_"+to_string(detId)]["DetectorSimData"]["EnergyDeposit_components"] = jEnergyDepositComponent;
-
 	} // end loop over detectors
 
-	ofstream outfile(outFileName);
-	outfile << jData;
+	// use compress if set in configuration
+	if (compressOutput) {
+		
+		outFileName+=".gz";
+		boost::iostreams::file_descriptor_sink outfile(outFileName);
+		// apply compression filters
+		boost::iostreams::filtering_streambuf<output> out;
+		out.push(boost::iostreams::gzip_compressor());
+    out.push(outfile);
+    ostream outFd(&out);
+    outFd << jData;
+    outFd.flush();
+    boost::iostreams::close(out);
+    outfile.close();
+	} 
+
+	else {
+		ofstream outfile(outFileName);
+		outfile << jData;
+	}
+	
+}
+
+void 
+DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId)
+{
+
+	json jEnergyDeposit;
+	json jEnergyDepositComponent;
+
+	const DetectorSimData &detSimData = simData.GetDetectorSimData(detId);
+	const vector<double> & energyDeposit = detSimData.GetEnergyDeposit();
+	jEnergyDeposit["EnergyDeposit"] = energyDeposit;
+
+	for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
+
+		Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
+		string componentName = aParticle.GetComponentName(particleComponent);
+
+		if (!detSimData.HasEnergyDeposit(particleComponent)) {
+			cout << "[INFO] DataWriter::SaveEnergy: Detector " << detId << " has no energy deposits of component " << componentName << endl;
+			continue;
+		}
+
+		vector<double> energyDepositComponent = detSimData.GetEnergyDeposit(particleComponent);
+		jEnergyDepositComponent[componentName] = energyDepositComponent;
+
+	} // end loop particle components
+
+	jData["Detector_"+to_string(detId)]["DetectorSimData"] = jEnergyDeposit;
+	jData["Detector_"+to_string(detId)]["DetectorSimData"]["EnergyDeposit_components"] = jEnergyDepositComponent;
 
 }

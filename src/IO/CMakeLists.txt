@@ -1,6 +1,7 @@
 file(GLOB sources ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
 file(GLOB headers ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 add_library(meiga_io STATIC ${sources} ${headers})
+target_link_libraries(meiga_io INTERFACE Boost::iostreams)
 set(MEIGA_LIBRARIES meiga_io ${MEIGA_LIBRARIES} PARENT_SCOPE)
 install(FILES ${headers} DESTINATION include)
 install(TARGETS ${MEIGA_LIBRARIES} DESTINATION lib)
