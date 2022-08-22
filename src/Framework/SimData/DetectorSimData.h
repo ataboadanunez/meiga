@@ -29,8 +29,10 @@ class DetectorSimData
 		// OptDeviceSimData calls from Detector
 		void MakeOptDeviceSimData(unsigned int id);
 		OptDeviceSimData& GetOptDeviceSimData() { return fOptDeviceSimData; }
+		const OptDeviceSimData& GetOptDeviceSimData() const  { return fOptDeviceSimData; }
 		OptDeviceSimData& GetOptDeviceSimData(unsigned int id) { return fOptDeviceSimMap[id]; }
-		bool HasOptDeviceSimData(unsigned int id) { return fOptDeviceSimMap.count(id) != 0; }
+		const OptDeviceSimData& GetOptDeviceSimData(unsigned int id) const  { return fOptDeviceSimMap.at(id); }
+		bool HasOptDeviceSimData(unsigned int id) const { return fOptDeviceSimMap.count(id) != 0; }
 
 		std::set<uint64_t>& GetMuonDecayID() { return fMuonDecayID; }
 		const std::set<uint64_t>& GetMuonDecayID() const { return fMuonDecayID; }
@@ -40,11 +42,13 @@ class DetectorSimData
 
 		void SetEnergyDeposit(const double eDep);
 		std::vector<double> GetEnergyDeposit() { return fEnergyDeposit; }
+		const std::vector<double> & GetEnergyDeposit() const { return fEnergyDeposit; }
 		// energy deposit for particle component
 		void SetEnergyDeposit(Particle::Component comp, const double eDep);
 		std::vector<double> GetEnergyDeposit(Particle::Component comp) { return fEDepComponentMap.at(comp); } 
+		const std::vector<double> & GetEnergyDeposit(Particle::Component comp) const { return fEDepComponentMap.at(comp); } 
 		// a Has method is needed before requesting information to the map
-		bool HasEnergyDeposit(Particle::Component comp) { return fEDepComponentMap.count(comp) != 0; }
+		bool HasEnergyDeposit(Particle::Component comp) const { return fEDepComponentMap.count(comp) != 0; }
 
 
 

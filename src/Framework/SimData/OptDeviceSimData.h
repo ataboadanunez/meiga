@@ -29,23 +29,26 @@ class OptDeviceSimData
 		unsigned int GetId() const { return fId; }
 
 		void AddPhotonTime(const double time);
-		std::vector<double> GetPhotonTime() { return fPhotonTime; }
+		std::vector<double> & GetPhotonTime() { return fPhotonTime; }
+		const std::vector<double> & GetPhotonTime() const { return fPhotonTime; }
 
 		void AddPhotonEnergy(const double energy);
-		std::vector<double> GetPhotonEnergy() { return fPhotonEnergy; }
+		std::vector<double> & GetPhotonEnergy() { return fPhotonEnergy; }
+		const std::vector<double> & GetPhotonEnergy() const { return fPhotonEnergy; }
 
 		// photo-electron time distribution
 		void AddPETimeDistribution(std::vector<double>* peTimeDist);
 		std::vector<std::vector<double>*>* PETimeDistributionRange() { return fPETimeDistribution; }
+		const std::vector<std::vector<double>*>* PETimeDistributionRange() const { return fPETimeDistribution; }
 		
 		// for particle types
 		void AddPETimeDistribution(Particle::Type type, const std::vector<double>& peTimeDist);
-		const std::vector<std::vector<double>>& PETimeDistributionRange(Particle::Type type) { return particleTypeMap.at(type); }
+		const std::vector<std::vector<double>>& PETimeDistributionRange(Particle::Type type) const { return particleTypeMap.at(type); }
 		bool HasPETimeDistribution(Particle::Type type) const { return !particleTypeMap.count(type); }
 
 		// for particle components
 		void AddPETimeDistribution(Particle::Component comp, const std::vector<double>& peTimeDist);
-		const std::vector<std::vector<double>>& PETimeDistributionRange(Particle::Component comp) { return particleCompMap.at(comp); }
+		const std::vector<std::vector<double>>& PETimeDistributionRange(Particle::Component comp) const { return particleCompMap.at(comp); }
 		bool HasPETimeDistribution(Particle::Component comp) const { return particleCompMap.count(comp); }
 		
 
