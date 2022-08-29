@@ -1,7 +1,6 @@
 #ifndef OptDevice_h
 #define OptDevice_h 1
 
-//#include "SiPM.h"
 #include "G4LogicalVolume.hh"
 #include <vector>
 #include <string>
@@ -56,7 +55,7 @@ class OptDevice
 		// response stuff
 		bool IsPhotonDetected(double energy);
 		double GetQuantumEfficiency(double wl, OptDevice::DeviceType t);
-		void SPEPulse(std::vector<double> &amplitude, double fBinTime, size_t fStartPulse);
+		void SPEPulse(std::vector<double> &amplitude, double fBinTime, std::size_t fStartPulse);
 		double GetSPEPulseDuration() { return fPulseDuration; }
 		std::vector<double> GetOpticalRange();
 

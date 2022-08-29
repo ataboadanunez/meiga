@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
-#include "SiPM.h"
+#include "OptDevice.h"
 #include "Particle.h"
 
 /*
@@ -74,7 +74,7 @@ class OptDeviceSimData
 		// add PE time distribution for different particle components
 		std::map<Particle::Component, std::vector<std::vector<double>> > particleCompMap;
 		// access to detector members
-		SiPM fDetSiPM;
+		OptDevice fDetSiPM;
 		// PMT, MChPMT
 
 };

@@ -53,7 +53,7 @@ OptDeviceSimData::CalculatePulse(const double fBinSize, const std::vector<double
 
 	// case for OptDevice types is needed
 	
-	size_t size = pulseLength / fBinSize + 1;
+	std::size_t size = pulseLength / fBinSize + 1;
 	std::vector<double> result(size, 0.);
 	//Fill array
 	for (auto t: peTime) {
