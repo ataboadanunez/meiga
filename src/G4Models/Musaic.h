@@ -10,7 +10,6 @@
 
 #include "Event.h"
 #include "Detector.h"
-#include "Module.h"
 #include "Materials.h"
 
 class G4VPhysicalVolume;
