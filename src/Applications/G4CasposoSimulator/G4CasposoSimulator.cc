@@ -54,7 +54,7 @@ namespace
 	void ProgramUsage() 
 	{
 		cerr << " Program Usage: " << endl;
-		cerr << " ./G4RICHSimulator [ -c ConfigFile.json ] " << endl;
+		cerr << " ./G4CasposoSimulator [ -c ConfigFile.json ] " << endl;
 	}
 
 }
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 
 	if (argc < 3) {
 		ProgramUsage();
-		throw invalid_argument("[ERROR] G4RICHSimulator::main: A configuration file is needed!");
+		throw invalid_argument("[ERROR] G4CasposoSimulator::main: A configuration file is needed!");
 	}
 
 	for (int i=1; i<argc; i=i+2) {
@@ -127,6 +127,7 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 
 	cout << "[INFO] G4CasposoSimulator::RunSimulation" << endl;
 
+	const Event::Config &cfg = theEvent.GetConfig();
 	SimData& simData = theEvent.GetSimData();
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
 	cout << "[INFO] G4CasposoSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
@@ -137,10 +138,7 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 		return false;
 	}
 	
-	simData.SetInjectionMode(fInjectionMode);
-	if (fInjectionMode == SimData::eInsideDetector)
-		cout << "[INFO] G4CasposoSimulator::RunSimulation: Partilces injected INSIDE the detector (InjectionMode = " << fInjectionMode << "). " << endl;
-
+	
 	/***************
 
 		Geant4 Setup    
@@ -181,12 +179,12 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 	fRunManager->Initialize();
 
 	// initialize visualization
-	if ((fGeoVisOn || fTrajVisOn) && !fVisManager)
+	if ((cfg.fGeoVis || cfg.fTrajVis) && !fVisManager)
 		fVisManager = new G4VisExecutive;
 
 	// get the pointer to the UI manager and set verbosities
 	G4UImanager* fUImanager = G4UImanager::GetUIpointer();
-	switch (fVerbosity) {
+	switch (cfg.fVerbosity) {
 		case 1:
 			fUImanager->ApplyCommand("/run/verbose 1");
 			fUImanager->ApplyCommand("/event/verbose 0");
@@ -208,7 +206,7 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 			fUImanager->ApplyCommand("/tracking/verbose 0");
 		}
 	
-	if (fGeoVisOn || fTrajVisOn) {
+	if (cfg.fGeoVis || cfg.fTrajVis) {
 		fVisManager->Initialize();
 		fUImanager->ApplyCommand(("/vis/open " + fRenderFile).c_str());
 		fUImanager->ApplyCommand("/vis/scene/create");
@@ -223,7 +221,7 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 		fUImanager->ApplyCommand("/vis/scene/notifyHandlers");
 		fUImanager->ApplyCommand("/vis/viewer/update");
 	}
-	if (fTrajVisOn) {
+	if (cfg.fTrajVis) {
 		fUImanager->ApplyCommand("/tracking/storeTrajectory 1");
 		fUImanager->ApplyCommand("/vis/scene/add/trajectories");
 	}
