@@ -104,10 +104,9 @@ DataWriter::FileWriter(Event& theEvent)
 
 				Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
 				string componentName = aParticle.GetComponentName(particleComponent);
-				cout << "[DEBUG] DataWriter::FileWriter: Accessing data of component " << componentName << endl;
 
 				if (!odSimData.HasPETimeDistribution(particleComponent)) {
-					cout << "[INFO] DataWriter::FileWriter: OptDevice " << odId << " has no PE time distribution for component " << componentName << endl;
+					cout << "[WARNING] DataWriter::FileWriter: OptDevice " << odId << " has no PE time distribution for component " << componentName << endl;
 					continue;
 				}
 
@@ -163,7 +162,7 @@ DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId)
 		string componentName = aParticle.GetComponentName(particleComponent);
 
 		if (!detSimData.HasEnergyDeposit(particleComponent)) {
-			cout << "[INFO] DataWriter::SaveEnergy: Detector " << detId << " has no energy deposits of component " << componentName << endl;
+			cout << "[WARNING] DataWriter::SaveEnergy: Detector " << detId << " has no energy deposits of component " << componentName << endl;
 			continue;
 		}
 
