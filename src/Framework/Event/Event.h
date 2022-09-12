@@ -64,6 +64,7 @@ class Event
 		std::string fInjectionMode;
 		bool fGeoVis;
 		bool fTrajVis;
+		bool fCheckOverlaps;
 		std::string fRenderFile;
 		std::string fPhysicsListName;
 		int fVerbosity;
@@ -73,6 +74,7 @@ class Event
 		bool fCompressOutput;
 		bool fSaveTraces;
 		bool fSaveEnergy;
+
 		// add more stuff below in case is needed
 
 

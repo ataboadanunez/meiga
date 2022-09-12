@@ -15,6 +15,7 @@
 		"InjectionMode" : "eCircle",
 		"GeoVisOn" : false,
 		"TrajVisOn" : false,
+		"CheckOverlaps" : false,
 		"Verbosity" : 1,
 		"RenderFile" : "VRML2FILE",
 		"PhysicsName" : "QGSP_BERT_HP"

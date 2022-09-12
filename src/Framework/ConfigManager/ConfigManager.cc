@@ -36,6 +36,7 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	simData.SetInjectionMode(simData.InjectionConversion(cfg.fInjectionMode));
 	cfg.fGeoVis  = tree.get<bool>("Simulation.GeoVisOn");
 	cfg.fTrajVis = tree.get<bool>("Simulation.TrajVisOn");
+	cfg.fCheckOverlaps = tree.get<bool>("Simulation.CheckOverlaps");
 	cfg.fRenderFile = tree.get<string>("Simulation.RenderFile");
 	cfg.fPhysicsListName = tree.get<string>("Simulation.PhysicsName");
 	cfg.fVerbosity = tree.get<int>("Simulation.Verbosity");
@@ -137,5 +138,6 @@ ConfigManager::PrintConfig(const Event::Config &cfg)
 	cout << "[INFO] VisualizeTrajectory = " << (cfg.fTrajVis ? "yes" : "no") << endl;
 	cout << "[INFO] RenderFile = " << cfg.fRenderFile << endl;
 	cout << "[INFO] PhysicsList = " << cfg.fPhysicsListName << endl;
+	cout << "[INFO] CheckOverlaps = " << (cfg.fCheckOverlaps ? "yes" : "no") << endl;
 
 }
