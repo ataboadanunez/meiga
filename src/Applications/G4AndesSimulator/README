@@ -1,0 +1,5 @@
+Simulation of the muon flux in for the ANDES Underground Laboratory
+
+Since no detector is simulated (only calculation of the muon flux),
+DetectorList.xml contains a eScintillator detector with 0 bars, i.e., no detector. This is to avoid the execution failure if no detector is given.
+
