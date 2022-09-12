@@ -40,14 +40,14 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	G4LogicalVolume* logicPixelL = nullptr;
 	G4LogicalVolume* logicPixelR = nullptr;
 
-	// physical volumes
-	G4PVPlacement* physCasing = nullptr;
-	G4PVPlacement* physCoating = nullptr;
-	G4PVPlacement* physScinBar = nullptr;
+	// // physical volumes
+	// G4PVPlacement* physCasing = nullptr;
+	// G4PVPlacement* physCoating = nullptr;
+	// G4PVPlacement* physScinBar = nullptr;
 
-	G4PVPlacement* physClad2 = nullptr;
-	G4PVPlacement* physClad1 = nullptr;
-	G4PVPlacement* physFiber = nullptr;
+	// G4PVPlacement* physClad2 = nullptr;
+	// G4PVPlacement* physClad1 = nullptr;
+	// G4PVPlacement* physFiber = nullptr;
 
 	// detector properties are fixed for this detector.
 	G4int nPanels = 3;
@@ -153,7 +153,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 		G4int panelId = pIt+1;
 		G4String nameCasing = "Casing_"+to_string(panelId);
 		logicCasing = new G4LogicalVolume(solidCasing, Materials().Air, nameCasing, 0, 0, 0);
-		physCasing  = new G4PVPlacement(nullptr, panelPosition, logicCasing, nameCasing, logMother, false, detectorId, fCheckOverlaps);
+		new G4PVPlacement(nullptr, panelPosition, logicCasing, nameCasing, logMother, false, detectorId, fCheckOverlaps);
 		
 
 		// bars of the top panel
@@ -208,26 +208,17 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			logicPixelR = new G4LogicalVolume(solidPixel, Materials().Pyrex, namePixelR, 0, 0, 0);
 			logicPixelR->SetVisAttributes(blue);
 
-			// physical volumes
-			// physCoating = new G4PVPlacement(0, barPosition, nameCoating, logicCoating, physCasing, false, barId, fCheckOverlaps);
-			// physScinBar = new G4PVPlacement(0, G4ThreeVector(), nameScinBar, logicScinBar, physCoating, false, barId, fCheckOverlaps);
-			// physClad2 = new G4PVPlacement(rotationFiber, fiberPosition, nameClad2, logicClad2, physScinBar, false, barId, fCheckOverlaps);
-			// physClad1 = new G4PVPlacement(0, G4ThreeVector(), nameClad1, logicClad1, physClad2, false, barId, fCheckOverlaps);
-			// physFiber = new G4PVPlacement(0, G4ThreeVector(), nameFiber, logicFiber, physClad1, false, barId, fCheckOverlaps);
-			// new G4PVPlacement(0, G4ThreeVector(fPMTPosX, fPMTPosY, fPMTPosZ), namePixelL, logicPixelL, physFiber, false, pixelLId, fCheckOverlaps);
-			// new G4PVPlacement(0, G4ThreeVector(fPMTPosX, fPMTPosY, -1*fPMTPosZ), namePixelR, logicPixelR, physFiber, false, pixelRId, fCheckOverlaps);
 
 			// physical volumes
-			physCoating  = new G4PVPlacement(nullptr, barPosition, logicCoating, 
+			new G4PVPlacement(nullptr, barPosition, logicCoating, 
 				nameCoating, logicCasing, false, barId, fCheckOverlaps);
-			physScinBar   = new G4PVPlacement(nullptr, G4ThreeVector(), logicScinBar, 
+			new G4PVPlacement(nullptr, G4ThreeVector(), logicScinBar, 
 				nameScinBar, logicCoating, false, barId, fCheckOverlaps);
-			cout << "[DEBUG] G4Models::Mudulus: Placement of fiber " <<  barId << ": " << fFiberPosX / CLHEP::mm << endl; 
-			physClad2 = new G4PVPlacement(rotationFiber, fiberPosition, logicClad2, 
+			new G4PVPlacement(rotationFiber, fiberPosition, logicClad2, 
 				nameClad2, logicScinBar, true, barId, fCheckOverlaps);
-			physClad1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
+			new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
 				nameClad1, logicClad2, false, barId, fCheckOverlaps);
-			physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
+			new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
 				nameFiber, logicClad1, false, barId, fCheckOverlaps); 
 
 			new G4PVPlacement(nullptr, G4ThreeVector(fPMTPosX, fPMTPosY, fPMTPosZ), logicPixelL,
@@ -300,24 +291,15 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			logicPixelR->SetVisAttributes(blue);
 
 			// physical volumes		
-			// physCoating = new G4PVPlacement(rotationBot, barPosition, nameCoating, logicCoating, physCasing, false, barId, fCheckOverlaps);
-			// physScinBar = new G4PVPlacement(0, G4ThreeVector(), nameScinBar, logicScinBar, physCoating, false, barId, fCheckOverlaps);
-			// physClad2 = new G4PVPlacement(rotationFiber, fiberPosition, nameClad2, logicClad2, physScinBar, false, barId, fCheckOverlaps);
-			// physClad1 = new G4PVPlacement(0, G4ThreeVector(), nameClad1, logicClad1, physClad2, false, barId, fCheckOverlaps);
-			// physFiber = new G4PVPlacement(0, G4ThreeVector(), nameFiber, logicFiber, physClad1, false, barId, fCheckOverlaps);
-			// new G4PVPlacement(0, G4ThreeVector(fPMTPosX, fPMTPosY, fPMTPosZ), namePixelL, logicPixelL, physFiber, false, pixelLId, fCheckOverlaps);
-			// new G4PVPlacement(0, G4ThreeVector(fPMTPosX, fPMTPosY, -1*fPMTPosZ), namePixelR, logicPixelR, physFiber, false, pixelRId, fCheckOverlaps);
-
-			// physical volumes		
-			physCoating  = new G4PVPlacement(rotationBot, barPosition, logicCoating, 
+			new G4PVPlacement(rotationBot, barPosition, logicCoating, 
 				nameCoating, logicCasing, false, barId, fCheckOverlaps);
-			physScinBar   = new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicScinBar,
+			new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicScinBar,
 				nameScinBar, logicCoating, false, barId, fCheckOverlaps);
-			physClad2 = new G4PVPlacement(rotationFiber, fiberPosition, logicClad2, 
+			new G4PVPlacement(rotationFiber, fiberPosition, logicClad2, 
 				nameClad2, logicScinBar, true, barId, fCheckOverlaps);
-			physClad1 = new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
+			new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
 				nameClad1, logicClad2, false, barId, fCheckOverlaps);
-			physFiber = new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
+			new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
 				nameFiber, logicClad1, false, barId, fCheckOverlaps); 
 			new G4PVPlacement(nullptr, G4ThreeVector(fPMTPosX, fPMTPosY, fPMTPosZ), logicPixelL, 
 					namePixelL, logicFiber, false, pixelLId, fCheckOverlaps);
