@@ -62,8 +62,8 @@ class G4AndesDetectorConstruction : public G4VUserDetectorConstruction {
 		G4PVPlacement*   physGround  = nullptr;
 
 		// size definitions
-		G4double fGroundSizeX = 1000 * CLHEP::m;
-		G4double fGroundSizeY = 1000 * CLHEP::m;
+		G4double fGroundSizeX = 10000 * CLHEP::m;
+		G4double fGroundSizeY = 10000 * CLHEP::m;
 		G4double fGroundSizeZ = 1750 * CLHEP::m;
 
 		G4double fWorldSizeX = fGroundSizeX + 5 * CLHEP::m;

@@ -35,23 +35,26 @@ G4AndesSteppingAction::UserSteppingAction(const G4Step* step)
 	SimData& simData = fEvent.GetSimData();
 	double groundThickness = simData.GetGroundThickness();
 	double depth = -0.5*groundThickness;
+
   // kill non-primary particles to speed up 
 	G4Track* track = step->GetTrack();
 	
-	// kill non primary particles to speed up
-	if (track->GetParentID() != 0)
-		track->SetTrackStatus(fStopAndKill);
+	if (track->GetParentID() != 0) {
+		track->SetTrackStatus(fStopAndKill);	
+	}
+	else {
+		// here we are left with primary particles (muons)
+		double currentEnergy = track->GetTotalEnergy();
+		G4ThreeVector trackPosition = track->GetPosition();
 
+		Particle& currParticle = G4AndesSimulator::currentParticle;
+		double fKineticEnergy = currParticle.GetKineticEnergy();
+		
+		double posZ = trackPosition[2];
+		// get muon energy at last step in ground
+		G4String stepVolumeName = track->GetVolume()->GetName();
+		if (stepVolumeName == "Ground" && step->IsLastStepInVolume() && posZ)
+			std::cout << "TrackStoppingInfo ParticleID " << currParticle.GetParticleId() << " LastStepEnergy_GeV " << currentEnergy / CLHEP::GeV << " depth_m " << posZ / CLHEP::m << " Initial Energy "  << fKineticEnergy / CLHEP::GeV <<std::endl;
 
-	// here we are left with primary particles (muons)
-	double currentEnergy = track->GetTotalEnergy();
-	G4ThreeVector trackPosition = track->GetPosition();
-	double posZ = trackPosition[2];
-	int pdgID = track->GetParticleDefinition()->GetPDGEncoding();
-
-	// get muon energy at last step in ground
-	G4String stepVolumeName = track->GetVolume()->GetName();
-	if (stepVolumeName == "Ground" && step->IsLastStepInVolume())
-		std::cout << "ParticleID_PDG " << pdgID << " LastStepEnergy_GeV " << currentEnergy / CLHEP::GeV << " depth_m " << posZ / CLHEP::m << std::endl;
-
+	}
 }
