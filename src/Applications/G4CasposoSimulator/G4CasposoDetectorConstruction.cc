@@ -63,10 +63,11 @@ void
 G4CasposoDetectorConstruction::PlaceDetector(Event& theEvent)
 {
 	
+	const Event::Config &cfg = theEvent.GetConfig();
 	// loop in detector vector
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 		auto& currentDet = detIt->second;
-		BuildDetector(logicWorld, currentDet, theEvent, true);
+		BuildDetector(logicWorld, currentDet, theEvent, cfg.fCheckOverlaps);
 	}
 
 }

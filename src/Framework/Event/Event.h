@@ -43,7 +43,7 @@ class Event
 
 		int GetNDetectors() {return fNDetectors; }
 
-#warning "move to DetectorSimData!"
+//#warning "move to DetectorSimData!"
 		void SetMaximumHeight(double maxH) { fMaximumHeight = maxH; }
 		double GetMaximumHeight() { return fMaximumHeight; }
 		
