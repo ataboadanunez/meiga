@@ -1,0 +1,13 @@
+{
+	"InputFile" : "./vertical_muon.txt",
+	"OutputFile" : "./output.dat",
+	"DetectorList" : "./DetectorList.xml",
+	"DetectorProperties" : "./DetectorProperties.xml",
+	"SimulationMode" : "eFull",
+	"InjectionMode" : "eRandom",
+	"GeoVisOn" : true,
+	"TrajVisOn" : false,
+	"Verbosity" : 1,
+	"RenderFile" : "VRML2FILE",
+	"PhysicsName" : "QGSP_BERT_HP"
+}

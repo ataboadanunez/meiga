@@ -1,0 +1,23 @@
+{
+	"InputFile" : "./vertical_muon.txt",
+	"Output" : 
+	{
+		"OutputFile" : "./output.json",
+		"CompressOutput" : true,
+		"SaveTraces" : true,
+		"SaveEnergy" : false
+	},
+	"DetectorList" : "./DetectorList.xml",
+	"DetectorProperties" : "./DetectorProperties.xml",
+	"Simulation" :
+	{
+		"SimulationMode" : "eFast",
+		"InjectionMode" : "eRandom",
+		"GeoVisOn" : false,
+		"TrajVisOn" : false,
+		"CheckOverlaps" : false,
+		"Verbosity" : 1,
+		"RenderFile" : "VRML2FILE",
+		"PhysicsName" : "QGSP_BERT_HP"
+	}
+}

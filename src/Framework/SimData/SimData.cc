@@ -2,6 +2,8 @@
 #include "SimData.h"
 #include "DetectorSimData.h"
 
+using namespace std;
+
 SimData::SimData()
 {
 	fParticles.clear();
@@ -10,6 +12,44 @@ SimData::SimData()
 SimData::~SimData()
 {
 
+}
+
+SimData::InjectionMode
+SimData::InjectionConversion(string name)
+{
+	
+	fInjectionModeName = name;
+
+	if (name == "eRandom")
+		return SimData::eRandom;
+	else if (name == "ePositionFromFile")
+		return SimData::ePositionFromFile;
+	else if (name == "eVertical")
+		return SimData::eVertical;
+	else if (name == "eInsideDetector")
+		return SimData::eInsideDetector;
+	else if (name == "eCircle")
+		return SimData::eCircle;
+	else {
+		cout << "[WARNING] SimData::StringToType: Unknown injection type!" << endl;
+		return SimData::eUnknown;
+	}
+}
+
+SimData::SimulationMode
+SimData::ModeConversion(string name)
+{
+	
+	fSimulationModeName = name;
+
+	if (name == "eFull")
+		return SimData::eFull;
+	else if (name == "eFast")
+		return SimData::eFast;
+	else {
+		cout << "[WARNING] SimData::StringToType: Unknown simulation type! (uwsing Full by default)." << endl;
+		return SimData::eFull;
+	}
 }
 
 void

@@ -11,15 +11,14 @@ class G4RockTrackingAction : public G4UserTrackingAction {
 		~G4RockTrackingAction() { }
 
 		virtual void PreUserTrackingAction(const G4Track*  track) override;
-    virtual void PostUserTrackingAction(const G4Track* track) override;
+		virtual void PostUserTrackingAction(const G4Track* track) override;
 
-    bool GetFirstStepInVolume() const { return firstStepInVolume; }
-    void SetFirstStepInVolume(const bool b) { firstStepInVolume = b; }
+		bool GetIsMuonDecay() { return fIsMuonDecay; }
+		void SetIsMuonDecay() { fIsMuonDecay = true; }
 
+	private:
 
-  private:
-
-  	bool firstStepInVolume = true;
+		bool fIsMuonDecay;
 
 };
 

@@ -23,8 +23,8 @@ ReadParticleFile::~ReadParticleFile()
 
 }
 
-Event
-ReadParticleFile::EventFileReader(const std::string &fileName)
+void
+ReadParticleFile::ParticleFileReader(const std::string &fileName, Event& theEvent)
 {
   /*
   This function gets as input a file with particle information.
@@ -42,13 +42,13 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
 
   */
   
-  cout << "[INFO] Event::ReadParticleFile: Reading Input File " << fileName << endl;
+  cout << "[INFO] ReadParticleFile::ParticleFileReader: Reading Input File " << fileName << endl;
   string errmsg;
   string info;
 
   ifstream fInputStream(fileName);
-  Event ret;
-  SimData& simData = ret.GetSimData();
+  //Event ret;
+  SimData& simData = theEvent.GetSimData();
 
   unsigned int particleId;
   unsigned int NumberOfParticles = 0;
@@ -61,9 +61,9 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
     double x;
     double y;
     double z;
-    unsigned primaryShowerId;
-    unsigned primaryParticleId;
-    double   primaryEnergy;
+    unsigned int primaryShowerId;
+    unsigned int primaryParticleId;
+    double primaryEnergy;
     double primaryTheta;
     double primaryPhi;
     
@@ -95,7 +95,7 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
               >> primaryTheta
               >> primaryPhi)){
       
-      cerr << "ReadParticleFile: Malformed line !!!" << endl;
+      cerr << "[ERROR] Event::ReadParticleFile: Malformed line !!!" << endl;
       break;
     }
 
@@ -121,7 +121,7 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
     px*=GeV;
     py*=GeV;
     pz*=GeV;
-    z*=m;
+    z*=cm;
     primaryEnergy*=GeV;
     primaryTheta*=deg;
     primaryPhi*=deg;
@@ -137,7 +137,7 @@ ReadParticleFile::EventFileReader(const std::string &fileName)
 
   simData.SetTotalNumberOfParticles(NumberOfParticles);
   //std::cout << "[INFO] Event::ReadParticleFile: Total number of particles in file = " << NumberOfParticles << std::endl;
-  return ret;
+  //return ret;
   
 
 

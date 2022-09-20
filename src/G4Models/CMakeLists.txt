@@ -1,0 +1,7 @@
+file(GLOB sources ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
+file(GLOB headers ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+set(MEIGA_LIBRARIES meiga_g4models ${MEIGA_LIBRARIES} PARENT_SCOPE)
+add_library(meiga_g4models STATIC ${sources} ${headers})
+target_link_libraries(meiga_g4models meiga_framework_simdata)
+install(FILES ${headers} DESTINATION include)
+install(TARGETS ${MEIGA_LIBRARIES} DESTINATION lib)

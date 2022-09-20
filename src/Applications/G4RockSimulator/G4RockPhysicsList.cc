@@ -28,58 +28,61 @@
 
 G4RockPhysicsList::G4RockPhysicsList(G4String physName) : G4VModularPhysicsList()
 {
-		G4LossTableManager::Instance();
 
-		defaultCutValue  = 1.*mm;
-		fCutForGamma     = defaultCutValue;
-		fCutForElectron  = defaultCutValue;
-		fCutForPositron  = defaultCutValue;
+	G4LossTableManager::Instance();
+	defaultCutValue  = 1.*mm;
+	fCutForGamma     = defaultCutValue;
+	fCutForElectron  = defaultCutValue;
+	fCutForPositron  = defaultCutValue;
 
-//    G4PhysListFactory factory;
-		G4VModularPhysicsList* phys = NULL;
-		if (physName == "QGSP_BERT_HP") {
-			 phys = new QGSP_BERT_HP;
-		} else {
-			 phys = new FTFP_BERT;
-		}
-//    if (factory.IsReferencePhysList(physName)) {
-//       phys = factory.GetReferencePhysList(physName);
-//       if(!phys)G4Exception("PhysicsList::PhysicsList","InvalidSetup",
-//                            FatalException,"PhysicsList does not exist");
-			 //fMessenger = new PhysicsListMessenger(this);
-//    }
-
-		for (G4int i = 0; ; ++i) {
-			 G4VPhysicsConstructor* elem =
-									const_cast<G4VPhysicsConstructor*> (phys->GetPhysics(i));
-			 if (elem == NULL) break;
-			 G4cout << "RegisterPhysics: " << elem->GetPhysicsName() << G4endl;
-			 RegisterPhysics(elem);
+	// G4PhysListFactory factory;
+	G4VModularPhysicsList* phys = NULL;
+	if (physName == "QGSP_BERT_HP") {
+		phys = new QGSP_BERT_HP;
+	} else {
+		phys = new FTFP_BERT;
+	}
+	
+	/*
+	if (factory.IsReferencePhysList(physName)) {
+		phys = factory.GetReferencePhysList(physName);
+		if (!phys) {
+			G4Exception("PhysicsList::PhysicsList","InvalidSetup", FatalException,"PhysicsList does not exist");
 		}
 
-		fAbsorptionOn = true;
-		
-		RegisterPhysics(new ExtraPhysics());
-		RegisterPhysics(fOpticalPhysics = new OpticalPhysics(fAbsorptionOn));
+		fMessenger = new PhysicsListMessenger(this);
+  }
+	*/
+	
+	for (G4int i = 0; ; ++i) {
+		G4VPhysicsConstructor* elem = const_cast<G4VPhysicsConstructor*> (phys->GetPhysics(i));
+		if (elem == NULL) break;
+		G4cout << "RegisterPhysics: " << elem->GetPhysicsName() << G4endl;
+		RegisterPhysics(elem);
+	}
 
-		RegisterPhysics(new G4RadioactiveDecayPhysics());
+	fAbsorptionOn = true;
+	RegisterPhysics(new ExtraPhysics());
+	RegisterPhysics(fOpticalPhysics = new OpticalPhysics(fAbsorptionOn));
+	RegisterPhysics(new G4RadioactiveDecayPhysics());
 
-		fStepMaxProcess = new StepMax();
+	fStepMaxProcess = new StepMax();
+
 }
 
 G4RockPhysicsList::~G4RockPhysicsList()
 {
-		//delete fMessenger;
-		delete fStepMaxProcess;
+	//delete fMessenger;
+	delete fStepMaxProcess;
 }
 
 void 
 G4RockPhysicsList::ClearPhysics()
 {
-	for (G4PhysConstVector::iterator p  = fPhysicsVector->begin();
-																	 p != fPhysicsVector->end(); ++p) {
-			delete (*p);
+	for (G4PhysConstVector::iterator p  = fPhysicsVector->begin(); p != fPhysicsVector->end(); ++p) {
+		delete (*p);
 	}
+	
 	fPhysicsVector->clear();
 }
 
@@ -89,17 +92,12 @@ G4RockPhysicsList::ConstructParticle()
 	G4VModularPhysicsList::ConstructParticle();
 
 	G4DecayTable* MuonPlusDecayTable = new G4DecayTable();
-	MuonPlusDecayTable -> Insert(new
-												 G4MuonDecayChannelWithSpin("mu+",0.986));
-	MuonPlusDecayTable -> Insert(new
-												 G4MuonRadiativeDecayChannelWithSpin("mu+",0.014));
+	MuonPlusDecayTable -> Insert(new G4MuonDecayChannelWithSpin("mu+",0.986));
+	MuonPlusDecayTable -> Insert(new G4MuonRadiativeDecayChannelWithSpin("mu+",0.014));
 	G4MuonPlus::MuonPlusDefinition() -> SetDecayTable(MuonPlusDecayTable);
-
 	G4DecayTable* MuonMinusDecayTable = new G4DecayTable();
-	MuonMinusDecayTable -> Insert(new
-													G4MuonDecayChannelWithSpin("mu-",0.986));
-	MuonMinusDecayTable -> Insert(new
-													G4MuonRadiativeDecayChannelWithSpin("mu-",0.014));
+	MuonMinusDecayTable -> Insert(new G4MuonDecayChannelWithSpin("mu-",0.986));
+	MuonMinusDecayTable -> Insert(new G4MuonRadiativeDecayChannelWithSpin("mu-",0.014));
 	G4MuonMinus::MuonMinusDefinition() -> SetDecayTable(MuonMinusDecayTable);
 
 }

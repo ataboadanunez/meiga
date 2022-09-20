@@ -13,17 +13,15 @@ class G4RockDetectorConstruction;
 class G4RockEventAction;
 
 /* Stepping action class.
-     UserSteppingAction collects arrival time of optical photons
-     at the photodetector (SiPM)
+     UserSteppingAction collects info at a step level
 */
 
 class G4RockSteppingAction : public G4UserSteppingAction
 {
     public:
-        G4RockSteppingAction(const G4RockDetectorConstruction* det, G4RockEventAction* event, std::ofstream* ofile, Event& theEvent);
+        G4RockSteppingAction(const G4RockDetectorConstruction* det, G4RockEventAction* event, Event& theEvent);
         virtual ~G4RockSteppingAction();
         virtual void UserSteppingAction(const G4Step* step);
-        G4bool IsDetected(G4double);
 
     private:
         const G4RockDetectorConstruction* fDetectorConstruction;

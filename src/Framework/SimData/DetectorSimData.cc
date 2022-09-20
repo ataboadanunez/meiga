@@ -1,18 +1,21 @@
 // implementation of class DetectorSimData
 #include "DetectorSimData.h"
 
-// DetectorSimData::DetectorSimData()
-// {
-// 	//fSiPMVector.clear()
-// }
+void
+DetectorSimData::MakeOptDeviceSimData(unsigned int id)
+{
+	fOptDeviceSimMap.emplace(id, OptDeviceSimData(id));
+}
 
-// DetectorSimData::~DetectorSimData()
-// {
-
-// }
+void 
+DetectorSimData::SetEnergyDeposit(const double eDep)
+{
+	fEnergyDeposit.push_back(eDep);
+}
 
 void
-DetectorSimData::MakeSiPMSimData(unsigned int id)
+DetectorSimData::SetEnergyDeposit(Particle::Component comp, const double eDep)
 {
-	fSiPMSimMap.emplace(id, SiPMSimData(id));
+	auto it = fEDepComponentMap.emplace(std::make_pair(comp, double()));
+	it.first->second.push_back(eDep);
 }

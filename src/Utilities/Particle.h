@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <string>
 
 // start using namespaces?
 
@@ -60,6 +61,16 @@ class Particle {
 			eIron = 1000026056
 		};
 
+		enum Component {
+			eUnknown = 0,
+			eElectromagnetic = 1,
+			eMuonic = 2,
+			eHadronic = 3,
+			eMuonDecay = 4,
+			// for iterating over enum elements
+			eEnd
+		};
+
 		Particle() { ; }
 		// constructor using momentum
 		Particle(int id, std::vector<double>& position, std::vector<double>& momentum);
@@ -68,6 +79,12 @@ class Particle {
 		void SetParticleId(const int id) { fId = id; }
 		// calculate particle code for a nucleus given (A, Z)
 		static int NucleusCode(const unsigned int theCharge, const unsigned int theAtomicNumber);
+
+		// type and components
+		void InsertComponent(const Particle::Type type, const Particle::Component comp);
+		void InitComponentMap();
+		Particle::Component GetComponent(const Particle::Type type);
+		std::string GetComponentName(Particle::Component type);
 
 		// particle momentum
 		const std::vector<double>& GetDirection() const { return fDirection; }
@@ -99,6 +116,8 @@ class Particle {
 		void SetAzimuth(const double azimuth) { fAzimuth = azimuth; }
 		double GetAzimuth() const { return fAzimuth; }
 
+
+
 	private:
  		
  		int fId;
@@ -112,6 +131,7 @@ class Particle {
   	std::vector<double> fDirection;
   	std::vector<double> fInjectionPosition;
   	static std::map<int, double> gParticleMassMap;
+  	static std::map<Particle::Type, Particle::Component> gComponentMap;
 		// particle properties for mass
 };
 
