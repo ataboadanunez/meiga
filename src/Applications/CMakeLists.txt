@@ -3,5 +3,5 @@ cmake_minimum_required(VERSION 3.10)
 add_subdirectory(G4CasposoSimulator)
 add_subdirectory(G4WCDSimulator)
 add_subdirectory(G4MuDecSimulator)
-#add_subdirectory(G4AndesSimulator)
+add_subdirectory(G4AndesSimulator)
 
