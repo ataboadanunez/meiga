@@ -48,7 +48,7 @@ OptDeviceSimData::AddPETimeDistribution(Particle::Component comp, const std::vec
 
 
 std::vector<double>
-OptDeviceSimData::CalculatePulse(const double fBinSize, const std::vector<double>& peTime, const double pulseLength)
+OptDeviceSimData::CalculatePulse(const double fBinSize, const std::vector<double>& peTime, const OptDevice::DeviceType& type, const double pulseLength)
 {
 
 	// case for OptDevice types is needed
@@ -57,7 +57,7 @@ OptDeviceSimData::CalculatePulse(const double fBinSize, const std::vector<double
 	std::vector<double> result(size, 0.);
 	//Fill array
 	for (auto t: peTime) {
-			fDetSiPM.SPEPulse(result, fBinSize, static_cast<size_t>(t/fBinSize));
+			fOptDevice.SPEPulse(result, fBinSize, static_cast<size_t>(t/fBinSize), type);
 	}
 
 	return result;

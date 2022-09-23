@@ -97,6 +97,43 @@ DataWriter::FileWriter(Event& theEvent)
 
 			*/
 
+		
+			/*
+				TEST AREA FOR PULSE CALCULATION (time vs Amplitude)
+			*/
+			cout << "[DEBUG] DataWriter::FileWriter: Accessing PE time distribution of Optical Device type " << currOd.GetType() << endl;
+			// iterate over PE time distriutions (time pulses)
+			for (auto peTime = peTimeDistributionRange->begin(); peTime != peTimeDistributionRange->end(); ++peTime) {
+			
+				size_t npe = (*peTime)->size();
+				// if not PE were produced, continue
+				if (!npe) {
+					continue;
+				}
+			
+				auto odPulse = odSimData.CalculatePulse(1*ns, *(*peTime), currOd.GetType());
+				size_t pulseSize = odPulse.size();
+
+				// pulse iterator
+				for (size_t pulseIt=0; pulseIt<pulseSize; pulseIt++) {
+					//cout << sipmPulse[pulseIt] << " ";
+					cout << odPulse[pulseIt] << " ";
+				}
+
+				cout << endl;
+
+				// // PE iterator
+				// for (size_t peIt=0; peIt<npe; peIt++) {
+				// 	(*fPETimeDistriution) << (*peTime)->at(peIt) << " ";
+				// }
+
+				// (*fPETimeDistriution) << endl;
+			}
+
+			/*
+				END OF TEST AREA
+			*/
+
 			// lines below should be in separate function...
 			// if (saveComponentPETimeDistribution...)
 			json jComponentPETimeDistribution;

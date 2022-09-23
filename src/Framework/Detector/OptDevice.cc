@@ -57,15 +57,45 @@ OptDevice::SetProperties(OptDevice::DeviceType type)
 }
 
 void
-OptDevice::SPEPulse(std::vector<double> &amplitude, double fBinTime, std::size_t fStartPulse)
+OptDevice::SPEPulse(std::vector<double> &amplitude, double fBinTime, std::size_t fStartPulse, const OptDevice::DeviceType &type)
 {
 
 	const std::size_t bins = (fPulseDuration/fBinTime);
-		
-		for (std::size_t i = 0; i < bins && (fStartPulse + i) < amplitude.size(); ++i) {
-			const double t = i*fBinTime;
-			amplitude[fStartPulse + i] += fA0 * ( 1.-exp(-(t-fT0) / fTr) * exp(-(t-fT0) / fTf));
-		}
+	
+	switch(type) {
+		case eSiPM:
+			// charge-discharge of a capacitor form for SiPM pulse
+			for (std::size_t i = 0; i < bins && (fStartPulse + i) < amplitude.size(); ++i) {
+				const double t = i*fBinTime;
+				amplitude[fStartPulse + i] += fA0 * ( 1.-exp(-(t-fT0) / fTr) * exp(-(t-fT0) / fTf));
+			}
+
+		break;
+
+		case eMChPMT:
+			// exponentially modified gaussian for MChPMT pulse
+			for (std::size_t i = 0; i < bins && (fStartPulse + i) < amplitude.size(); ++i) {
+				const double t = i*fBinTime;
+				amplitude[fStartPulse + i] += fAmplitude * fLambda * 0.5 * exp(fLambda*0.5 * (2*fMu + fLambda*pow(fSigma, 2) - 2*t)) * erfc((fMu + fLambda*pow(fSigma, 2) -t) / (sqrt(2)*fSigma));
+			}
+
+		break;
+
+		case ePMT:
+		// need pulse shape for ePMT (large)
+			for (std::size_t i = 0; i < bins && (fStartPulse + i) < amplitude.size(); ++i) {
+				const double t = i*fBinTime;
+				amplitude[fStartPulse + i] += t*0;
+			}
+		break;		
+
+		case eUnknown:
+			throw std::invalid_argument("Unknown Optical Device type!");
+		break; 
+
+
+	} 
+
 
 }
 

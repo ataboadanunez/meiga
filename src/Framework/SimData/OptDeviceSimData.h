@@ -57,7 +57,7 @@ class OptDeviceSimData
 
 		// for SiPM pulse calculation.
 		// this function needs to be generalized for each type of optical device
-		std::vector<double> CalculatePulse(const double fBinSize, const std::vector<double>& peTime, const double pulseLenght = 500.);
+		std::vector<double> CalculatePulse(const double fBinSize, const std::vector<double>& peTime, const OptDevice::DeviceType &type, const double pulseLenght = 500.);
 
 	private:
 
@@ -74,7 +74,7 @@ class OptDeviceSimData
 		// add PE time distribution for different particle components
 		std::map<Particle::Component, std::vector<std::vector<double>> > particleCompMap;
 		// access to detector members
-		OptDevice fDetSiPM;
+		OptDevice fOptDevice;
 		// PMT, MChPMT
 
 };
