@@ -17,13 +17,14 @@ G4MOptDeviceAction::G4MOptDeviceAction(const G4String& name, const G4int dId, co
 
 	{ 
 		
-		std::cout << "[INFO] G4Models::G4MOptDeviceAction: Registering OptDevice " << name << std::endl;
 		SimData& simData = fEvent.GetSimData();
 		DetectorSimData& detSimData = simData.GetDetectorSimData(fDetectorId);
 		detSimData.MakeOptDeviceSimData(fOptDeviceId);
-		OptDeviceSimData& OptDeviceSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
+		// OptDeviceSimData& OptDeviceSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
+		OptDevice& optDevice = fEvent.GetDetector(fDetectorId).GetOptDevice(fOptDeviceId);
+		// fPETimeDistribution = OptDeviceSimData.PETimeDistributionRange();
 
-		fPETimeDistribution = OptDeviceSimData.PETimeDistributionRange();
+		std::cout << "[INFO] G4Models::G4MOptDeviceAction: Registering OptDevice " << optDevice.GetName() << " " << name << " " << fOptDeviceId << std::endl;
 
 	}
 
@@ -38,7 +39,15 @@ G4MOptDeviceAction::Initialize(G4HCofThisEvent* const /*hce*/)
 void
 G4MOptDeviceAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 {
-	fEvent.GetSimData().GetDetectorSimData(fDetectorId).GetOptDeviceSimData(fOptDeviceId).AddPETimeDistribution(fPETime);
+	OptDeviceSimData& optDeviceSimData = fEvent.GetSimData().GetDetectorSimData(fDetectorId).GetOptDeviceSimData(fOptDeviceId);
+	optDeviceSimData.AddPETimeDistribution(fPETime);
+	// Pulse calculator
+	OptDevice& optDevice = fEvent.GetDetector(fDetectorId).GetOptDevice(fOptDeviceId);
+	const OptDevice::DeviceType &type = optDevice.GetType();
+	// calculate analog trace for that particular optical device
+	auto odTrace = optDeviceSimData.CalculateTrace(1*CLHEP::ns, *fPETime, type);
+	// add to SimData
+	optDeviceSimData.AddTimeTrace(odTrace);
 	//fPETimeDistribution->push_back(fPETime);
 
 }
