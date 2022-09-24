@@ -97,7 +97,9 @@ DataWriter::FileWriter(Event& theEvent)
 
 			*/
 
-		
+			auto timeTraces = odSimData.GetTimeTraceDistribution();
+			json jTimeTraces = timeTraces;
+
 			/*
 				TEST AREA FOR PULSE CALCULATION (time vs Amplitude)
 			*/
@@ -111,7 +113,7 @@ DataWriter::FileWriter(Event& theEvent)
 					continue;
 				}
 			
-				auto odPulse = odSimData.CalculatePulse(1*ns, *(*peTime), currOd.GetType());
+				auto odPulse = odSimData.CalculateTrace(1*ns, *(*peTime), currOd.GetType());
 				size_t pulseSize = odPulse.size();
 
 				// pulse iterator
@@ -122,12 +124,6 @@ DataWriter::FileWriter(Event& theEvent)
 
 				cout << endl;
 
-				// // PE iterator
-				// for (size_t peIt=0; peIt<npe; peIt++) {
-				// 	(*fPETimeDistriution) << (*peTime)->at(peIt) << " ";
-				// }
-
-				// (*fPETimeDistriution) << endl;
 			}
 
 			/*
@@ -155,6 +151,7 @@ DataWriter::FileWriter(Event& theEvent)
 
 			jData["OptDevice_"+to_string(odId)]["PETimeDistribution"] = jComponentPETimeDistribution;
 
+			jData["OptDevice_"+to_string(odId)]["TimeTraces"] = jTimeTraces;
 		} // end loop over optical devices
 
 	} // end loop over detectors
