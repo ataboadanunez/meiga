@@ -61,12 +61,10 @@ DataWriter::FileWriter(Event& theEvent)
 		DetectorSimData& detSimData = simData.GetDetectorSimData(detId);
 
 		/* 
-			at this level one could access energy deposit, particle counters, etc... 
-			this is set in the configuration
+			Detector level: access energy deposit, particle counters, etc... 
 		*/
-		if (cfg.fSaveEnergy) {
-			SaveEnergy(jData, simData, detId);
-		}
+		if (cfg.fSaveEnergy)
+			SaveEnergy(jData, simData, detId, cfg.fSaveComponentsEnergy);
 		
 
 
@@ -91,67 +89,54 @@ DataWriter::FileWriter(Event& theEvent)
 				continue;
 			}
 
-			/* at this level one could access total charge (number of photo-electrons), 
-			time distributions (pe arrival time), pulses (time vs Amplitude) 
-			and also obtain these for different particle components.
+			// if has PE time distributions it has signals...
+			if (cfg.fSavePETimeDistribution)
+				SavePETimeDistribution(jData, detSimData, odId, cfg.fSaveComponentsPETimeDistribution);
 
+			/* 
+				Optical Device Level: Time traces, PE time distribution, charge, etc...
 			*/
+			if (cfg.fSaveTraces)
+				SaveTraces(jData, detSimData, odId);
 
-			auto timeTraces = odSimData.GetTimeTraceDistribution();
-			json jTimeTraces = timeTraces;
+			// auto timeTraces = odSimData.GetTimeTraceDistribution();
+			// json jTimeTraces = timeTraces;
 
-			/*
-				TEST AREA FOR PULSE CALCULATION (time vs Amplitude)
-			*/
-			cout << "[DEBUG] DataWriter::FileWriter: Accessing PE time distribution of Optical Device type " << currOd.GetType() << endl;
-			// iterate over PE time distriutions (time pulses)
-			for (auto peTime = peTimeDistributionRange->begin(); peTime != peTimeDistributionRange->end(); ++peTime) {
+			// /*
+			// 	TEST AREA FOR PULSE CALCULATION (time vs Amplitude)
+			// */
+			// cout << "[DEBUG] DataWriter::FileWriter: Accessing PE time distribution of Optical Device type " << currOd.GetType() << endl;
+			// // iterate over PE time distriutions (time pulses)
+			// for (auto peTime = peTimeDistributionRange->begin(); peTime != peTimeDistributionRange->end(); ++peTime) {
 			
-				size_t npe = (*peTime)->size();
-				// if not PE were produced, continue
-				if (!npe) {
-					continue;
-				}
+			// 	size_t npe = (*peTime)->size();
+			// 	// if not PE were produced, continue
+			// 	if (!npe) {
+			// 		continue;
+			// 	}
 			
-				auto odPulse = odSimData.CalculateTrace(1*ns, *(*peTime), currOd.GetType());
-				size_t pulseSize = odPulse.size();
+			// 	auto odPulse = odSimData.CalculateTrace(1*ns, *(*peTime), currOd.GetType());
+			// 	size_t pulseSize = odPulse.size();
 
-				// pulse iterator
-				for (size_t pulseIt=0; pulseIt<pulseSize; pulseIt++) {
-					//cout << sipmPulse[pulseIt] << " ";
-					cout << odPulse[pulseIt] << " ";
-				}
+			// 	// pulse iterator
+			// 	for (size_t pulseIt=0; pulseIt<pulseSize; pulseIt++) {
+			// 		//cout << sipmPulse[pulseIt] << " ";
+			// 		cout << odPulse[pulseIt] << " ";
+			// 	}
 
-				cout << endl;
+			// 	cout << endl;
 
-			}
+			// }
 
-			/*
-				END OF TEST AREA
-			*/
+			// /*
+			// 	END OF TEST AREA
+			// */
 
 			// lines below should be in separate function...
 			// if (saveComponentPETimeDistribution...)
-			json jComponentPETimeDistribution;
-			for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
+			
 
-				Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
-				string componentName = aParticle.GetComponentName(particleComponent);
-
-				if (!odSimData.HasPETimeDistribution(particleComponent)) {
-					cout << "[WARNING] DataWriter::FileWriter: OptDevice " << odId << " has no PE time distribution for component " << componentName << endl;
-					continue;
-				}
-
-				auto peTimedistributionRangeComp = odSimData.PETimeDistributionRange(particleComponent);
-
-				jComponentPETimeDistribution[componentName] = peTimedistributionRangeComp;
-
-			} // end loop particle components
-
-			jData["OptDevice_"+to_string(odId)]["PETimeDistribution"] = jComponentPETimeDistribution;
-
-			jData["OptDevice_"+to_string(odId)]["TimeTraces"] = jTimeTraces;
+			
 		} // end loop over optical devices
 
 	} // end loop over detectors
@@ -179,8 +164,53 @@ DataWriter::FileWriter(Event& theEvent)
 	
 }
 
+
+void
+DataWriter::SavePETimeDistribution(json &jData, const DetectorSimData& detSimData, int odId, const bool saveComponents)
+{
+
+	const OptDeviceSimData &odSimData = detSimData.GetOptDeviceSimData(odId);
+
+	if (saveComponents) {
+
+		json jComponentPETimeDistribution;
+		for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
+
+			Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
+			string componentName = aParticle.GetComponentName(particleComponent);
+
+			if (!odSimData.HasPETimeDistribution(particleComponent)) {
+				cout << "[WARNING] DataWriter::FileWriter: OptDevice " << odId << " has no PE time distribution for component " << componentName << endl;
+				continue;
+			}
+
+			auto peTimedistributionRangeComp = odSimData.PETimeDistributionRange(particleComponent);
+
+			jComponentPETimeDistribution[componentName] = peTimedistributionRangeComp;
+
+		} // end loop particle components
+
+		jData["OptDevice_"+to_string(odId)]["PETimeDistribution"] = jComponentPETimeDistribution;
+
+	}
+
+}
+
+void
+DataWriter::SaveTraces(json &jData, const DetectorSimData& detSimData, int odId)
+{
+	json jTimeTraces;
+	const OptDeviceSimData &odSimData = detSimData.GetOptDeviceSimData(odId);
+	auto timeTraces = odSimData.GetTimeTraceDistribution();
+	jTimeTraces = timeTraces;
+
+	cout << "[INFO] DataWriter::SaveTraces: Saving time traces of Optical Device with ID " << odId << endl;
+	jData["OptDevice_"+to_string(odId)]["TimeTraces"] = jTimeTraces;
+
+}
+
 void 
-DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId)
+DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId, const bool saveComponents)
 {
 
 	json jEnergyDeposit;
@@ -189,8 +219,12 @@ DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId)
 	const DetectorSimData &detSimData = simData.GetDetectorSimData(detId);
 	const vector<double> & energyDeposit = detSimData.GetEnergyDeposit();
 	jEnergyDeposit["EnergyDeposit"] = energyDeposit;
+	
+	if (saveComponents) {
+		
+		
 
-	for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
+		for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
 
 		Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
 		string componentName = aParticle.GetComponentName(particleComponent);
@@ -201,11 +235,16 @@ DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId)
 		}
 
 		vector<double> energyDepositComponent = detSimData.GetEnergyDeposit(particleComponent);
-		jEnergyDepositComponent[componentName] = energyDepositComponent;
+		jEnergyDepositComponent["EnergyDeposit_"+componentName] = energyDepositComponent;
 
-	} // end loop particle components
+		} // end loop particle components
 
-	jData["Detector_"+to_string(detId)]["DetectorSimData"] = jEnergyDeposit;
-	jData["Detector_"+to_string(detId)]["DetectorSimData"]["EnergyDeposit_components"] = jEnergyDepositComponent;
+		jData["Detector_"+to_string(detId)]["DetectorSimData"] = jEnergyDepositComponent;	
+
+	}
+	
+
+	jData["Detector_"+to_string(detId)]["DetectorSimData"] = (saveComponents ? jEnergyDepositComponent : jEnergyDeposit);
+	
 
 }
