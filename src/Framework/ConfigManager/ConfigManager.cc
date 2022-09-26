@@ -43,8 +43,11 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 
 	cfg.fOutputFileName = tree.get<string>("Output.OutputFile");
 	cfg.fCompressOutput = tree.get<bool>("Output.CompressOutput");
+	cfg.fSavePETimeDistribution = tree.get<bool>("Output.SavePETimeDistribution");
+	cfg.fSaveComponentsPETimeDistribution = tree.get<bool>("Output.SaveComponentsPETimeDistribution");
 	cfg.fSaveTraces     = tree.get<bool>("Output.SaveTraces");
 	cfg.fSaveEnergy     = tree.get<bool>("Output.SaveEnergy");
+	cfg.fSaveComponentsEnergy = tree.get<bool>("Output.SaveComponentsEnergy");
 
 	return theEvent;
 
@@ -127,9 +130,10 @@ ConfigManager::PrintConfig(const Event::Config &cfg)
 	cout << "[INFO] Using the following configuration:" << endl;
 	cout << "[INFO] InputFile = " << cfg.fInputFileName << endl;
 	cout << "[INFO] OutputFile = " << cfg.fOutputFileName << endl;
+	cout << "[INFO] Save PE Time distribution (components) = " << (cfg.fSavePETimeDistribution ? "yes" : "no") << " (" << (cfg.fSaveComponentsPETimeDistribution ? "yes)" : "no)") << endl;
 	cout << "[INFO] Compress Output = " << (cfg.fCompressOutput ? "yes" : "no") << endl;
 	cout << "[INFO] Save Traces = " << (cfg.fSaveTraces ? "yes" : "no") << endl;
-	cout << "[INFO] Save Energy = " << (cfg.fSaveEnergy ? "yes" : "no") << endl;
+	cout << "[INFO] Save Energy Deposit (components) = " << (cfg.fSaveEnergy ? "yes" : "no") << " (" << (cfg.fSaveComponentsEnergy ? "yes)" : "no)") << endl;
 	cout << "[INFO] DetectorList = " << cfg.fDetectorList << endl;
 	cout << "[INFO] DetectorProperties = " << cfg.fDetectorProperties << endl;
 	cout << "[INFO] SimulationMode = " << cfg.fSimulationMode << endl;
