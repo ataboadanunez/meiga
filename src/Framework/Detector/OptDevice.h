@@ -109,10 +109,10 @@ class OptDevice
 		double fTf = 0.329; // ns
 		
 		// PMT-MCh SPE pulse parameters
-		double fAmplitude = 0.024021;
-		double fMu        = 3.312093;
-		double fSigma     = 0.265150;
-		double fLambda    = 0.982545;
+		double fAmplitude = 0.024021; // V ns
+		double fMu        = 3.312093; // ns
+		double fSigma     = 0.265150; 
+		double fLambda    = 0.982545; // ns-1
 
 
 		std::map<std::string, G4LogicalVolume*> fLogicalVolumeMap;

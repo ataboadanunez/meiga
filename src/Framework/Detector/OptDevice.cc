@@ -63,6 +63,7 @@ OptDevice::SPEPulse(std::vector<double> &amplitude, double fBinTime, std::size_t
 	const std::size_t bins = (fPulseDuration/fBinTime);
 	
 	switch(type) {
+		
 		case eSiPM:
 			// charge-discharge of a capacitor form for SiPM pulse
 			for (std::size_t i = 0; i < bins && (fStartPulse + i) < amplitude.size(); ++i) {

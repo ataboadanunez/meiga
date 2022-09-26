@@ -55,6 +55,7 @@ G4MOptDeviceAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 G4bool
 G4MOptDeviceAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHist*/)
 {
+	
 	// If it is not an opticalphoton, continue
 	if (step->GetTrack()->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition())
 		return true;
@@ -66,6 +67,7 @@ G4MOptDeviceAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*
 
 	// check if photon is detected according to its energy and quantum efficiency
 	if (optDevice.IsPhotonDetected(photonEnergy)) {
+
 		DetectorSimData& detSimData = simData.GetDetectorSimData(fDetectorId);
 		OptDeviceSimData& optDeviceSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
 		const double time = step->GetPreStepPoint()->GetGlobalTime() / (1*CLHEP::ns);
