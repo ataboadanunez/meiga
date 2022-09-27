@@ -4,8 +4,6 @@
 OptDeviceSimData::OptDeviceSimData(const unsigned int id) : fId(id)
 {
 	
-	// fPETimeDistribution = new std::vector<std::vector<double>*>();
-	
 }
 
 void 
