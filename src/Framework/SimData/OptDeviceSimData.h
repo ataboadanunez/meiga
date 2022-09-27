@@ -35,20 +35,21 @@ class OptDeviceSimData
 		void AddPhotonEnergy(const double energy);
 		std::vector<double> & GetPhotonEnergy() { return fPhotonEnergy; }
 		const std::vector<double> & GetPhotonEnergy() const { return fPhotonEnergy; }
-
-		// photo-electron time distribution
-		void AddPETimeDistribution(std::vector<double>* peTimeDist);
-		std::vector<std::vector<double>*>* PETimeDistributionRange() { return fPETimeDistribution; }
-		const std::vector<std::vector<double>*>* PETimeDistributionRange() const { return fPETimeDistribution; }
 		
+		// photo-electron time distribution
+		void AddPETimeDistribution(const std::vector<double>& peTime);
+		std::vector<std::vector<double>>& GetPETimeDistribution() { return fPETimeDistribution; }
+		const std::vector<std::vector<double>>& GetPETimeDistribution() const { return fPETimeDistribution; }
+		bool HasPETimeDistribution() const { return !fPETimeDistribution.empty(); }
+
 		// for particle types
 		void AddPETimeDistribution(Particle::Type type, const std::vector<double>& peTimeDist);
-		const std::vector<std::vector<double>>& PETimeDistributionRange(Particle::Type type) const { return fParticleTypeMap.at(type); }
+		const std::vector<std::vector<double>>& GetPETimeDistribution(Particle::Type type) const { return fParticleTypeMap.at(type); }
 		bool HasPETimeDistribution(Particle::Type type) const { return !fParticleTypeMap.count(type); }
 
 		// for particle components
 		void AddPETimeDistribution(Particle::Component comp, const std::vector<double>& peTimeDist);
-		const std::vector<std::vector<double>>& PETimeDistributionRange(Particle::Component comp) const { return fParticleCompMap.at(comp); }
+		const std::vector<std::vector<double>>& GetPETimeDistribution(Particle::Component comp) const { return fParticleCompMap.at(comp); }
 		bool HasPETimeDistribution(Particle::Component comp) const { return fParticleCompMap.count(comp); }
 		
 		// time traces (analog pulse)
@@ -71,7 +72,7 @@ class OptDeviceSimData
 		std::vector<double> fPhotonEnergy;
 
 		// for PE time distribution
-		std::vector<std::vector<double>*>* fPETimeDistribution;
+		std::vector<std::vector<double>> fPETimeDistribution;
 		// add PE time distribution for different particle types
 		std::map<Particle::Type, std::vector<std::vector<double>> > fParticleTypeMap;
 		// add PE time distribution for different particle components

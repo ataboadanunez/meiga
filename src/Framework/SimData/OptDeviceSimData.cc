@@ -4,7 +4,8 @@
 OptDeviceSimData::OptDeviceSimData(const unsigned int id) : fId(id)
 {
 	
-	fPETimeDistribution = new std::vector<std::vector<double>*>();
+	// fPETimeDistribution = new std::vector<std::vector<double>*>();
+	
 }
 
 void 
@@ -21,9 +22,9 @@ OptDeviceSimData::AddPhotonEnergy(const double phEnergy)
 
 
 void
-OptDeviceSimData::AddPETimeDistribution(std::vector<double>* peTimeDist)
+OptDeviceSimData::AddPETimeDistribution(const std::vector<double>& peTimeDist)
 {
-	fPETimeDistribution->push_back(peTimeDist);
+	fPETimeDistribution.push_back(peTimeDist);
 }
 
 // time distribution for particle types
