@@ -71,6 +71,9 @@ DataWriter::FileWriter(Event& theEvent)
 		const int nOptDev = currDet.GetNOptDevice();
 		cout << "[INFO] DataWriter::FileWriter: Detector ID: " << detId << " has " << nOptDev << " optical device(s)" << endl; 
 
+		/* 
+				Optical Device Level: Time traces, PE time distribution, charge, etc...
+		*/
 		// loop over optical devices 
 		for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
 
@@ -82,61 +85,20 @@ DataWriter::FileWriter(Event& theEvent)
 
 			OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(odId);
 
-			// checking for signals at optical device (i.e., photo-electron time distribution)
-			const auto *peTimeDistributionRange = odSimData.PETimeDistributionRange();
-			if (!peTimeDistributionRange) {
+			// if has PE time distribution, has signals.
+			if (!odSimData.HasPETimeDistribution()) {
 				cout << "[INFO] DataWriter::FileWriter: photo-electron time distributions not found for Optical Device " << odId << endl;
 				continue;
 			}
 
-			// if has PE time distributions it has signals...
+			// save photo-electron time distribution(s)
 			if (cfg.fSavePETimeDistribution)
 				SavePETimeDistribution(jData, detSimData, odId, cfg.fSaveComponentsPETimeDistribution);
 
-			/* 
-				Optical Device Level: Time traces, PE time distribution, charge, etc...
-			*/
+			// save time traces
 			if (cfg.fSaveTraces)
 				SaveTraces(jData, detSimData, odId);
 
-			// auto timeTraces = odSimData.GetTimeTraceDistribution();
-			// json jTimeTraces = timeTraces;
-
-			// /*
-			// 	TEST AREA FOR PULSE CALCULATION (time vs Amplitude)
-			// */
-			// cout << "[DEBUG] DataWriter::FileWriter: Accessing PE time distribution of Optical Device type " << currOd.GetType() << endl;
-			// // iterate over PE time distriutions (time pulses)
-			// for (auto peTime = peTimeDistributionRange->begin(); peTime != peTimeDistributionRange->end(); ++peTime) {
-			
-			// 	size_t npe = (*peTime)->size();
-			// 	// if not PE were produced, continue
-			// 	if (!npe) {
-			// 		continue;
-			// 	}
-			
-			// 	auto odPulse = odSimData.CalculateTrace(1*ns, *(*peTime), currOd.GetType());
-			// 	size_t pulseSize = odPulse.size();
-
-			// 	// pulse iterator
-			// 	for (size_t pulseIt=0; pulseIt<pulseSize; pulseIt++) {
-			// 		//cout << sipmPulse[pulseIt] << " ";
-			// 		cout << odPulse[pulseIt] << " ";
-			// 	}
-
-			// 	cout << endl;
-
-			// }
-
-			// /*
-			// 	END OF TEST AREA
-			// */
-
-			// lines below should be in separate function...
-			// if (saveComponentPETimeDistribution...)
-			
-
-			
 		} // end loop over optical devices
 
 	} // end loop over detectors
@@ -171,9 +133,12 @@ DataWriter::SavePETimeDistribution(json &jData, const DetectorSimData& detSimDat
 
 	const OptDeviceSimData &odSimData = detSimData.GetOptDeviceSimData(odId);
 
+	json jPETimeDistribution;
+	json jComponentPETimeDistribution;
+
+
 	if (saveComponents) {
 
-		json jComponentPETimeDistribution;
 		for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
 
 			Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
@@ -184,7 +149,7 @@ DataWriter::SavePETimeDistribution(json &jData, const DetectorSimData& detSimDat
 				continue;
 			}
 
-			auto peTimedistributionRangeComp = odSimData.PETimeDistributionRange(particleComponent);
+			auto peTimedistributionRangeComp = odSimData.GetPETimeDistribution(particleComponent);
 
 			jComponentPETimeDistribution[componentName] = peTimedistributionRangeComp;
 
@@ -193,7 +158,14 @@ DataWriter::SavePETimeDistribution(json &jData, const DetectorSimData& detSimDat
 		jData["OptDevice_"+to_string(odId)]["PETimeDistribution"] = jComponentPETimeDistribution;
 
 	}
+	// save PETimeDistributions when components are disabled. do not save both.
+	else {
 
+		auto peTimeDistribution = odSimData.GetPETimeDistribution();	
+		jPETimeDistribution = peTimeDistribution;
+		jData["OptDevice_"+to_string(odId)]["PETimeDistribution"] = jPETimeDistribution;
+	}
+	
 }
 
 void
