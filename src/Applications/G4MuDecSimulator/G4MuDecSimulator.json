@@ -4,9 +4,9 @@
 	{
 		"OutputFile" : "./output.json",
 		"CompressOutput" : true,
-		"SavePETimeDistribution" : false,
-		"SaveComponentsPETimeDistribution" : false,
-		"SaveTraces" : true,
+		"SavePETimeDistribution" : true,
+		"SaveComponentsPETimeDistribution" : true,
+		"SaveTraces" : false,
 		"SaveEnergy" : false,
 		"SaveComponentsEnergy" : false
 	},
