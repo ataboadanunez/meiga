@@ -54,7 +54,7 @@ G4AndesSteppingAction::UserSteppingAction(const G4Step* step)
 		// get muon energy at last step in ground
 		G4String stepVolumeName = track->GetVolume()->GetName();
 		if (stepVolumeName == "Ground" && step->IsLastStepInVolume() && posZ)
-			std::cout << "TrackStoppingInfo ParticleID " << currParticle.GetParticleId() << " LastStepEnergy_GeV " << currentEnergy / CLHEP::GeV << " depth_m " << posZ / CLHEP::m << " Initial Energy "  << fKineticEnergy / CLHEP::GeV <<std::endl;
+			std::cout << "TrackStoppingInfo ParticleID " << currParticle.GetParticleId() << " LastStepEnergy_GeV " << currentEnergy / CLHEP::GeV << " depth_m " << posZ / CLHEP::m << " Initial Energy "  << fKineticEnergy / CLHEP::GeV << std::endl;
 
 	}
 }
