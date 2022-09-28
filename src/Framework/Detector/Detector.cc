@@ -4,6 +4,7 @@
 #include "Scintillator.h"
 #include "Musaic.h"
 #include "Mudulus.h"
+#include "Dummy.h"
 
 #include "G4UnitsTable.hh"
 
@@ -32,6 +33,8 @@ Detector::StringToType(string name)
 		return Detector::eMusaic;
 	else if (name == "eMudulus")
 		return Detector::eMudulus;
+	else if (name == "eDummy")
+		return Detector::eDummy;
 	else {
 		cout << "[WARNING] Detector::StringToType: Unknown detector type!" << endl;
 		return Detector::eUnknown;
@@ -61,6 +64,7 @@ InitTypeToBuild() {
 	TypeToBuild[Detector::eScintillator]	= Scintillator::BuildDetector;
 	TypeToBuild[Detector::eMusaic]				= Musaic::BuildDetector;
 	TypeToBuild[Detector::eMudulus]				= Mudulus::BuildDetector;
+	TypeToBuild[Detector::eDummy]					= Dummy::BuildDetector;
 
 }
 
