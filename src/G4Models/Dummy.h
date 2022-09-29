@@ -12,16 +12,13 @@
 #include "G4LogicalVolume.hh"
 #include "G4LogicalBorderSurface.hh"
 #include "G4Box.hh"
-#include "G4Tubs.hh"
-#include "G4Sphere.hh"
-#include "G4Ellipsoid.hh"
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4OpticalSkinSurface;
 
 class Dummy {
-	// Basic Geant4 model for a Water-Cerenkov Detector
+	// class for a Dummy detector
 	
 public:
 	static void BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps = true);
