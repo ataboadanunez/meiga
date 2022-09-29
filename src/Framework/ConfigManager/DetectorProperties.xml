@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='ISO-8859-1'?>
 <!-- default detector properties -->
-<detectorList>
+<detectorProperties>
 	
 	
 	<tankRadius unit="cm"> 105 </tankRadius>
@@ -15,6 +15,12 @@
 	<fiberLength unit="mm"> 500 </fiberLength>
 	<fiberRadius unit="mm"> 1.2 </fiberRadius>
 	<claddingThickness unit="mm"> 0.10 </claddingThickness>
-	
+	<length unit="mm"> 1000 </length>
+	<width unit="mm"> 1000 </width>
+	<thickness unit="mm"> 1000 </thickness>	
 
-</detectorList>
+	<groundSizeX unit="m"> 5 </groundSizeX>
+	<groundSizeY unit="m"> 5 </groundSizeY>
+	<groundSizeZ unit="m"> 1 </groundSizeZ>
+
+</detectorProperties>

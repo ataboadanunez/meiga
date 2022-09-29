@@ -145,6 +145,14 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 	SetFiberRadius(defProp.gFiberRadius);
 	SetCladdingThickness(defProp.gCladdingThickness);
 
+	SetLength(defProp.gLength);
+	SetWidth(defProp.gWidth);
+	SetThickness(defProp.gThickness);
+
+	SetGroundSizeX(defProp.gGroundSizeX);
+	SetGroundSizeY(defProp.gGroundSizeY);
+	SetGroundSizeZ(defProp.gGroundSizeZ);
+
 	/*
 		Now that the default properties are set, look for a property
 		in the DetectorList.xml and override in case of exist. 
@@ -216,7 +224,36 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
 				SetCladdingThickness(value * unit);
 			}
-		
+			else if (xmlLabel == "length") {
+				double value = stod(xmlValue);
+				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
+				SetLength(value * unit);
+			}
+			else if (xmlLabel == "width") {
+				double value = stod(xmlValue);
+				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
+				SetWidth(value * unit);
+			}
+			else if (xmlLabel == "thickness") {
+				double value = stod(xmlValue);
+				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
+				SetThickness(value * unit);
+			}
+			else if (xmlLabel == "groundSizeX") {
+				double value = stod(xmlValue);
+				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
+				SetGroundSizeX(value * unit);
+			}
+			else if (xmlLabel == "groundSizeY") {
+				double value = stod(xmlValue);
+				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
+				SetGroundSizeY(value * unit);
+			}
+			else if (xmlLabel == "groundSizeZ") {
+				double value = stod(xmlValue);
+				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
+				SetGroundSizeZ(value * unit);
+			}
 		}
 	}
 }
