@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+
+<detectorList>
+	
+	<detector id="0" type="eWCD">
+		<x unit="cm"> 0.0 </x>
+		<y unit="cm"> 0.0 </y>
+		<z unit="cm"> 0.0 </z>
+		<tankRadius unit="mm"> 780 </tankRadius>
+		<tankHeight unit="mm"> 1580 </tankHeight>
+	</detector>
+
+
+</detectorList>
