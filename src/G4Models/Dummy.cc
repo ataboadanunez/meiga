@@ -6,7 +6,7 @@
 using namespace std;
 
 void
-Dummy::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps)
+Dummy::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& , G4bool )
 {
 	
 	int detectorId = detector.GetId();
@@ -15,10 +15,9 @@ Dummy::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theE
 	ostringstream namedetector;
 	namedetector.str("");
 	namedetector << "Dummy";
-	cout << "[INFO] G4Models::Dummy: Building detector " << namedetector.str();
-	cout << "(ID = " << detectorId << ")" << endl;
+	cout << "[INFO] G4Models::Dummy: Building detector " << namedetector.str() << " (ID = " << detectorId << ")" << endl;
 	cout << "[INFO] G4Models::Dummy: Detector Position = ";
-	cout << "(" << detectorPos.getX() / CLHEP::cm << ", " << detectorPos.getY() << ", " << detectorPos.getZ() << ") " << endl;
+	cout << "(" << detectorPos.getX() / CLHEP::cm << ", " << detectorPos.getY() << ", " << detectorPos.getZ() / CLHEP::cm << ") cm" << endl;
 
 
 
