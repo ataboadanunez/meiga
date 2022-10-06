@@ -54,7 +54,7 @@ class Detector
 		DetectorType GetType() const { return fType; }
 		void SetType(Detector::DetectorType type) { fType = type; }
 
-		std::vector<double> GetDetectorPosition() { return fDetectorPosition; }
+		const std::vector<double>& GetDetectorPosition() const { return fDetectorPosition; }
 		void SetDetectorPosition(const std::vector<double> &pos) { fDetectorPosition = pos; }
 
 		// Mechanical properties

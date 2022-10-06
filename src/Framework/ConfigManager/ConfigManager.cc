@@ -108,7 +108,24 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 					if ((label == "z") && (coord > maxHeight))
 						maxHeight = coord;	
 				}
-				
+				else if (label == "injectionRadius") {
+					string value = v.second.data();
+					boost::algorithm::trim(value);
+					double dValue = stod(value);
+					string unit = v.second.get<string>("<xmlattr>.unit");
+					double coord = G4UnitDefinition::GetValueOf(unit) * dValue;
+					cout << "[DEBUG] ConfigManager::ReadDetectorList: injectionRadius = " << coord << endl;
+					simData.SetInjectionRadius(coord);
+				}
+				else if (label == "injectionHeight") {
+					string value = v.second.data();
+					boost::algorithm::trim(value);
+					double dValue = stod(value);
+					string unit = v.second.get<string>("<xmlattr>.unit");
+					double coord = G4UnitDefinition::GetValueOf(unit) * dValue;
+					cout << "[DEBUG] ConfigManager::ReadDetectorList: injectionHeight = " << coord << endl;
+					simData.SetInjectionHeight(coord);
+				}
 				
 			}
 		}

@@ -97,6 +97,13 @@ class SimData
 		void SetGroundThickness(const double t) { fGroundThickness = t; }
 		double GetGroundThickness() { return fGroundThickness; }
 
+		// dimensions of the injection area
+		void SetInjectionRadius(const double r) { fInjectionRadius = r; }
+		double GetInjectionRadius() { return fInjectionRadius; }
+
+		void SetInjectionHeight(const double h) { fInjectionHeight = h; }
+		double GetInjectionHeight() { return fInjectionHeight; }
+
 		// DetectorSimData getters
 		void MakeDetectorSimData(unsigned int id);
 		DetectorSimData& GetDetectorSimData() { return fDetectorSimData; }
@@ -132,6 +139,9 @@ class SimData
 		double fGroundLength;
 		double fGroundWidth;
 		double fGroundThickness;
+
+		double fInjectionRadius = 0;
+		double fInjectionHeight = 0;
 };
 
 #endif
