@@ -15,7 +15,7 @@
 	"Simulation" :
 	{
 		"SimulationMode" : "eFast",
-		"InjectionMode" : "eRandom",
+		"InjectionMode" : "eCircle",
 		"GeoVisOn" : false,
 		"TrajVisOn" : false,
 		"CheckOverlaps" : false,
