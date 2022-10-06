@@ -4,6 +4,7 @@
 
 #include "Event.h"
 #include "SimData.h"
+#include "DetectorSimData.h"
 
 #include <nlohmann/json.hpp>
 
@@ -16,7 +17,12 @@ class DataWriter {
 		static void FileWriter(Event& theEvent);
 
 	private:
-		static void SaveEnergy(nlohmann::json &jData, const SimData& sim, int id);
+		
+		static void SavePETimeDistribution(nlohmann::json &jData, const DetectorSimData& sim, int id, bool saveComponents);
+
+		static void SaveTraces(nlohmann::json &jData, const DetectorSimData& sim, int id);
+
+		static void SaveEnergy(nlohmann::json &jData, const SimData& sim, int id, const bool saveComponents);
 };
 
 #endif

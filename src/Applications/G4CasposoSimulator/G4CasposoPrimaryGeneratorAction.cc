@@ -60,8 +60,8 @@ G4CasposoPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   // particle injection on ground surface
   // get ground thickness (depth, along z-axis)
   // double groundThickness = simData.GetGroundThickness();
-  double injHeight = 0*CLHEP::m;
-  double injWidth  = 0.5 * CLHEP::m;
+  double injHeight = 1.2*CLHEP::m;
+  double injWidth  = 0.25 * CLHEP::m;
 
   const double x0 = RandFlat::shoot(-injWidth, injWidth);
   const double y0 = RandFlat::shoot(-injWidth, injWidth);

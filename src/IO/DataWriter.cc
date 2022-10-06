@@ -61,18 +61,19 @@ DataWriter::FileWriter(Event& theEvent)
 		DetectorSimData& detSimData = simData.GetDetectorSimData(detId);
 
 		/* 
-			at this level one could access energy deposit, particle counters, etc... 
-			this is set in the configuration
+			Detector level: access energy deposit, particle counters, etc... 
 		*/
-		if (cfg.fSaveEnergy) {
-			SaveEnergy(jData, simData, detId);
-		}
+		if (cfg.fSaveEnergy)
+			SaveEnergy(jData, simData, detId, cfg.fSaveComponentsEnergy);
 		
 
 
 		const int nOptDev = currDet.GetNOptDevice();
 		cout << "[INFO] DataWriter::FileWriter: Detector ID: " << detId << " has " << nOptDev << " optical device(s)" << endl; 
 
+		/* 
+				Optical Device Level: Time traces, PE time distribution, charge, etc...
+		*/
 		// loop over optical devices 
 		for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
 
@@ -84,39 +85,19 @@ DataWriter::FileWriter(Event& theEvent)
 
 			OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(odId);
 
-			// checking for signals at optical device (i.e., photo-electron time distribution)
-			const auto *peTimeDistributionRange = odSimData.PETimeDistributionRange();
-			if (!peTimeDistributionRange) {
+			// if has PE time distribution, has signals.
+			if (!odSimData.HasPETimeDistribution()) {
 				cout << "[INFO] DataWriter::FileWriter: photo-electron time distributions not found for Optical Device " << odId << endl;
 				continue;
 			}
 
-			/* at this level one could access total charge (number of photo-electrons), 
-			time distributions (pe arrival time), pulses (time vs Amplitude) 
-			and also obtain these for different particle components.
+			// save photo-electron time distribution(s)
+			if (cfg.fSavePETimeDistribution)
+				SavePETimeDistribution(jData, detSimData, odId, cfg.fSaveComponentsPETimeDistribution);
 
-			*/
-
-			// lines below should be in separate function...
-			// if (saveComponentPETimeDistribution...)
-			json jComponentPETimeDistribution;
-			for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
-
-				Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
-				string componentName = aParticle.GetComponentName(particleComponent);
-
-				if (!odSimData.HasPETimeDistribution(particleComponent)) {
-					cout << "[WARNING] DataWriter::FileWriter: OptDevice " << odId << " has no PE time distribution for component " << componentName << endl;
-					continue;
-				}
-
-				auto peTimedistributionRangeComp = odSimData.PETimeDistributionRange(particleComponent);
-
-				jComponentPETimeDistribution[componentName] = peTimedistributionRangeComp;
-
-			} // end loop particle components
-
-			jData["OptDevice_"+to_string(odId)]["PETimeDistribution"] = jComponentPETimeDistribution;
+			// save time traces
+			if (cfg.fSaveTraces)
+				SaveTraces(jData, detSimData, odId);
 
 		} // end loop over optical devices
 
@@ -145,8 +126,63 @@ DataWriter::FileWriter(Event& theEvent)
 	
 }
 
+
+void
+DataWriter::SavePETimeDistribution(json &jData, const DetectorSimData& detSimData, int odId, const bool saveComponents)
+{
+
+	const OptDeviceSimData &odSimData = detSimData.GetOptDeviceSimData(odId);
+
+	json jPETimeDistribution;
+	json jComponentPETimeDistribution;
+
+
+	if (saveComponents) {
+
+		for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
+
+			Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
+			string componentName = aParticle.GetComponentName(particleComponent);
+
+			if (!odSimData.HasPETimeDistribution(particleComponent)) {
+				cout << "[WARNING] DataWriter::FileWriter: OptDevice " << odId << " has no PE time distribution for component " << componentName << endl;
+				continue;
+			}
+
+			auto peTimedistributionRangeComp = odSimData.GetPETimeDistribution(particleComponent);
+
+			jComponentPETimeDistribution[componentName] = peTimedistributionRangeComp;
+
+		} // end loop particle components
+
+		jData["OptDevice_"+to_string(odId)]["PETimeDistribution"] = jComponentPETimeDistribution;
+
+	}
+	// save PETimeDistributions when components are disabled. do not save both.
+	else {
+
+		auto peTimeDistribution = odSimData.GetPETimeDistribution();	
+		jPETimeDistribution = peTimeDistribution;
+		jData["OptDevice_"+to_string(odId)]["PETimeDistribution"] = jPETimeDistribution;
+	}
+	
+}
+
+void
+DataWriter::SaveTraces(json &jData, const DetectorSimData& detSimData, int odId)
+{
+	json jTimeTraces;
+	const OptDeviceSimData &odSimData = detSimData.GetOptDeviceSimData(odId);
+	auto timeTraces = odSimData.GetTimeTraceDistribution();
+	jTimeTraces = timeTraces;
+
+	cout << "[INFO] DataWriter::SaveTraces: Saving time traces of Optical Device with ID " << odId << endl;
+	jData["OptDevice_"+to_string(odId)]["TimeTraces"] = jTimeTraces;
+
+}
+
 void 
-DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId)
+DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId, const bool saveComponents)
 {
 
 	json jEnergyDeposit;
@@ -155,8 +191,12 @@ DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId)
 	const DetectorSimData &detSimData = simData.GetDetectorSimData(detId);
 	const vector<double> & energyDeposit = detSimData.GetEnergyDeposit();
 	jEnergyDeposit["EnergyDeposit"] = energyDeposit;
+	
+	if (saveComponents) {
+		
+		
 
-	for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
+		for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
 
 		Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
 		string componentName = aParticle.GetComponentName(particleComponent);
@@ -167,11 +207,16 @@ DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId)
 		}
 
 		vector<double> energyDepositComponent = detSimData.GetEnergyDeposit(particleComponent);
-		jEnergyDepositComponent[componentName] = energyDepositComponent;
+		jEnergyDepositComponent["EnergyDeposit_"+componentName] = energyDepositComponent;
 
-	} // end loop particle components
+		} // end loop particle components
 
-	jData["Detector_"+to_string(detId)]["DetectorSimData"] = jEnergyDeposit;
-	jData["Detector_"+to_string(detId)]["DetectorSimData"]["EnergyDeposit_components"] = jEnergyDepositComponent;
+		jData["Detector_"+to_string(detId)]["DetectorSimData"] = jEnergyDepositComponent;	
+
+	}
+	
+
+	jData["Detector_"+to_string(detId)]["DetectorSimData"] = (saveComponents ? jEnergyDepositComponent : jEnergyDeposit);
+	
 
 }

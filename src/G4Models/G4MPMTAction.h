@@ -28,10 +28,10 @@ class G4MPMTAction : public G4VSensitiveDetector {
     int NumPE;
     int NumPEMuDecay;
 
-    std::vector<double>* fPETime;
+    std::vector<double> fPETime;
     std::vector<double> fPETimeComp;
     std::vector<double> fPETimeMuDecay;
-    std::vector<std::vector<double>*>* fPETimeDistribution;
+    // std::vector<std::vector<double>*>* fPETimeDistribution;
 };
 
 

@@ -43,8 +43,11 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 
 	cfg.fOutputFileName = tree.get<string>("Output.OutputFile");
 	cfg.fCompressOutput = tree.get<bool>("Output.CompressOutput");
+	cfg.fSavePETimeDistribution = tree.get<bool>("Output.SavePETimeDistribution");
+	cfg.fSaveComponentsPETimeDistribution = tree.get<bool>("Output.SaveComponentsPETimeDistribution");
 	cfg.fSaveTraces     = tree.get<bool>("Output.SaveTraces");
 	cfg.fSaveEnergy     = tree.get<bool>("Output.SaveEnergy");
+	cfg.fSaveComponentsEnergy = tree.get<bool>("Output.SaveComponentsEnergy");
 
 	return theEvent;
 
@@ -105,7 +108,24 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 					if ((label == "z") && (coord > maxHeight))
 						maxHeight = coord;	
 				}
-				
+				else if (label == "injectionRadius") {
+					string value = v.second.data();
+					boost::algorithm::trim(value);
+					double dValue = stod(value);
+					string unit = v.second.get<string>("<xmlattr>.unit");
+					double coord = G4UnitDefinition::GetValueOf(unit) * dValue;
+					cout << "[DEBUG] ConfigManager::ReadDetectorList: injectionRadius = " << coord << endl;
+					simData.SetInjectionRadius(coord);
+				}
+				else if (label == "injectionHeight") {
+					string value = v.second.data();
+					boost::algorithm::trim(value);
+					double dValue = stod(value);
+					string unit = v.second.get<string>("<xmlattr>.unit");
+					double coord = G4UnitDefinition::GetValueOf(unit) * dValue;
+					cout << "[DEBUG] ConfigManager::ReadDetectorList: injectionHeight = " << coord << endl;
+					simData.SetInjectionHeight(coord);
+				}
 				
 			}
 		}
@@ -113,7 +133,7 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 		// shouldn't be part of DetectorSimData?
 		theEvent.SetMaximumHeight(maxHeight);
 		detector.SetDetectorPosition(detPosition);
-
+		cout << "[INFO] Detector Position from XML = (" << detPosition.at(0) / CLHEP::cm << ", " << detPosition.at(1) / CLHEP::cm << ", " << detPosition.at(2) / CLHEP::cm << ") cm" << endl; 
 		// search for another detector properties in the DetectorList.xml
 		detector.SetDetectorProperties(subtree, defProp);
 	}
@@ -127,9 +147,10 @@ ConfigManager::PrintConfig(const Event::Config &cfg)
 	cout << "[INFO] Using the following configuration:" << endl;
 	cout << "[INFO] InputFile = " << cfg.fInputFileName << endl;
 	cout << "[INFO] OutputFile = " << cfg.fOutputFileName << endl;
+	cout << "[INFO] Save PE Time distribution (components) = " << (cfg.fSavePETimeDistribution ? "yes" : "no") << " (" << (cfg.fSaveComponentsPETimeDistribution ? "yes)" : "no)") << endl;
 	cout << "[INFO] Compress Output = " << (cfg.fCompressOutput ? "yes" : "no") << endl;
 	cout << "[INFO] Save Traces = " << (cfg.fSaveTraces ? "yes" : "no") << endl;
-	cout << "[INFO] Save Energy = " << (cfg.fSaveEnergy ? "yes" : "no") << endl;
+	cout << "[INFO] Save Energy Deposit (components) = " << (cfg.fSaveEnergy ? "yes" : "no") << " (" << (cfg.fSaveComponentsEnergy ? "yes)" : "no)") << endl;
 	cout << "[INFO] DetectorList = " << cfg.fDetectorList << endl;
 	cout << "[INFO] DetectorProperties = " << cfg.fDetectorProperties << endl;
 	cout << "[INFO] SimulationMode = " << cfg.fSimulationMode << endl;

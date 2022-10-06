@@ -55,7 +55,7 @@ class OptDevice
 		// response stuff
 		bool IsPhotonDetected(double energy);
 		double GetQuantumEfficiency(double wl, OptDevice::DeviceType t);
-		void SPEPulse(std::vector<double> &amplitude, double fBinTime, std::size_t fStartPulse);
+		void SPEPulse(std::vector<double> &amplitude, double fBinTime, std::size_t fStartPulse, const OptDevice::DeviceType &type);
 		double GetSPEPulseDuration() { return fPulseDuration; }
 		std::vector<double> GetOpticalRange();
 
@@ -98,19 +98,21 @@ class OptDevice
 		double fQEScaleParameter = 0.31;
 		// probability of photo-electrons to land on the first dynode (>70%-80%) 
 		double fPMTCollectionEfficiency = 0.7;
+		
+		// SPE pulse parameters
+		double fPulseDuration = 100.;
 
 		// sipm SPE pulse parameters
-		double fPulseDuration = 100.;
 		double fA0 = 0.013; // mV
 		double fT0 = -1.160; // ns
 		double fTr = 2.679; // ns
 		double fTf = 0.329; // ns
 		
 		// PMT-MCh SPE pulse parameters
-		double fAmplitude = 0.024021;
-		double fMu        = 3.312093;
-		double fSigma     = 0.265150;
-		double fLambda    = 0.982545;
+		double fAmplitude = 0.024021; // V ns
+		double fMu        = 3.312093; // ns
+		double fSigma     = 0.265150; 
+		double fLambda    = 0.982545; // ns-1
 
 
 		std::map<std::string, G4LogicalVolume*> fLogicalVolumeMap;

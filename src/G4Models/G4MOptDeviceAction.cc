@@ -17,13 +17,14 @@ G4MOptDeviceAction::G4MOptDeviceAction(const G4String& name, const G4int dId, co
 
 	{ 
 		
-		std::cout << "[INFO] G4Models::G4MOptDeviceAction: Registering OptDevice " << name << std::endl;
 		SimData& simData = fEvent.GetSimData();
 		DetectorSimData& detSimData = simData.GetDetectorSimData(fDetectorId);
 		detSimData.MakeOptDeviceSimData(fOptDeviceId);
-		OptDeviceSimData& OptDeviceSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
+		// OptDeviceSimData& OptDeviceSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
+		OptDevice& optDevice = fEvent.GetDetector(fDetectorId).GetOptDevice(fOptDeviceId);
+		// fPETimeDistribution = OptDeviceSimData.PETimeDistributionRange();
 
-		fPETimeDistribution = OptDeviceSimData.PETimeDistributionRange();
+		std::cout << "[INFO] G4Models::G4MOptDeviceAction: Registering OptDevice " << optDevice.GetName() << " " << name << " " << fOptDeviceId << std::endl;
 
 	}
 
@@ -31,21 +32,33 @@ void
 G4MOptDeviceAction::Initialize(G4HCofThisEvent* const /*hce*/)
 {
 	
-	fPETime = new std::vector<double>();
+	// fPETime = new std::vector<double>();
 
 }
 
 void
 G4MOptDeviceAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 {
-	fEvent.GetSimData().GetDetectorSimData(fDetectorId).GetOptDeviceSimData(fOptDeviceId).AddPETimeDistribution(fPETime);
-	//fPETimeDistribution->push_back(fPETime);
+	
+	OptDeviceSimData& odSimData = fEvent.GetSimData().GetDetectorSimData(fDetectorId).GetOptDeviceSimData(fOptDeviceId);
+	odSimData.AddPETimeDistribution(fPETime);
+	// Pulse calculator
+	OptDevice& optDevice = fEvent.GetDetector(fDetectorId).GetOptDevice(fOptDeviceId);
+	const OptDevice::DeviceType &type = optDevice.GetType();
+	// calculate analog trace for that particular optical device
+	auto odTrace = odSimData.CalculateTrace(1*CLHEP::ns, fPETime, type);
+	// add to SimData
+	odSimData.AddTimeTrace(odTrace);
+	
+	// clear PE time vector
+	fPETime.clear();
 
 }
 
 G4bool
 G4MOptDeviceAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHist*/)
 {
+	
 	// If it is not an opticalphoton, continue
 	if (step->GetTrack()->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition())
 		return true;
@@ -57,13 +70,15 @@ G4MOptDeviceAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*
 
 	// check if photon is detected according to its energy and quantum efficiency
 	if (optDevice.IsPhotonDetected(photonEnergy)) {
+
 		DetectorSimData& detSimData = simData.GetDetectorSimData(fDetectorId);
-		OptDeviceSimData& optDeviceSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
+		OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
+		// get photon time
 		const double time = step->GetPreStepPoint()->GetGlobalTime() / (1*CLHEP::ns);
-		optDeviceSimData.AddPhotonEnergy(photonEnergy);
-		optDeviceSimData.AddPhotonTime(time);
+		odSimData.AddPhotonEnergy(photonEnergy);
+		odSimData.AddPhotonTime(time);
 		
-		fPETime->push_back(time);
+		fPETime.push_back(time);
 
 	}
 	

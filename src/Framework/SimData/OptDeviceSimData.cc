@@ -4,7 +4,6 @@
 OptDeviceSimData::OptDeviceSimData(const unsigned int id) : fId(id)
 {
 	
-	fPETimeDistribution = new std::vector<std::vector<double>*>();
 }
 
 void 
@@ -21,16 +20,16 @@ OptDeviceSimData::AddPhotonEnergy(const double phEnergy)
 
 
 void
-OptDeviceSimData::AddPETimeDistribution(std::vector<double>* peTimeDist)
+OptDeviceSimData::AddPETimeDistribution(const std::vector<double>& peTimeDist)
 {
-	fPETimeDistribution->push_back(peTimeDist);
+	fPETimeDistribution.push_back(peTimeDist);
 }
 
 // time distribution for particle types
 void
 OptDeviceSimData::AddPETimeDistribution(Particle::Type type, const std::vector<double>& peTimeDist)
 {
-	auto it = particleTypeMap.emplace(std::make_pair(type, std::vector<std::vector<double> >()));
+	auto it = fParticleTypeMap.emplace(std::make_pair(type, std::vector<std::vector<double> >()));
 	it.first->second.push_back(peTimeDist);
 
 }
@@ -40,15 +39,20 @@ OptDeviceSimData::AddPETimeDistribution(Particle::Type type, const std::vector<d
 void
 OptDeviceSimData::AddPETimeDistribution(Particle::Component comp, const std::vector<double>& peTimeDist)
 {
-	auto it = particleCompMap.emplace(std::make_pair(comp, std::vector<std::vector<double> >()));
+	auto it = fParticleCompMap.emplace(std::make_pair(comp, std::vector<std::vector<double> >()));
 	it.first->second.push_back(peTimeDist);
 
 }
 
-
+// time traces
+void
+OptDeviceSimData::AddTimeTrace(const std::vector<double>& trace)
+{
+	fTimeTraceDistribution.push_back(trace);
+}
 
 std::vector<double>
-OptDeviceSimData::CalculatePulse(const double fBinSize, const std::vector<double>& peTime, const double pulseLength)
+OptDeviceSimData::CalculateTrace(const double fBinSize, const std::vector<double>& peTime, const OptDevice::DeviceType& type, const double pulseLength)
 {
 
 	// case for OptDevice types is needed
@@ -57,7 +61,7 @@ OptDeviceSimData::CalculatePulse(const double fBinSize, const std::vector<double
 	std::vector<double> result(size, 0.);
 	//Fill array
 	for (auto t: peTime) {
-			fDetSiPM.SPEPulse(result, fBinSize, static_cast<size_t>(t/fBinSize));
+			fOptDevice.SPEPulse(result, fBinSize, static_cast<size_t>(t/fBinSize), type);
 	}
 
 	return result;

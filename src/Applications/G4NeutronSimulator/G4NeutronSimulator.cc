@@ -1,21 +1,22 @@
 /* 
 	
-	Application for simulating the muon decay in a WCD
+	Main script of an example application using Geant4
 
 	author: alvaro taboada
-	date: 9 Feb 2022
+	date: 15 Sep 2021
+
+	$Id:$
 
  */
 
 // Headers of this particular application
-#include "G4MuDecSimulator.h"
-#include "G4MuDecConstruction.h"
-#include "G4MuDecPrimaryGeneratorAction.h"
-#include "G4MuDecStackingAction.h"
-#include "G4MuDecEventAction.h"
-#include "G4MuDecRunAction.h"
-#include "G4MuDecTrackingAction.h"
-#include "G4MuDecSteppingAction.h"
+#include "G4NeutronSimulator.h"
+#include "G4NeutronDetectorConstruction.h"
+#include "G4NeutronPrimaryGeneratorAction.h"
+#include "G4NeutronEventAction.h"
+#include "G4NeutronRunAction.h"
+#include "G4NeutronTrackingAction.h"
+#include "G4NeutronSteppingAction.h"
 
 // Geant4 headers
 #include "FTFP_BERT.hh"
@@ -28,7 +29,6 @@
 // Framework libraries
 #include "ConfigManager.h"
 #include "CorsikaUtilities.h"
-#include "ReadParticleFile.h"
 #include "Event.h"
 #include "SimData.h"
 #include "OptDeviceSimData.h"
@@ -39,11 +39,11 @@
 
 using namespace std;
 
-Particle G4MuDecSimulator::currentParticle;
-G4MuDecSimulator* fG4MuDecSimulator;
+Particle G4NeutronSimulator::currentParticle;
+G4NeutronSimulator* fG4NeutronSimulator;
 string fCfgFile;
 
-G4MuDecSimulator::G4MuDecSimulator()
+G4NeutronSimulator::G4NeutronSimulator()
 {
 
 }
@@ -53,18 +53,17 @@ namespace
 	void ProgramUsage() 
 	{
 		cerr << " Program Usage: " << endl;
-		cerr << " ./G4MuDecSimulator [ -c ConfigFile.json ] " << endl;
+		cerr << " ./G4NeutronSimulator [ -c ConfigFile.json ] " << endl;
 	}
 
 }
-
 
 int main(int argc, char** argv) 
 {
 
 	if (argc < 3) {
 		ProgramUsage();
-		throw invalid_argument("[ERROR] G4MuDecSimulator::main: A configuration file is needed!");
+		throw invalid_argument("[ERROR] G4NeutronSimulator::main: A configuration file is needed!");
 	}
 
 	for (int i=1; i<argc; i=i+2) {
@@ -72,41 +71,41 @@ int main(int argc, char** argv)
 		if (sarg == "-c")
 			fCfgFile = argv[i+1];
 	}
-
+	
 	// for program time calculation
-	time_t start, end;
-	time(&start);
-
-	fG4MuDecSimulator = new G4MuDecSimulator();
+  time_t start, end;
+  time(&start);
+  
+	fG4NeutronSimulator = new G4NeutronSimulator();
 	// Create Event object
 	Event theEvent;
-	fG4MuDecSimulator->Initialize(theEvent, fCfgFile);
-	fG4MuDecSimulator->RunSimulation(theEvent);
+	fG4NeutronSimulator->Initialize(theEvent, fCfgFile);
+	fG4NeutronSimulator->RunSimulation(theEvent);
 	/*************************************************
 		
 		Geant4 simulation ended here!
 		What happens next is up to you =)
 
 	**************************************************/
-	fG4MuDecSimulator->WriteEventInfo(theEvent);
+	fG4NeutronSimulator->WriteEventInfo(theEvent);
 	time(&end);
 
 	// Calculating total time taken by the program.
-	double time_taken = double(end - start);
-	cout << "[INFO] G4MuDecSimulator: Time taken by program is : " << fixed
-			 << time_taken << setprecision(5);
-	cout << " sec " << endl;
-	
+    double time_taken = double(end - start);
+    cout << "[INFO] G4NeutronSimulator: Time taken by program is : " << fixed
+         << time_taken << setprecision(5);
+    cout << " sec " << endl;
+
 	return 0;
 
 }
 
 void
-G4MuDecSimulator::Initialize(Event& theEvent, string cfgFile)
+G4NeutronSimulator::Initialize(Event& theEvent, string cfgFile)
 {
 
-	cout << "[INFO] G4MuDecSimulator::Initialize" << endl;
-	cout << "[INFO] Reading configuration file " << cfgFile << endl;
+	cout << "[INFO] G4NeutronSimulator::Initialize" << endl;
+	cout << "[INFO] G4NeutronSimulator::Initialize: Reading configuration file " << cfgFile << endl;
 
 	// Fill Event object from configuration file
 	// Read Simulation configuration
@@ -116,29 +115,28 @@ G4MuDecSimulator::Initialize(Event& theEvent, string cfgFile)
 	ConfigManager::PrintConfig(cfg);
 	// Read Detector Configuration
 	ConfigManager::ReadDetectorList(cfg.fDetectorList, theEvent);
-
+	
 }            
 
 
 bool
-G4MuDecSimulator::RunSimulation(Event& theEvent)
+G4NeutronSimulator::RunSimulation(Event& theEvent)
 {
 
-	cout << "[INFO] G4MuDecSimulator::RunSimulation" << endl;
+	cout << "[INFO] G4NeutronSimulator::RunSimulation" << endl;
 	
 	const Event::Config &cfg = theEvent.GetConfig();
 	SimData& simData = theEvent.GetSimData();
-	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
-	cout << "[INFO] G4MuDecSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
-	
-	if (!NumberOfParticles) {
-		cerr << "[ERROR] G4MuDecSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
+	const unsigned int numberOfParticles = simData.GetTotalNumberOfParticles();
+	cout << "[INFO] G4NeutronSimulator::RunSimulation: Number of particles to be simulated = " << numberOfParticles << endl;
+	if (!numberOfParticles) {
+		cerr << "[ERROR] G4NeutronSimulator::RunSimulation: No Particles in the Event! Exiting..." << endl;
 		return false;
 	}
-
+	
 	/***************
 
-		Geant4 Setup    
+	Geant4 Setup    
 
 	*****************/
 
@@ -152,26 +150,23 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 	auto fRunManager = G4RunManagerFactory::CreateRunManager();
 
 	// set mandatory initialization classes
-	auto fDetConstruction = new G4MuDecConstruction(theEvent);
+	auto fDetConstruction = new G4NeutronDetectorConstruction(theEvent);
 	fRunManager->SetUserInitialization(fDetConstruction);
 	
 	fRunManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
 
-	G4MuDecPrimaryGeneratorAction *fPrimaryGenerator = new G4MuDecPrimaryGeneratorAction(theEvent);
+	G4NeutronPrimaryGeneratorAction *fPrimaryGenerator = new G4NeutronPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
 	
-	G4MuDecStackingAction *fStackingAction = new G4MuDecStackingAction(theEvent);
-	fRunManager->SetUserAction(fStackingAction);
-
-	G4MuDecRunAction *fRunAction = new G4MuDecRunAction();
+	G4NeutronRunAction *fRunAction = new G4NeutronRunAction();
 	fRunManager->SetUserAction(fRunAction);
 	
-	G4MuDecEventAction *fEventAction = new G4MuDecEventAction(theEvent);
+	G4NeutronEventAction *fEventAction = new G4NeutronEventAction();
 	fRunManager->SetUserAction(fEventAction);
 
-	fRunManager->SetUserAction(new G4MuDecTrackingAction(fEventAction, theEvent));
+	fRunManager->SetUserAction(new G4NeutronTrackingAction());
 
-	G4MuDecSteppingAction *fSteppingAction = new G4MuDecSteppingAction(fDetConstruction, fEventAction, theEvent);
+	G4NeutronSteppingAction *fSteppingAction = new G4NeutronSteppingAction(fDetConstruction, fEventAction, theEvent);
 	fRunManager->SetUserAction(fSteppingAction);
 	
 	// initialize G4 kernel
@@ -207,7 +202,7 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 	
 	if (cfg.fGeoVis || cfg.fTrajVis) {
 		fVisManager->Initialize();
-		fUImanager->ApplyCommand(("/vis/open " + cfg.fRenderFile).c_str());
+		fUImanager->ApplyCommand(("/vis/open " + fRenderFile).c_str());
 		fUImanager->ApplyCommand("/vis/scene/create");
 		fUImanager->ApplyCommand("/vis/sceneHandler/attach");
 		fUImanager->ApplyCommand("/vis/scene/add/volume");
@@ -230,8 +225,7 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
-		G4MuDecSimulator::currentParticle = *it;
-		simData.SetCurrentParticle(*it);
+		G4NeutronSimulator::currentParticle = *it;
 		// Run simulation
 		fRunManager->BeamOn(1);
 	}
@@ -240,7 +234,7 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 	delete fVisManager;
 	delete fRunManager;
 
-	cout << "[INFO] G4MuDecSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
+	cout << "[INFO] G4NeutronSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
 
 	return true;
 
@@ -248,12 +242,12 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 
 
 void
-G4MuDecSimulator::WriteEventInfo(Event& theEvent)
+G4NeutronSimulator::WriteEventInfo(Event& theEvent)
 {
-	cout << "[INFO] G4MuDecSimulator::WriteEventInfo" << endl;
+	cout << "[INFO] G4NeutronSimulator::WriteEventInfo" << endl;
 
 	DataWriter::FileWriter(theEvent);
-	
+
 	return;
 
 }

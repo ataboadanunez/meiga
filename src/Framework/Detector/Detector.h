@@ -39,7 +39,8 @@ class Detector
 			eMusaic = 1,
 			eMudulus = 2,
 			eWCD = 3,
-			eScintillator
+			eScintillator = 4,
+			eDummy
 		};
 
 
@@ -53,7 +54,7 @@ class Detector
 		DetectorType GetType() const { return fType; }
 		void SetType(Detector::DetectorType type) { fType = type; }
 
-		std::vector<double> GetDetectorPosition() { return fDetectorPosition; }
+		const std::vector<double>& GetDetectorPosition() const { return fDetectorPosition; }
 		void SetDetectorPosition(const std::vector<double> &pos) { fDetectorPosition = pos; }
 
 		// Mechanical properties
@@ -96,6 +97,26 @@ class Detector
 		double GetTankThickness() const { return fTankThickness; }
 		void SetTankThickness(double t) { fTankThickness = t; }
 
+		// general detector size parameters
+		double GetLength() const { return fLength; }
+		void SetLength(double l) { fLength = l; }
+
+		double GetWidth() const { return fWidth; }
+		void SetWidth(double w) { fWidth = w; }
+
+		double GetThickness() const { return fThickness; }
+		void SetThickness(double t) { fThickness = t; }
+
+		// ground size
+		double GetGroundSizeX() const { return fGroundX; }
+		void SetGroundSizeX(double gx) { fGroundX = gx; }
+
+		double GetGroundSizeY() const { return fGroundY; }
+		void SetGroundSizeY(double gy) { fGroundY = gy; }
+
+		double GetGroundSizeZ() const { return fGroundZ; }
+		void SetGroundSizeZ(double gz) { fGroundZ = gz; }
+
 		// Optical device
 		//OptDevice& GetOptDevice() { return fOptDevice; } // to access OptDevice class members
 		// Make, Get and Has optical device by its id
@@ -124,7 +145,7 @@ class Detector
 		DetectorType fType;
 		int fNOptDevices = 0;
 
-		// 
+		// Scintillator bars
 
 		double fBarWidth;
 		double fBarLength;
@@ -136,10 +157,21 @@ class Detector
 		double fCoatingThickness;
 		int    fNumberOfBars;
 
+		// Water-Cerenkov Detector parameters
 		double fTankHeight;
 		double fTankRadius;
 		double fTankThickness;
+
+		// general detector size parameters
+		double fLength;
+		double fWidth;
+		double fThickness;
 		
+		// ground size parameters
+		double fGroundX;
+		double fGroundY;
+		double fGroundZ;
+
 		std::vector<double> fDetectorPosition;
 		OptDevice fOptDevice;
 		std::map<int, OptDevice> fOptDeviceMap;

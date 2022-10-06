@@ -4,8 +4,11 @@
 	{
 		"OutputFile" : "./output.json",
 		"CompressOutput" : true,
-		"SaveTraces" : true,
-		"SaveEnergy" : false
+		"SavePETimeDistribution" : true,
+		"SaveComponentsPETimeDistribution" : true,
+		"SaveTraces" : false,
+		"SaveEnergy" : false,
+		"SaveComponentsEnergy" : false
 	},
 	"DetectorList" : "./DetectorList.xml",
 	"DetectorProperties" : "./DetectorProperties.xml",

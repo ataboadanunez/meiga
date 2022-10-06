@@ -65,6 +65,13 @@ DefaultProperties::SetDefaultProperties(const string &filename)
 	gFiberRadius = GetPropertyFromXML<double>(tree, branchName, "fiberRadius");
 	gCladdingThickness = GetPropertyFromXML<double>(tree, branchName, "claddingThickness");
 	
+	gLength = GetPropertyFromXML<double>(tree, branchName, "length");
+	gWidth = GetPropertyFromXML<double>(tree, branchName, "width");
+	gThickness = GetPropertyFromXML<double>(tree, branchName, "thickness");
 
+	// ground size parameters
+	gGroundSizeX = GetPropertyFromXML<double>(tree, branchName, "groundSizeX");
+	gGroundSizeY = GetPropertyFromXML<double>(tree, branchName, "groundSizeY");
+	gGroundSizeZ = GetPropertyFromXML<double>(tree, branchName, "groundSizeZ");
 
 }

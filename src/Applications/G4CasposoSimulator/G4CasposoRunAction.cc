@@ -78,17 +78,15 @@ G4CasposoRunAction::EndOfRunAction(const G4Run* aRun)
 		int odId = currOd.GetId();
 		// access to optical device signals
 		OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(odId);
-		const auto *peTimeDistributionRange = odSimData.PETimeDistributionRange();
+		if (!odSimData.HasPETimeDistribution())
+			continue;
+
+		const auto peTimeDistributionRange = odSimData.GetPETimeDistribution();
 		
 		// access to PETimeDistribution element by run ID (should match the vector element)
-		auto peTime = peTimeDistributionRange->at(g4RunId);
+		auto peTime = peTimeDistributionRange.at(g4RunId);
 		
-		// if (peTime->size())
-		// {
-		// 	std::cout << "[DEBUG] Signal at PMT_Channel " << odId << " NPE " << peTime->size() << std::endl;	
-		// }
-		
-		(*fOutFile) << peTime->size() << " ";
+		(*fOutFile) << peTime.size() << " ";
 		
 	}
 
