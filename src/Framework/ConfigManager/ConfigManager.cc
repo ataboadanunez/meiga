@@ -116,7 +116,7 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 		// shouldn't be part of DetectorSimData?
 		theEvent.SetMaximumHeight(maxHeight);
 		detector.SetDetectorPosition(detPosition);
-
+		cout << "[INFO] Detector Position from XML = (" << detPosition.at(0) / CLHEP::cm << ", " << detPosition.at(1) / CLHEP::cm << ", " << detPosition.at(2) / CLHEP::cm << ") cm" << endl; 
 		// search for another detector properties in the DetectorList.xml
 		detector.SetDetectorProperties(subtree, defProp);
 	}
