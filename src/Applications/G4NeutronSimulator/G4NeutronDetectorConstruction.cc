@@ -17,9 +17,9 @@ G4NeutronDetectorConstruction::G4NeutronDetectorConstruction(Event& theEvent) :
 	fGroundSizeY = fEvent.GetDetector(0).GetGroundSizeY();
 	fGroundSizeZ = fEvent.GetDetector(0).GetGroundSizeZ();
 
-	fWorldSizeX = fGroundSizeX + 0.5*m;
-	fWorldSizeY = fGroundSizeY + 0.5*m;
-	fWorldSizeZ = fGroundSizeZ*0.5 + 5*m;
+	fWorldSizeX = fGroundSizeX + 10*m;
+	fWorldSizeY = fGroundSizeY + 10*m;
+	fWorldSizeZ = fGroundSizeZ + 10*m;
 }
 
 G4NeutronDetectorConstruction::~G4NeutronDetectorConstruction() 
@@ -57,7 +57,8 @@ G4NeutronDetectorConstruction::CreateGround()
 	G4VisAttributes brown(G4Colour::Brown());
 	logicGround = new G4LogicalVolume(solidGround, Materials().StdRock, "Ground");
 	logicGround->SetVisAttributes(brown);
-	physGround  =  new G4PVPlacement(nullptr, G4ThreeVector(0, 0, -fWorldSizeZ/2 + fGroundSizeZ/2), logicGround, "Ground", logicWorld, false, 0, fCheckOverlaps);
+	// physGround  =  new G4PVPlacement(nullptr, G4ThreeVector(0, 0, -fWorldSizeZ/2 + fGroundSizeZ/2), logicGround, "Ground", logicWorld, false, 0, fCheckOverlaps);
+	physGround  =  new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicGround, "Ground", logicWorld, false, 0, fCheckOverlaps);
 }
 
 

@@ -72,5 +72,46 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E copy "${copy_source_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
   COMMENT "Copying ${copy_file_name} to build directory"
 )
-
-
+#-------------------------------------------------------------------------------------------------------------
+# COPY TWO EXAMPLE CONFIGURATION FILES FOR RUNNING WITH AND WITHOUD DETECTOR
+#-------------------------------------------------------------------------------------------------------------
+set(copy_file_name "DetectorList_ground.xml")
+add_custom_command(
+  TARGET G4NeutronSimulator POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${copy_dest_dir}
+)
+add_custom_command(
+  TARGET G4NeutronSimulator POST_BUILD 
+  COMMAND ${CMAKE_COMMAND} -E copy "${copy_source_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
+  COMMENT "Copying ${copy_file_name} to build directory"
+)
+set(copy_file_name "DetectorList_WCD.xml")
+add_custom_command(
+  TARGET G4NeutronSimulator POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${copy_dest_dir}
+)
+add_custom_command(
+  TARGET G4NeutronSimulator POST_BUILD 
+  COMMAND ${CMAKE_COMMAND} -E copy "${copy_source_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
+  COMMENT "Copying ${copy_file_name} to build directory"
+)
+set(copy_file_name "G4NeutronSimulator_ground.json")
+add_custom_command(
+  TARGET G4NeutronSimulator POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${copy_dest_dir}
+)
+add_custom_command(
+  TARGET G4NeutronSimulator POST_BUILD 
+  COMMAND ${CMAKE_COMMAND} -E copy "${copy_source_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
+  COMMENT "Copying ${copy_file_name} to build directory"
+)
+set(copy_file_name "G4NeutronSimulator_WCD.json")
+add_custom_command(
+  TARGET G4NeutronSimulator POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${copy_dest_dir}
+)
+add_custom_command(
+  TARGET G4NeutronSimulator POST_BUILD 
+  COMMAND ${CMAKE_COMMAND} -E copy "${copy_source_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
+  COMMENT "Copying ${copy_file_name} to build directory"
+)

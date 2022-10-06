@@ -153,7 +153,7 @@ G4NeutronSimulator::RunSimulation(Event& theEvent)
 	auto fDetConstruction = new G4NeutronDetectorConstruction(theEvent);
 	fRunManager->SetUserInitialization(fDetConstruction);
 	
-	fRunManager->SetUserInitialization(new G4MPhysicsList(fPhysicsName));
+	fRunManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
 
 	G4NeutronPrimaryGeneratorAction *fPrimaryGenerator = new G4NeutronPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);

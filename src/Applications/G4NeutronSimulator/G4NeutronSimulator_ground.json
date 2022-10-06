@@ -10,7 +10,7 @@
 		"SaveEnergy" : false,
 		"SaveComponentsEnergy" : false
 	},
-	"DetectorList" : "./DetectorList.xml",
+	"DetectorList" : "./DetectorList_ground.xml",
 	"DetectorProperties" : "./DetectorProperties.xml",
 	"Simulation" :
 	{
