@@ -65,13 +65,9 @@ void
 G4NeutronDetectorConstruction::PlaceDetector(Event& theEvent)
 {
 	
-	// loop in Detectors Range
+	// loop over Detectors Range
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 		auto& currentDet = detIt->second;
-		auto detPos = currentDet.GetDetectorPosition();
-		double posZ = -fWorldSizeZ/2 + fGroundSizeZ;
-		std::vector<double> newPos = {detPos[0], detPos[1], posZ};
-		currentDet.SetDetectorPosition(newPos);
 		BuildDetector(logicWorld, currentDet, theEvent, true);
 
 	}
