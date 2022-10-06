@@ -136,8 +136,6 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 		return false;
 	}
 
-
-
 	/***************
 
 		Geant4 Setup    
