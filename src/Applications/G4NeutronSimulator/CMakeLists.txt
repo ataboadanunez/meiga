@@ -69,7 +69,7 @@ add_custom_command(
 )
 add_custom_command(
   TARGET G4NeutronSimulator POST_BUILD 
-  COMMAND ${CMAKE_COMMAND} -E copy "${copy_source_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
+  COMMAND ${CMAKE_COMMAND} -E copy "${config_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
   COMMENT "Copying ${copy_file_name} to build directory"
 )
 #-------------------------------------------------------------------------------------------------------------
@@ -112,6 +112,6 @@ add_custom_command(
 )
 add_custom_command(
   TARGET G4NeutronSimulator POST_BUILD 
-  COMMAND ${CMAKE_COMMAND} -E copy "${config_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
+  COMMAND ${CMAKE_COMMAND} -E copy "${copy_source_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
   COMMENT "Copying ${copy_file_name} to build directory"
 )
