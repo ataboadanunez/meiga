@@ -140,6 +140,7 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 	SetBarLength(defProp.gBarLength);
 	SetBarThickness(defProp.gBarThickness);
 	SetBarCoatingThickness(defProp.gCoatingThickness);
+	SetRotationAngle(defProp.gRotationAngle);
 	SetCasingThickness(defProp.gCasingThickness);
 	SetFiberLength(defProp.gFiberLength);
 	SetFiberRadius(defProp.gFiberRadius);
@@ -209,6 +210,10 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
 				SetCasingThickness(value * unit);
 			}
+			else if (xmlLabel == "rotationAngle") {
+				double value = stod(xmlValue);
+				SetRotationAngle(value);
+			}
 			else if (xmlLabel == "fiberLength") {
 				double value = stod(xmlValue);
 				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
@@ -258,3 +263,9 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 	}
 }
 
+void
+Detector::SetRotationAngle(const double angle)
+{
+	double angle_rad = angle * (M_PI / 180.);
+	fRotationAngle = angle_rad;
+}

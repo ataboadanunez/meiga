@@ -60,6 +60,8 @@ class Detector
 		// Mechanical properties
 		double GetCasingThickness() const { return fCasingThickness; }
 		void SetCasingThickness(double casingThickness) { fCasingThickness = casingThickness; }
+		double GetRotationAngle() const { return fRotationAngle; }
+		void SetRotationAngle(double angle);
 
 		// scintillator-type detector properties
 		int GetNBars() const { return fNumberOfBars; }
@@ -151,6 +153,7 @@ class Detector
 		double fBarLength;
 		double fBarThickness;
 		double fCasingThickness;
+		double fRotationAngle;
 		double fFiberLength;
 		double fFiberRadius;
 		double fCladdingThickness;
