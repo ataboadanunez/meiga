@@ -19,7 +19,7 @@ G4AndesSteppingAction::G4AndesSteppingAction(const G4AndesDetectorConstruction* 
 	: G4UserSteppingAction(),
 		fDetectorConstruction(det),
 		fEventAction(G4event),
-    fEvent(theEvent)
+		fEvent(theEvent)
 {
 }
 
@@ -30,13 +30,13 @@ G4AndesSteppingAction::~G4AndesSteppingAction()
 void
 G4AndesSteppingAction::UserSteppingAction(const G4Step* step)
 {
-  
+	
 	//Particle& currParticle = G4AndesSimulator::currentParticle;
 	SimData& simData = fEvent.GetSimData();
 	double groundThickness = simData.GetGroundThickness();
 	double depth = -0.5*groundThickness;
 
-  // kill non-primary particles to speed up 
+	// kill non-primary particles to speed up 
 	G4Track* track = step->GetTrack();
 	
 	if (track->GetParentID() != 0) {

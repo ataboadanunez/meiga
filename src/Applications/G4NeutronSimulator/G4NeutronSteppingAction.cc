@@ -21,10 +21,10 @@ G4NeutronSteppingAction::G4NeutronSteppingAction(const G4NeutronDetectorConstruc
     fEvent(theEvent)
 {
 	
-	std::string outFileName = "GroundTrackingInfo.dat";
+	std::string outFileName = "groundTrackingInfo.dat";
 	// create output file
 	fOutputFile = new std::ofstream(outFileName.c_str());
-	*fOutputFile << "ParticleID InitialEnergy_GeV LastStepEnergy_GeV depth_m"  << std::endl;
+	*fOutputFile << "ParticleID StepVolume InitialEnergy_GeV CurrentEnergy_GeV depth_m"  << std::endl;
 }
 
 G4NeutronSteppingAction::~G4NeutronSteppingAction()
@@ -42,18 +42,18 @@ G4NeutronSteppingAction::UserSteppingAction(const G4Step* step)
 
 	// save only primary particles (neutrons)
 	if (track->GetParentID() == 0) {
-		double currentEnergy = track->GetTotalEnergy();
+		double fTrackEnergy = track->GetTotalEnergy();
 		G4ThreeVector trackPosition = track->GetPosition();
 
 		Particle& currParticle = G4NeutronSimulator::currentParticle;
-		double fKineticEnergy = currParticle.GetKineticEnergy();
+		double fInitialEnergy = currParticle.GetTotalEnergy();
 		
 		double posZ = trackPosition[2];
 		// get muon energy at last step in ground
-		
-		if (stepVolumeName == "Ground" && step->IsLastStepInVolume() && posZ) {
+		// std::cout << "[DEBUG] G4NeutronDetectorConstruction::G4UserSteppingAction: stepVolumeName " << stepVolumeName << " posZ " << posZ << std::endl;  
+		if (step->IsLastStepInVolume()) {
 			// std::cout << "TrackStoppingInfo ParticleID " << currParticle.GetParticleId() << " InitialEnergy_GeV " << fKineticEnergy / CLHEP::GeV << " LastStepEnergy_GeV " << currentEnergy / CLHEP::GeV << " depth_m " << posZ / CLHEP::m << std::endl;
-			*fOutputFile << currParticle.GetParticleId() << " " << fKineticEnergy / CLHEP::GeV << " " << currentEnergy / CLHEP::GeV << " " << posZ / CLHEP::m << std::endl;
+			*fOutputFile << currParticle.GetParticleId() << " " << stepVolumeName << " " << fInitialEnergy / CLHEP::GeV << " " << fTrackEnergy / CLHEP::GeV << " " << posZ / CLHEP::m << std::endl;
 		}
 	}
 	
