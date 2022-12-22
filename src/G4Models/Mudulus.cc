@@ -121,8 +121,12 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	new G4LogicalSkinSurface("BarCoating", logicCoating, Materials().ScinOptSurf);
 
 	// useful rotation matrix for bars orientation
+	G4RotationMatrix* rotationCasing = new G4RotationMatrix();
 	G4RotationMatrix* rotationFiber = new G4RotationMatrix();
 	G4RotationMatrix* rotationBot = new G4RotationMatrix();
+	G4double alpha = detector.GetRotationAngle();
+	cout << "[DEBUG] G4Models::Mudulus: Rotation Angle = " << alpha << endl;
+	rotationCasing->rotateX(alpha);
 	rotationFiber->rotateY(M_PI/2);
 	rotationBot->rotateZ(M_PI/2);
 
@@ -137,23 +141,33 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	// loop over casings (volume which contains the panels)
 	for (G4int pIt=0; pIt<nPanels; ++pIt) {
 
-		G4double fPanelPosZ;
-		if (pIt==0)
-			fPanelPosZ = 0;
-		else if (pIt==1)
-			fPanelPosZ = fDistanceBtwPanels;
-		else if (pIt==2)
-			fPanelPosZ = -1*fDistanceBtwPanels;
-
+		// reference position of middle panel
 		G4double fPanelPosX = detectorPos.getX();
 		G4double fPanelPosY = detectorPos.getY();
-		fPanelPosZ += detectorPos.getZ();
+		G4double fPanelPosZ = detectorPos.getZ();
+
+		// shift upper and lower panel's Z position
+		// shift y-coordinate in case rotation angle is applied
+		if (pIt==0)
+			fPanelPosZ += 0;
+		else if (pIt==1) {
+			fPanelPosZ += fDistanceBtwPanels;
+			if (alpha)
+				fPanelPosY += 0.5*fCasingSizeX*cos(alpha);
+		}
+		else if (pIt==2) {
+			fPanelPosZ += -1*fDistanceBtwPanels;
+			if (alpha)
+				fPanelPosY -= 0.5*fCasingSizeX*cos(alpha);
+		}
+
+		cout << "[DEBUG] G4Models::Mudulus: Panel " << pIt << ", position = (" << fPanelPosX / 	CLHEP::cm << ", " << fPanelPosY / CLHEP::cm << ", " << fPanelPosZ / CLHEP::cm << ") cm " << endl;
 		G4ThreeVector panelPosition = G4ThreeVector(fPanelPosX, fPanelPosY, fPanelPosZ);
 
 		G4int panelId = pIt+1;
 		G4String nameCasing = "Casing_"+to_string(panelId);
 		logicCasing = new G4LogicalVolume(solidCasing, Materials().Air, nameCasing, 0, 0, 0);
-		new G4PVPlacement(nullptr, panelPosition, logicCasing, nameCasing, logMother, false, detectorId, fCheckOverlaps);
+		new G4PVPlacement(rotationCasing, panelPosition, logicCasing, nameCasing, logMother, false, detectorId, fCheckOverlaps);
 		
 
 		// bars of the top panel
