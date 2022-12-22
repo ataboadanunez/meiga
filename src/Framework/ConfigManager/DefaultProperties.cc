@@ -61,6 +61,7 @@ DefaultProperties::SetDefaultProperties(const string &filename)
 	gBarThickness = GetPropertyFromXML<double>(tree, branchName, "barThickness");
 	gCoatingThickness = GetPropertyFromXML<double>(tree, branchName, "coatingThickness");
 	gCasingThickness = GetPropertyFromXML<double>(tree, branchName, "casingThickness");
+	gRotationAngle = GetPropertyFromXML<double>(tree, branchName, "rotationAngle", false);
 	gFiberLength = GetPropertyFromXML<double>(tree, branchName, "fiberLength");
 	gFiberRadius = GetPropertyFromXML<double>(tree, branchName, "fiberRadius");
 	gCladdingThickness = GetPropertyFromXML<double>(tree, branchName, "claddingThickness");

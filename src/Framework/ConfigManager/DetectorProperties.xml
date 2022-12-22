@@ -12,6 +12,7 @@
 	<barThickness unit="mm"> 10 </barThickness>
 	<coatingThickness unit="mm"> 0.25 </coatingThickness>
 	<casingThickness unit="mm"> 2 </casingThickness>
+	<rotationAngle> 0 </rotationAngle>
 	<fiberLength unit="mm"> 500 </fiberLength>
 	<fiberRadius unit="mm"> 1.2 </fiberRadius>
 	<claddingThickness unit="mm"> 0.10 </claddingThickness>

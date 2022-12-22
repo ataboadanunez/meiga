@@ -14,6 +14,7 @@ struct DefaultProperties
 	double gBarLength;
 	double gBarThickness;
 	double gCasingThickness;
+	double gRotationAngle;
 	double gFiberLength;
 	double gFiberRadius;
 	double gCladdingThickness;
