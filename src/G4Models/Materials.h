@@ -31,6 +31,9 @@ public:
 	static G4Element* elTi;
 	static G4Element* elB ;
 	static G4Element* elNa;
+	static G4Element* elCa;
+	static G4Element* elFe;
+	static G4Element* elAl;
 	
 	// compounds
 	static G4Material* SiO2;
@@ -52,9 +55,11 @@ public:
 	static G4Material* FPethylene;
 	static G4Material* Pyrex;
 	static G4Material* HDPE;
+	static G4Material* Concrete;
 	static G4OpticalSurface* ScinOptSurf;
 	static G4OpticalSurface* LinerOptSurf;
 	static G4OpticalSurface* LinerOptSurf2;
+
 
 	const G4double* GetScinPhotonEnergyArray() const;
 	const G4double* GetScinRefIndexArray() const;

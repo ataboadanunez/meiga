@@ -271,6 +271,9 @@ G4Element* Materials::elSi;
 G4Element* Materials::elTi;
 G4Element* Materials::elB;
 G4Element* Materials::elNa;
+G4Element* Materials::elCa;
+G4Element* Materials::elFe;
+G4Element* Materials::elAl;
 	
 G4Material* Materials::SiO2;
 G4Material* Materials::TiO2;
@@ -291,6 +294,7 @@ G4Material* Materials::Pethylene;
 G4Material* Materials::FPethylene;
 G4Material* Materials::Pyrex;
 G4Material* Materials::HDPE;
+G4Material* Materials::Concrete;
 G4OpticalSurface* Materials::ScinOptSurf;
 G4OpticalSurface* Materials::LinerOptSurf;
 G4OpticalSurface* Materials::LinerOptSurf2;
@@ -332,6 +336,9 @@ Materials::CreateElements()
 	elTi = new G4Element("Titanium", "Ti", 22, 47.867 * g/mole);
 	elB  = new G4Element("Boron", "B", 5, 10.811 * g/mole);
 	elNa = new G4Element("Sodium", "Na", 11, 22.98977 * g/mole);
+	elCa = new G4Element("Calcium", "Ca", 20, 40.08 * g/mole);
+	elFe = new G4Element("Iron", "Fe", 26, 55.850 * g/mole);
+	elAl = new G4Element("Aluminium", "Al", 13, 26.98 * g/mole);
 
 }
 
@@ -577,6 +584,16 @@ Materials::CreateMaterials()
 	LinerOptSurf2->SetFinish(groundtyvekair);
 	LinerOptSurf2->SetModel(LUT);
 
-	
+	// --------------------------------------------------------------------
+	// Concrete
+	// --------------------------------------------------------------------
+	// 
+	Concrete = new G4Material("Concrete", 2.5 *g/cm3, 6);
+	Concrete->AddElement(elO, 0.52);
+	Concrete->AddElement(elSi, 0.325);
+	Concrete->AddElement(elCa, 0.06);
+	Concrete->AddElement(elNa, 0.015);
+	Concrete->AddElement(elFe, 0.04);
+	Concrete->AddElement(elAl, 0.04);
 
 }
