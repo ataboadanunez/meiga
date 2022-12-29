@@ -36,11 +36,6 @@ class G4CasposoDetectorConstruction : public G4VUserDetectorConstruction {
 		virtual ~G4CasposoDetectorConstruction();
 		virtual G4VPhysicalVolume* Construct();
 
-		G4double GetGroundSizeX() const { return fGroundSizeX; }
-		G4double GetGroundSizeY() const { return fGroundSizeY; }
-		G4double GetGroundSizeZ() const { return fGroundSizeZ; }
-
-
 	private:
 
 		void CreateWorld();
@@ -53,6 +48,9 @@ class G4CasposoDetectorConstruction : public G4VUserDetectorConstruction {
 		// solids
 		G4Box* solidWorld = nullptr;
 		G4Box* solidGround = nullptr;
+
+		G4Tubs* solidTandar = nullptr;
+		G4Tubs* solidTandarTop = nullptr;
 		
 		// logical and physical volumes
 		G4LogicalVolume* logicWorld = nullptr;
@@ -61,26 +59,11 @@ class G4CasposoDetectorConstruction : public G4VUserDetectorConstruction {
 		G4LogicalVolume* logicGround = nullptr;
 		G4PVPlacement*   physGround  = nullptr;
 
-		// size definitions
-		G4double fGroundSizeX = 2 * CLHEP::m;
-		G4double fGroundSizeY = 2 * CLHEP::m;
-		G4double fGroundSizeZ = 1 * CLHEP::m;
-
-		G4double fWorldSizeX = fGroundSizeX + 5 * CLHEP::m;
-		G4double fWorldSizeY = fGroundSizeY + 5 * CLHEP::m;
-		G4double fWorldSizeZ = fGroundSizeZ + 5 * CLHEP::m;
-
-		G4double fHallSizeX = 25*m;
-		G4double fHallSizeY = 3*m;
-		G4double fHallSizeZ = 3*m;
-
-		G4double fRockPosX = 0;
-		G4double fRockPosY = 0;
-		G4double fRockPosZ = 0;
-
-		G4double fHallPosX = 0;
-		G4double fHallPosY = 0;
-		G4double fHallPosZ = fHallSizeZ - 150*m;
+		G4LogicalVolume* logTandar = nullptr;
+		G4PVPlacement* physTandar = nullptr;
+		
+		G4LogicalVolume* logTandarTop = nullptr;
+		G4PVPlacement* physTandarTop = nullptr;
 
 		Event& fEvent;
 };

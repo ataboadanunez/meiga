@@ -1,11 +1,21 @@
 <?xml version='1.0' encoding='ISO-8859-1'?>
 
 <detectorList>
-	
+
 	<detector id="0" type="eMudulus">
-		<x unit="cm"> 0.0 </x>
-		<y unit="cm"> 0.0 </y>
-		<z unit="cm"> 0.0 </z>
+		<x unit="m"> 0.0 </x>
+		<y unit="m"> -100.0 </y>
+		<z unit="m"> 1.0 </z>
+
+		<rotationAngle> 45 </rotationAngle>
+
+		<groundSizeX unit="m"> 110 </groundSizeX>
+    <groundSizeY unit="m"> 110 </groundSizeY>
+    <groundSizeZ unit="m"> 1   </groundSizeZ>
+
+    <injectionHeight unit="m"> 0.6 </injectionHeight>
+    <injectionRadius unit="m"> 0.5641895835477563 </injectionRadius>
+
 	</detector>
 
 
