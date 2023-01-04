@@ -4,10 +4,10 @@
 
 	<detector id="0" type="eMudulus">
 		<x unit="m"> 0.0 </x>
-		<y unit="m"> -100.0 </y>
-		<z unit="m"> 1.0 </z>
+		<y unit="m"> 0.0 </y>
+		<z unit="m"> 2.0 </z>
 
-		<rotationAngle> 45 </rotationAngle>
+		<rotationAngle> 75 </rotationAngle>
 
 		<groundSizeX unit="m"> 110 </groundSizeX>
     <groundSizeY unit="m"> 110 </groundSizeY>

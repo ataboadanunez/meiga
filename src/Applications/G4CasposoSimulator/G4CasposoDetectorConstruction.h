@@ -52,6 +52,9 @@ class G4CasposoDetectorConstruction : public G4VUserDetectorConstruction {
 		G4Tubs* solidTandar = nullptr;
 		G4Tubs* solidTandarTop = nullptr;
 		
+		G4Box * solidStairsIn = nullptr;
+		G4Box * solidStairsOut = nullptr;
+
 		// logical and physical volumes
 		G4LogicalVolume* logicWorld = nullptr;
 		G4PVPlacement*   physWorld  = nullptr;
@@ -61,10 +64,16 @@ class G4CasposoDetectorConstruction : public G4VUserDetectorConstruction {
 
 		G4LogicalVolume* logTandar = nullptr;
 		G4PVPlacement* physTandar = nullptr;
-		
+
 		G4LogicalVolume* logTandarTop = nullptr;
 		G4PVPlacement* physTandarTop = nullptr;
 
+		G4LogicalVolume* logStairsIn = nullptr;
+		G4PVPlacement* physStairsIn = nullptr;
+			
+		G4LogicalVolume* logStairsOut = nullptr;
+		G4PVPlacement* physStairsOut = nullptr;
+	
 		Event& fEvent;
 };
 

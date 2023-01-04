@@ -212,7 +212,7 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 		fUImanager->ApplyCommand("/vis/scene/create");
 		fUImanager->ApplyCommand("/vis/sceneHandler/attach");
 		fUImanager->ApplyCommand("/vis/scene/add/volume");
-		fUImanager->ApplyCommand("/vis/scene/add/axes 0 0 0 1 m");
+		fUImanager->ApplyCommand("/vis/scene/add/axes");
 		fUImanager->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 0. 0.");
 		fUImanager->ApplyCommand("/vis/viewer/set/targetPoint 0 0 0");
 		fUImanager->ApplyCommand("/vis/viewer/zoom 1");
@@ -224,6 +224,10 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 	if (cfg.fTrajVis) {
 		fUImanager->ApplyCommand("/tracking/storeTrajectory 1");
 		fUImanager->ApplyCommand("/vis/scene/add/trajectories");
+		fUImanager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");
+		// for debugging purposes, gammas are not drawn
+		fUImanager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
+		fUImanager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
 	}
 
 

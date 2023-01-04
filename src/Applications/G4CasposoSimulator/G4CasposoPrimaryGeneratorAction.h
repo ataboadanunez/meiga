@@ -9,6 +9,8 @@
 
 #include <iostream>
 
+#include "EcoMug.h"
+
 #include "G4CasposoDetectorConstruction.h"
 #include "Particle.h"
 #include "Event.h"
@@ -29,9 +31,16 @@ class G4CasposoPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 
     // method to access particle gun
     const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
+    // for EcoMug muon generation
+    G4ParticleDefinition *mu_plus; 
+    G4ParticleDefinition *mu_minus;
     
     G4ThreeVector fParticlePosition;
     G4ThreeVector farticleDirection;
+
+    EcoMug fMuonGen;
+    bool fUseEcoMug = true;
+    int fMuonCharge = 0;
 
   private:
 

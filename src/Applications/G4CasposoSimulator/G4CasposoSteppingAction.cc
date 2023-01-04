@@ -30,6 +30,5 @@ G4CasposoSteppingAction::~G4CasposoSteppingAction()
 void
 G4CasposoSteppingAction::UserSteppingAction(const G4Step* step)
 {
-  
 	
 }

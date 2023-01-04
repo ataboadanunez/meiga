@@ -16,9 +16,9 @@
 	{
 		"SimulationMode" : "eFast",
 		"InjectionMode" : "eRandom",
-		"GeoVisOn" : false,
+		"GeoVisOn" : true,
 		"TrajVisOn" : false,
-		"CheckOverlaps" : false,
+		"CheckOverlaps" : true,
 		"Verbosity" : 1,
 		"RenderFile" : "VRML2FILE",
 		"PhysicsName" : "QGSP_BERT_HP"
