@@ -18,6 +18,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	// BuildDetector() is a static method of the Class.
 
 	// solids
+	G4Box* solidEnclosure = nullptr;
 	G4Box* solidCasing = nullptr;
 	G4Box* solidCoating = nullptr;
 	G4Box* solidScinBar = nullptr;
@@ -29,6 +30,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	G4Box* solidPixel = nullptr;
 
 	// logical volumes
+	G4LogicalVolume* logicEnclosure = nullptr;
 	G4LogicalVolume* logicCasing = nullptr;
 	G4LogicalVolume* logicCoating = nullptr;
 	G4LogicalVolume* logicScinBar = nullptr;
@@ -107,6 +109,9 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 
 
 	// solids
+	// enclosure
+	G4double fEnclosureSize = 3 * CLHEP::m;
+	solidEnclosure = new G4Box("Enclosure", 0.5*fEnclosureSize, 0.5*fEnclosureSize, 0.5*fEnclosureSize);
 	// Casing
 	solidCasing = new G4Box("Casing", 0.5*fCasingSizeX, 0.5*fCasingSizeY, 0.5*fCasingSizeZ);
 	// Bars: Coating + Scintillator bar
@@ -137,14 +142,16 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 
 	// assemble Mudulus detector
 	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
+	logicEnclosure = new G4LogicalVolume(solidEnclosure, Materials().Air, "Enclosure", 0, 0, 0);
+	new G4PVPlacement(rotationCasing, G4ThreeVector(detectorPos.getX(), detectorPos.getY(), detectorPos.getZ()), logicEnclosure, "Enclosure", logMother, false, detectorId, fCheckOverlaps);
 
 	// loop over casings (volume which contains the panels)
 	for (G4int pIt=0; pIt<nPanels; ++pIt) {
 
 		// reference position of middle panel
-		G4double fPanelPosX = detectorPos.getX();
-		G4double fPanelPosY = detectorPos.getY();
-		G4double fPanelPosZ = detectorPos.getZ();
+		G4double fPanelPosX = 0;
+		G4double fPanelPosY = 0;
+		G4double fPanelPosZ = 0;
 
 		// shift upper and lower panel's Z position
 		// shift y-coordinate in case rotation angle is applied
@@ -152,13 +159,13 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			fPanelPosZ += 0;
 		else if (pIt==1) {
 			fPanelPosZ += fDistanceBtwPanels;
-			if (alpha)
-				fPanelPosY += 0.5*fCasingSizeX*cos(alpha);
+			// if (alpha)
+			// 	fPanelPosY += 0.5*fCasingSizeX*cos(alpha);
 		}
 		else if (pIt==2) {
 			fPanelPosZ += -1*fDistanceBtwPanels;
-			if (alpha)
-				fPanelPosY -= 0.5*fCasingSizeX*cos(alpha);
+			// if (alpha)
+			// 	fPanelPosY -= 0.5*fCasingSizeX*cos(alpha);
 		}
 
 		cout << "[DEBUG] G4Models::Mudulus: Panel " << pIt << ", position = (" << fPanelPosX / 	CLHEP::cm << ", " << fPanelPosY / CLHEP::cm << ", " << fPanelPosZ / CLHEP::cm << ") cm " << endl;
@@ -167,7 +174,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 		G4int panelId = pIt+1;
 		G4String nameCasing = "Casing_"+to_string(panelId);
 		logicCasing = new G4LogicalVolume(solidCasing, Materials().Air, nameCasing, 0, 0, 0);
-		new G4PVPlacement(rotationCasing, panelPosition, logicCasing, nameCasing, logMother, false, detectorId, fCheckOverlaps);
+		new G4PVPlacement(nullptr, panelPosition, logicCasing, nameCasing, logicEnclosure, false, detectorId, fCheckOverlaps);
 		
 
 		// bars of the top panel
