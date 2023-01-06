@@ -105,6 +105,7 @@ class Particle {
 		void SetTotalEnergy(const double totE) { fKineticEnergy = totE - GetMass(); }
 		
 		// particle position
+		void SetParticlePosition(const std::vector<double>& pos) { fPosition = pos; }
 		std::vector<double>& GetParticlePosition() { return fPosition; }
 		// CAVEAT: this sould be part of Detector SimData
 		// particle injection position
@@ -128,10 +129,10 @@ class Particle {
  		double fAzimuth = 0;
  		
  		std::vector<double> fPosition;
-  	std::vector<double> fDirection;
-  	std::vector<double> fInjectionPosition;
-  	static std::map<int, double> gParticleMassMap;
-  	static std::map<Particle::Type, Particle::Component> gComponentMap;
+  	        std::vector<double> fDirection;
+  	        std::vector<double> fInjectionPosition;
+  	        static std::map<int, double> gParticleMassMap;
+   	        static std::map<Particle::Type, Particle::Component> gComponentMap;
 		// particle properties for mass
 };
 
