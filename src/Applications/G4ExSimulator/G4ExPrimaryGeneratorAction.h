@@ -9,6 +9,8 @@
 
 #include <iostream>
 
+#include "EcoMug.h"
+
 #include "G4ExDetectorConstruction.h"
 #include "Particle.h"
 #include "Event.h"
@@ -32,7 +34,12 @@ class G4ExPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     
     G4ThreeVector fParticlePosition;
     G4ThreeVector farticleDirection;
-
+    // for EcoMug muon generation
+    G4ParticleDefinition *mu_plus; 
+    G4ParticleDefinition *mu_minus;
+    EcoMug fMuonGen;
+    int fMuonCharge = 0;
+    bool fUseEcoMug = true;
   private:
 
     G4ParticleGun* fParticleGun;

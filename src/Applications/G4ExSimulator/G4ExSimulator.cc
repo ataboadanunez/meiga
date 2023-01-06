@@ -95,6 +95,7 @@ int main(int argc, char** argv)
     cout << "[INFO] G4ExSimulator: Time taken by program is : " << fixed
          << time_taken << setprecision(5);
     cout << " sec " << endl;
+    
 
 	return 0;
 
@@ -105,7 +106,6 @@ G4ExSimulator::Initialize(Event& theEvent, string cfgFile)
 {
 
 	cout << "[INFO] G4ExSimulator::Initialize" << endl;
-	cout << "[INFO] G4ExSimulator::Initialize: Reading configuration file " << cfgFile << endl;
 
 	// Fill Event object from configuration file
 	// Read Simulation configuration
@@ -124,7 +124,8 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 {
 
 	cout << "[INFO] G4ExSimulator::RunSimulation" << endl;
-	
+
+	const Event::Config &cfg = theEvent.GetConfig();
 	SimData& simData = theEvent.GetSimData();
 	const unsigned int numberOfParticles = simData.GetTotalNumberOfParticles();
 	cout << "[INFO] G4ExSimulator::RunSimulation: Number of particles to be simulated = " << numberOfParticles << endl;
@@ -172,12 +173,12 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	fRunManager->Initialize();
 
 	// initialize visualization
-	if ((fGeoVisOn || fTrajVisOn) && !fVisManager)
+	if ((cfg.fGeoVis || cfg.fTrajVis) && !fVisManager)
 		fVisManager = new G4VisExecutive;
 
 	// get the pointer to the UI manager and set verbosities
 	G4UImanager* fUImanager = G4UImanager::GetUIpointer();
-	switch (fVerbosity) {
+	switch (cfg.fVerbosity) {
 		case 1:
 			fUImanager->ApplyCommand("/run/verbose 1");
 			fUImanager->ApplyCommand("/event/verbose 0");
@@ -199,7 +200,7 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 			fUImanager->ApplyCommand("/tracking/verbose 0");
 		}
 	
-	if (fGeoVisOn || fTrajVisOn) {
+	if (cfg.fGeoVis || cfg.fTrajVis) {
 		fVisManager->Initialize();
 		fUImanager->ApplyCommand(("/vis/open " + fRenderFile).c_str());
 		fUImanager->ApplyCommand("/vis/scene/create");
@@ -216,9 +217,9 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 
 	}
 
-	if (fTrajVisOn) {
-			fUImanager->ApplyCommand("/tracking/storeTrajectory 1");
-			fUImanager->ApplyCommand("/vis/scene/add/trajectories");
+	if (cfg.fTrajVis) {
+		fUImanager->ApplyCommand("/tracking/storeTrajectory 1");
+		fUImanager->ApplyCommand("/vis/scene/add/trajectories");
 	}
 	
 
@@ -234,7 +235,7 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	delete fRunManager;
 
 	cout << "[INFO] G4ExSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
-
+	
 	return true;
 
 }
