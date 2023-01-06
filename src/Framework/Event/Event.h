@@ -55,6 +55,8 @@ class Event
 		// program configuration variables
 
 		// input variables
+		std::string fInputMode;
+		unsigned int fInputNParticles;
 		std::string fInputFileName;
 		std::string fDetectorList;
 		std::string fDetectorProperties;
