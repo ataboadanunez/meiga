@@ -1,6 +1,6 @@
 // Meiga headers
 #include "ConfigManager.h"
-#include "ReadParticleFile.h"
+#include "ParticleFiller.h"
 // Geant4 headers
 #include "G4UnitsTable.hh"
 
@@ -14,24 +14,37 @@ Event
 ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 {
 	
+	cout << "[INFO] ConfigManager::ReadConfigurationFile: Reading configuration File " << fConfigFile << endl;
 	Event theEvent;
 	Event::Config &cfg = theEvent.GetConfig();
 	ptree tree;
 	read_json(fConfigFile, tree);
-
-	// reads the input file and fills the Event with particles
-	string fInputFileName = tree.get<string>("InputFile");
-	ReadParticleFile::ParticleFileReader(fInputFileName, theEvent);
+	
 
 	SimData& simData = theEvent.GetSimData();
+	// input
+	cfg.fInputMode = tree.get<string>("Input.Mode");
+	simData.SetInputMode(simData.InputModeConversion(cfg.fInputMode));
+	cfg.fInputFileName = tree.get<string>("Input.InputFileName");
+	cfg.fInputNParticles = tree.get<unsigned int>("Input.InputNParticles");
 
-	cfg.fInputFileName = tree.get<string>("InputFile");
+	// reads the input (ARTI) file and fills the Event with particles
+	if (simData.GetInputMode() == SimData::InputMode::eUseARTI) {
+		cout << "[WARNING] ConfigManager::ReadConfigurationFile: Selected InputMode = eUseARTI. An input file is needed." << endl;
+		ParticleFiller::FillParticleVector(cfg.fInputFileName, theEvent);
+	}
+	// 
+	else if (simData.GetInputMode() == SimData::InputMode::eUseEcoMug) {
+		cout << "[WARNING] ConfigManager::ReadConfigurationFile: Selected InputMode = eUseEcoMug. An input number of particles is needed." << endl;
+		ParticleFiller::FillParticleVector(cfg.fInputNParticles, theEvent);
+	}
+		
 	cfg.fDetectorList  = tree.get<string>("DetectorList");
 	cfg.fDetectorProperties = tree.get<string>("DetectorProperties");
 	defProp.SetDefaultProperties(cfg.fDetectorProperties);
 
 	cfg.fSimulationMode = tree.get<string>("Simulation.SimulationMode");
-	simData.SetSimulationMode(simData.ModeConversion(cfg.fSimulationMode));
+	simData.SetSimulationMode(simData.SimulationModeConversion(cfg.fSimulationMode));
 	cfg.fInjectionMode  = tree.get<string>("Simulation.InjectionMode");
 	simData.SetInjectionMode(simData.InjectionConversion(cfg.fInjectionMode));
 	cfg.fGeoVis  = tree.get<bool>("Simulation.GeoVisOn");
@@ -57,6 +70,7 @@ void
 ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 {
 	
+	cout << "[INFO] ConfigManager::ReadDetectorList: Reading DetectorList File " << fDetectorList << endl;
 	// used to determine maximum value of Z coordinate of current detectors in file
 	double maxHeight = 0.;
 	
@@ -144,21 +158,37 @@ void
 ConfigManager::PrintConfig(const Event::Config &cfg)
 {
 	cout << "[INFO] ConfigManager::PrintConfig:" << endl;
-	cout << "[INFO] Using the following configuration:" << endl;
-	cout << "[INFO] InputFile = " << cfg.fInputFileName << endl;
-	cout << "[INFO] OutputFile = " << cfg.fOutputFileName << endl;
-	cout << "[INFO] Save PE Time distribution (components) = " << (cfg.fSavePETimeDistribution ? "yes" : "no") << " (" << (cfg.fSaveComponentsPETimeDistribution ? "yes)" : "no)") << endl;
-	cout << "[INFO] Compress Output = " << (cfg.fCompressOutput ? "yes" : "no") << endl;
-	cout << "[INFO] Save Traces = " << (cfg.fSaveTraces ? "yes" : "no") << endl;
-	cout << "[INFO] Save Energy Deposit (components) = " << (cfg.fSaveEnergy ? "yes" : "no") << " (" << (cfg.fSaveComponentsEnergy ? "yes)" : "no)") << endl;
-	cout << "[INFO] DetectorList = " << cfg.fDetectorList << endl;
-	cout << "[INFO] DetectorProperties = " << cfg.fDetectorProperties << endl;
-	cout << "[INFO] SimulationMode = " << cfg.fSimulationMode << endl;
-	cout << "[INFO] InjectionMode = " << cfg.fInjectionMode << endl;
-	cout << "[INFO] VisualizeGeometry = " << (cfg.fGeoVis ? "yes" : "no") << endl;
-	cout << "[INFO] VisualizeTrajectory = " << (cfg.fTrajVis ? "yes" : "no") << endl;
-	cout << "[INFO] RenderFile = " << cfg.fRenderFile << endl;
-	cout << "[INFO] PhysicsList = " << cfg.fPhysicsListName << endl;
-	cout << "[INFO] CheckOverlaps = " << (cfg.fCheckOverlaps ? "yes" : "no") << endl;
+	cout << "Using the following configuration:" << endl;
+	cout << "==================================" << endl;
+	cout << " ------------- Input --------------" << endl;
+	cout << "Input Mode = " << cfg.fInputMode << endl;
 
+	if (cfg.fInputMode == "UseARTI") {
+		cout << "InputFile = " << cfg.fInputFileName << endl;
+	}
+	else if (cfg.fInputMode == "UseEcoMug") {
+		cout << "InputNParticles = " << cfg.fInputNParticles << endl;
+	} else {
+		cout << "Unknown input mode!" << endl;
+	}
+
+	cout << " ------------- Output -------------" << endl;
+	cout << "OutputFile = " << cfg.fOutputFileName << endl;
+	cout << "Save PE Time distribution (components) = " << (cfg.fSavePETimeDistribution ? "yes" : "no") << " (" << (cfg.fSaveComponentsPETimeDistribution ? "yes)" : "no)") << endl;
+	cout << "Compress Output = " << (cfg.fCompressOutput ? "yes" : "no") << endl;
+	cout << "Save Traces = " << (cfg.fSaveTraces ? "yes" : "no") << endl;
+	cout << "Save Energy Deposit (components) = " << (cfg.fSaveEnergy ? "yes" : "no") << " (" << (cfg.fSaveComponentsEnergy ? "yes)" : "no)") << endl;
+	cout << " ------------ Detector ------------" << endl;
+	cout << "DetectorList = " << cfg.fDetectorList << endl;
+	cout << "DetectorProperties = " << cfg.fDetectorProperties << endl;
+	cout << " ---------- Simulation ------------" << endl;
+	cout << "SimulationMode = " << cfg.fSimulationMode << endl;
+	cout << "InjectionMode = " << cfg.fInjectionMode << endl;
+	cout << "VisualizeGeometry = " << (cfg.fGeoVis ? "yes" : "no") << endl;
+	cout << "VisualizeTrajectory = " << (cfg.fTrajVis ? "yes" : "no") << endl;
+	cout << "RenderFile = " << cfg.fRenderFile << endl;
+	cout << "PhysicsList = " << cfg.fPhysicsListName << endl;
+	cout << "CheckOverlaps = " << (cfg.fCheckOverlaps ? "yes" : "no") << endl;
+	cout << "==================================" << endl;
+	cout << "==================================" << endl;
 }
