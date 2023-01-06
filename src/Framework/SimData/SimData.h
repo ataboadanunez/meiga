@@ -14,12 +14,19 @@ class SimData
 		SimData();
 		~SimData();
 
-		enum SimulationMode {
+		enum class InputMode {
+			eUnknown = 0,
+			eUseARTI = 1,
+			eUseEcoMug = 2,
+
+		};
+
+		enum class SimulationMode {
 			eFull = 0,
 			eFast = 1
 		};
 
-		enum InjectionMode {
+		enum class InjectionMode {
 			eUnknown = 0,
 			eRandom = 1,
 			ePositionFromFile = 2,
@@ -41,8 +48,14 @@ class SimData
 		Particle& GetCurrentParticle() { return fCurrentParticle; }
 		void SetCurrentParticle(Particle particle) { fCurrentParticle = particle; }
 
+		// Input mode
+		InputMode InputModeConversion(std::string name);
+		void SetInputMode(const InputMode inpMode) { fInputMode = inpMode; }
+		InputMode GetInputMode() const { return fInputMode; }
+		std::string GetInputModeName() const { return fInputModeName; }
+
 		// Simulation mode
-		SimulationMode ModeConversion(std::string name);
+		SimulationMode SimulationModeConversion(std::string name);
 		void SetSimulationMode(const SimulationMode simMode) { fSimulationMode = simMode; }
 		SimulationMode GetSimulationMode() const { return fSimulationMode; }
 		std::string GetSimulationModeName() const { return fSimulationModeName; }
@@ -121,6 +134,8 @@ class SimData
 		DetectorSimData fDetectorSimData;
 		std::map<int, DetectorSimData> fDetectorSimDataMap;
 		
+		InputMode fInputMode;
+		std::string fInputModeName;
 		SimulationMode fSimulationMode;
 		std::string fSimulationModeName;
 		InjectionMode  fInjectionMode;
