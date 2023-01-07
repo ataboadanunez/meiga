@@ -17,7 +17,7 @@ G4CasposoRunAction::G4CasposoRunAction(Event& theEvent)
 {
 	G4cout << "...G4CasposoRunAction..." << G4endl;
 	fOutFile = new std::ofstream();
-	string fileName = theEvent.GetSimData().GetOutputFileName();
+	string fileName = "./output.dat"; //theEvent.GetSimData().GetOutputFileName();
 	fOutFile->open(fileName);
 
 }
