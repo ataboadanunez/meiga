@@ -159,5 +159,5 @@ G4ExPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 		fParticleGun->GeneratePrimaryVertex(event);
 	
 	}
- cout << "[DEBUG] G4GeneratePrimaries successfully exit" << endl;
+
 }
