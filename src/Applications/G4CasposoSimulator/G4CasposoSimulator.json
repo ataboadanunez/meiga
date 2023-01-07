@@ -1,12 +1,17 @@
 {
-	"InputFile" : "./vertical_muon.txt",
+	"Input" :
+	{
+		"Mode" : "UseEcoMug",
+		"InputFileName" : "./vertical_muon.txt",
+		"InputNParticles" : 1
+	},
 	"Output" : 
 	{
 		"OutputFile" : "./output.json",
-		"CompressOutput" : true,
+		"CompressOutput" : false,
 		"SavePETimeDistribution" : false,
 		"SaveComponentsPETimeDistribution" : false,
-		"SaveTraces" : true,
+		"SaveTraces" : false,
 		"SaveEnergy" : false,
 		"SaveComponentsEnergy" : false
 	},
@@ -17,8 +22,8 @@
 		"SimulationMode" : "eFast",
 		"InjectionMode" : "eRandom",
 		"GeoVisOn" : true,
-		"TrajVisOn" : false,
-		"CheckOverlaps" : true,
+		"TrajVisOn" : true,
+		"CheckOverlaps" : false,
 		"Verbosity" : 1,
 		"RenderFile" : "VRML2FILE",
 		"PhysicsName" : "QGSP_BERT_HP"

@@ -83,20 +83,9 @@ G4CasposoPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     double muon_theta = fMuonGen.GetGenerationTheta();
     double muon_phi   = fMuonGen.GetGenerationPhi();
 
-    // DEBUG
-    x0 = 0 * CLHEP::m;
-    y0 = 0 * CLHEP::m;
-    z0 = 10 * CLHEP::m;
-    muon_theta = 0;
-
     double fPx = muon_ptot * sin(muon_theta) * cos(muon_phi) * CLHEP::GeV;
     double fPy = muon_ptot * sin(muon_theta) * sin(muon_phi) * CLHEP::GeV;
-    double fPz = -1*muon_ptot * cos(muon_theta) * CLHEP::GeV;
-
-
-
-    fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
-    fParticleGun->SetParticleMomentum(G4ParticleMomentum(fPx, fPy, fPz));
+    double fPz = muon_ptot * cos(muon_theta) * CLHEP::GeV;
 
     if (fMuonGen.GetCharge() < 0) {
       fParticleGun->SetParticleDefinition(mu_minus);
@@ -105,6 +94,9 @@ G4CasposoPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
       fParticleGun->SetParticleDefinition(mu_plus);
       fMuonCharge = 1;
     }
+
+    fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
+    fParticleGun->SetParticleMomentum(G4ParticleMomentum(fPx, fPy, fPz));
 
     fParticleGun->GeneratePrimaryVertex(event);
     cout << "[DEBUG] MinPhi = " << fMuonGen.GetMinimumPhi() * 180 / M_PI << " MaxPhi = " << fMuonGen.GetMaximumPhi() * 180 / M_PI << endl;
