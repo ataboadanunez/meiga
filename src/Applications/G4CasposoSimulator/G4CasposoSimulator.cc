@@ -29,7 +29,6 @@
 // Framework libraries
 #include "ConfigManager.h"
 #include "CorsikaUtilities.h"
-#include "ReadParticleFile.h"
 #include "Event.h"
 #include "SimData.h"
 #include "OptDeviceSimData.h"
