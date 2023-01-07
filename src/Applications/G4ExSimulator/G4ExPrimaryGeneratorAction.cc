@@ -30,15 +30,18 @@ G4ExPrimaryGeneratorAction::G4ExPrimaryGeneratorAction(Event& theEvent) :
 	
 {  
 	
+	SimData &simData = fEvent.GetSimData();
+	fUseEcoMug = (simData.GetInputMode() == simData.InputMode::eUseEcoMug);
 	if (fUseEcoMug) {
 
-	  // initialize class
-	  fMuonGen.SetUseHSphere();
-          // use coordinate system related to detector position
-	  fMuonGen.SetHSphereRadius(1 * CLHEP::mm);
-          fMuonGen.SetHSphereCenterPosition({{0., 0., 0.}});
-	  mu_minus = G4ParticleTable::GetParticleTable()->FindParticle("mu-");
-	  mu_plus = G4ParticleTable::GetParticleTable()->FindParticle("mu+");
+		// initialize class
+		fMuonGen.SetUseHSphere();
+		// use coordinate system related to detector position
+		fMuonGen.SetHSphereRadius(1 * CLHEP::mm);
+		fMuonGen.SetHSphereCenterPosition({{0., 0., 0.}});
+		mu_minus = G4ParticleTable::GetParticleTable()->FindParticle("mu-");
+		mu_plus = G4ParticleTable::GetParticleTable()->FindParticle("mu+");
+	 
 	 }
 
 	fDetectorConstructor = static_cast<const G4ExDetectorConstruction*> (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
@@ -57,43 +60,44 @@ G4ExPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 {
 	
 
-	SimData &simData = fEvent.GetSimData();
-
 
 	// Example using EcoMug as primary generator
 	if (fUseEcoMug) {
 
-		cout << "[DEBUG] G4ExPrimaryGeneratorAction::GeneratePrimaries: using EcoMug as muon generator!" << endl;
+		cout << "[INFO] G4ExPrimaryGeneratorAction::GeneratePrimaries: using EcoMug as muon generator!" << endl;
 		fMuonGen.Generate();
-    		array<double, 3> muon_pos = fMuonGen.GetGenerationPosition();
-    		double x0 = muon_pos[0] * CLHEP::mm;
-    		double y0 = muon_pos[1] * CLHEP::mm;
-    		double z0 = muon_pos[2] * CLHEP::mm;
-    		cout << " Muon position " << x0 / CLHEP::m << " " << y0 / CLHEP::m << " " << z0 / CLHEP::m << endl;
-    		cout << " muon charge " << fMuonGen.GetCharge() << endl;
+		array<double, 3> muon_pos = fMuonGen.GetGenerationPosition();
+		double x0 = muon_pos[0] * CLHEP::mm;
+		double y0 = muon_pos[1] * CLHEP::mm;
+		double z0 = muon_pos[2] * CLHEP::mm;
+		cout << " Muon position " << x0 / CLHEP::m << " " << y0 / CLHEP::m << " " << z0 / CLHEP::m << endl;
+		cout << " muon charge " << fMuonGen.GetCharge() << endl;
 
-    		double muon_ptot = fMuonGen.GetGenerationMomentum();
-    		double muon_theta = fMuonGen.GetGenerationTheta();
-   		double muon_phi   = fMuonGen.GetGenerationPhi();
+		double muon_ptot = fMuonGen.GetGenerationMomentum();
+		double muon_theta = fMuonGen.GetGenerationTheta();
+		double muon_phi   = fMuonGen.GetGenerationPhi();
 
-    		cout << " muon momentum " << muon_ptot / CLHEP::GeV << endl;
+		cout << " muon momentum " << muon_ptot / CLHEP::GeV << endl;
 
-    		double fPx = muon_ptot * sin(muon_theta) * cos(muon_phi) * CLHEP::GeV;
+		double fPx = muon_ptot * sin(muon_theta) * cos(muon_phi) * CLHEP::GeV;
 		double fPy = muon_ptot * sin(muon_theta) * sin(muon_phi) * CLHEP::GeV;
-    		double fPz = muon_ptot * cos(muon_theta) * CLHEP::GeV;
+		double fPz = muon_ptot * cos(muon_theta) * CLHEP::GeV;
 
-    		fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
-    		fParticleGun->SetParticleMomentum(G4ParticleMomentum(fPx, fPy, fPz));
+		if (fMuonGen.GetCharge() < 0) {
+			
+			fParticleGun->SetParticleDefinition(mu_minus);
+			fMuonCharge = -1;
+			
+			} else {
+				
+				fParticleGun->SetParticleDefinition(mu_plus);
+				fMuonCharge = 1;
+		}
 
-   	 	if (fMuonGen.GetCharge() < 0) {
-      			fParticleGun->SetParticleDefinition(mu_minus);
-      			fMuonCharge = -1;
-    		} else {
-      			fParticleGun->SetParticleDefinition(mu_plus);
-      			fMuonCharge = 1;
-    		}
+		fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
+		fParticleGun->SetParticleMomentum(G4ParticleMomentum(fPx, fPy, fPz));
 
-    		fParticleGun->GeneratePrimaryVertex(event);
+		fParticleGun->GeneratePrimaryVertex(event);
 
 
 	} else{

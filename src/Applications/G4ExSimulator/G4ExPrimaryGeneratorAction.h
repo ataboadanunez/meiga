@@ -39,7 +39,7 @@ class G4ExPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     G4ParticleDefinition *mu_minus;
     EcoMug fMuonGen;
     int fMuonCharge = 0;
-    bool fUseEcoMug = true;
+    bool fUseEcoMug = false;
   private:
 
     G4ParticleGun* fParticleGun;
