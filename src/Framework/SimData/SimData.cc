@@ -39,16 +39,14 @@ SimData::InjectionConversion(string name)
 	
 	fInjectionModeName = name;
 
-	if (name == "eRandom")
-		return SimData::InjectionMode::eRandom;
-	else if (name == "ePositionFromFile")
-		return SimData::InjectionMode::ePositionFromFile;
+	if (name == "eCircle")
+		return SimData::InjectionMode::eCircle;
+	else if (name == "eHalfSphere")
+		return SimData::InjectionMode::eHalfSphere;
 	else if (name == "eVertical")
 		return SimData::InjectionMode::eVertical;
 	else if (name == "eInsideDetector")
 		return SimData::InjectionMode::eInsideDetector;
-	else if (name == "eCircle")
-		return SimData::InjectionMode::eCircle;
 	else {
 		cout << "[WARNING] SimData::InjectionConversion: Unknown injection type!" << endl;
 		return SimData::InjectionMode::eUnknown;

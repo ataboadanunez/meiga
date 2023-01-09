@@ -28,10 +28,9 @@ class SimData
 
 		enum class InjectionMode {
 			eUnknown = 0,
-			eRandom = 1,
-			ePositionFromFile = 2,
+			eCircle = 1,
+			eHalfSphere = 2,
 			eVertical = 3,
-			eCircle,
 			// specific case when particles are injected inside the detector (e.g. muon decay inside WCD)
 			eInsideDetector
 		};
@@ -60,11 +59,6 @@ class SimData
 		SimulationMode GetSimulationMode() const { return fSimulationMode; }
 		std::string GetSimulationModeName() const { return fSimulationModeName; }
 
-		// Particle injection mode
-		InjectionMode InjectionConversion(std::string name);
-		void SetInjectionMode(const InjectionMode injMode) { fInjectionMode = injMode; }
-		InjectionMode GetInjectionMode() const { return fInjectionMode; }
-		std::string GetInjectionModeName() const { return fInjectionModeName; }
 		// Visualization settings
 		void SetVisualizationGeometry(const bool geovis) { fGeoVis = geovis; }
 		bool VisualizeGeometry() const { return fGeoVis; }
@@ -110,12 +104,34 @@ class SimData
 		void SetGroundThickness(const double t) { fGroundThickness = t; }
 		double GetGroundThickness() { return fGroundThickness; }
 
-		// dimensions of the injection area
+		// settings for particle injection
+		InjectionMode InjectionConversion(std::string name);
+		void SetInjectionMode(const InjectionMode injMode) { fInjectionMode = injMode; }
+		InjectionMode GetInjectionMode() const { return fInjectionMode; }
+		std::string GetInjectionModeName() const { return fInjectionModeName; }
+
+		const std::vector<double>& GetInjectionOrigin() const { return fInjectionOrigin; }
+		void SetInjectionOrigin(const std::vector<double> &pos) { fInjectionOrigin = pos; }
+
+		// for circle & halfsphere injection 
 		void SetInjectionRadius(const double r) { fInjectionRadius = r; }
 		double GetInjectionRadius() { return fInjectionRadius; }
 
 		void SetInjectionHeight(const double h) { fInjectionHeight = h; }
 		double GetInjectionHeight() { return fInjectionHeight; }
+
+		void SetInjectionMinTheta(const double minTh) { fInjectionMinTheta = minTh; }
+		double GetInjectionMinTheta() { return fInjectionMinTheta; }
+
+		void SetInjectionMaxTheta(const double maxTh) { fInjectionMaxTheta = maxTh; }
+		double GetInjectionMaxTheta() { return fInjectionMaxTheta; }
+
+		void SetInjectionMinPhi(const double minPh) { fInjectionMinPhi = minPh; }
+		double GetInjectionMinPhi() { return fInjectionMinPhi; }
+
+		void SetInjectionMaxPhi(const double maxPh) { fInjectionMaxPhi = maxPh; }
+		double GetInjectionMaxPhi() { return fInjectionMaxPhi; }
+
 
 		// DetectorSimData getters
 		void MakeDetectorSimData(unsigned int id);
@@ -157,6 +173,14 @@ class SimData
 
 		double fInjectionRadius = 0;
 		double fInjectionHeight = 0;
+
+		double fInjectionMinTheta = 0;
+		double fInjectionMaxTheta = 90;
+
+		double fInjectionMinPhi = 0;
+		double fInjectionMaxPhi = 360;
+
+		std::vector<double> fInjectionOrigin;
 };
 
 #endif
