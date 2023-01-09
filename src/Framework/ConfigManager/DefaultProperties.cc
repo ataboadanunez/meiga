@@ -1,14 +1,5 @@
 #include "DefaultProperties.h"
-
-#include "G4UnitsTable.hh"
-
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/foreach.hpp>
-
-using boost::property_tree::ptree;
-using namespace std;
+#include "ConfigManager.h"
 
 
 const ptree& empty_ptree(){
@@ -16,29 +7,6 @@ const ptree& empty_ptree(){
 	return t;
 }
 
-template <typename T>
-inline static T GetPropertyFromXML(const ptree &tree, const string &branchName, const string &property, bool hasUnit = true) {
-  T res = tree.get<T>(branchName+"."+property);
-  if (hasUnit) {
-  	auto unit = G4UnitDefinition::GetValueOf(tree.get<string>(branchName+"."+property+".<xmlattr>.unit"));
-  	res *= unit;
-  } 
-  	
-
-  return res;
-}
-
-template <typename T>
-inline static T GetPropertyFromXML(const ptree &tree, const string &branchName, const string &property, const T &defaultVal, bool hasUnit = true, const string &defaultUnit = "mm") {
-  T res = tree.get<T>(branchName+"."+property, defaultVal);
-  if (hasUnit) {
-  	auto unit = G4UnitDefinition::GetValueOf(tree.get<string>(branchName+"."+property+".<xmlattr>.unit", defaultUnit));
-  	res *= unit;
-  } 
-  	
-
-  return res;
-}
 
 void
 DefaultProperties::SetDefaultProperties(const string &filename)
@@ -51,28 +19,28 @@ DefaultProperties::SetDefaultProperties(const string &filename)
 	read_xml(filename, tree);
 	string branchName = "detectorProperties";
 	// setting default detector properties from XML
-	gTankRadius = GetPropertyFromXML<double>(tree, branchName, "tankRadius");
-	gTankHeight = GetPropertyFromXML<double>(tree, branchName, "tankHeight");
-	gTankThickness = GetPropertyFromXML<double>(tree, branchName, "tankThickness");
+	gTankRadius = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "tankRadius");
+	gTankHeight = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "tankHeight");
+	gTankThickness = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "tankThickness");
 	
-	gNumberOfBars = GetPropertyFromXML<int>(tree, branchName, "barsInPanel", false);
-	gBarWidth = GetPropertyFromXML<double>(tree, branchName, "barWidth");
-	gBarLength = GetPropertyFromXML<double>(tree, branchName, "barLength");
-	gBarThickness = GetPropertyFromXML<double>(tree, branchName, "barThickness");
-	gCoatingThickness = GetPropertyFromXML<double>(tree, branchName, "coatingThickness");
-	gCasingThickness = GetPropertyFromXML<double>(tree, branchName, "casingThickness");
-	gRotationAngle = GetPropertyFromXML<double>(tree, branchName, "rotationAngle", false);
-	gFiberLength = GetPropertyFromXML<double>(tree, branchName, "fiberLength");
-	gFiberRadius = GetPropertyFromXML<double>(tree, branchName, "fiberRadius");
-	gCladdingThickness = GetPropertyFromXML<double>(tree, branchName, "claddingThickness");
+	gNumberOfBars = ConfigManager::GetPropertyFromXML<int>(tree, branchName, "barsInPanel", false);
+	gBarWidth = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "barWidth");
+	gBarLength = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "barLength");
+	gBarThickness = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "barThickness");
+	gCoatingThickness = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "coatingThickness");
+	gCasingThickness = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "casingThickness");
+	gRotationAngle = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "rotationAngle", false);
+	gFiberLength = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "fiberLength");
+	gFiberRadius = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "fiberRadius");
+	gCladdingThickness = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "claddingThickness");
 	
-	gLength = GetPropertyFromXML<double>(tree, branchName, "length");
-	gWidth = GetPropertyFromXML<double>(tree, branchName, "width");
-	gThickness = GetPropertyFromXML<double>(tree, branchName, "thickness");
+	gLength = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "length");
+	gWidth = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "width");
+	gThickness = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "thickness");
 
 	// ground size parameters
-	gGroundSizeX = GetPropertyFromXML<double>(tree, branchName, "groundSizeX");
-	gGroundSizeY = GetPropertyFromXML<double>(tree, branchName, "groundSizeY");
-	gGroundSizeZ = GetPropertyFromXML<double>(tree, branchName, "groundSizeZ");
+	gGroundSizeX = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "groundSizeX");
+	gGroundSizeY = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "groundSizeY");
+	gGroundSizeZ = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "groundSizeZ");
 
 }
