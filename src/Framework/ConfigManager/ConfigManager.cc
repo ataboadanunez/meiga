@@ -71,6 +71,10 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 {
 	
 	cout << "[INFO] ConfigManager::ReadDetectorList: Reading DetectorList File " << fDetectorList << endl;
+	// print detector configuration
+	cout << "Using the following detector configuration: " << endl;
+	cout << "===========================================" << endl;
+
 	SimData& simData = theEvent.GetSimData();
 
 	// used to determine maximum value of Z coordinate of current detectors in file
@@ -86,38 +90,51 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 	string injModestr = tree.get<string>(injectionBranch + ".<xmlattr>.type");
 	SimData::InjectionMode injMode = simData.InjectionConversion(injModestr);
 	simData.SetInjectionMode(injMode);
+	cout << "---------- Particle Injection ------------- " << endl;
+	cout << "Injection Mode: " << simData.GetInjectionModeName() << endl;
 
 	double posX = GetPropertyFromXML<double>(tree, injectionBranch, "x");
 	double posY = GetPropertyFromXML<double>(tree, injectionBranch, "y");
 	double posZ = GetPropertyFromXML<double>(tree, injectionBranch, "z");
 	vector<double> injectionOrigin = {posX, posY, posZ}; 
+	simData.SetInjectionOrigin(injectionOrigin);
+	cout << "Origin of injection coordinates: " << endl;
+	cout << "(x0, y0, z0) = (" << posX / CLHEP::m << ", " << posY / CLHEP::m << ", " << posZ / CLHEP::m << ") m" << endl;
 
  	// injection radius
 	double defInjRadius = simData.GetInjectionRadius();
 	double xmlInjRadius = GetPropertyFromXML<double>(tree, injectionBranch, "radius", defInjRadius);
 	simData.SetInjectionRadius(xmlInjRadius);
+	cout << "Injection Radius = " << xmlInjRadius / CLHEP::m << " m" << endl;
 	// injection height
 	double defInjHeight = simData.GetInjectionHeight();
 	double xmlInjHeight = GetPropertyFromXML<double>(tree, injectionBranch, "height", defInjHeight);
 	simData.SetInjectionHeight(xmlInjHeight);
+	cout << "Injection Height = " << xmlInjHeight / CLHEP::m << " m" << endl;
 	// injection min theta
 	double defMinTheta = simData.GetInjectionMinTheta();
 	double xmlMinTheta = GetPropertyFromXML<double>(tree, injectionBranch, "minTheta", defMinTheta, false);
 	simData.SetInjectionMinTheta(xmlMinTheta);
+	cout << "Injection MinTheta = " << xmlMinTheta << " deg" << endl; 
 	// injection max theta
 	double defMaxTheta = simData.GetInjectionMaxTheta();
-	double xmlMaxTheta = GetPropertyFromXML<double>(tree, injectionBranch, "minTheta", defMaxTheta, false);
+	double xmlMaxTheta = GetPropertyFromXML<double>(tree, injectionBranch, "maxTheta", defMaxTheta, false);
 	simData.SetInjectionMaxTheta(xmlMaxTheta);
+	cout << "Injection MaxTheta = " << xmlMaxTheta << " deg" << endl;
 	// injection min phi
 	double defMinPhi = simData.GetInjectionMinPhi();
-	double xmlMinPhi = GetPropertyFromXML<double>(tree, injectionBranch, "minTheta", defMinPhi, false);
+	double xmlMinPhi = GetPropertyFromXML<double>(tree, injectionBranch, "minPhi", defMinPhi, false);
 	simData.SetInjectionMinTheta(xmlMinPhi);
+	cout << "Injection MinPhi = " << xmlMinPhi << " deg" << endl;
 	// injection max phi
 	double defMaxPhi = simData.GetInjectionMaxPhi();
-	double xmlMaxPhi = GetPropertyFromXML<double>(tree, injectionBranch, "minTheta", defMaxPhi, false);
+	double xmlMaxPhi = GetPropertyFromXML<double>(tree, injectionBranch, "maxPhi", defMaxPhi, false);
 	simData.SetInjectionMaxPhi(xmlMaxPhi);
-	
+	cout << "Injection MaxPhi = " << xmlMaxPhi << " deg" << endl;
+	cout << "===========================================" << endl;
+	cout << "===========================================" << endl;
 
+	cout << "------------ Detector Info -------------- " << endl;
 	for (const auto& i : tree.get_child("detectorList")) {
 		ptree subtree;
 		string name;
@@ -132,13 +149,13 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 			Detector::DetectorType detType = theEvent.GetDetector().StringToType(detTypestr);
 			detPosition.clear();
 
-			cout << "[INFO] ConfigManager::ReadDetectorList: Reading configuration of detector " << detTypestr << " with ID = " << detId << endl;
+			cout << "Reading configuration of detector " << detTypestr << " with ID = " << detId << endl;
 			// register detector in the Event
 			if (!theEvent.HasDetector(detId)) {
 				theEvent.MakeDetector(detId, detType);
 			}
 			else {
-				cout << "[WARNING] ConfigManager::ReadDetectorList: A Detector " << " with ID = " << detId << " already registered! IDs must be unique, please check your DetectorList.xml!" << endl;
+				cout << "[WARNING] Detector " << " with ID = " << detId << " already registered! IDs must be unique, please check your DetectorList.xml" << endl;
 				continue;
 			}
 			
@@ -167,12 +184,17 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 			// shouldn't be part of DetectorSimData?
 			theEvent.SetMaximumHeight(maxHeight);
 			detector.SetDetectorPosition(detPosition);
-			cout << "[INFO] Detector Position from XML = (" << detPosition.at(0) / CLHEP::cm << ", " << detPosition.at(1) / CLHEP::cm << ", " << detPosition.at(2) / CLHEP::cm << ") cm" << endl; 
+			cout << "Detector position " << endl;
+			cout << "(x0, y0, z0) = (" << detPosition.at(0) / CLHEP::m << ", " << detPosition.at(1) / CLHEP::m << ", " << detPosition.at(2) / CLHEP::m << ") m" << endl; 
 			// search for another detector properties in the DetectorList.xml
 			detector.SetDetectorProperties(subtree, defProp);
 		}
 
 	}
+
+	cout << "===========================================" << endl;
+	cout << "===========================================" << endl;
+
 
 }
 
@@ -201,12 +223,8 @@ ConfigManager::PrintConfig(const Event::Config &cfg)
 	cout << "Compress Output = " << (cfg.fCompressOutput ? "yes" : "no") << endl;
 	cout << "Save Traces = " << (cfg.fSaveTraces ? "yes" : "no") << endl;
 	cout << "Save Energy Deposit (components) = " << (cfg.fSaveEnergy ? "yes" : "no") << " (" << (cfg.fSaveComponentsEnergy ? "yes)" : "no)") << endl;
-	cout << " ------------ Detector ------------" << endl;
-	cout << "DetectorList = " << cfg.fDetectorList << endl;
-	cout << "DetectorProperties = " << cfg.fDetectorProperties << endl;
-	cout << " ---------- Simulation ------------" << endl;
-	cout << "SimulationMode = " << cfg.fSimulationMode << endl;
-	cout << "InjectionMode = " << cfg.fInjectionMode << endl;
+	
+	cout << " -------- Geant4 Settings ---------" << endl;
 	cout << "VisualizeGeometry = " << (cfg.fGeoVis ? "yes" : "no") << endl;
 	cout << "VisualizeTrajectory = " << (cfg.fTrajVis ? "yes" : "no") << endl;
 	cout << "RenderFile = " << cfg.fRenderFile << endl;
