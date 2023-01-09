@@ -3,11 +3,13 @@
 <detectorList>
 	
 	<injectionMode type="eCircle">
+		<!-- parametros de inyeccion -->
 		<x unit="m"> 0 </x>
 		<y unit="m"> 0 </y>
 		<z unit="m"> 1 </z>
 		<radius unit="m"> 1 </radius>
 		<height unit="m"> 1 </height>
+		<minPhi> 35 </minPhi>
 	</injectionMode>
 
 	<detector id="0" type="eScintillator">

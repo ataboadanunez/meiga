@@ -34,6 +34,8 @@ class G4ExPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
     
     G4ThreeVector fParticlePosition;
     G4ThreeVector farticleDirection;
+
+    SimData::InjectionMode injMode;
     // for EcoMug muon generation
     G4ParticleDefinition *mu_plus; 
     G4ParticleDefinition *mu_minus;
