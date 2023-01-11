@@ -55,6 +55,7 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	cfg.fVerbosity = tree.get<int>("Simulation.Verbosity");
 
 	cfg.fOutputFileName = tree.get<string>("Output.OutputFile");
+	simData.SetOutputFileName(cfg.fOutputFileName);
 	cfg.fCompressOutput = tree.get<bool>("Output.CompressOutput");
 	cfg.fSavePETimeDistribution = tree.get<bool>("Output.SavePETimeDistribution");
 	cfg.fSaveComponentsPETimeDistribution = tree.get<bool>("Output.SaveComponentsPETimeDistribution");
