@@ -339,6 +339,7 @@ Materials::CreateElements()
 	elCa = new G4Element("Calcium", "Ca", 20, 40.08 * g/mole);
 	elFe = new G4Element("Iron", "Fe", 26, 55.850 * g/mole);
 	elAl = new G4Element("Aluminium", "Al", 13, 26.98 * g/mole);
+	elPb = new G4Element("Lead", "Pb", 82, 207.2 * g/mole);
 
 }
 

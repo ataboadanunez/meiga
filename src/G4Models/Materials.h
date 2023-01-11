@@ -34,6 +34,7 @@ public:
 	static G4Element* elCa;
 	static G4Element* elFe;
 	static G4Element* elAl;
+	static G4Element* elPb;
 	
 	// compounds
 	static G4Material* SiO2;
