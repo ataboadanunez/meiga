@@ -2,19 +2,23 @@
 
 <detectorList>
 
+	<injectionMode type="eHalfSphere">
+		<x unit="m"> 0 </x>
+		<y unit="m"> 0 </y>
+		<z unit="m"> 0 </z>
+		<radius unit="m"> 220 </radius>
+		<minTheta> 60 </minTheta>
+		<maxTheta> 90 </maxTheta>
+		<minPhi> 75 </minPhi>
+		<maxPhi> 105 </maxPhi>
+	</injectionMode>
+
 	<detector id="0" type="eMudulus">
 		<x unit="m"> 0.0 </x>
 		<y unit="m"> 0.0 </y>
 		<z unit="m"> 2.0 </z>
 
 		<rotationAngle> 75 </rotationAngle>
-
-		<groundSizeX unit="m"> 110 </groundSizeX>
-    <groundSizeY unit="m"> 110 </groundSizeY>
-    <groundSizeZ unit="m"> 1   </groundSizeZ>
-
-    <injectionHeight unit="m"> 0.6 </injectionHeight>
-    <injectionRadius unit="m"> 0.5641895835477563 </injectionRadius>
 
 	</detector>
 

@@ -40,6 +40,7 @@ class G4CasposoPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 
     EcoMug fMuonGen;
     bool fUseEcoMug = true;
+    SimData::InjectionMode injMode;
     int fMuonCharge = 0;
 
   private:

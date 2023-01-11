@@ -26,19 +26,41 @@ G4CasposoPrimaryGeneratorAction::G4CasposoPrimaryGeneratorAction(Event& theEvent
   fEvent(theEvent)
 {  
 
-  if (fUseEcoMug) {
+  // lines below are a copy of G4ExPrimaryGeneratorAction.cc
+  // should be part of an external function
+
+  SimData &simData = fEvent.GetSimData();
+  injMode = simData.GetInjectionMode();
+  fUseEcoMug = (simData.GetInputMode() == simData.InputMode::eUseEcoMug);
+
+  if (fUseEcoMug || (injMode == SimData::InjectionMode::eHalfSphere)) {
+
+    cout << "[INFO] G4CasposoPrimaryGeneratorAction::GeneratePrimaries: Primary generation using EcoMug" << endl;
+    cout << "Particles injected in " << simData.GetInjectionModeName() << endl;
 
     fMuonGen.SetUseHSphere();
     // use coordinate system related to detector position
-    fMuonGen.SetHSphereRadius(220 * CLHEP::m);
-    fMuonGen.SetHSphereCenterPosition({{0., 0., 0.}});
+    double injectionRadius = simData.GetInjectionRadius();
+    vector<double> injectionOrigin = simData.GetInjectionOrigin();
+    double oX = injectionOrigin[0];
+    double oY = injectionOrigin[1];
+    double oZ = injectionOrigin[2];
+
+    fMuonGen.SetHSphereRadius(injectionRadius);
+    cout << "[INFO] G4CasposoPrimaryGeneratorAction::GeneratePrimaries: Setting InjectionRadius = " << injectionRadius / CLHEP::m << endl;
+    fMuonGen.SetHSphereCenterPosition({{oX, oY, oZ}});
     // limits for momentum and generation position
-    fMuonGen.SetMinimumMomentum(100);
-    fMuonGen.SetMaximumMomentum(1e4); 
-    fMuonGen.SetHSphereMinPositionTheta(60 * (M_PI / 180));
-    fMuonGen.SetHSphereMaxPositionTheta(90 * (M_PI / 180));
-    fMuonGen.SetHSphereMinPositionPhi(75 * (M_PI / 180));
-    fMuonGen.SetHSphereMaxPositionPhi(105 * (M_PI / 180));
+    fMuonGen.SetMinimumMomentum(1e-1);
+    fMuonGen.SetMaximumMomentum(1e4);
+    double minPhi = simData.GetInjectionMinPhi();
+    double maxPhi = simData.GetInjectionMaxPhi();
+    double minTheta = simData.GetInjectionMinTheta();
+    double maxTheta = simData.GetInjectionMaxTheta();
+
+    fMuonGen.SetHSphereMinPositionTheta(minTheta * (M_PI / 180));
+    fMuonGen.SetHSphereMaxPositionTheta(maxTheta * (M_PI / 180));
+    fMuonGen.SetHSphereMinPositionPhi(minPhi * (M_PI / 180));
+    fMuonGen.SetHSphereMaxPositionPhi(maxPhi * (M_PI / 180));
 
     // inject mu_minus or mu_plus according to ratio of atmospheric muons
     mu_minus = G4ParticleTable::GetParticleTable()->FindParticle("mu-");

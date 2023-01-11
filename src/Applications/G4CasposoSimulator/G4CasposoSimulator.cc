@@ -255,8 +255,9 @@ G4CasposoSimulator::WriteEventInfo(Event& theEvent)
 {
 
 	cout << "[INFO] G4CasposoSimulator::WriteEventInfo" << endl;
-	
-	DataWriter::FileWriter(theEvent);
+	#warning "FileWriter disabled to not overwrite output.dat files"
+	cout << "[WARNING] G4CasposoSimulator::WriteEventInfo: FileWriter disabled to not overwrite output.dat files" << endl;
+	// DataWriter::FileWriter(theEvent);
 
 	return;
 
