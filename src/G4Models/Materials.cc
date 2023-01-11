@@ -274,6 +274,7 @@ G4Element* Materials::elNa;
 G4Element* Materials::elCa;
 G4Element* Materials::elFe;
 G4Element* Materials::elAl;
+G4Element* Materials::elPb;
 	
 G4Material* Materials::SiO2;
 G4Material* Materials::TiO2;
