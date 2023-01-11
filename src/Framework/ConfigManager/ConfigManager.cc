@@ -124,7 +124,7 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 	// injection min phi
 	double defMinPhi = simData.GetInjectionMinPhi();
 	double xmlMinPhi = GetPropertyFromXML<double>(tree, injectionBranch, "minPhi", defMinPhi, false);
-	simData.SetInjectionMinTheta(xmlMinPhi);
+	simData.SetInjectionMinPhi(xmlMinPhi);
 	cout << "Injection MinPhi = " << xmlMinPhi << " deg" << endl;
 	// injection max phi
 	double defMaxPhi = simData.GetInjectionMaxPhi();
