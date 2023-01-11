@@ -6,6 +6,7 @@ import argparse
 import random
 import re
 import string
+import json 
 
 from glob import glob
 import numpy as np
@@ -26,6 +27,14 @@ def abspath(s):
 		return s
 	cwd = environ["PWD"]
 	return path.join(cwd, s)
+
+def id_generator(dict_var, Id):
+	for k, v in dict_var.items():
+		if k == Id:
+			yield v
+		elif isinstance(v, dict):
+			for id_val in id_generator(v, Id):
+				yield id_val
 
 def SplitInputFile(ifile, N=100000):
 	# check that input file exits
@@ -51,6 +60,57 @@ def SplitInputFile(ifile, N=100000):
 	return splits_dir
 
 
+def CreateJobsNPart(base_dir, job_dir, n_part, n_max=100000):
+	# copies executable and .json / .xml files from base_dir to each job_dir/jobid
+	# replaces "InputNParticles" target in .json with corresponding n_part / n_max
+
+	# returns file "joblists.txt" with list of job_dir/jobid 
+
+	if not path.exists(base_dir):
+		print("[ERROR] Base directory does not exist. Exiting ...")
+		return
+
+	if not n_part:
+		raise Exception("No input particles!")
+
+	if n_part < n_max:
+		njobs = 1
+	else:
+		njobs = int(n_part / n_max)
+
+	print("[INFO] Creating %i jobs" %njobs)
+	jobDirs = []
+
+	for jobid in range(njobs):
+		#outfile = 'output_'+jobid+'.dat'
+		jobpath = path.join(job_dir, 'run_'+str(jobid))
+		if not path.exists(jobpath):
+			print("[INFO] Creating job directory: %s " %jobpath)
+			makedirs(jobpath)
+			# copy executable and cfg files from base directory
+			system("cp -r %s/* %s" %(base_dir, jobpath))
+
+			jobDirs.append(jobpath)
+		else:
+			raise Exception("[ERROR] jobpath %s already exists!" %jobpath)
+	
+	# write log with jobs information
+	jobCreationTime = datetime.now()
+	jobCreationUser = environ.get("USER")
+	jobLogName = path.join(job_dir, 'jobs.log')
+	with open(jobLogName, "w") as f:
+		f.write("# user: %s \n" %jobCreationUser)
+		f.write("# date: %s \n" %jobCreationTime.strftime("%d-%b-%Y (%H:%M:%S.%f)"))
+
+		f.write("# created jobs: \n")
+		for jobi in jobDirs:
+			f.write(jobi + "\n")
+
+	f.close()
+
+	return jobDirs
+
+
 def CreateJobs(base_dir, splits_dir, job_dir):
 	
 	# copies executable and .json / .xml files from base_dir to each job_dir/jobid
@@ -61,7 +121,7 @@ def CreateJobs(base_dir, splits_dir, job_dir):
 
 	# check if base_dir exists
 	if not path.exists(base_dir):
-		print("[WARNING] Base directory does not exist. Exiting ...")
+		print("[ERROR] Base directory does not exist. Exiting ...")
 		return
 
 	# create one job directory per split file (input file)
@@ -112,7 +172,7 @@ def CreateJobs(base_dir, splits_dir, job_dir):
 	return jobDirs
 
 
-def PrepareConfigFile(job_dir):
+def PrepareConfigFile(job_dir, nlines):
 
 	print("[INFO] Preparing Configuration files")
 	def is_exe(filename):
@@ -128,12 +188,14 @@ def PrepareConfigFile(job_dir):
 		exeName = ''
 		inputFileName = ''
 		outputFileName = ''
+		
+		# jobid from job path
+		jobid = jobpath.split('/')[-1].split('_')[-1]
 
 		for item in listdir(jobpath):
 			filename = path.join(jobpath, item)
 			split_filename = path.splitext(filename)
 			
-
 			name = split_filename[0].split('/')[-1].split('_')[0]
 			ext = split_filename[1]
 
@@ -148,11 +210,12 @@ def PrepareConfigFile(job_dir):
 				raise Exception("[ERROR] Executable not found at %s" %jobpath)
 
 			if name == 'input':
-				jobid = split_filename[0].split('/')[-1].split('_')[1]
+				#jobid = split_filename[0].split('/')[-1].split('_')[1]
 				inputFileName = name + '_'+ jobid
-				outputFileName = 'output' + '_' + jobid + '.json'
+		
+		# name of file to store the simulation output
+		outputFileName = 'output' + '_' + jobid + '.dat'
 			
-
 		infile 	= path.join(jobpath, inputFileName)
 		cfgfile = path.join(jobpath, cfgFileName)
 		detlist = path.join(jobpath, 'DetectorList.xml')
@@ -161,26 +224,35 @@ def PrepareConfigFile(job_dir):
 
 		# flags to be replaced in the configuration file
 		flags = {"@INPUTFILE@" : infile,
+						 "@NPARTICLES@" : nlines,
 						 "@OUTPUTFILE@" : outfile,
 						 "@DETECTORLIST@" : detlist,
 						 "@DETECTORPROPERTIES@" : detprop
 						 }
 
+		# read json file and replace the key flags
 		fin = open(cfgfile, "rt")
-		data = fin.read()
+		data = json.load(fin)
 		
-		# replace flags in cfg files
-		for flag in flags.keys():
-			if not flag in data:
-				raise Exception("[ERROR] Flag %s not found in file %s. \n Check your base configuration file." %(flag, cfgfile))
-			else:
-				rep = flags.get(flag)
-				data = data.replace(flag, rep)
-		
+		# copy original dictionary
+		copydata = data
+
+		# replace values in copy
+		# the following lines may need to be changed if the strcuture of the original JSON file changes.
+		copydata['Input']['InputFileName'] = flags['@INPUTFILE@']		
+		copydata['Input']['InputNParticles'] = flags['@NPARTICLES@']
+		copydata['Output']['OutputFile'] = flags['@OUTPUTFILE@']
+		copydata['DetectorList'] = flags['@DETECTORLIST@']
+		copydata['DetectorProperties'] = flags['@DETECTORPROPERTIES@']
+
+		# check that copy and original have the same keys
+		if not data.keys() == copydata.keys():
+			raise Exception("[ERROR] Copy of JSON content failed.")
+			return False
 		fin.close()
-		fin = open(cfgfile, "wt")
-		fin.write(data)
-		fin.close()
+		# if we get here the copy was successful. write to file replacing original
+		with open(cfgfile, "w") as outcfgfile:
+			json.dump(copydata, outcfgfile)
 
 		# dump job information into log file
 		jobLogName = path.join(jobpath, 'job_info_%s.log' %jobid)
@@ -216,9 +288,12 @@ def main():
 	#parser.add_argument("-e", dest="inext",
 		#help="input file extension", default=None, required=True)
 	parser.add_argument("-i", dest="infile",
-		help="full path to input file and filename with extension. Example: /home/user/file.shw", default=None, required=True)
+		help="full path to input file and filename with extension. Example: /home/user/file.shw", default=None, required=False)
 	parser.add_argument("-n", dest="nlines",
 		help="number of lines to split input file", default=100000)
+	parser.add_argument("-p", dest="inpart",
+		help="number of particles to be simulated in case no input file is given", default=0, required=False)
+
 	parser.add_argument("-b", dest="basedir",
 		help="base directory (containing Executable and cfg files)", default=None, required=True)
 	parser.add_argument("-j", dest="jobdir",
@@ -235,69 +310,60 @@ def main():
 	base_dir  = abspath(options.basedir)
 	job_dir   = abspath(options.jobdir)
 	input_file = options.infile
+	input_part = int(options.inpart)
+
 	nlines = int(options.nlines)
 	#filext    = options.inext
+	if not input_file and not input_part:
+		print("[ERROR] Input file or Input number of particles must be given!")
+		return False
+
 	print("[INFO] Running createjobs script with the following options:\n")
-	print("- Path to input file: %s " %input_file)
+	if input_file:
+		print("- Path to input file: %s " %input_file)
+	if input_part:
+		print("- Number of particles to be simulated: %i " %input_part)
+
 	print("- Path to base directory: %s" %base_dir)
 	print("- Path to job directory: %s" %job_dir)
 	print("\n")
 
 	# implement check if split files already exist.
 	# if not: split. if exist: jump to CreateJobDirectories
-	print("[INFO] Reading input file")
-	print(input_file)
-	filext = path.splitext(input_file)[1]
+	if input_file:
+		print("[INFO] Reading input file")
+		print(input_file)
+		filext = path.splitext(input_file)[1]
 	
-	if filext == "bz2":
-		print("[INFO] Decompressing file %s" %input_file)
-		os.system("bzip2 -d -k %s" %input_file)
-		# now take the decompressed file as input
-		input_file = path.splitext(input_file)[0]
+		if filext == "bz2":
+			print("[INFO] Decompressing file %s" %input_file)
+			os.system("bzip2 -d -k %s" %input_file)
+			# now take the decompressed file as input
+			input_file = path.splitext(input_file)[0]
 	
-	print("\n")	
-	splits_dir = SplitInputFile(input_file, N=nlines)
+		print("\n")	
+		splits_dir = SplitInputFile(input_file, N=nlines)
 
-	try:
-		jobDirs = CreateJobs(base_dir, splits_dir, job_dir)
-		if PrepareConfigFile(jobDirs):
-			print("[INFO] Configured jobs at %s was done." %job_dir)
-	except Exception as e:
-		
-		print("%s" %e)
-		shutil.rmtree(splits_dir)
-		print("[INFO] Deleting temporary directory %s" %splits_dir)
-
-	# implement for multiple input files
-	if False:
-		print("[INFO] Reading input files")
-		ifiles = glob(path.join(input_dir, '*%s' %filext))
-
-		if len(ifiles) == 0:
-			raise Exception("[ERROR] No input files!")
-
-		print(ifiles)
-
-		for ifile in ifiles:
-			if filext == "bz2":
-				print("[INFO] Decompressing file %s" %ifile)
-				os.system("bzip2 -d -k %s" %ifile)
-				# now take the decompressed file as input
-				ifile = path.splitext(ifile)[0]
+		try:
+			jobDirs = CreateJobs(base_dir, splits_dir, job_dir)
+			if PrepareConfigFile(jobDirs, 0):
+				print("[INFO] Configured jobs at %s was done." %job_dir)
+		except Exception as e:
 			
-			print("\n")	
-			splits_dir = SplitInputFile(ifile, N=nlines)
+			print("%s" %e)
+			shutil.rmtree(splits_dir)
+			print("[INFO] Deleting temporary directory %s" %splits_dir)
 
-			try:
-				jobDirs = CreateJobs(base_dir, splits_dir, job_dir)
-				if PrepareConfigFile(jobDirs):
-					print("[INFO] Configured jobs at %s was done." %job_dir)
-			except Exception as e:
-				
-				print("%s" %e)
-				shutil.rmtree(splits_dir)
-				print("[INFO] Deleting temporary directory %s" %splits_dir)
-
+	if input_part:
+		print("[INFO] Creating job directories for simulating %i particles" %input_part)
+		print("\n")
+		
+		try:
+			jobDirs = CreateJobsNPart(base_dir, job_dir, input_part, n_max=nlines)
+			if PrepareConfigFile(jobDirs, nlines):
+				print("[INFO] Configured jobs at %s was done." %job_dir)
+		except Exception as e:
+			print("%s" %e)
 
 
 if __name__ == "__main__":
