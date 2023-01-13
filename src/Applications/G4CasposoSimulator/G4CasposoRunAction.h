@@ -31,7 +31,7 @@ class G4CasposoRunAction : public G4UserRunAction
 
 	private:
 
-		std::ofstream* fOutFile;
+		std::ofstream fOutFile;
 		Event& fEvent;
 
 
