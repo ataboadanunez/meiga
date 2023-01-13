@@ -148,7 +148,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	// loop over casings (volume which contains the panels)
 	for (G4int pIt=0; pIt<nPanels; ++pIt) {
 
-		// reference position of middle panel
+		// panel position w.r.t enclosure 
 		G4double fPanelPosX = 0;
 		G4double fPanelPosY = 0;
 		G4double fPanelPosZ = 0;
@@ -168,7 +168,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			// 	fPanelPosY -= 0.5*fCasingSizeX*cos(alpha);
 		}
 
-		cout << "[DEBUG] G4Models::Mudulus: Panel " << pIt << ", position = (" << fPanelPosX / 	CLHEP::cm << ", " << fPanelPosY / CLHEP::cm << ", " << fPanelPosZ / CLHEP::cm << ") cm " << endl;
+		cout << "[DEBUG] G4Models::Mudulus: Panel " << pIt << ", position = (" << (detectorPos.getX() + fPanelPosX) / 	CLHEP::cm << ", " << (detectorPos.getY() + fPanelPosY) / CLHEP::cm << ", " << (detectorPos.getZ() + fPanelPosZ) / CLHEP::cm << ") cm " << endl;
 		G4ThreeVector panelPosition = G4ThreeVector(fPanelPosX, fPanelPosY, fPanelPosZ);
 
 		G4int panelId = pIt+1;
@@ -236,16 +236,16 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			new G4PVPlacement(nullptr, G4ThreeVector(), logicScinBar, 
 				nameScinBar, logicCoating, false, barId, fCheckOverlaps);
 			new G4PVPlacement(rotationFiber, fiberPosition, logicClad2, 
-				nameClad2, logicScinBar, true, barId, fCheckOverlaps);
+				nameClad2, logicScinBar, true, barId, false);
 			new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
-				nameClad1, logicClad2, false, barId, fCheckOverlaps);
+				nameClad1, logicClad2, false, barId, false);
 			new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
-				nameFiber, logicClad1, false, barId, fCheckOverlaps); 
+				nameFiber, logicClad1, false, barId, false); 
 
 			new G4PVPlacement(nullptr, G4ThreeVector(fPMTPosX, fPMTPosY, fPMTPosZ), logicPixelL,
-				namePixelL, logicFiber, false, pixelLId, fCheckOverlaps);
+				namePixelL, logicFiber, false, pixelLId, false);
 			new G4PVPlacement(nullptr, G4ThreeVector(fPMTPosX, fPMTPosY, -1*fPMTPosZ), logicPixelR,
-				namePixelR, logicFiber, false, pixelRId, fCheckOverlaps);
+				namePixelR, logicFiber, false, pixelRId, false);
 
 
 			// registration of PMTs as Sensitive Detectors
@@ -317,15 +317,15 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicScinBar,
 				nameScinBar, logicCoating, false, barId, fCheckOverlaps);
 			new G4PVPlacement(rotationFiber, fiberPosition, logicClad2, 
-				nameClad2, logicScinBar, true, barId, fCheckOverlaps);
+				nameClad2, logicScinBar, true, barId, false);
 			new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
-				nameClad1, logicClad2, false, barId, fCheckOverlaps);
+				nameClad1, logicClad2, false, barId, false);
 			new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
-				nameFiber, logicClad1, false, barId, fCheckOverlaps); 
+				nameFiber, logicClad1, false, barId, false); 
 			new G4PVPlacement(nullptr, G4ThreeVector(fPMTPosX, fPMTPosY, fPMTPosZ), logicPixelL, 
-					namePixelL, logicFiber, false, pixelLId, fCheckOverlaps);
+					namePixelL, logicFiber, false, pixelLId, false);
 			new G4PVPlacement(nullptr, G4ThreeVector(fPMTPosX, fPMTPosY, -1*fPMTPosZ), logicPixelR, 
-					namePixelR, logicFiber, false, pixelRId, fCheckOverlaps);
+					namePixelR, logicFiber, false, pixelRId, false);
 
 
 			// registration of pixels as Sensitive Detectors
