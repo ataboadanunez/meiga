@@ -135,7 +135,7 @@ def main():
 	if options.nthreads == None:
 		n_threads = mp.cpu_count()-1
 	else:
-		n_threads = options.nthreads
+		n_threads = int(options.nthreads)
 
 	print("[INFO] Running runjobs with the following options:\n")
 	print("- Path to job directory: %s" %job_dir)
