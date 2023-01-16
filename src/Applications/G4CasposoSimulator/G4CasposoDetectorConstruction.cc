@@ -24,7 +24,7 @@ G4CasposoDetectorConstruction::CreateDetector()
 {
 
 	CreateWorld();
-	CreateGround();
+	//CreateGround();
 	PlaceDetector(fEvent);
 	return physWorld;
 }
@@ -36,17 +36,12 @@ G4CasposoDetectorConstruction::CreateWorld()
 	// size definitions
 	G4double fWorldSizeX = 500 * CLHEP::m;
 	G4double fWorldSizeY = 500 * CLHEP::m;
-	G4double fWorldSizeZ = 500 * CLHEP::m;
+	G4double fWorldSizeZ = 250 * CLHEP::m;
 
 	solidWorld  = new G4Box("World", fWorldSizeX/2, fWorldSizeY/2, fWorldSizeZ/2);
 	logicWorld = new G4LogicalVolume(solidWorld, Materials().Air, "World");
 	physWorld  =  new G4PVPlacement(nullptr, G4ThreeVector(), "World", logicWorld, 0, false, 0, fCheckOverlaps);
 
-}
-
-void
-G4CasposoDetectorConstruction::CreateGround()
-{
 	
 	const Event::Config &cfg = fEvent.GetConfig();	
 	G4double fGroundSizeX = 495 * CLHEP::m;
@@ -67,7 +62,7 @@ G4CasposoDetectorConstruction::CreateGround()
 	G4VisAttributes brown(G4Colour::Brown());
 	logicGround = new G4LogicalVolume(solidGround, Materials().StdRock, "Ground");
 	logicGround->SetVisAttributes(brown);
-	physGround  =  new G4PVPlacement(nullptr, G4ThreeVector(), logicGround, "Ground", logicWorld, false, 0, cfg.fCheckOverlaps);
+	physGround  =  new G4PVPlacement(nullptr, G4ThreeVector(0, 0, -fWorldSizeZ/2), logicGround, "Ground", logicWorld, false, 0, cfg.fCheckOverlaps);
 
                         
 	/*    TANDAR             Stairs
@@ -121,7 +116,7 @@ G4CasposoDetectorConstruction::CreateGround()
 	// TANDAR origin located w.r.t detector position
 	G4double fTandarX = 0 * CLHEP::m;
 	G4double fTandarY = fDistance2Detector;
-	G4double fTandarZ = 0.5*fTandarHeight + 0.5*fGroundSizeZ;
+	G4double fTandarZ = -0.5*fWorldSizeZ + 0.5*fTandarHeight + 0.5*fGroundSizeZ;
 
 	// position of Stairs building
 	G4double fStairsX = 0 * CLHEP::m;
@@ -139,7 +134,7 @@ G4CasposoDetectorConstruction::CreateGround()
 	physTandar = new G4PVPlacement(nullptr, G4ThreeVector(fTandarX, fTandarY, fTandarZ), logTandar, "physTandar", logicWorld, false, 0, cfg.fCheckOverlaps);
 
 	logTandarTop  = new G4LogicalVolume(solidTandarTop, Materials().Concrete, "logTandarTop", 0, 0, 0);
-	physTandarTop = new G4PVPlacement(nullptr, G4ThreeVector(fTandarX, fTandarY, 0.5*fGroundSizeZ + fTandarHeight + 0.5*fTandarThickness), logTandarTop, "physTandarTop", logicWorld, false, 0, cfg.fCheckOverlaps);
+	physTandarTop = new G4PVPlacement(nullptr, G4ThreeVector(fTandarX, fTandarY, -0.5*fWorldSizeZ + 0.5*fGroundSizeZ + fTandarHeight + 0.5*fTandarThickness), logTandarTop, "physTandarTop", logicWorld, false, 0, cfg.fCheckOverlaps);
 
 	logStairsIn = new G4LogicalVolume(solidStairsIn, Materials().Air, "logStairsIn", 0, 0, 0);
 	G4VisAttributes blue(G4Colour::Blue());
