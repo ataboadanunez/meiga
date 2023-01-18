@@ -1,12 +1,18 @@
 {
-	"InputFile" : "./vertical_muon.txt",
+	"Input" :
+	{
+		"Mode" : "UseARTI",
+		"InputFileName" : "./vertical_muon.txt",
+		"InputNParticles" : 0
+	},
+	
 	"Output" : 
 	{
 		"OutputFile" : "./output.json",
 		"CompressOutput" : true,
-		"SavePETimeDistribution" : false,
+		"SavePETimeDistribution" : true,
 		"SaveComponentsPETimeDistribution" : false,
-		"SaveTraces" : true,
+		"SaveTraces" : false,
 		"SaveEnergy" : false,
 		"SaveComponentsEnergy" : false
 	},
@@ -15,7 +21,7 @@
 	"Simulation" :
 	{
 		"SimulationMode" : "eFast",
-		"InjectionMode" : "eCircle",
+		"InjectionMode" : "eRandom",
 		"GeoVisOn" : false,
 		"TrajVisOn" : false,
 		"CheckOverlaps" : false,

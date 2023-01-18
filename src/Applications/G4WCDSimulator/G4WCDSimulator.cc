@@ -125,6 +125,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 	cout << "[INFO] G4WCDSimulator::RunSimulation" << endl;
 	
 	SimData& simData = theEvent.GetSimData();
+	const Event::Config &cfg = theEvent.GetConfig();
 	const unsigned int numberOfParticles = simData.GetTotalNumberOfParticles();
 	cout << "[INFO] G4WCDSimulator::RunSimulation: Number of particles to be simulated = " << numberOfParticles << endl;
 	
@@ -175,7 +176,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 	fRunManager->Initialize();
 
 	// initialize visualization
-	if ((fGeoVisOn || fTrajVisOn) && !fVisManager)
+	if ((cfg.fGeoVis || cfg.fTrajVis) && !fVisManager)
 		fVisManager = new G4VisExecutive;
 
 	// get the pointer to the UI manager and set verbosities
@@ -202,7 +203,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 			fUImanager->ApplyCommand("/tracking/verbose 0");
 		}
 	
-	if (fGeoVisOn || fTrajVisOn) {
+	if (cfg.fGeoVis || cfg.fTrajVis) {
 		fVisManager->Initialize();
 		fUImanager->ApplyCommand(("/vis/open " + fRenderFile).c_str());
 		fUImanager->ApplyCommand("/vis/scene/create");
@@ -219,7 +220,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 
 	}
 
-	if (fTrajVisOn) {
+	if (cfg.fTrajVis) {
 			fUImanager->ApplyCommand("/tracking/storeTrajectory 1");
 			fUImanager->ApplyCommand("/vis/scene/add/trajectories");
 	}
