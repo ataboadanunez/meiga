@@ -46,10 +46,13 @@ G4MOptDeviceAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 	OptDevice& optDevice = fEvent.GetDetector(fDetectorId).GetOptDevice(fOptDeviceId);
 	const OptDevice::DeviceType &type = optDevice.GetType();
 	// calculate analog trace for that particular optical device
-	auto odTrace = odSimData.CalculateTrace(1*CLHEP::ns, fPETime, type);
-	// add to SimData
-	odSimData.AddTimeTrace(odTrace);
+	if (fEvent.GetConfig().fSaveTraces) {
+		auto odTrace = odSimData.CalculateTrace(1*CLHEP::ns, fPETime, type);
+		// add to SimData
+		odSimData.AddTimeTrace(odTrace);
 	
+	}
+
 	// clear PE time vector
 	fPETime.clear();
 
