@@ -143,8 +143,6 @@ G4ExPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 				return;
 		}
 	
-		double maxHeight = fEvent.GetMaximumHeight();
-
 		double fMomentum = currParticle.GetMomentum();
 		double fKineticEnergy = currParticle.GetKineticEnergy();
 

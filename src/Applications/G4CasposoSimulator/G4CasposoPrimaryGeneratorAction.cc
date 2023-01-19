@@ -82,7 +82,13 @@ G4CasposoPrimaryGeneratorAction::~G4CasposoPrimaryGeneratorAction()
 void 
 G4CasposoPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 {
-   
+  
+  SimData &simData = fEvent.GetSimData();
+  injMode = simData.GetInjectionMode();
+
+  double x0;
+  double y0;
+  double z0;
 
   if (fUseEcoMug) {
     
@@ -96,9 +102,9 @@ G4CasposoPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   
     fMuonGen.Generate();
     array<double, 3> muon_pos = fMuonGen.GetGenerationPosition();
-    double x0 = muon_pos[0] * CLHEP::mm;
-    double y0 = muon_pos[1] * CLHEP::mm;
-    double z0 = muon_pos[2] * CLHEP::mm;
+    x0 = muon_pos[0] * CLHEP::mm;
+    y0 = muon_pos[1] * CLHEP::mm;
+    z0 = muon_pos[2] * CLHEP::mm;
 
 
     double muon_ptot = fMuonGen.GetGenerationMomentum();
@@ -143,26 +149,15 @@ G4CasposoPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
         return;
       }
     
-    // 
-    auto& simData = fEvent.GetSimData();
     
-    // particle injection on ground surface
-    // get ground thickness (depth, along z-axis)
-    // double groundThickness = simData.GetGroundThickness();
-    double injHeight = 1.2*CLHEP::m;
-    double injWidth  = 0.25 * CLHEP::m;
-    // HARDCODED
-    const double x0 = 0 * CLHEP::m; //RandFlat::shoot(-injWidth, injWidth);
-    const double y0 = 195 * CLHEP::m; //RandFlat::shoot(-injWidth, injWidth);
-    const double z0 = 70 * CLHEP::m;
-    // get particle energy and momentum direction
+    double fMomentum = currParticle.GetMomentum();
     double fKineticEnergy = currParticle.GetKineticEnergy();
 
-    const std::vector<double> particleMomentumDirection = currParticle.GetDirection(); 
+    const std::vector<double> particleMomentumDirection = currParticle.GetDirection();
     double fPx = particleMomentumDirection.at(0);
     double fPy = particleMomentumDirection.at(1);
     double fPz = particleMomentumDirection.at(2);
-    
+  
     fParticleGun->SetParticleDefinition(particleDef);
 
     G4double px2 = fPx*fPx;
@@ -175,17 +170,57 @@ G4CasposoPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 
     currParticle.SetAzimuth(particleAzimut);
     currParticle.SetZenith(particleZenith);
+    
+    injMode = simData.GetInjectionMode();
+    
+    // switch between injection modes
+    if (injMode == SimData::InjectionMode::eCircle) {
+      
+      double injRadius = simData.GetInjectionRadius();
+      double injHeight = simData.GetInjectionHeight();
+
+      double rand = RandFlat::shoot(0., 1.);
+      double  r = injRadius*sqrt(rand);
+      double minPhi = simData.GetInjectionMinPhi() * (CLHEP::twopi / 360);
+      double maxPhi = simData.GetInjectionMaxPhi() * (CLHEP::twopi / 360);
+      double phi = RandFlat::shoot(minPhi, maxPhi);
+
+      x0 = r*cos(phi);
+      y0 = r*sin(phi);
+      z0 = injHeight;
+  
+    } 
+
+    else if (injMode == SimData::InjectionMode::eHalfSphere) {
+      // use EcoMug for HalfSphere generation (only particle position)
+      fMuonGen.Generate();
+      array<double, 3> particlePos = fMuonGen.GetGenerationPosition();
+      x0 = particlePos[0] * CLHEP::mm;
+      y0 = particlePos[1] * CLHEP::mm;
+      z0 = particlePos[2] * CLHEP::mm;
+
+    }
+
+    else if (injMode == SimData::InjectionMode::eUnknown) {
+      // inject particles from origin given in XML
+      vector<double> particlePos = simData.GetInjectionOrigin();
+      x0 = particlePos[0];
+      y0 = particlePos[1];
+      z0 = particlePos[2];
+    }
+    else {
+      x0 = 0;
+      y0 = 0;
+      z0 = 0;
+    }
 
     const std::vector<double> injectionPosition = {x0, y0, z0};
     currParticle.SetInjectionPosition(injectionPosition);
-    cout << "[INFO] InjectionPosition = (" << x0 / CLHEP::m << ", " << y0 / CLHEP::m << ", " << z0 / CLHEP::m << ") m" << endl;
     fParticleGun->SetParticleMomentumDirection(G4ThreeVector(fPx, fPy, -1*fPz));
     fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));
     fParticleGun->SetParticleEnergy(fKineticEnergy);
-
     fParticleGun->GeneratePrimaryVertex(event);
-
+    
+    cout << "[DEBUG] TestInjection " << fParticleId << " " << x0 / CLHEP::m << " " << y0 / CLHEP::m << " " << z0 / CLHEP::m << " " << fPx / CLHEP::GeV << " " << fPy / CLHEP::GeV << " " << fPz / CLHEP::GeV << " " << fMomentum << " " << particleZenith * 180 / M_PI << " " << particleAzimut * 180 / M_PI << endl;
   }
-
-  
 }
