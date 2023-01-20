@@ -53,7 +53,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 
 	// detector properties are fixed for this detector.
 	G4int nPanels = 3;
-	G4double fDistanceBtwPanels = 1 * CLHEP::m;
+	G4double fDistanceBtwPanels = detector.GetDistanceBtwPanels();
 
 	const G4int nBars = 12;
 	const G4double fBarLength   = 495 * CLHEP::mm;
@@ -86,6 +86,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	cout << "[INFO] G4Models::Mudulus: Building detector " << namedetector.str();
 	cout << " (ID = " << detectorId << ")";
 	cout << " with " << pmt.GetName() << ". " << endl;
+	cout << "Distance between panels = " << fDistanceBtwPanels / CLHEP::mm << " mm " << endl;
 
 	/*************************************************
 		
@@ -109,10 +110,22 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 
 
 	// solids
-	// enclosure
-	G4double fEnclosureSize = 3 * CLHEP::m;
-	solidEnclosure = new G4Box("Enclosure", 0.5*fEnclosureSize, 0.5*fEnclosureSize, 0.5*fEnclosureSize);
-	// Casing
+	/*
+		The "Enclosure" is a box of Air used as mother volume 
+		for the rest of the volumes.
+		The rotation matrix is applied to that volume in order to 
+		rotate all panels accordingly.
+		
+		The detector position corresponds to the center of the Enclosure volume
+
+	*/
+
+	const G4double fEnclosureSizeX = fCasingSizeX + fCasingThickness;
+	const G4double fEnclosureSizeY = fCasingSizeY + fCasingThickness;
+	const G4double fEnclosureSizeZ = fCasingSizeZ + 2 * fDistanceBtwPanels; 
+
+	solidEnclosure = new G4Box("Enclosure", 0.5*fEnclosureSizeX, 0.5*fEnclosureSizeY, 0.5*fEnclosureSizeZ);
+	// Casing (same as Enclosure but for each panel): Air volume that contains 2 planes of scintillator bars + fibers and pixels
 	solidCasing = new G4Box("Casing", 0.5*fCasingSizeX, 0.5*fCasingSizeY, 0.5*fCasingSizeZ);
 	// Bars: Coating + Scintillator bar
 	solidCoating  	= new G4Box("BarCoating", 0.5*fBarLength + fCoatingThickness, 0.5*fBarWidth + fCoatingThickness, 0.5*fBarThickness + fCoatingThickness);

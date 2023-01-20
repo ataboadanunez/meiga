@@ -79,6 +79,9 @@ class Detector
 		double GetBarCoatingThickness() const { return fCoatingThickness; }
 		void SetBarCoatingThickness(double barCoatThickness) { fCoatingThickness = barCoatThickness; }
 
+		double GetDistanceBtwPanels() const { return fDistancePanels; }
+		void SetDistanceBtwPanels( double dist) { fDistancePanels = dist; }
+
 		// WLS fibers
 		double GetFiberRadius() const { return fFiberRadius; }
 		void SetFiberRadius(double fiberRad) { fFiberRadius = fiberRad; }
@@ -159,6 +162,7 @@ class Detector
 		double fCladdingThickness;
 		double fCoatingThickness;
 		int    fNumberOfBars;
+		double fDistancePanels;
 
 		// Water-Cerenkov Detector parameters
 		double fTankHeight;

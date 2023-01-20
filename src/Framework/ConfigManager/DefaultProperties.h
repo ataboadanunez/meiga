@@ -25,6 +25,7 @@ struct DefaultProperties
 	double gTankThickness;
 	double gLength;
 	double gWidth;
+	double gDistancePanels;
 	double gThickness;
 	double gGroundSizeX;
 	double gGroundSizeY;

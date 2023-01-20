@@ -18,7 +18,8 @@
 	<claddingThickness unit="mm"> 0.10 </claddingThickness>
 	<length unit="mm"> 1000 </length>
 	<width unit="mm"> 1000 </width>
-	<thickness unit="mm"> 1000 </thickness>	
+	<thickness unit="mm"> 1000 </thickness>
+	<distancePanels unit="mm"> 1000 </distancePanels>
 
 	<groundSizeX unit="m"> 5 </groundSizeX>
 	<groundSizeY unit="m"> 5 </groundSizeY>

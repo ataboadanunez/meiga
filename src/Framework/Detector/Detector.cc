@@ -145,6 +145,7 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 	SetFiberLength(defProp.gFiberLength);
 	SetFiberRadius(defProp.gFiberRadius);
 	SetCladdingThickness(defProp.gCladdingThickness);
+	SetDistanceBtwPanels(defProp.gDistancePanels);
 
 	SetLength(defProp.gLength);
 	SetWidth(defProp.gWidth);
@@ -243,6 +244,11 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 				double value = stod(xmlValue);
 				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
 				SetThickness(value * unit);
+			}
+			else if (xmlLabel == "distancePanels") {
+				double value = stod(xmlValue);
+				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
+				SetDistanceBtwPanels(value * unit);
 			}
 			else if (xmlLabel == "groundSizeX") {
 				double value = stod(xmlValue);

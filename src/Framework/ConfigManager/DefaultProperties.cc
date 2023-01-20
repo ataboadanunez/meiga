@@ -37,7 +37,8 @@ DefaultProperties::SetDefaultProperties(const string &filename)
 	gLength = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "length");
 	gWidth = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "width");
 	gThickness = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "thickness");
-
+	gDistancePanels = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "distancePanels");
+	
 	// ground size parameters
 	gGroundSizeX = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "groundSizeX");
 	gGroundSizeY = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "groundSizeY");
