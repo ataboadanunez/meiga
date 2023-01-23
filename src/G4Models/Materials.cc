@@ -296,6 +296,7 @@ G4Material* Materials::FPethylene;
 G4Material* Materials::Pyrex;
 G4Material* Materials::HDPE;
 G4Material* Materials::Concrete;
+G4Material* Materials::Lead;
 G4OpticalSurface* Materials::ScinOptSurf;
 G4OpticalSurface* Materials::LinerOptSurf;
 G4OpticalSurface* Materials::LinerOptSurf2;
@@ -395,7 +396,6 @@ Materials::CreateCompounds()
 	POPOP->AddElement(elH, 16);
 	POPOP->AddElement(elN, 2);
 	POPOP->AddElement(elO, 2);
-
 
 }
 
@@ -598,4 +598,6 @@ Materials::CreateMaterials()
 	Concrete->AddElement(elFe, 0.04);
 	Concrete->AddElement(elAl, 0.04);
 
+	// define lead as material, not element
+	Lead = new G4Material("Lead", 82., 207.2 * g/mole, 11.35 * g/cm3);
 }

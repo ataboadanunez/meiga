@@ -44,6 +44,7 @@ public:
 	static G4Material* PPO;
 	static G4Material* POPOP;
 	static G4Material* Polystyrene;
+	static G4Material* Lead;
 
 	// Materials
 	static G4Material* Air;
