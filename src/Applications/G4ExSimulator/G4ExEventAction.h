@@ -6,7 +6,6 @@
 #include "G4Event.hh"
 
 #include "G4ExRunAction.h"
-#include "G4ExPrimaryGeneratorAction.h"
 
 #include <string>
 #include <vector>

@@ -3,6 +3,8 @@
 #include "DetectorSimData.h"
 #include "OptDeviceSimData.h"
 
+using namespace std;
+
 G4HodoscopeEventAction::G4HodoscopeEventAction(Event& theEvent) : 
 	fEvent(theEvent),
 	G4UserEventAction()

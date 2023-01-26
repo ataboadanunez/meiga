@@ -10,7 +10,7 @@
 // Headers of this particular application
 #include "G4WCDSimulator.h"
 #include "G4WCDConstruction.h"
-#include "G4WCDPrimaryGeneratorAction.h"
+#include "G4MPrimaryGeneratorAction.h"
 #include "G4WCDStackingAction.h"
 #include "G4WCDEventAction.h"
 #include "G4WCDRunAction.h"
@@ -155,7 +155,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 	
 	fRunManager->SetUserInitialization(new G4MPhysicsList(fPhysicsName));
 
-	G4WCDPrimaryGeneratorAction *fPrimaryGenerator = new G4WCDPrimaryGeneratorAction(theEvent);
+	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
 	
 	G4WCDStackingAction *fStackingAction = new G4WCDStackingAction(theEvent);

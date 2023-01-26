@@ -10,7 +10,7 @@
 // Headers of this particular application
 #include "G4HodoscopeSimulator.h"
 #include "G4HodoscopeDetectorConstruction.h"
-#include "G4HodoscopePrimaryGeneratorAction.h"
+#include "G4MPrimaryGeneratorAction.h"
 #include "G4HodoscopeEventAction.h"
 #include "G4HodoscopeRunAction.h"
 #include "G4HodoscopeTrackingAction.h"
@@ -159,7 +159,7 @@ G4HodoscopeSimulator::RunSimulation(Event& theEvent)
 	
 	fRunManager->SetUserInitialization(new G4HodoscopePhysicsList(fPhysicsName));  
  
-	G4HodoscopePrimaryGeneratorAction *fPrimaryGenerator = new G4HodoscopePrimaryGeneratorAction(theEvent);
+	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
 	
 	G4HodoscopeRunAction *fRunAction = new G4HodoscopeRunAction(theEvent);
@@ -232,6 +232,7 @@ G4HodoscopeSimulator::RunSimulation(Event& theEvent)
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
 		G4HodoscopeSimulator::currentParticle = *it;
+		simData.SetCurrentParticle(*it);
 		// Run simulation
 		fRunManager->BeamOn(1);
 

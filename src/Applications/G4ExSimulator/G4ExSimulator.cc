@@ -12,7 +12,6 @@
 // Headers of this particular application
 #include "G4ExSimulator.h"
 #include "G4ExDetectorConstruction.h"
-//#include "G4ExPrimaryGeneratorAction.h"
 #include "G4ExEventAction.h"
 #include "G4ExRunAction.h"
 #include "G4ExTrackingAction.h"

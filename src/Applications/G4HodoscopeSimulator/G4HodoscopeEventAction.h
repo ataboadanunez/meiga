@@ -8,7 +8,7 @@
 // Meiga headers
 #include "Event.h"
 #include "G4HodoscopeRunAction.h"
-#include "G4HodoscopePrimaryGeneratorAction.h"
+
 #include "G4HodoscopeSimulator.h"
 // C++ headers
 #include <string>

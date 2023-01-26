@@ -6,7 +6,6 @@
 #include "G4Event.hh"
 
 #include "G4WCDRunAction.h"
-#include "G4WCDPrimaryGeneratorAction.h"
 
 #include <string>
 #include <vector>

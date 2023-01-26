@@ -8,7 +8,6 @@
 // Meiga headers
 #include "Event.h"
 #include "G4CasposoRunAction.h"
-#include "G4CasposoPrimaryGeneratorAction.h"
 #include "G4CasposoSimulator.h"
 // C++ headers
 #include <string>

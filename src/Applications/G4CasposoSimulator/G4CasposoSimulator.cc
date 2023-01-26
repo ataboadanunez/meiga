@@ -11,7 +11,7 @@
 // Headers of this particular application
 #include "G4CasposoSimulator.h"
 #include "G4CasposoDetectorConstruction.h"
-#include "G4CasposoPrimaryGeneratorAction.h"
+#include "G4MPrimaryGeneratorAction.h"
 #include "G4CasposoEventAction.h"
 #include "G4CasposoRunAction.h"
 #include "G4CasposoTrackingAction.h"
@@ -160,7 +160,7 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 	
 	fRunManager->SetUserInitialization(new G4CasposoPhysicsList(fPhysicsName));  
  
-	G4CasposoPrimaryGeneratorAction *fPrimaryGenerator = new G4CasposoPrimaryGeneratorAction(theEvent);
+	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
 	
 	G4CasposoRunAction *fRunAction = new G4CasposoRunAction(theEvent);
@@ -233,6 +233,7 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
 		G4CasposoSimulator::currentParticle = *it;
+		simData.SetCurrentParticle(*it);
 		// Run simulation
 		fRunManager->BeamOn(1);
 
