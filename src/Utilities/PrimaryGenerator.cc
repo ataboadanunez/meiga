@@ -68,16 +68,10 @@ void
 PrimaryGenerator::GeneratePrimaryParticle()
 {
 
-	// cout << "[INFO] PrimaryGenerator::PrimaryGenerator: Primary generated using EcoMug" << endl;
-	// set particle Id = current particle in the event / muon
-	// set particle position 
-	// set particle direction as muon momentum
 
 	SimData &simData = fEvent.GetSimData();
 	Particle &currentParticle = simData.GetCurrentParticle();
-	cout << "[DEBUG] PrimaryGenerator::GeneratePrimaryParticle: Particle ID before generation = " << currentParticle.GetParticleId() << endl;
-	cout << "[DEBUG] PrimaryGenerator::GeneratePrimaryParticle: Particle position (X0) before generation = " << currentParticle.GetPosition().at(0) / CLHEP::cm << endl; 
-	cout << "[DEBUG] PrimaryGenerator::GeneratePrimaryParticle: Particle momentum (pX) before generation = " << currentParticle.GetMomentumDirection().at(0) / CLHEP::GeV << endl; 
+
 	// coordinates of particle position
 	double x0;
 	double y0;
@@ -144,9 +138,7 @@ PrimaryGenerator::GeneratePrimaryParticle()
 		currentParticle.SetParticleId(fParticleId);
 		currentParticle.SetMomentum(pTot);
 
-		cout << "[DEBUG] PrimaryGenerator::GeneratePrimaryParticle: Particle ID AFTER generation = " << currentParticle.GetParticleId() << endl;
-		cout << "[DEBUG] PrimaryGenerator::GeneratePrimaryParticle: Particle position (X0) AFTER generation = " << currentParticle.GetPosition().at(0) / CLHEP::cm << endl; 
-		cout << "[DEBUG] PrimaryGenerator::GeneratePrimaryParticle: Particle momentum (pX) AFTER generation = " << currentParticle.GetMomentumDirection().at(0) / CLHEP::GeV << endl;
+
 		return;
 	}
 
