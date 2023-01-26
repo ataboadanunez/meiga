@@ -169,9 +169,9 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 		// shift upper and lower panel's Z position
 		// shift y-coordinate in case rotation angle is applied
 		if (pIt==0)
-			fPanelPosZ += 0;
-		else if (pIt==1) {
 			fPanelPosZ += fDistanceBtwPanels;
+		else if (pIt==1) {
+			fPanelPosZ += 0;
 			// if (alpha)
 			// 	fPanelPosY += 0.5*fCasingSizeX*cos(alpha);
 		}
@@ -187,7 +187,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 		G4int panelId = pIt+1;
 		G4String nameCasing = "Casing_"+to_string(panelId);
 		logicCasing = new G4LogicalVolume(solidCasing, Materials().Air, nameCasing, 0, 0, 0);
-		new G4PVPlacement(nullptr, panelPosition, logicCasing, nameCasing, logicEnclosure, false, detectorId, fCheckOverlaps);
+		new G4PVPlacement(nullptr, panelPosition, logicCasing, nameCasing, logicEnclosure, false, panelId, fCheckOverlaps);
 		
 
 		// bars of the top panel
@@ -196,6 +196,8 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			// bar position (w.r.t casing)
 			G4String gridName = "X";
 			int barId = bIt+1;
+			int barId2 = 100*panelId + barId;
+
 			G4double fBarPosX =  - 0.5*fBarWidth;//0 * CLHEP::mm;
 			G4double fBarPosY = bIt*(fBarWidth + 2*fCoatingThickness);
 			G4double fBarPosZ = (0.5*fBarThickness * 2 + fCasingThickness) / 2;
@@ -216,11 +218,11 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			G4int pixelRId = 100*panelId + barId + nBars; // (113...124, 213...224, 313...324)
 			
 
-			G4String nameCoating = "BarCoating_"+gridName+"_"+to_string(barId);
-			G4String nameScinBar = "BarScin_"+gridName+"_"+to_string(barId);
-			G4String nameClad2 = "FiberClad2_"+gridName+"_"+to_string(barId);
-			G4String nameClad1 = "FiberClad1_"+gridName+"_"+to_string(barId);
-			G4String nameFiber = "Fiber_"+gridName+"_"+to_string(barId);
+			G4String nameCoating = "BarCoating_"+gridName;
+			G4String nameScinBar = "BarScin_"+gridName;
+			G4String nameClad2 = "FiberClad2";
+			G4String nameClad1 = "FiberClad1";
+			G4String nameFiber = "Fiber";
 			G4String namePixelL = "PMT_"+gridName+"_"+to_string(pixelLId);
 			G4String namePixelR = "PMT_"+gridName+"_"+to_string(pixelRId);
 			// register PMTs in the detector class
@@ -245,21 +247,20 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 
 			// physical volumes
 			new G4PVPlacement(nullptr, barPosition, logicCoating, 
-				nameCoating, logicCasing, false, barId, fCheckOverlaps);
+				nameCoating, logicCasing, false, barId2, fCheckOverlaps);
 			new G4PVPlacement(nullptr, G4ThreeVector(), logicScinBar, 
-				nameScinBar, logicCoating, false, barId, fCheckOverlaps);
+				nameScinBar, logicCoating, false, barId2, fCheckOverlaps);
 			new G4PVPlacement(rotationFiber, fiberPosition, logicClad2, 
-				nameClad2, logicScinBar, true, barId, false);
+				nameClad2, logicScinBar, true, barId2, false);
 			new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
-				nameClad1, logicClad2, false, barId, false);
+				nameClad1, logicClad2, false, barId2, false);
 			new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
-				nameFiber, logicClad1, false, barId, false); 
+				nameFiber, logicClad1, false, barId2, false); 
 
 			new G4PVPlacement(nullptr, G4ThreeVector(fPMTPosX, fPMTPosY, fPMTPosZ), logicPixelL,
 				namePixelL, logicFiber, false, pixelLId, false);
 			new G4PVPlacement(nullptr, G4ThreeVector(fPMTPosX, fPMTPosY, -1*fPMTPosZ), logicPixelR,
 				namePixelR, logicFiber, false, pixelRId, false);
-
 
 			// registration of PMTs as Sensitive Detectors
 			G4MOptDeviceAction* const PixelTopL = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelL, detectorId, pixelLId, theEvent);
@@ -278,6 +279,8 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			// bar position (w.r.t casing)
 			G4String gridName = "Y";
 			int barId = bIt+1+nBars;
+			int barId2 = 100*panelId + barId;
+
 			G4double fBarPosX = bIt*(fBarWidth + 2*fCoatingThickness);//0 * CLHEP::mm;
 			G4double fBarPosY =  - 0.5*fBarWidth;//0 * CLHEP::mm;
 			G4double fBarPosZ = -1*(0.5*fBarThickness * 2 + fCasingThickness) / 2;
@@ -299,11 +302,11 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			G4int pixelLId = 100*panelId + barId + nBars;   // (125...136, 225...236, 325...336)
 			G4int pixelRId = 100*panelId + barId + 2*nBars; // (137...148, 237...248, 337...348)
 
-			G4String nameCoating = "BarCoating_"+gridName+"_"+to_string(barId);
-			G4String nameScinBar = "BarScin_"+gridName+"_"+to_string(barId);
-			G4String nameClad2 = "FiberClad2_"+gridName+"_"+to_string(barId);
-			G4String nameClad1 = "FiberClad1_"+gridName+"_"+to_string(barId);
-			G4String nameFiber = "Fiber_"+gridName+"_"+to_string(barId);
+			G4String nameCoating = "BarCoating_"+gridName;
+			G4String nameScinBar = "BarScin_"+gridName;
+			G4String nameClad2 = "FiberClad2";
+			G4String nameClad1 = "FiberClad1";
+			G4String nameFiber = "Fiber";
 			G4String namePixelL = "PMT_"+gridName+"_"+to_string(pixelLId);
 			G4String namePixelR = "PMT_"+gridName+"_"+to_string(pixelRId);
 			// register PMTs in the detector class
@@ -326,20 +329,20 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 
 			// physical volumes		
 			new G4PVPlacement(rotationBot, barPosition, logicCoating, 
-				nameCoating, logicCasing, false, barId, fCheckOverlaps);
+				nameCoating, logicCasing, false, barId2, fCheckOverlaps);
 			new G4PVPlacement(nullptr, G4ThreeVector(0, 0, 0), logicScinBar,
-				nameScinBar, logicCoating, false, barId, fCheckOverlaps);
+				nameScinBar, logicCoating, false, barId2, fCheckOverlaps);
 			new G4PVPlacement(rotationFiber, fiberPosition, logicClad2, 
-				nameClad2, logicScinBar, true, barId, false);
+				nameClad2, logicScinBar, true, barId2, false);
 			new G4PVPlacement(nullptr, G4ThreeVector(), logicClad1, 
-				nameClad1, logicClad2, false, barId, false);
+				nameClad1, logicClad2, false, barId2, false);
 			new G4PVPlacement(nullptr, G4ThreeVector(), logicFiber, 
-				nameFiber, logicClad1, false, barId, false); 
+				nameFiber, logicClad1, false, barId2, false); 
+			
 			new G4PVPlacement(nullptr, G4ThreeVector(fPMTPosX, fPMTPosY, fPMTPosZ), logicPixelL, 
 					namePixelL, logicFiber, false, pixelLId, false);
 			new G4PVPlacement(nullptr, G4ThreeVector(fPMTPosX, fPMTPosY, -1*fPMTPosZ), logicPixelR, 
 					namePixelR, logicFiber, false, pixelRId, false);
-
 
 			// registration of pixels as Sensitive Detectors
 			G4MOptDeviceAction* const PixelBotL = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelL, detectorId, pixelLId, theEvent);

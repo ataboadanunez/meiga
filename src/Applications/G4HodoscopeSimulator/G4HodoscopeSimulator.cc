@@ -165,12 +165,12 @@ G4HodoscopeSimulator::RunSimulation(Event& theEvent)
 	G4HodoscopeRunAction *fRunAction = new G4HodoscopeRunAction(theEvent);
 	fRunManager->SetUserAction(fRunAction);
 	
-	G4HodoscopeEventAction *fEventAction = new G4HodoscopeEventAction();
+	G4HodoscopeEventAction *fEventAction = new G4HodoscopeEventAction(theEvent);
 	fRunManager->SetUserAction(fEventAction);
 
-	fRunManager->SetUserAction(new G4HodoscopeTrackingAction());
+	fRunManager->SetUserAction(new G4HodoscopeTrackingAction(theEvent));
 
-	G4HodoscopeSteppingAction *fSteppingAction = new G4HodoscopeSteppingAction(fDetConstruction, fEventAction, theEvent);
+	G4HodoscopeSteppingAction *fSteppingAction = new G4HodoscopeSteppingAction(fEventAction, theEvent);
 	fRunManager->SetUserAction(fSteppingAction);
 	
 	// initialize G4 kernel
