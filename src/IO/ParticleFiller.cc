@@ -127,7 +127,7 @@ ParticleFiller::FillParticleVector(const std::string &fileName, Event& theEvent)
     primaryPhi *= deg;
 		
     vector<double> particlePosition{x, y, z};
-    vector<double> particleMomentum{px, py, pz};
+    vector<double> particleMomentum{px, py, -1*pz};
     Particle particle(particleId, particlePosition, particleMomentum);
     simData.InsertParticle(particle);
 
