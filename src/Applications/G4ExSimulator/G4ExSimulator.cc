@@ -12,7 +12,7 @@
 // Headers of this particular application
 #include "G4ExSimulator.h"
 #include "G4ExDetectorConstruction.h"
-#include "G4ExPrimaryGeneratorAction.h"
+//#include "G4ExPrimaryGeneratorAction.h"
 #include "G4ExEventAction.h"
 #include "G4ExRunAction.h"
 #include "G4ExTrackingAction.h"
@@ -35,6 +35,7 @@
 #include "Detector.h"
 #include "OptDevice.h"
 #include "G4MPhysicsList.h"
+#include "G4MPrimaryGeneratorAction.h"
 #include "DataWriter.h"
 
 using namespace std;
@@ -155,7 +156,8 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	
 	fRunManager->SetUserInitialization(new G4MPhysicsList(fPhysicsName));
 
-	G4ExPrimaryGeneratorAction *fPrimaryGenerator = new G4ExPrimaryGeneratorAction(theEvent);
+	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
+	//G4ExPrimaryGeneratorAction *fPrimaryGenerator = new G4ExPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
 	
 	G4ExRunAction *fRunAction = new G4ExRunAction();
@@ -226,6 +228,7 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
 		G4ExSimulator::currentParticle = *it;
+		simData.SetCurrentParticle(*it);
 		// Run simulation
 		fRunManager->BeamOn(1);
 	}
