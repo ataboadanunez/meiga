@@ -83,7 +83,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	ostringstream namedetector;
 	namedetector.str("");
 	namedetector << "Mudulus";
-	cout << "[INFO] G4Models::Mudulus: Building detector " << namedetector.str();
+	cout << "[INFO] Mudulus::BuildDetector: Building detector " << namedetector.str();
 	cout << " (ID = " << detectorId << ")";
 	cout << " with " << pmt.GetName() << ". " << endl;
 	cout << "Distance between panels = " << fDistanceBtwPanels / CLHEP::mm << " mm " << endl;
