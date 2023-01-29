@@ -40,6 +40,7 @@ class Detector
 			eMudulus = 2,
 			eWCD = 3,
 			eScintillator = 4,
+			eHodoscope = 5,
 			eDummy
 		};
 
@@ -64,6 +65,9 @@ class Detector
 		void SetRotationAngle(double angle);
 
 		// scintillator-type detector properties
+		int GetNPanels() const { return fNumberOfPanels; }
+		void SetNPanels(int nPanels) { fNumberOfPanels = nPanels; }
+
 		int GetNBars() const { return fNumberOfBars; }
 		void SetNBars(int nBars) { fNumberOfBars = nBars; }
 
@@ -162,6 +166,7 @@ class Detector
 		double fCladdingThickness;
 		double fCoatingThickness;
 		int    fNumberOfBars;
+		int    fNumberOfPanels;
 		double fDistancePanels;
 
 		// Water-Cerenkov Detector parameters

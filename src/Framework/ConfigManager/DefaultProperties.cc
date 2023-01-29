@@ -23,7 +23,8 @@ DefaultProperties::SetDefaultProperties(const string &filename)
 	gTankHeight = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "tankHeight");
 	gTankThickness = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "tankThickness");
 	
-	gNumberOfBars = ConfigManager::GetPropertyFromXML<int>(tree, branchName, "barsInPanel", false);
+	gNumberOfBars = ConfigManager::GetPropertyFromXML<int>(tree, branchName, "numberOfBars", false);
+	gNumberOfPanels = ConfigManager::GetPropertyFromXML<int>(tree, branchName, "numberOfPanels", false);
 	gBarWidth = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "barWidth");
 	gBarLength = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "barLength");
 	gBarThickness = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "barThickness");

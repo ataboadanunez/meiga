@@ -4,6 +4,7 @@
 #include "Scintillator.h"
 #include "Musaic.h"
 #include "Mudulus.h"
+#include "Hodoscope.h"
 #include "Dummy.h"
 
 #include "G4UnitsTable.hh"
@@ -33,6 +34,8 @@ Detector::StringToType(string name)
 		return Detector::eMusaic;
 	else if (name == "eMudulus")
 		return Detector::eMudulus;
+	else if (name == "eHodoscope")
+		return Detector::eHodoscope;
 	else if (name == "eDummy")
 		return Detector::eDummy;
 	else {
@@ -64,6 +67,7 @@ InitTypeToBuild() {
 	TypeToBuild[Detector::eScintillator]	= Scintillator::BuildDetector;
 	TypeToBuild[Detector::eMusaic]				= Musaic::BuildDetector;
 	TypeToBuild[Detector::eMudulus]				= Mudulus::BuildDetector;
+	TypeToBuild[Detector::eHodoscope]			= Hodoscope::BuildDetector;
 	TypeToBuild[Detector::eDummy]					= Dummy::BuildDetector;
 
 }
@@ -136,6 +140,7 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 	SetTankThickness(defProp.gTankThickness);
 
 	SetNBars(defProp.gNumberOfBars);
+	SetNPanels(defProp.gNumberOfPanels);
 	SetBarWidth(defProp.gBarWidth);
 	SetBarLength(defProp.gBarLength);
 	SetBarThickness(defProp.gBarThickness);
@@ -182,7 +187,7 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 				SetTankThickness(value * unit);
 			}
 			
-			else if (xmlLabel == "barsInPanel") {
+			else if (xmlLabel == "numberOfBars") {
 				int value = stoi(xmlValue);
 				SetNBars(value);
 			}
@@ -249,6 +254,10 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 				double value = stod(xmlValue);
 				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
 				SetDistanceBtwPanels(value * unit);
+			}
+			else if (xmlLabel == "numberOfPanels") {
+				int value = stoi(xmlValue);
+				SetNPanels(value);
 			}
 			else if (xmlLabel == "groundSizeX") {
 				double value = stod(xmlValue);

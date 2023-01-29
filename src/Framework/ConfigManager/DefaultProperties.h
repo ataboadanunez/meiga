@@ -20,6 +20,7 @@ struct DefaultProperties
 	double gCladdingThickness;
 	double gCoatingThickness;
 	int    gNumberOfBars;
+	int    gNumberOfPanels;
 	double gTankHeight;
 	double gTankRadius;
 	double gTankThickness;
