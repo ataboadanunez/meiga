@@ -7,3 +7,4 @@ install
 *.swp
 *~
 CMakeCache.txt
+__pycache__
