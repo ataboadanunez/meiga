@@ -9,9 +9,18 @@ Meiga is a framework designed to develop astroparticle simulations and their pos
 
 # Installation
 
+### Pre-requisites
 Prior to install and use Meiga, the following packages need to be installed:
-- Geant4:
-  Meiga uses Geant4 as a toolkit for simulating the interaction of particles with the detector. Current version used is **geant4-07.p03** and can be downloaded from the [source page](https://geant4.web.cern.ch/support/download_archive).
+
+- **Geant4**:\
+  Meiga uses Geant4 as a toolkit for simulating the interaction of particles with the detector. Current version used is **geant4-07.p03** and can be downloaded from the [source page](https://geant4.web.cern.ch/support/download_archive). Geant4 must be installed with X11 OpenGL drivers in order to enable visualization.
+
+- **boost** (version > 1.75)
+
+- **nlohmann-json** \
+  For JSON parsers. Can be installed via:\
+  `sudo apt-get install nlohmann-json-dev`
+- **view3dscene** (or similar) for visualization of .wrl files
 
 # Framework Structure
 
