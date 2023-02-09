@@ -20,8 +20,8 @@ Prior to install and use Meiga, the following packages need to be installed:
 - **nlohmann-json** \
   For JSON parsers. Can be installed via:\
   `sudo apt-get install nlohmann-json-dev`
-- **view3dscene** (or similar) for visualization of .wrl files
-
+- **view3dscene** (or similar) for visualization of .wrl files.\
+  `sudo apt-get install view3dscene`
 # Framework Structure
 
 # Input flux
