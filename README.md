@@ -2,9 +2,6 @@
 Simulations Framework for Astroparticle Physics and Applications
 
 # Introduction
-
-It has been known for several decades that the Earth's surface constantly receives a flux of radiation resulting from the interaction of cosmic rays in the atmosphere. This radiation (in the form of particles) can be used for different purposes: scientific, such as the study of its origin and energy; or technological, such as muon tomography (or muonography), neutron studies of the ground, etc. To carry out these purposes, particle detectors and simulations are generally needed to evaluate the scope and reliability of a given project.
-
 Meiga is a framework designed to develop astroparticle simulations and their possible applications. It is a set of classes written in C++ that connects the particle flux simulation with the response of a given detector through Geant4. The framework is designed with a hierarchical structure for data transfer and access and also provides an interface for the user to configure the parameters of the simulation or detector design.
 
 # Installation
