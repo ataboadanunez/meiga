@@ -53,6 +53,22 @@ Before installing Meiga, be sure that Geant4 and the DATA packages are correctly
 
 # Framework Structure
 
+The Meiga framework has a hierarchical structure that allows easy data access. 
+
+
+- Event:\
+The _Event_ is at the top of the structure and is used as a main vehicle for data flowing. In this sense, an _Event_ object is often passed as argument of the functions in the framework in such a way that data can be accessed to in any part of the code.
+- Detector:\
+The _Detector_ class provides an iterface to the _Event_ from which de detector description can be read. It contains the necessary methods for setting the detector properties and the functions to read these properties from configuration files, i.e., the conection between User and Geant4.
+- SimData:\
+Data from simulation is stored in the class _SimData_. This class has a hierarchical strcuture itself  for accessing data at different levels, for example, energy deposition of particles in a detector (_DetectorSimData_) or signal produced in a given optical sensor (_OptDeviceSimData_).
+
+An example of how data can be accessed would be:\
+`double len = theEvent.GetDetector().GetBarLength();`\
+returns the length of a bar in a scintillator detector and\
+`vector<double> Edep = theEvent.GetSimData().GetDetectorSimData().GetEnergyDeposited();`\
+returns the energy deposited of particles in a given detector.
+
 # Input flux
 
 # Example Applications
