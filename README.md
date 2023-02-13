@@ -76,8 +76,9 @@ returns the energy deposited of particles in that particular detector.
 - G4Models:\
 Everything related to the Geant4 _DetectorConstruction_ which can be described in a general way independently of any application is stored in the _G4Models_. For example, definition of materials, compounds and their physical properties but also detectors are described as independent classes within _G4Models_. 
 
-[![Workflow](src/Documentation/workflow.png)]
+The strcuture and workflow of the Meiga framework is shown in the diagram below. The _Meiga_ classes are represented in green while external packages (Geant4 and generators of input farticles) are represented in blue. The gray area shows the workflow of an _Application_. Arrows indicate the flow of information and whether a process is done automatically or can be configurable / done by the user.
 
+![Workflow](src/Documentation/workflow.png)*Structure of the Meiga framework*
 
 # Input flux
 
