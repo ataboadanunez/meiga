@@ -1,5 +1,6 @@
 # meiga
-Simulations Framework for Astroparticle Physics and Applications
+
+![Cover](src/Documentation/wcd.png)
 
 # Introduction
 Meiga is a framework designed to develop astroparticle simulations and their possible applications. It is a set of classes written in C++ that connects the particle flux simulation with the response of a given detector through Geant4. The framework is designed with a hierarchical structure for data transfer and access and also provides an interface for the user to configure the parameters of the simulation or detector design.
