@@ -98,6 +98,12 @@ returns the energy deposited of particles in that particular detector.
 - G4Models:\
 Everything related to the Geant4 _DetectorConstruction_ which can be described in a general way independently of any application is stored in the _G4Models_. For example, definition of materials, compounds and their physical properties but also detectors are described as independent classes within _G4Models_. 
 
+- IO:\
+Contains all functions related to the handling of Input/Output. 
+
+- Utilities:\
+Contains functions and classes which are used by the rest of the framework. Examples are `Geometry` or the `Particle` class.
+
 The strcuture and workflow of the Meiga framework is shown in the diagram below. The _Meiga_ classes are represented in green while external packages (Geant4 and generators of input farticles) are represented in blue. The gray area shows the workflow of an _Application_. Arrows indicate the flow of information and whether a process is done automatically or can be configurable / done by the user.
 
 ![Workflow](src/Documentation/workflow.png)*Structure of the Meiga framework*
@@ -114,8 +120,26 @@ The flux of galactic cosmic rays is given by
 ```math
 \Phi(E_{p}, Z, A, \Omega) = j_{0}(Z, A) \left( \frac{E_{p}}{E_{0}}\right)^{\alpha(E_{p}, Z, A)}, 
 ``` 
-where $`E_{p}`$ is the energy of the primary cosmic ray of atomic number _Z_ and mass number _A_, $`\Omega`$ is the solid angle, $`j_{0}`$ is a normalization parameter, and $`E_0 = 10^3~\mathrm{GeV}`$. The spectral index $`alpha`$ is consider independent of the primary energy for a wide range of energies.
+where $`E_{p}`$ is the energy of the primary cosmic ray of atomic number _Z_ and mass number _A_, $`\Omega`$ is the solid angle, $`j_{0}`$ is a normalization parameter, and $`E_0 = 10^3~\mathrm{GeV}`$. The spectral index $`\alpha`$ is consider independent of the primary energy for a wide range of energies ($`10^{11}~\mathrm{eV} - 10^{15}~\mathrm{eV}`$). As charged particles are affected by the geomagnetic field, ARTI uses the coordinates of the logal geomagnetic field, $`B_x`$ and $`B_z`$, as well as the altitude of the observation level to obtain an accurate estimation of the flux of particles at any desired site. 
 
+The information of the particle flux computed by ARTI is given in an ASCII file where each line represents one particle, and 12 columns with information about the particle ID, particle momentum, angular coordinates and information about its primary cosmic ray. An example is given in the following table:
+
+
+```bash
+# # # shw
+# # CURVED mode is ENABLED and observation level is 956 m a.s.l.
+# # This is the Secondaries file - ARTI     v1r0
+# # 12 column format is:
+# # CorsikaId px py pz x y z shower_id prm_id prm_energy prm_theta prm_phi
+0005 -1.67029e+00 +2.52492e-01 +3.79519e+00 -2.26858e+03 -3.77545e+03 +9.54478e+02 00000001 0703 +1.41286e+02 +22.098 +149.536
+0005 -3.17177e-02 -1.21972e-02 +3.47233e-01 +2.36552e+03 -3.25636e+03 +9.54729e+02 00000001 0703 +1.41286e+02 +22.098 +149.536
+0005 +1.10976e+00 +1.52449e+00 +1.55494e+00 -1.53852e+02 -1.22788e+03 +9.55880e+02 00000002 0703 +1.27323e+02 +50.622 +056.129
+0006 +8.61081e-01 +1.60220e+00 +1.40590e+00 -3.54074e+03 +9.62486e+01 +9.55016e+02 00000002 0703 +1.27323e+02 +50.622 +056.129
+0005 +1.50211e-01 +2.97882e-01 +4.45445e-01 -6.19894e+03 -5.66025e+03 +9.50471e+02 00000002 0703 +1.27323e+02 +50.622 +056.129
+0001 +4.46898e-05 -3.83559e-05 +1.19358e-04 +5.39763e+00 -4.13637e+03 +9.54657e+02 00000003 0703 +1.47967e+02 +52.981 -063.175
+0001 +2.24420e-03 -3.83343e-03 +3.06014e-03 +8.78293e+02 -4.82531e+03 +9.54113e+02 00000003 0703 +1.47967e+02 +52.981 -063.175
+```
+where particles are given by their [CORSIKA](https://www.iap.kit.edu/corsika/) ID, and the momentum is given in units of GeV. This is the information needed by Meiga to know which particle and how to propagate it (energy and direction). The `FillParticleVector` function loads this information in the `Particle` vector. 
 
 ### The EcoMug input
 
