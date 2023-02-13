@@ -63,11 +63,21 @@ The _Detector_ class provides an iterface to the _Event_ from which de detector 
 - SimData:\
 Data from simulation is stored in the class _SimData_. This class has a hierarchical strcuture itself  for accessing data at different levels, for example, energy deposition of particles in a detector (_DetectorSimData_) or signal produced in a given optical sensor (_OptDeviceSimData_).
 
-An example of how data can be accessed would be:\
-`double len = theEvent.GetDetector().GetBarLength();`\
-returns the length of a bar in a scintillator detector and\
-`vector<double> Edep = theEvent.GetSimData().GetDetectorSimData().GetEnergyDeposited();`\
-returns the energy deposited of particles in a given detector.
+An example of how data can be accessed would be:
+
+`double len = theEvent.GetDetector(detId).GetBarLength();`
+
+returns the length of a scintillator bar of a given detector with id `detId`.
+
+`vector<double> Edep = theEvent.GetSimData().GetDetectorSimData(detId).GetEnergyDeposited();`
+
+returns the energy deposited of particles in that particular detector.
+
+- G4Models:\
+Everything related to the Geant4 _DetectorConstruction_ which can be described in a general way independently of any application is stored in the _G4Models_. For example, definition of materials, compounds and their physical properties but also detectors are described as independent classes within _G4Models_. 
+
+[![Workflow](src/Documentation/workflow.png)]
+
 
 # Input flux
 
