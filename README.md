@@ -1,7 +1,19 @@
 # meiga
 
 ![Cover](src/Documentation/wcd.png)
-[[_TOC_]]
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+<br />
+  <ol>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#getting-started">Getting started</a></li>
+    <li><a href="#framework-structure">Framework structure</a></li>
+    <li><a href="#input-flux">Input flux</a></li>
+    <li><a href="#applications">Applications</a></li>
+  </ol>
+</details>
+
 # Introduction
 Meiga is a framework designed to develop astroparticle simulations and their possible applications. It is a set of classes written in C++ that connects the particle flux simulation with the response of a given detector through Geant4. The framework is designed with a hierarchical structure for data transfer and access and also provides an interface for the user to configure the parameters of the simulation or detector design.
 
@@ -69,7 +81,7 @@ cmake -DCMAKE_INSTALL_PREFIX=../install ../src
 make -jN; make install;
 ```
 
-# Framework Structure
+# Framework structure
 
 The Meiga framework has a hierarchical structure that allows easy data access. 
 
@@ -146,4 +158,4 @@ where particles are given by their [CORSIKA](https://www.iap.kit.edu/corsika/) I
 
 One of the original purposes of the Meiga framework was to perform simulations for Muography. For this reason, we have incorporated the [EcoMug](https://github.com/dr4kan/EcoMug/tree/main) library to generate samples of atmospheric muons without the need of an input file. It is a simple header file included in the `Utilities` and its functions for generating the muon energy and position distributions are properly integrated within the framework.
 
-# Example Applications
+# Applications
