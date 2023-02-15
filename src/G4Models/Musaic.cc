@@ -41,11 +41,13 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	const G4double fCasingThickness = detector.GetCasingThickness() * CLHEP::mm;
 	
 	// scintillator bar properties
-	const G4double fBarWidth  = detector.GetBarWidth();
-	const G4double fBarLength = detector.GetBarLength();
-	const G4double fBarThickness = detector.GetBarThickness();
+#warning "Bar size parameters are fixed for this detector"
+	const G4double fBarWidth  = 41*CLHEP::mm;
+	const G4double fBarLength = 82*CLHEP::mm;
+	const G4double fBarThickness = 10*CLHEP::mm;
 	const G4double fCoatingThickness = detector.GetBarCoatingThickness();
-
+	const G4int  nBars = 2;
+	
 	// fiber properties
 	const G4double fCladdingThickness = detector.GetCladdingThickness();
 	const G4double fFiberRadius = detector.GetFiberRadius();
@@ -65,7 +67,6 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	auto pos = detector.GetDetectorPosition();
 	auto  detectorPos = Geometry::ToG4Vector(pos, 1.);
 	const G4int  detectorId = detector.GetId();
-	const G4int  nBars = detector.GetNBars();
 
 	ostringstream namedetector;
 	namedetector.str("");
