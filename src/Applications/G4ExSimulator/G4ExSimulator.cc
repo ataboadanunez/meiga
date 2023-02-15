@@ -221,6 +221,10 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	if (cfg.fTrajVis) {
 		fUImanager->ApplyCommand("/tracking/storeTrajectory 1");
 		fUImanager->ApplyCommand("/vis/scene/add/trajectories");
+		fUImanager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");
+		// for debugging purposes, gammas are not drawn
+		fUImanager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
+		fUImanager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
 	}
 	
 
