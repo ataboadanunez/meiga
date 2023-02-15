@@ -133,7 +133,7 @@ The flux of galactic cosmic rays is given by
 ```math
 \Phi(E_{p}, Z, A, \Omega) = j_{0}(Z, A) \left( \frac{E_{p}}{E_{0}}\right)^{\alpha(E_{p}, Z, A)}, 
 ``` 
-where $`E_{p}`$ is the energy of the primary cosmic ray of atomic number _Z_ and mass number _A_, $`\Omega`$ is the solid angle, $`j_{0}`$ is a normalization parameter, and $`E_0 = 10^3~\mathrm{GeV}`$. The spectral index $`\alpha`$ is consider independent of the primary energy for a wide range of energies ($`10^{11}~\mathrm{eV} - 10^{15}~\mathrm{eV}`$). As charged particles are affected by the geomagnetic field, ARTI uses the coordinates of the logal geomagnetic field, $`B_x`$ and $`B_z`$, as well as the altitude of the observation level to obtain an accurate estimation of the flux of particles at any desired site. 
+where $E_{p}$ is the energy of the primary cosmic ray of atomic number _Z_ and mass number _A_, $\Omega$ is the solid angle, $j_{0}$ is a normalization parameter, and $E_0 = 10^3~\mathrm{GeV}$. The spectral index $\alpha$ is consider independent of the primary energy for a wide range of energies ($10^{11} \ \mathrm{eV}$ to $10^{15} \ \mathrm{eV}$). As charged particles are affected by the geomagnetic field, ARTI uses the coordinates of the logal geomagnetic field, $B_x$ and $B_z$, as well as the altitude of the observation level to obtain an accurate estimation of the flux of particles at any desired site. 
 
 The information of the particle flux computed by ARTI is given in an ASCII file where each line represents one particle, and 12 columns with information about the particle ID, particle momentum, angular coordinates and information about its primary cosmic ray. An example is given in the following table:
 
