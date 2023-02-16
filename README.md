@@ -85,7 +85,7 @@ To run an example application go to `build/Applications/G4ExSimulator` and type:
 ```bash
 ./G4ExSimulator -c G4ExSimulator.json
 ``` 
-The usage of configuration files will be addressed in the [Applications](#Applications) section.
+The usage of configuration files will be addressed in the [Applications](#applications) section.
 
 # Framework structure
 
@@ -165,3 +165,110 @@ where particles are given by their [CORSIKA](https://www.iap.kit.edu/corsika/) I
 One of the original purposes of the Meiga framework was to perform simulations for Muography. For this reason, we have incorporated the [EcoMug](https://github.com/dr4kan/EcoMug/tree/main) library to generate samples of atmospheric muons without the need of an input file. It is a simple header file included in the `Utilities` and its functions for generating the muon energy and position distributions are properly integrated within the framework.
 
 # Applications
+
+The structure of classes and functionalities mentioned in  the [Framework structure](#framework-structure) section represent the base of the Meiga framework. The
+simulation task is integrated into what is called
+_Applications_, where each application is composed of three sequential methods
+that read the configuration, run the simulation, and write the output files, respectively:
+
+- `Initialize`:
+  Is called at the beginning of the execution and is used to set up and load information to the `Event` object. It reads the configuration (JSON) file with information about the input type, detector information, simulation and output settings.  
+- `RunSimulation`:
+  Invokes the Geant4 classes for running the simulation based on the configuration given previously. Each particle is injected _one-by-one_, i.e., represents a `G4Run` and a `G4Event`, meaning that when Geant4 stops propagating a particle, the next particle in the loop is injected. In this sense, simulation data is stored _particle-by-particle_.
+- `WriteInfo`:
+  Once the Geant4 simulation ends, this method is called and the output of the simulation is dumped into a JSON file, storing the detector signals produced by each particle in an format easy to read. 
+
+All the relevant information of an application is located in the `main()` function where all the classes and functions are linked. After compilation, an executable is created and is run by typing:
+```bash
+./executable -c configuration.json
+```
+where `configuration.json` is the configuration file modified by the user.
+
+### The Configuration.json file
+
+The configuration settings are written in a JSON file like the example below:
+
+```json 
+{
+  "Input" :
+  {
+    "Mode" : "UseARTI",
+    "InputFileName" : "./input.shw",
+    "InputNParticles" : 0
+  },
+  "Output" : 
+  {
+    "OutputFile" : "./output.json",
+    "CompressOutput" : true,
+    "SavePETimeDistribution" : false,
+    "SaveComponentsPETimeDistribution" : false,
+    "SaveTraces" : false,
+    "SaveEnergy" : false,
+    "SaveComponentsEnergy" : false
+  },
+  "DetectorList" : "./DetectorList.xml",
+  "DetectorProperties" : "./DetectorProperties.xml",
+  "Simulation" :
+  {
+    "SimulationMode" : "eFull",
+    "InjectionMode" : "eRandom",
+    "GeoVisOn" : true,
+    "TrajVisOn" : false,
+    "CheckOverlaps" : false,
+    "Verbosity" : 1,
+    "RenderFile" : "VRML2FILE",
+    "PhysicsName" : "QGSP_BERT_HP"
+  }
+}
+
+```
+
+- `Mode`: can be `UseARTI` or `UseEcoMug` for selecting between the two input types (see [Input flux](#input-flux)).
+- `InputFileName`: path to input file in case `UseARTI` is chosen.
+- `InputNParticles`: number of *muons* to be injected in case `UseEcoMug` is chosen.
+- `OutputFile`: path to the output file.
+- `CompressOutput`: if `True`, a `.tar.gz` with the output will be generated.
+- `SavePETimeDistribution`: save photo-electron time distributions for each injected particle.
+- `SaveComponentsPETimeDistribution`: save photo-electron time distributions by particle component (electromagnetic, muons, hadrons).
+- `SaveTraces`: save analog time traces in the detector.
+- `SaveEnergy`: save energy deposits in the detector.
+- `SaveComponentsEnergy`: save energy deposits in the detector by particle component.
+- `DetectorList`: path to the detector list file.
+- `DetectorProperties`: path to file with the default detector properties.
+- `SimulationMode`: `eFull` by default. Some applications allow `eFast` for fast simulation (e.g., kill secondary particles). Must be implemented by the user in the _G4UserAction_ class(es). 
+- `GeoVisOn` and `TrajVisOn`: if `True`, a render file with geometry (and particle trajectories) of the detector is generated.
+- `CheckOverlaps`: if `True` detects overlaps between detector volumes.
+- `Verbosity`: level of Geant4 verbosity output.
+- `RenderFile`: type of render file. For now, only .wrl files are allowed.
+- `PhysicsName`: name of the physics list.
+
+### Detector configuration
+
+
+
+```XML
+<?xml version='1.0' encoding='ISO-8859-1'?>
+
+<detectorList>
+  
+  <injectionMode type="eCircle">
+    <!-- injection parameters -->
+    <x unit="m"> 0 </x>
+    <y unit="m"> 0 </y>
+    <z unit="m"> 1 </z>
+    <radius unit="m"> 1 </radius>
+    <height unit="m"> 1.5 </height>
+  </injectionMode>
+
+  <detector id="0" type="eScintillator">
+    <x unit="cm"> 0.0 </x>
+    <y unit="cm"> 0.0 </y>
+    <z unit="cm"> 0.0 </z>
+    <barWidth unit="cm"> 4 </barWidth>
+    <barThickness unit="cm"> 1 </barThickness>
+    <barLength unit="cm"> 32 </barLength>
+    <numberOfBars> 4 </numberOfBars>
+  </detector>
+
+</detectorList>
+```
