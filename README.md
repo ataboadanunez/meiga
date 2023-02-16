@@ -80,6 +80,12 @@ cmake -DCMAKE_INSTALL_PREFIX=../install ../src
 ```bash
 make -jN; make install;
 ```
+5. The applications will be built in the `build/Applications` directory where the executables are located.
+To run an example application go to `build/Applications/G4ExSimulator` and type:
+```bash
+./G4ExSimulator -c G4ExSimulator.json
+``` 
+The usage of configuration files will be addressed in the [Applications](#Applications) section.
 
 # Framework structure
 
