@@ -23,7 +23,7 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 
 	SimData& simData = theEvent.GetSimData();
 	// input
-	cfg.fInputMode = tree.get<string>("Input.Mode");
+	cfg.fInputMode = tree.get<string>("Input.Mode", "UseARTI");
 	simData.SetInputMode(simData.InputModeConversion(cfg.fInputMode));
 	cfg.fInputFileName = tree.get<string>("Input.InputFileName");
 	cfg.fInputNParticles = tree.get<unsigned int>("Input.InputNParticles");
@@ -39,29 +39,29 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 		ParticleFiller::FillParticleVector(cfg.fInputNParticles, theEvent);
 	}
 		
-	cfg.fDetectorList  = tree.get<string>("DetectorList");
-	cfg.fDetectorProperties = tree.get<string>("DetectorProperties");
+	cfg.fDetectorList  = tree.get<string>("DetectorList", "./DetectorList.xml");
+	cfg.fDetectorProperties = tree.get<string>("DetectorProperties", "./DetectorProperties.xml");
 	defProp.SetDefaultProperties(cfg.fDetectorProperties);
 
-	cfg.fSimulationMode = tree.get<string>("Simulation.SimulationMode");
+	cfg.fSimulationMode = tree.get<string>("Simulation.SimulationMode", "eFull");
 	simData.SetSimulationMode(simData.SimulationModeConversion(cfg.fSimulationMode));
-	// cfg.fInjectionMode  = tree.get<string>("Simulation.InjectionMode");
-	// simData.SetInjectionMode(simData.InjectionConversion(cfg.fInjectionMode));
-	cfg.fGeoVis  = tree.get<bool>("Simulation.GeoVisOn");
-	cfg.fTrajVis = tree.get<bool>("Simulation.TrajVisOn");
-	cfg.fCheckOverlaps = tree.get<bool>("Simulation.CheckOverlaps");
-	cfg.fRenderFile = tree.get<string>("Simulation.RenderFile");
-	cfg.fPhysicsListName = tree.get<string>("Simulation.PhysicsName");
-	cfg.fVerbosity = tree.get<int>("Simulation.Verbosity");
+	
+	cfg.fGeoVis  = tree.get<bool>("Simulation.GeoVisOn", false);
+	cfg.fTrajVis = tree.get<bool>("Simulation.TrajVisOn", false);
+	cfg.fCheckOverlaps = tree.get<bool>("Simulation.CheckOverlaps", false);
+	cfg.fRenderFile = tree.get<string>("Simulation.RenderFile", "VRML2FILE");
+	cfg.fPhysicsListName = tree.get<string>("Simulation.PhysicsName", "QGSP_BERT_HP");
+	cfg.fVerbosity = tree.get<int>("Simulation.Verbosity", 1);
 
 	cfg.fOutputFileName = tree.get<string>("Output.OutputFile");
 	simData.SetOutputFileName(cfg.fOutputFileName);
-	cfg.fCompressOutput = tree.get<bool>("Output.CompressOutput");
-	cfg.fSavePETimeDistribution = tree.get<bool>("Output.SavePETimeDistribution");
-	cfg.fSaveComponentsPETimeDistribution = tree.get<bool>("Output.SaveComponentsPETimeDistribution");
-	cfg.fSaveTraces     = tree.get<bool>("Output.SaveTraces");
-	cfg.fSaveEnergy     = tree.get<bool>("Output.SaveEnergy");
-	cfg.fSaveComponentsEnergy = tree.get<bool>("Output.SaveComponentsEnergy");
+	cfg.fCompressOutput = tree.get<bool>("Output.CompressOutput", true);
+	cfg.fSaveInput = tree.get<bool>("Output.SaveInput", false);
+	cfg.fSavePETimeDistribution = tree.get<bool>("Output.SavePETimeDistribution", false);
+	cfg.fSaveComponentsPETimeDistribution = tree.get<bool>("Output.SaveComponentsPETimeDistribution", false);
+	cfg.fSaveTraces     = tree.get<bool>("Output.SaveTraces", false);
+	cfg.fSaveEnergy     = tree.get<bool>("Output.SaveEnergy", false);
+	cfg.fSaveComponentsEnergy = tree.get<bool>("Output.SaveComponentsEnergy", false);
 
 	return theEvent;
 
@@ -220,6 +220,7 @@ ConfigManager::PrintConfig(const Event::Config &cfg)
 
 	cout << " ------------- Output -------------" << endl;
 	cout << "OutputFile = " << cfg.fOutputFileName << endl;
+	cout << "Save Input = " << (cfg.fSaveInput ? "yes" : "no") << endl;
 	cout << "Save PE Time distribution (components) = " << (cfg.fSavePETimeDistribution ? "yes" : "no") << " (" << (cfg.fSaveComponentsPETimeDistribution ? "yes)" : "no)") << endl;
 	cout << "Compress Output = " << (cfg.fCompressOutput ? "yes" : "no") << endl;
 	cout << "Save Traces = " << (cfg.fSaveTraces ? "yes" : "no") << endl;

@@ -74,6 +74,7 @@ class Event
 		// output variables
 		std::string fOutputFileName;
 		bool fCompressOutput;
+		bool fSaveInput;
 		bool fSavePETimeDistribution;
 		bool fSaveComponentsPETimeDistribution;
 		bool fSaveTraces;
