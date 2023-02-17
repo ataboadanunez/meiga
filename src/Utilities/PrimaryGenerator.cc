@@ -204,6 +204,16 @@ PrimaryGenerator::GeneratePrimaryParticle()
 			}
 			break;
 
+			case SimData::InjectionMode::eVertical:
+			{
+				
+				vector<double> injectionOrigin = simData.GetInjectionOrigin();
+				x0 = injectionOrigin[0];
+				y0 = injectionOrigin[1];
+				z0 = injectionOrigin[2]; 
+			}
+			break;
+
 			case SimData::InjectionMode::eUnknown:
 			{
 
