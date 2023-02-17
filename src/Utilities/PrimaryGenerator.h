@@ -7,7 +7,7 @@
 
 class PrimaryGenerator
 {
-
+	
 public:
 	PrimaryGenerator(Event& theEvent);
 	virtual ~PrimaryGenerator();
@@ -16,7 +16,7 @@ public:
 
 private:
 
-	
+	void ComputeInjectionPosition(SimData &simData, std::vector<double> &particlePosition);
 
 	std::vector<double> fParticlePosition;
 	std::vector<double> fParticleDirection;
