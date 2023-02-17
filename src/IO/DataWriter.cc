@@ -45,6 +45,17 @@ DataWriter::FileWriter(Event& theEvent)
 	json jData;
 
 	SimData& simData = theEvent.GetSimData();
+	
+	if (cfg.fSaveInput && (simData.GetInputMode() != SimData::InputMode::eUseEcoMug)) {
+		/*
+			Option only available if input file is given.
+			When using EcoMug, information about injected particle
+			is not stored in the ParticleVector but in currentParticle object.
+			SaveInputFlux reads information from ParticleVector.
+		*/
+		SaveInputFlux(jData, simData);	
+	}
+	
 
 	// loop over detector range
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
@@ -66,8 +77,6 @@ DataWriter::FileWriter(Event& theEvent)
 		if (cfg.fSaveEnergy)
 			SaveEnergy(jData, simData, detId, cfg.fSaveComponentsEnergy);
 		
-
-
 		const int nOptDev = currDet.GetNOptDevice();
 		cout << "[INFO] DataWriter::FileWriter: Detector ID: " << detId << " has " << nOptDev << " optical device(s)" << endl; 
 
@@ -124,6 +133,26 @@ DataWriter::FileWriter(Event& theEvent)
 		outfile << jData;
 	}
 	
+}
+
+void
+DataWriter::SaveInputFlux(json &jData, SimData& simData)
+{
+	vector<json> jParticles;
+
+	for (auto pIt = simData.GetParticleVector().begin(); pIt != simData.GetParticleVector().end(); ++pIt) {
+		json myCurrentParticle;
+		Particle &part = *pIt;
+
+		myCurrentParticle["ID"] = part.GetParticleId();
+		myCurrentParticle["Position"] = part.GetPosition();
+		myCurrentParticle["Momentum"] = part.GetMomentumDirection();
+
+		jParticles.push_back(myCurrentParticle);
+
+	}
+
+	jData["InputFlux"] = jParticles;
 }
 
 
