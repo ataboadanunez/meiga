@@ -2,6 +2,7 @@
 // Meiga headers
 #include "Scintillator.h"
 #include "Geometry.h"
+#include "G4MDetectorAction.h"
 
 // Geant4 headers
 #include "G4VisAttributes.hh"
@@ -53,7 +54,7 @@ Scintillator::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Even
 	G4int fNBars = detector.GetNBars();
 	G4double fHalfWidth = 0.5*fBarWidth*fNBars; 
 
-	//G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
+	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
 	
 	// Bars: Coating + Scintillator bar
 	solidCoating  	= new G4Box("BarCoating", 0.5*fBarLength + fCoatingThickness, 0.5*fBarWidth + fCoatingThickness, 0.5*fBarThickness + fCoatingThickness);
@@ -61,6 +62,9 @@ Scintillator::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Even
 	// register Bar coating as a LogicalSkinSurface
 	new G4LogicalSkinSurface("BarCoating", logicCoating, Materials().ScinOptSurf);
 
+	// logical volumes
+	logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, "BarCoating", 0, 0, 0);
+	logicScinBar = new G4LogicalVolume(solidScinBar, Materials().ScinPlastic, "BarScin", 0, 0, 0);
 
 	// bars placement
 	for (G4int i=0; i<fNBars; ++i) {
@@ -77,9 +81,7 @@ Scintillator::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Even
 		// shift each bar position by 1/2 of the panel width to center the detector
 		yPos -= fHalfWidth;
 
-		// logical volumes
-		logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
-		logicScinBar = new G4LogicalVolume(solidScinBar, Materials().ScinPlastic, nameScinBar, 0, 0, 0);
+		
 
 		// physical volumes
 		new G4PVPlacement(nullptr, G4ThreeVector(detectorPos.getX(), yPos, detectorPos.getZ()), logicCoating, 
@@ -87,7 +89,13 @@ Scintillator::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Even
 		new G4PVPlacement(nullptr, G4ThreeVector(), logicScinBar, 
 			nameScinBar, logicCoating, false, barId, fCheckOverlaps);
 
-		
   }
+
+  // register scintillator bar as sensitive detector
+	G4MDetectorAction* const scinSD = new G4MDetectorAction("BarScin", detectorId, theEvent);
+	sdMan->AddNewDetector(scinSD);
+	logicScinBar->SetSensitiveDetector(scinSD);
+
+  
 
 }
