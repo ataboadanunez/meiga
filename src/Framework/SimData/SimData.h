@@ -47,6 +47,10 @@ class SimData
 		Particle& GetCurrentParticle() { return fCurrentParticle; }
 		void SetCurrentParticle(Particle particle) { fCurrentParticle = particle; }
 
+		typedef std::vector<Particle> InjectedParticleVector;
+		ParticleVector& GetInjectedParticleVector() { return fInjectedParticles; }
+		void InsertInjectedParticle(Particle& particle) { fInjectedParticles.push_back(particle); }
+
 		// Input mode
 		InputMode InputModeConversion(std::string name);
 		void SetInputMode(const InputMode inpMode) { fInputMode = inpMode; }
@@ -144,6 +148,7 @@ class SimData
 	private:
 
 		ParticleVector fParticles;
+		ParticleVector fInjectedParticles;
 		Particle fCurrentParticle;
 		unsigned int fTotalNumberOfParticles = 0;
 
