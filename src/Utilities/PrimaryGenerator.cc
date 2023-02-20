@@ -18,7 +18,9 @@ PrimaryGenerator::PrimaryGenerator(Event& theEvent) :
 	SimData &simData = fEvent.GetSimData();
 	injMode = simData.GetInjectionMode();
 	fUseEcoMug = (simData.GetInputMode() == simData.InputMode::eUseEcoMug);
-	
+	Event::Config &cfg = fEvent.GetConfig();
+	fSaveInput = cfg.fSaveInput;
+	cout << "[INFO] PrimaryGenerator::PrimaryGenerator: SaveInput = " << (fSaveInput ? "yes" : "no") << endl;
 	// initialize EcoMug generator in case is needed: only muons or HalfSphere generation
 	if (fUseEcoMug) {
 		// print info
@@ -126,8 +128,6 @@ PrimaryGenerator::GeneratePrimaryParticle()
 		currentParticle.SetParticleId(fParticleId);
 		currentParticle.SetMomentum(pTot);
 
-
-		return;
 	}
 
 	// if not EcoMug, use ARTI (ASCII) file as input
@@ -160,10 +160,15 @@ PrimaryGenerator::GeneratePrimaryParticle()
 
 		ComputeInjectionPosition(simData, fParticlePosition);
 		currentParticle.SetPosition(fParticlePosition);
-
-		return;
 	}
 
+	if (fSaveInput) {
+		// save particle information
+		simData.InsertInjectedParticle(currentParticle);
+	}
+
+
+	return;
 }
 
 void 

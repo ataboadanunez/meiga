@@ -26,6 +26,7 @@ private:
 	// for muon generator using EcoMug
 	EcoMug fMuonGen;
 	bool fUseEcoMug;
+	bool fSaveInput;
 	
 	Event& fEvent;
 

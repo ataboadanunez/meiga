@@ -46,13 +46,8 @@ DataWriter::FileWriter(Event& theEvent)
 
 	SimData& simData = theEvent.GetSimData();
 	
-	if (cfg.fSaveInput && (simData.GetInputMode() != SimData::InputMode::eUseEcoMug)) {
-		/*
-			Option only available if input file is given.
-			When using EcoMug, information about injected particle
-			is not stored in the ParticleVector but in currentParticle object.
-			SaveInputFlux reads information from ParticleVector.
-		*/
+	if (cfg.fSaveInput) {
+		cout << "[DEBUG] DataWriter::FileWriter: Saving input flux information!" << endl;
 		SaveInputFlux(jData, simData);	
 	}
 	
@@ -140,7 +135,7 @@ DataWriter::SaveInputFlux(json &jData, SimData& simData)
 {
 	vector<json> jParticles;
 
-	for (auto pIt = simData.GetParticleVector().begin(); pIt != simData.GetParticleVector().end(); ++pIt) {
+	for (auto pIt = simData.GetInjectedParticleVector().begin(); pIt != simData.GetInjectedParticleVector().end(); ++pIt) {
 		json myCurrentParticle;
 		Particle &part = *pIt;
 
