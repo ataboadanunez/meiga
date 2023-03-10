@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # Python code to read Meiga output
 import json
 import gzip
@@ -75,6 +76,11 @@ def main():
 	saveEnergy = outputcfg.get('SaveEnergy')
 	saveComponentsEnergy = outputcfg.get('SaveComponentsEnergy')
 
+	# this is redundant so keep PETimeDistribution flag False if Components was True
+	if saveComponentsPETimeDistribution:
+		savePETimeDistribution = False
+
+	print("\n")
 	print("[INFO] Reading output file: %s" %ifile)
 	# check if file is compressed
 	if compressOutput:
@@ -192,8 +198,6 @@ def main():
 		for keyoptdev in optdevices:
 			# this returns a list where each element is the PETimeDistribution of each injected particle
 			peTimeDistributions = data[keyoptdev][0][key]
-			# length of the list should match the number of events
-			assert(len(peTimeDistributions) == nEvents)
 
 			# compute charge as count of PE
 			for peTimeDisti in peTimeDistributions:
@@ -213,6 +217,54 @@ def main():
 			plt.ylabel(r'Counts')
 			plt.legend(loc='upper right')
 			plt.title('%s' %key)
+
+	if saveComponentsPETimeDistribution:
+		print("-------------- Signals --------------")
+		print("[INFO] Reading ifnormation of optical Device(s) signals")
+		key = 'PETimeDistribution'
+		keyscomponents = ['eMuonDecay', 'eMuonic', 'eElectromagnetic', 'eHadronic']
+		optDataDict = defaultdict(list)
+		for keyoptdev in optdevices:
+			print("[INFO] Reading signals of OpticalDevice: ", keyoptdev)
+			# this returns a dictionary where each key contains the PETimeDistributions of the corresponding particle component
+			peTimeDistributions = data[keyoptdev][0][key]
+			print("[INFO] Accessing PE timde distributions of particle components:")
+			for comp in peTimeDistributions.keys():
+				print(comp)
+
+			# number of events (input particles) is the number of MuonDecay traces
+			nEvents = len(peTimeDistributions['eMuonDecay'])
+			for event in range(nEvents):
+				optDataDict['event'].append(event)
+				
+				emtrace = peTimeDistributions['eElectromagnetic'][event] if 'eElectromagnetic' in peTimeDistributions.keys() else []
+				mutrace = peTimeDistributions['eMuonic'][event] if 'eMuonic' in peTimeDistributions.keys() else []
+				hatrace = peTimeDistributions['eHadronic'][event] if 'eHadronic' in peTimeDistributions.keys() else []
+				mudectrace = peTimeDistributions['eMuonDecay'][event] if 'eMuonDecay' in peTimeDistributions.keys() else []
+
+				optDataDict['eElectromagnetic'].append(emtrace)
+				optDataDict['eMuonic'].append(mutrace)
+				optDataDict['eHadronic'].append(hatrace)
+				optDataDict['eMuonDecay'].append(mudectrace)
+
+			# save component traces of that OpticalDevice in a DataFrame
+			traces_df = pd.DataFrame(optDataDict)
+			# plot charge histogram (charge = length of each trace)
+			chargedict = defaultdict(list)
+			fig = plt.figure()
+			plt.yscale('log')
+			plt.xlabel(r'Number of photo-electrons')
+			plt.ylabel(r'Counts')
+			for comp in peTimeDistributions.keys():
+				comp_df = traces_df[comp]
+				for trace in comp_df:
+					chargedict[comp].append(len(trace))
+
+				plt.hist(chargedict[comp], bins=int(np.sqrt(nEvents)), histtype='step', lw=1.5, label='%s' %comp)
+
+			plt.legend(loc='upper right', title='Component:')
+			plt.title(r'%s of %s' %(key, keyoptdev))
+
 
 	plt.show()
 	embed()
