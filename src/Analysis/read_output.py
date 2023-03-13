@@ -70,10 +70,11 @@ def Process(options):
 	saveEnergy = outputcfg.get('SaveEnergy')
 	saveComponentsEnergy = outputcfg.get('SaveComponentsEnergy')
 
-	# this is redundant so keep PETimeDistribution flag False if SaveComponents was True
+	# redundant if saveComponents* set to True
 	if saveComponentsPETimeDistribution:
 		savePETimeDistribution = False
-
+	if saveComponentsEnergy:
+		saveEnergy = False
 
 	processedcfg = {"InputFlux" : saveInput,
 									"PETimeDistribution" : savePETimeDistribution,
@@ -105,6 +106,7 @@ def Process(options):
 	for optdev in optdevices:
 		print("%s \n" %optdev)
 
+
 	###########################################################################
 	# Data is extracted according to Output settings in configuration file
 	###########################################################################
@@ -114,7 +116,8 @@ def Process(options):
 		processedData['InputFlux'] = GetInputFlux(data)
 	if saveEnergy:
 		processedData['DepositedEnergy'] = GetDepositedEnergy(data, detectors)
-	#TODO: add saveComponentsEnergy
+	if saveComponentsEnergy:
+		processedData['ComponentsDepositedEnergy'] = GetComponentsDepositedEnergy(data, detectors)
 	if saveComponentsPETimeDistribution:
 		processedData['ComponentsPETimeDistribution'] = GetComponentsTraces(data, optdevices)
 	if savePETimeDistribution:
@@ -147,6 +150,7 @@ if __name__ == "__main__":
 	
 	plotcfg = {"InputFlux" : PlotInputFlux,
 						 "DepositedEnergy" :  PlotDepositedEnergy,
+						 "ComponentsDepositedEnergy" : PlotComponentsDepositedEnergy,
 						 "PETimeDistribution" : PlotChargeHistogram,
 						 "ComponentsPETimeDistribution" : PlotComponentsChargeHistogram
 						}

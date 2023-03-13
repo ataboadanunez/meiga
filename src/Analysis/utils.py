@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 import matplotlib.pyplot as plt
-
+from IPython import embed
 components = ['eElectromagnetic', 'eHadronic', 'eMuonDecay', 'eMuonic']
 
 
@@ -89,7 +89,7 @@ def GetDepositedEnergy(data, detectors):
 	container = {}
 	for keydet in detectors:
 		print("[INFO] GetDepositedEnergy: Accessing data of Detector: %s" %keydet)
-		eDepData = np.array(data[keydet][0]['DetectorSimData'][key])
+		eDepData = np.array(data[keydet][0][key])
 		# skip particles that did not hit the detector
 		edep = eDepData[eDepData > 0]
 		container['EnergyDeposit_%s' %keydet] = edep
@@ -119,6 +119,50 @@ def PlotDepositedEnergy(df):
 		plt.title('%s' %name)
 
 	return fig
+
+def GetComponentsDepositedEnergy(data, detectors):
+	"""
+	
+	"""
+	key = 'EnergyDeposit'
+	container = {}
+	for keydet in detectors:
+		print("[INFO] GetComponentesDepositedEnergy: Accessing data of Detector: %s" %keydet)
+
+		depositedEnergy = data[keydet][0][key]
+		component_eDep = {}
+		for comp in components:
+			try:
+				component_eDep[comp] = depositedEnergy[comp]
+			except KeyError:
+				print("[WARNING] GetComponentesDepositedEnergy: Component not found in data: ", comp )
+		container[keydet] = component_eDep
+	# convert to Pandas DataFrame
+	componentsEdepDf = pd.DataFrame(container)
+	return componentsEdepDf
+
+def PlotComponentsDepositedEnergy(df):
+
+	for name in df.columns:
+		fig = plt.figure()
+		sfig = fig.add_axes([0.15, 0.11, 0.845, 0.78])
+		sfig.set_xlabel(r'Deposited Energy / MeV')
+		sfig.set_ylabel(r'Counts')
+		sfig.set_yscale('log')
+
+		for comp in components:
+			try:
+				edepcomp = df[name][comp]
+				bins = max(10, int(np.sqrt(len(edepcomp))))
+				plt.hist(edepcomp, bins, histtype='step', lw=1.5, label='%s' %comp)
+			except KeyError:
+				print("[WARNING] PlotComponentsDepositedEnergy: Component not found in data: ", comp)
+
+		plt.legend(loc='upper right', title='Component:')
+		plt.title('%s' %name)
+
+	return fig
+
 
 def GetTraces(data, optdevices):
 	print("[INFO] GetTraces: Reading information of Optical Device signals")
