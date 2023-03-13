@@ -69,7 +69,7 @@ DataWriter::FileWriter(Event& theEvent)
 		/* 
 			Detector level: access energy deposit, particle counters, etc... 
 		*/
-		if (cfg.fSaveEnergy)
+		if (cfg.fSaveEnergy || cfg.fSaveComponentsEnergy)
 			SaveEnergy(jData, simData, detId, cfg.fSaveComponentsEnergy);
 		
 		const int nOptDev = currDet.GetNOptDevice();
@@ -96,7 +96,7 @@ DataWriter::FileWriter(Event& theEvent)
 			}
 
 			// save photo-electron time distribution(s)
-			if (cfg.fSavePETimeDistribution)
+			if (cfg.fSavePETimeDistribution || cfg.fSaveComponentsPETimeDistribution)
 				SavePETimeDistribution(jData, detSimData, odId, cfg.fSaveComponentsPETimeDistribution);
 
 			// save time traces
@@ -214,7 +214,7 @@ DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId, const boo
 
 	const DetectorSimData &detSimData = simData.GetDetectorSimData(detId);
 	const vector<double> & energyDeposit = detSimData.GetEnergyDeposit();
-	jEnergyDeposit["EnergyDeposit"] = energyDeposit;
+	jEnergyDeposit = energyDeposit;
 	
 	if (saveComponents) {
 		
@@ -231,16 +231,16 @@ DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId, const boo
 		}
 
 		vector<double> energyDepositComponent = detSimData.GetEnergyDeposit(particleComponent);
-		jEnergyDepositComponent["EnergyDeposit_"+componentName] = energyDepositComponent;
+		jEnergyDepositComponent[componentName] = energyDepositComponent;
 
 		} // end loop particle components
 
-		jData["Detector_"+to_string(detId)]["DetectorSimData"] = jEnergyDepositComponent;	
+		//jData["Detector_"+to_string(detId)]["EnergyDeposit"] = jEnergyDepositComponent;	
 
 	}
 	
 
-	jData["Detector_"+to_string(detId)]["DetectorSimData"] = (saveComponents ? jEnergyDepositComponent : jEnergyDeposit);
+	jData["Detector_"+to_string(detId)]["EnergyDeposit"] = (saveComponents ? jEnergyDepositComponent : jEnergyDeposit);
 	
 
 }
