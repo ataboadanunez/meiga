@@ -2,21 +2,17 @@
 
 <detectorList>
 	
-	<injectionMode type="eCircle">
+	<injectionMode type="eVertical">
 		<!-- parametros de inyeccion -->
 		<x unit="m"> 0 </x>
 		<y unit="m"> 0 </y>
 		<z unit="m"> 1 </z>
-		<radius unit="m"> 1 </radius>
-		<height unit="m"> 1 </height>
-		<minPhi> 35 </minPhi>
 	</injectionMode>
 
 	<detector id="0" type="eScintillator">
 		<x unit="cm"> 0.0 </x>
 		<y unit="cm"> 0.0 </y>
-		<z unit="cm"> 200.0 </z>
-		<barsInPanel> 1 </barsInPanel>
+		<z unit="cm"> 0.0 </z>
 	</detector>
 
 </detectorList>

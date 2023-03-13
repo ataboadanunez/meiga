@@ -12,7 +12,6 @@
 		"CompressOutput" : true,
 		"SavePETimeDistribution" : true,
 		"SaveComponentsPETimeDistribution" : false,
-		"SaveTraces" : false,
 		"SaveEnergy" : false,
 		"SaveComponentsEnergy" : false
 	},

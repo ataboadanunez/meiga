@@ -9,9 +9,8 @@
 	{
 		"OutputFile" : "./output.json",
 		"CompressOutput" : true,
-		"SavePETimeDistribution" : false,
+		"SavePETimeDistribution" : true,
 		"SaveComponentsPETimeDistribution" : false,
-		"SaveTraces" : true,
 		"SaveEnergy" : false,
 		"SaveComponentsEnergy" : false
 	},
@@ -20,9 +19,8 @@
 	"Simulation" :
 	{
 		"SimulationMode" : "eFast",
-		"InjectionMode" : "eRandom",
-		"GeoVisOn" : false,
-		"TrajVisOn" : false,
+		"GeoVisOn" : true,
+		"TrajVisOn" : true,
 		"CheckOverlaps" : false,
 		"Verbosity" : 1,
 		"RenderFile" : "VRML2FILE",
