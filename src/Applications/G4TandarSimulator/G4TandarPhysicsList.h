@@ -1,7 +1,7 @@
-// definiton of the G4CasposoPhysicsList class
+// definiton of the G4TandarPhysicsList class
 
-#ifndef G4CasposoPhysicsList_h
-#define G4CasposoPhysicsList_h 1
+#ifndef G4TandarPhysicsList_h
+#define G4TandarPhysicsList_h 1
 
 #include "globals.hh"
 #include "G4VModularPhysicsList.hh"
@@ -14,12 +14,12 @@ class StepMax;
 class OpticalPhysics;
 
 
-class G4CasposoPhysicsList: public G4VModularPhysicsList
+class G4TandarPhysicsList: public G4VModularPhysicsList
 {
   public:
 
-	G4CasposoPhysicsList(G4String);
-	virtual ~G4CasposoPhysicsList();
+	G4TandarPhysicsList(G4String);
+	virtual ~G4TandarPhysicsList();
 
 	void SetCuts();
 	void SetCutForGamma(G4double);

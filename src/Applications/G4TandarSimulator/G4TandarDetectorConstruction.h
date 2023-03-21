@@ -1,6 +1,6 @@
-// definition of the G4CasposoDetectorConstruction class
-#ifndef G4CasposoDetectorConstruction_h
-#define G4CasposoDetectorConstruction_h 1
+// definition of the G4TandarDetectorConstruction class
+#ifndef G4TandarDetectorConstruction_h
+#define G4TandarDetectorConstruction_h 1
 
 #include "G4VUserDetectorConstruction.hh"
 #include "G4SDManager.hh"
@@ -29,11 +29,11 @@ class G4OpticalSkinSurface;
 
 // Detector construction class to define materials and geometry
 
-class G4CasposoDetectorConstruction : public G4VUserDetectorConstruction {
+class G4TandarDetectorConstruction : public G4VUserDetectorConstruction {
 	
 	public:
-		G4CasposoDetectorConstruction(Event& theEvent);
-		virtual ~G4CasposoDetectorConstruction();
+		G4TandarDetectorConstruction(Event& theEvent);
+		virtual ~G4TandarDetectorConstruction();
 		virtual G4VPhysicalVolume* Construct();
 
 	private:

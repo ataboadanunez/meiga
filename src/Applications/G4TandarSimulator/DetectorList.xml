@@ -6,7 +6,7 @@
 		<x unit="m"> 0 </x>
 		<y unit="m"> 0 </y>
 		<z unit="m"> 0 </z>
-		<radius unit="m"> 220 </radius>
+		<radius unit="m"> 200 </radius>
 		<minTheta> 60 </minTheta>
 		<maxTheta> 90 </maxTheta>
 		<minPhi> 75 </minPhi>
@@ -16,9 +16,9 @@
 	<detector id="0" type="eMudulus">
 		<x unit="m"> 0.0 </x>
 		<y unit="m"> 0.0 </y>
-		<z unit="m"> 2.0 </z>
-
-		<rotationAngle> 75 </rotationAngle>
+		<z unit="m"> -122 </z>
+		<distancePanels unit="cm"> 200 </distancePanels>
+		<rotationAngle> 70 </rotationAngle>
 
 	</detector>
 

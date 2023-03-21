@@ -1,7 +1,7 @@
-// implementation of the G4CasposoDetectorConstruction class
+// implementation of the G4TandarDetectorConstruction class
 #include <iostream>
 
-#include "G4CasposoDetectorConstruction.h"
+#include "G4TandarDetectorConstruction.h"
 #include "Materials.h"
 
 #include "G4SDManager.hh"
@@ -10,17 +10,17 @@
 using namespace std;
 
 
-G4CasposoDetectorConstruction::G4CasposoDetectorConstruction(Event& theEvent) : 
+G4TandarDetectorConstruction::G4TandarDetectorConstruction(Event& theEvent) : 
 	G4VUserDetectorConstruction(),
 	fEvent(theEvent)
 { 
 }
 
-G4CasposoDetectorConstruction::~G4CasposoDetectorConstruction() 
+G4TandarDetectorConstruction::~G4TandarDetectorConstruction() 
 	{ }
 
 G4VPhysicalVolume*
-G4CasposoDetectorConstruction::CreateDetector()
+G4TandarDetectorConstruction::CreateDetector()
 {
 
 	CreateWorld();
@@ -30,7 +30,7 @@ G4CasposoDetectorConstruction::CreateDetector()
 }
 
 void
-G4CasposoDetectorConstruction::CreateWorld()
+G4TandarDetectorConstruction::CreateWorld()
 {
 
 	// size definitions
@@ -54,9 +54,9 @@ G4CasposoDetectorConstruction::CreateWorld()
 	auto& simData = fEvent.GetSimData();
 	simData.SetGroundLength(fGroundSizeX);
 	simData.SetGroundWidth(fGroundSizeY);
-	std::cout << "[DEBUG] G4CasposoDetectorConstruction::CreateGround: GroundThickness = " << fGroundSizeZ /CLHEP::m << std::endl;
+	std::cout << "[DEBUG] G4TandarDetectorConstruction::CreateGround: GroundThickness = " << fGroundSizeZ /CLHEP::m << std::endl;
 	simData.SetGroundThickness(fGroundSizeZ);
-	std::cout << "[DEBUG] G4CasposoDetectorConstruction::SimData: GroundThickness = " << simData.GetGroundThickness() / CLHEP::m << std::endl;
+	std::cout << "[DEBUG] G4TandarDetectorConstruction::SimData: GroundThickness = " << simData.GetGroundThickness() / CLHEP::m << std::endl;
 	
 	solidGround = new G4Box("Ground", fGroundSizeX/2, fGroundSizeY/2, fGroundSizeZ/2);
 	G4VisAttributes brown(G4Colour::Brown());
@@ -149,20 +149,23 @@ G4CasposoDetectorConstruction::CreateWorld()
 
 
 void
-G4CasposoDetectorConstruction::PlaceDetector(Event& theEvent)
+G4TandarDetectorConstruction::PlaceDetector(Event& theEvent)
 {
 	
 	const Event::Config &cfg = theEvent.GetConfig();
 	// loop in detector vector
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 		auto& currentDet = detIt->second;
+		// change detector position z-coordinate w.r.t ground
+		// auto & currentDetPos = currentDet.GetDetectorPosition();
+		// currentDet.SetDetectorPosition(currentDetPos.at(0), currentDetPos.at(1), currentDetPos.at(2) - fTandarZ)
 		BuildDetector(logicWorld, currentDet, theEvent, cfg.fCheckOverlaps);
 	}
 
 }
 
 G4VPhysicalVolume* 
-G4CasposoDetectorConstruction::Construct() 
+G4TandarDetectorConstruction::Construct() 
 {
 
 	if (!physWorld) {

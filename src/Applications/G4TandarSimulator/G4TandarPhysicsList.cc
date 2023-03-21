@@ -1,5 +1,5 @@
-// implementation of the G4CasposoPhysicsList class
-#include "G4CasposoPhysicsList.h"
+// implementation of the G4TandarPhysicsList class
+#include "G4TandarPhysicsList.h"
 
 #include "G4LossTableManager.hh"
 #include "G4ProcessManager.hh"
@@ -26,7 +26,7 @@
 
 
 
-G4CasposoPhysicsList::G4CasposoPhysicsList(G4String physName) : G4VModularPhysicsList()
+G4TandarPhysicsList::G4TandarPhysicsList(G4String physName) : G4VModularPhysicsList()
 {
 		G4LossTableManager::Instance();
 
@@ -67,14 +67,14 @@ G4CasposoPhysicsList::G4CasposoPhysicsList(G4String physName) : G4VModularPhysic
 		fStepMaxProcess = new StepMax();
 }
 
-G4CasposoPhysicsList::~G4CasposoPhysicsList()
+G4TandarPhysicsList::~G4TandarPhysicsList()
 {
 		//delete fMessenger;
 		delete fStepMaxProcess;
 }
 
 void 
-G4CasposoPhysicsList::ClearPhysics()
+G4TandarPhysicsList::ClearPhysics()
 {
 	for (G4PhysConstVector::iterator p  = fPhysicsVector->begin();
 																	 p != fPhysicsVector->end(); ++p) {
@@ -84,7 +84,7 @@ G4CasposoPhysicsList::ClearPhysics()
 }
 
 void 
-G4CasposoPhysicsList::ConstructParticle()
+G4TandarPhysicsList::ConstructParticle()
 {
 	G4VModularPhysicsList::ConstructParticle();
 
@@ -107,7 +107,7 @@ G4CasposoPhysicsList::ConstructParticle()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void 
-G4CasposoPhysicsList::ConstructProcess()
+G4TandarPhysicsList::ConstructProcess()
 {
 	G4VModularPhysicsList::ConstructProcess();
 
@@ -174,7 +174,7 @@ G4CasposoPhysicsList::ConstructProcess()
 }
 
 void 
-G4CasposoPhysicsList::RemoveFromPhysicsList(const G4String& name)
+G4TandarPhysicsList::RemoveFromPhysicsList(const G4String& name)
 {
 	G4bool success = false;
 	for (G4PhysConstVector::iterator p  = fPhysicsVector->begin();
@@ -195,7 +195,7 @@ G4CasposoPhysicsList::RemoveFromPhysicsList(const G4String& name)
 }
 
 void 
-G4CasposoPhysicsList::SetAbsorption(G4bool toggle)
+G4TandarPhysicsList::SetAbsorption(G4bool toggle)
 {
  fAbsorptionOn = toggle;
  RemoveFromPhysicsList("Optical");
@@ -205,7 +205,7 @@ G4CasposoPhysicsList::SetAbsorption(G4bool toggle)
 }
 
 void 
-G4CasposoPhysicsList::SetCuts()
+G4TandarPhysicsList::SetCuts()
 {
 	if (verboseLevel >0) {
 			G4cout << "PhysicsList::SetCuts:";
@@ -223,40 +223,40 @@ G4CasposoPhysicsList::SetCuts()
 }
 
 void 
-G4CasposoPhysicsList::SetCutForGamma(G4double cut)
+G4TandarPhysicsList::SetCutForGamma(G4double cut)
 {
 	fCutForGamma = cut;
 	SetParticleCuts(fCutForGamma, G4Gamma::Gamma());
 }
 
 void 
-G4CasposoPhysicsList::SetCutForElectron(G4double cut)
+G4TandarPhysicsList::SetCutForElectron(G4double cut)
 {
 	fCutForElectron = cut;
 	SetParticleCuts(fCutForElectron, G4Electron::Electron());
 }
 
 void 
-G4CasposoPhysicsList::SetCutForPositron(G4double cut)
+G4TandarPhysicsList::SetCutForPositron(G4double cut)
 {
 	fCutForPositron = cut;
 	SetParticleCuts(fCutForPositron, G4Positron::Positron());
 }
 
 void 
-G4CasposoPhysicsList::SetStepMax(G4double step)
+G4TandarPhysicsList::SetStepMax(G4double step)
 {
 	fStepMaxProcess->SetStepMax(step);
 }
 
 StepMax* 
-G4CasposoPhysicsList::GetStepMaxProcess()
+G4TandarPhysicsList::GetStepMaxProcess()
 {
 	return fStepMaxProcess;
 }
 
 void 
-G4CasposoPhysicsList::AddStepMax()
+G4TandarPhysicsList::AddStepMax()
 {
 	// Step limitation seen as a process
 
@@ -275,14 +275,14 @@ G4CasposoPhysicsList::AddStepMax()
 
 
 void 
-G4CasposoPhysicsList::SetNbOfPhotonsCerenkov(G4int maxNumber)
+G4TandarPhysicsList::SetNbOfPhotonsCerenkov(G4int maxNumber)
 {
 	fOpticalPhysics->SetNbOfPhotonsCerenkov(maxNumber);
 }
 
 
 void 
-G4CasposoPhysicsList::SetVerbose(G4int verbose)
+G4TandarPhysicsList::SetVerbose(G4int verbose)
 {
 	fOpticalPhysics->GetCerenkovProcess()->SetVerboseLevel(verbose);
 	fOpticalPhysics->GetScintillationProcess()->SetVerboseLevel(verbose);

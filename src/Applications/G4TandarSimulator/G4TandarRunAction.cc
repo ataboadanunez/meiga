@@ -1,35 +1,35 @@
-// implementation of the G4CasposoRunAction class
+// implementation of the G4TandarRunAction class
 
 #include "G4Timer.hh"
 #include "G4Run.hh"
 #include "g4root.hh"
 #include "G4AccumulableManager.hh"
-#include "G4CasposoRunAction.h"
+#include "G4TandarRunAction.h"
 //#include "histosRun.hh"
 
 //#include <TFile.h>
 
 using namespace std;
 
-G4CasposoRunAction::G4CasposoRunAction(Event& theEvent)
+G4TandarRunAction::G4TandarRunAction(Event& theEvent)
  : G4UserRunAction(),
  fEvent(theEvent)
 {
-	G4cout << "...G4CasposoRunAction..." << G4endl;
+	G4cout << "...G4TandarRunAction..." << G4endl;
 	string fileName = theEvent.GetSimData().GetOutputFileName();
 	fOutFile = std::ofstream(fileName, ofstream::out | ofstream::app);
-	G4cout << "[DEBUG] G4CasposoRunAction: output file name = " << fileName << G4endl;
+	G4cout << "[DEBUG] G4TandarRunAction: output file name = " << fileName << G4endl;
 }
 
 
-G4CasposoRunAction::~G4CasposoRunAction()
+G4TandarRunAction::~G4TandarRunAction()
 {
 	fOutFile.close();
 }
 
 
 void 
-G4CasposoRunAction::BeginOfRunAction(const G4Run* aRun)
+G4TandarRunAction::BeginOfRunAction(const G4Run* aRun)
 {
 
 	// write header only in run = 0.
@@ -55,11 +55,11 @@ G4CasposoRunAction::BeginOfRunAction(const G4Run* aRun)
 
 
 void 
-G4CasposoRunAction::EndOfRunAction(const G4Run* aRun)
+G4TandarRunAction::EndOfRunAction(const G4Run* aRun)
 { 
 
 	// get current particle information
-	double particleMomentum = G4CasposoSimulator::currentParticle.GetMomentum();
+	double particleMomentum = G4TandarSimulator::currentParticle.GetMomentum();
 	fOutFile << particleMomentum / CLHEP::MeV << " ";
 
 	// loop PMT channels and get signal for each injected particle

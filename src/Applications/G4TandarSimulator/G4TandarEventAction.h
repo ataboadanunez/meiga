@@ -1,14 +1,14 @@
-// definition of G4CasposoEventAction class
-#ifndef G4CasposoEventAction_h 
-#define G4CasposoEventAction_h 1
+// definition of G4TandarEventAction class
+#ifndef G4TandarEventAction_h 
+#define G4TandarEventAction_h 1
 
 // Geant4 headers
 #include "G4UserEventAction.hh"
 #include "G4Event.hh"
 // Meiga headers
 #include "Event.h"
-#include "G4CasposoRunAction.h"
-#include "G4CasposoSimulator.h"
+#include "G4TandarRunAction.h"
+#include "G4TandarSimulator.h"
 // C++ headers
 #include <string>
 #include <vector>
@@ -16,18 +16,18 @@
 #include <fstream>
 #include <iostream>
 
-class G4CasposoEventAction : public G4UserEventAction
+class G4TandarEventAction : public G4UserEventAction
 {
   public:
-    G4CasposoEventAction();
-    virtual ~G4CasposoEventAction();
+    G4TandarEventAction();
+    virtual ~G4TandarEventAction();
 
     virtual void BeginOfEventAction(const G4Event *event);
     virtual void EndOfEventAction(const G4Event *event);
   
   private:
    
-  friend class G4CasposoSimulator;
+  friend class G4TandarSimulator;
 
 };
 

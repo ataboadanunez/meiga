@@ -1,5 +1,5 @@
-#ifndef G4CasposoSimulator_h
-#define G4CasposoSimulator_h 1
+#ifndef G4TandarSimulator_h
+#define G4TandarSimulator_h 1
 
 // C++ libraries
 #include <sstream>
@@ -14,12 +14,12 @@
 
 class G4RunManager;
 
-class G4CasposoSimulator 
+class G4TandarSimulator 
 {
   public:
   
-    G4CasposoSimulator();
-    virtual ~G4CasposoSimulator() {;}
+    G4TandarSimulator();
+    virtual ~G4TandarSimulator() {;}
 
     // main methods of the application
     void Initialize(Event& evt, std::string fileName);
@@ -28,7 +28,7 @@ class G4CasposoSimulator
 
     // static members 
     static Particle currentParticle;
-    static G4CasposoSimulator* fG4CasposoSimulator;
+    static G4TandarSimulator* fG4TandarSimulator;
 
     // name of configuration file
     std::string fCfgFile;
@@ -49,8 +49,8 @@ class G4CasposoSimulator
     std::string fRenderFile = "VRML2FILE";
     std::string fPhysicsName = "QGSP_BERT_HP";
 
-  	friend class G4CasposoDetectorConstructor;
-  	friend class G4CasposoPrimaryGenerator;
+  	friend class G4TandarDetectorConstructor;
+  	friend class G4TandarPrimaryGenerator;
 };
 
 #endif

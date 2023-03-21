@@ -9,14 +9,14 @@
  */
 
 // Headers of this particular application
-#include "G4CasposoSimulator.h"
-#include "G4CasposoDetectorConstruction.h"
+#include "G4TandarSimulator.h"
+#include "G4TandarDetectorConstruction.h"
 #include "G4MPrimaryGeneratorAction.h"
-#include "G4CasposoEventAction.h"
-#include "G4CasposoRunAction.h"
-#include "G4CasposoTrackingAction.h"
-#include "G4CasposoSteppingAction.h"
-#include "G4CasposoPhysicsList.h" 
+#include "G4TandarEventAction.h"
+#include "G4TandarRunAction.h"
+#include "G4TandarTrackingAction.h"
+#include "G4TandarSteppingAction.h"
+#include "G4TandarPhysicsList.h" 
 
 // Geant4 headers
 #include "FTFP_BERT.hh"
@@ -39,11 +39,11 @@
 
 using namespace std;
 
-Particle G4CasposoSimulator::currentParticle;
-G4CasposoSimulator* fG4CasposoSimulator;
+Particle G4TandarSimulator::currentParticle;
+G4TandarSimulator* fG4TandarSimulator;
 string fCfgFile;
 
-G4CasposoSimulator::G4CasposoSimulator()
+G4TandarSimulator::G4TandarSimulator()
 {
 
 }
@@ -53,7 +53,7 @@ namespace
 	void ProgramUsage() 
 	{
 		cerr << " Program Usage: " << endl;
-		cerr << " ./G4CasposoSimulator [ -c ConfigFile.json ] " << endl;
+		cerr << " ./G4TandarSimulator [ -c ConfigFile.json ] " << endl;
 	}
 
 }
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 
 	if (argc < 3) {
 		ProgramUsage();
-		throw invalid_argument("[ERROR] G4CasposoSimulator::main: A configuration file is needed!");
+		throw invalid_argument("[ERROR] G4TandarSimulator::main: A configuration file is needed!");
 	}
 
 	for (int i=1; i<argc; i=i+2) {
@@ -77,23 +77,23 @@ int main(int argc, char** argv)
 	time_t start, end;
 	time(&start);
 
-	fG4CasposoSimulator = new G4CasposoSimulator();
+	fG4TandarSimulator = new G4TandarSimulator();
 	// Create Event object
 	Event theEvent;
-	fG4CasposoSimulator->Initialize(theEvent, fCfgFile);
-	fG4CasposoSimulator->RunSimulation(theEvent);
+	fG4TandarSimulator->Initialize(theEvent, fCfgFile);
+	fG4TandarSimulator->RunSimulation(theEvent);
 	/*************************************************
 		
 		Geant4 simulation ended here!
 		What happens next is up to you =)
 
 	**************************************************/
-	fG4CasposoSimulator->WriteEventInfo(theEvent);
+	fG4TandarSimulator->WriteEventInfo(theEvent);
 	time(&end);
 	
 	// Calculating total time taken by the program.
 	double time_taken = double(end - start);
-	cout << "[INFO] G4CasposoSimulator: Time taken by program is : " << fixed
+	cout << "[INFO] G4TandarSimulator: Time taken by program is : " << fixed
 			 << time_taken << setprecision(5);
 	cout << " sec " << endl;
 
@@ -102,11 +102,11 @@ int main(int argc, char** argv)
 }
 
 void
-G4CasposoSimulator::Initialize(Event& theEvent, string cfgFile)
+G4TandarSimulator::Initialize(Event& theEvent, string cfgFile)
 {
 
-	cout << "[INFO] G4CasposoSimulator::Initialize" << endl;
-	cout << "[INFO] G4CasposoSimulator::Initialize: Reading configuration file " << cfgFile << endl;
+	cout << "[INFO] G4TandarSimulator::Initialize" << endl;
+	cout << "[INFO] G4TandarSimulator::Initialize: Reading configuration file " << cfgFile << endl;
 
 	// Fill Event object from configuration file
 	// Read Simulation configuration
@@ -121,19 +121,19 @@ G4CasposoSimulator::Initialize(Event& theEvent, string cfgFile)
 
 
 bool
-G4CasposoSimulator::RunSimulation(Event& theEvent)
+G4TandarSimulator::RunSimulation(Event& theEvent)
 {
 
-	cout << "[INFO] G4CasposoSimulator::RunSimulation" << endl;
+	cout << "[INFO] G4TandarSimulator::RunSimulation" << endl;
 
 	const Event::Config &cfg = theEvent.GetConfig();
 	SimData& simData = theEvent.GetSimData();
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
-	cout << "[INFO] G4CasposoSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
+	cout << "[INFO] G4TandarSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
 
 	
 	if (!NumberOfParticles) {
-		cerr << "[ERROR] G4CasposoSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
+		cerr << "[ERROR] G4TandarSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
 		return false;
 	}
 	
@@ -155,23 +155,23 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 	auto fRunManager = G4RunManagerFactory::CreateRunManager();
 
 	// set mandatory initialization classes
-	auto fDetConstruction = new G4CasposoDetectorConstruction(theEvent);
+	auto fDetConstruction = new G4TandarDetectorConstruction(theEvent);
 	fRunManager->SetUserInitialization(fDetConstruction);
 	
-	fRunManager->SetUserInitialization(new G4CasposoPhysicsList(fPhysicsName));  
+	fRunManager->SetUserInitialization(new G4TandarPhysicsList(fPhysicsName));  
  
 	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
 	
-	G4CasposoRunAction *fRunAction = new G4CasposoRunAction(theEvent);
+	G4TandarRunAction *fRunAction = new G4TandarRunAction(theEvent);
 	fRunManager->SetUserAction(fRunAction);
 	
-	G4CasposoEventAction *fEventAction = new G4CasposoEventAction();
+	G4TandarEventAction *fEventAction = new G4TandarEventAction();
 	fRunManager->SetUserAction(fEventAction);
 
-	fRunManager->SetUserAction(new G4CasposoTrackingAction());
+	fRunManager->SetUserAction(new G4TandarTrackingAction());
 
-	G4CasposoSteppingAction *fSteppingAction = new G4CasposoSteppingAction(fDetConstruction, fEventAction, theEvent);
+	G4TandarSteppingAction *fSteppingAction = new G4TandarSteppingAction(fDetConstruction, fEventAction, theEvent);
 	fRunManager->SetUserAction(fSteppingAction);
 	
 	// initialize G4 kernel
@@ -232,7 +232,7 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
-		G4CasposoSimulator::currentParticle = *it;
+		G4TandarSimulator::currentParticle = *it;
 		simData.SetCurrentParticle(*it);
 		// Run simulation
 		fRunManager->BeamOn(1);
@@ -243,7 +243,7 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 	delete fVisManager;
 	delete fRunManager;
 
-	cout << "[INFO] G4CasposoSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
+	cout << "[INFO] G4TandarSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
 
 
 	return true;
@@ -252,12 +252,12 @@ G4CasposoSimulator::RunSimulation(Event& theEvent)
 
 
 void
-G4CasposoSimulator::WriteEventInfo(Event& theEvent)
+G4TandarSimulator::WriteEventInfo(Event& theEvent)
 {
 
-	cout << "[INFO] G4CasposoSimulator::WriteEventInfo" << endl;
+	cout << "[INFO] G4TandarSimulator::WriteEventInfo" << endl;
 	#warning "FileWriter disabled to not overwrite output.dat files"
-	cout << "[WARNING] G4CasposoSimulator::WriteEventInfo: FileWriter disabled to not overwrite output.dat files" << endl;
+	cout << "[WARNING] G4TandarSimulator::WriteEventInfo: FileWriter disabled to not overwrite output.dat files" << endl;
 	// DataWriter::FileWriter(theEvent);
 
 	return;
