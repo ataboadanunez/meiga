@@ -31,8 +31,8 @@ class SimData
 			eCircle = 1,
 			eHalfSphere = 2,
 			eVertical = 3,
-			// specific case when particles are injected inside the detector (e.g. muon decay inside WCD)
-			eInsideDetector
+			// particle position given in input file
+			eFromFile
 		};
 
 

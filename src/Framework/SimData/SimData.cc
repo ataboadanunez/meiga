@@ -45,8 +45,8 @@ SimData::InjectionConversion(string name)
 		return SimData::InjectionMode::eHalfSphere;
 	else if (name == "eVertical")
 		return SimData::InjectionMode::eVertical;
-	else if (name == "eInsideDetector")
-		return SimData::InjectionMode::eInsideDetector;
+	else if (name == "eFromFile")
+		return SimData::InjectionMode::eFromFile;
 	else {
 		cout << "[WARNING] SimData::InjectionConversion: Unknown injection type!" << endl;
 		return SimData::InjectionMode::eUnknown;

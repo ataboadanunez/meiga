@@ -176,6 +176,7 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
 {
 
 	auto mode = simData.GetInjectionMode();
+	Particle &currentParticle = simData.GetCurrentParticle();
 	vector<double> injectionOrigin = simData.GetInjectionOrigin();
 	double x0 = injectionOrigin[0];
 	double y0 = injectionOrigin[1];
@@ -235,12 +236,16 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
 		yInj = y0;
 		zInj = z0;
 		break;
-  case SimData::InjectionMode::eInsideDetector:
+  case SimData::InjectionMode::eFromFile:
+  	xInj = currentParticle.GetPosition().at(0);
+  	yInj = currentParticle.GetPosition().at(1);
+  	zInj = currentParticle.GetPosition().at(2);
+  	break;
 	case SimData::InjectionMode::eUnknown:
 	default:
-		xInj = 0;
-		yInj = 0;
-		zInj = 0;
+		xInj = currentParticle.GetPosition().at(0);
+		yInj = currentParticle.GetPosition().at(1);
+		zInj = currentParticle.GetPosition().at(2);
 		break;
 	
 
