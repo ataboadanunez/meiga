@@ -2,15 +2,10 @@
 
 <detectorList>
 
-	<injectionMode type="eHalfSphere">
+	<injectionMode type="eFromFile">
 		<x unit="m"> 0 </x>
 		<y unit="m"> 0 </y>
 		<z unit="m"> 0 </z>
-		<radius unit="m"> 200 </radius>
-		<minTheta> 60 </minTheta>
-		<maxTheta> 90 </maxTheta>
-		<minPhi> 75 </minPhi>
-		<maxPhi> 105 </maxPhi>
 	</injectionMode>
 
 	<detector id="0" type="eMudulus">

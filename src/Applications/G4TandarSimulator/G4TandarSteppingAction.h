@@ -18,21 +18,14 @@ class G4TandarEventAction;
 
 class G4TandarSteppingAction : public G4UserSteppingAction
 {
-    public:
-        G4TandarSteppingAction(const G4TandarDetectorConstruction* det, G4TandarEventAction* event, Event& theEvent);
-        virtual ~G4TandarSteppingAction();
-        virtual void UserSteppingAction(const G4Step* step);
+  public:
+    G4TandarSteppingAction(G4TandarEventAction* event, Event& theEvent);
+    virtual ~G4TandarSteppingAction();
+    virtual void UserSteppingAction(const G4Step* step);
 
-    private:
-        const G4TandarDetectorConstruction* fDetectorConstruction;
-        G4TandarEventAction* fEventAction;
-        std::ofstream* fOutputFile;
-        Event& fEvent;
-
-        G4double fSiPMTime;
-        G4double fScinTime;
-        G4String stepVolume;
-        G4String trackVolume;
+  private:
+    G4TandarEventAction* fEventAction;
+    Event& fEvent;
 };
 
 #endif

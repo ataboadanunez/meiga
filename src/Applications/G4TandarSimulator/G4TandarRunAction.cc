@@ -32,23 +32,25 @@ void
 G4TandarRunAction::BeginOfRunAction(const G4Run* aRun)
 {
 
-	// write header only in run = 0.
+	if (fEvent.GetSimData().GetSimulationMode() == SimData::SimulationMode::eFull) {
+		// write header only in run = 0.
 
-	G4int g4RunId = aRun->GetRunID();
-	if (g4RunId == 0) {
-		Detector& currDet = fEvent.GetDetector(0);
-		// loop over OptDevices and print output header
-		// #p_momentum Channel_1 Channel_2 ... Channel_n
-		fOutFile << "# p_momentum ";
-		for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
-			auto& currOd = odIt->second;
-			int odId = currOd.GetId();
-			//cout << "[DEBUG] Optical Device ID = " << odId << endl;
-			fOutFile << odId << " ";
-		}
+		G4int g4RunId = aRun->GetRunID();
+		if (g4RunId == 0) {
+			Detector& currDet = fEvent.GetDetector(0);
+			// loop over OptDevices and print output header
+			// #p_momentum Channel_1 Channel_2 ... Channel_n
+			fOutFile << "# p_momentum ";
+			for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
+				auto& currOd = odIt->second;
+				int odId = currOd.GetId();
+				//cout << "[DEBUG] Optical Device ID = " << odId << endl;
+				fOutFile << odId << " ";
+			}
 
-		fOutFile << endl;
+			fOutFile << endl;
 	
+		}
 	}
 	
 }
@@ -58,6 +60,8 @@ void
 G4TandarRunAction::EndOfRunAction(const G4Run* aRun)
 { 
 
+	if (fEvent.GetSimData().GetSimulationMode() != SimData::SimulationMode::eFull)
+		return;
 	// get current particle information
 	double particleMomentum = G4TandarSimulator::currentParticle.GetMomentum();
 	fOutFile << particleMomentum / CLHEP::MeV << " ";

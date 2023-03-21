@@ -49,7 +49,7 @@ G4TandarDetectorConstruction::CreateWorld()
 	G4double fGroundSizeZ = 1 * CLHEP::m;
 
 	// according to google maps
-	G4double fDistance2Detector = 195 * CLHEP::m;
+	G4double fDistance2Detector = 150 * CLHEP::m;
 
 	auto& simData = fEvent.GetSimData();
 	simData.SetGroundLength(fGroundSizeX);
@@ -156,9 +156,6 @@ G4TandarDetectorConstruction::PlaceDetector(Event& theEvent)
 	// loop in detector vector
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 		auto& currentDet = detIt->second;
-		// change detector position z-coordinate w.r.t ground
-		// auto & currentDetPos = currentDet.GetDetectorPosition();
-		// currentDet.SetDetectorPosition(currentDetPos.at(0), currentDetPos.at(1), currentDetPos.at(2) - fTandarZ)
 		BuildDetector(logicWorld, currentDet, theEvent, cfg.fCheckOverlaps);
 	}
 

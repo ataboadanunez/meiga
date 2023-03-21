@@ -27,8 +27,8 @@ class G4HodoscopeSteppingAction : public G4UserSteppingAction
 		G4HodoscopeEventAction* fEventAction;
 		Event& fEvent;
 
-		std::vector<int> fBarsX1;
-		std::vector<int> fBarsY1;
+		//std::vector<int> fBarsX1;
+		//std::vector<int> fBarsY1;
 };
 
 #endif

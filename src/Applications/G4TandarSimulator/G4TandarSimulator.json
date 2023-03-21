@@ -1,8 +1,8 @@
 {
 	"Input" :
 	{
-		"Mode" : "UseEcoMug",
-		"InputFileName" : "./vertical_muon.txt",
+		"Mode" : "UseARTI",
+		"InputFileName" : "./test.shw",
 		"InputNParticles" : 1
 	},
 	"Output" : 

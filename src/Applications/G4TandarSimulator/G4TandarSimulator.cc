@@ -166,12 +166,12 @@ G4TandarSimulator::RunSimulation(Event& theEvent)
 	G4TandarRunAction *fRunAction = new G4TandarRunAction(theEvent);
 	fRunManager->SetUserAction(fRunAction);
 	
-	G4TandarEventAction *fEventAction = new G4TandarEventAction();
+	G4TandarEventAction *fEventAction = new G4TandarEventAction(theEvent);
 	fRunManager->SetUserAction(fEventAction);
 
 	fRunManager->SetUserAction(new G4TandarTrackingAction());
 
-	G4TandarSteppingAction *fSteppingAction = new G4TandarSteppingAction(fDetConstruction, fEventAction, theEvent);
+	G4TandarSteppingAction *fSteppingAction = new G4TandarSteppingAction(fEventAction, theEvent);
 	fRunManager->SetUserAction(fSteppingAction);
 	
 	// initialize G4 kernel
