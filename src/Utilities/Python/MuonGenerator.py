@@ -390,6 +390,8 @@ class MuonGenerator:
 				self.impacts = []
 				self.momentum = []
 				self.origin = []
+				self.theta = []
+				self.phi = []
 
 		def MuonGenerate(self, *args, **kwargs):
 				if kwargs.get('N') != None:
@@ -397,11 +399,11 @@ class MuonGenerator:
 				else:
 						self.Nmu_requested = 1
 
-
-				
 				self.impacts = []
 				self.momentum = []
 				self.origin = []
+				self.theta = []
+				self.phi = []
 
 
 				Ntot = 0
@@ -410,12 +412,13 @@ class MuonGenerator:
 				while (Nmu < self.Nmu_requested):
 						
 						theta = GenerateAngle(0, np.pi/2)
+						self.theta.append(theta)
 						# generate random momentum value given its PDF
 						ptot = np.random.choice(logP, p=PDF)
 
 						#theta = GenerateSample(cos2, [0, np.pi / 2], 1)
 						phi = np.random.uniform(low=self.azimuth-self.deltaPhi, high=self.azimuth+self.deltaPhi, size=1)
-
+						self.phi.append(phi)
 						#aux = pol2cart(theta[0], phi[0], 1)
 						aux = pol2cart(theta, phi[0], 1)
 
@@ -470,6 +473,7 @@ def main():
 	parser.add_argument('--elevation', type=float, help='Elevation angle (deg)', default=0.)
 	parser.add_argument('--azimuth', type=float, help='Azimuth angle (deg)', default=90.)
 	parser.add_argument('--dphi', type=float, help='Restrict simulation up to (deg)', default=180.)
+	parser.add_argument('--plot', type=bool, help='Plot results', default=False)
 
 	args = parser.parse_args()
 
@@ -525,19 +529,61 @@ def main():
 	##############################################################################
 	# Plot
 	##############################################################################
-	if False:
-		fig2 = plt.figure()
-		ax2 = fig2.add_subplot(projection='3d')
-		ax2.quiver(np.array(muon.origin)[:, 0], np.array(muon.origin)[:, 1], np.array(muon.origin)[:, 2], 
-												np.array(muon.momentum)[:, 0], np.array(muon.momentum)[:, 1], np.array(muon.momentum)[:, 2], 
-												color='blue', alpha=0.2)
+	if args.plot:
+		# 3D plot of muon positions on the sky
+		# plot maximum of 100 muons (just for visualization)
+		maxNumTraj = min(100, args.num)
+		fig1 = plt.figure()
+		ax1 = fig1.add_subplot(projection='3d')
+		ax1.quiver(np.array(muon.origin)[:maxNumTraj, 0], np.array(muon.origin)[:maxNumTraj, 1], np.array(muon.origin)[:maxNumTraj, 2], 
+												np.array(muon.momentum)[:maxNumTraj, 0], np.array(muon.momentum)[:maxNumTraj, 1], np.array(muon.momentum)[:maxNumTraj, 2], 
+												color='k', alpha=0.2)
 
-		ax2.set_xlim([-muon.sc_r * 1.1, muon.sc_r * 1.1])
-		ax2.set_ylim([-muon.sc_r * 1.1, muon.sc_r * 1.1])
-		ax2.set_zlim([0, muon.sc_r * 1.1])
-		ax2.set_xlabel(r'$\mathrm{X / \ m}$')
-		ax2.set_ylabel(r'$\mathrm{Y / \ m}$')
-		ax2.set_zlabel(r'$\mathrm{Z / \ m}$')
+		ax1.set_xlim([-muon.sc_r * 1.1, muon.sc_r * 1.1])
+		ax1.set_ylim([-muon.sc_r * 1.1, muon.sc_r * 1.1])
+		ax1.set_zlim([0, muon.sc_r * 1.1])
+		ax1.set_xlabel(r'X / m')
+		ax1.set_ylabel(r'Y / m')
+		ax1.set_zlabel(r'Z / m')
+		
+		bins = int(np.sqrt(args.num))
+		# plot elevation and azimuth distributions		
+		fig5 = plt.figure()
+		plt.hist(np.degrees(np.array(muon.theta)), bins=bins, lw=2, histtype='step', color='k')
+		plt.xlabel(r'Elvetation / deg')
+		plt.ylabel(r'Counts')
+
+		fig6 = plt.figure()
+		plt.hist(np.degrees(np.array(muon.phi)), bins=bins, lw=2, histtype='step', color='k')
+		plt.xlabel(r'Azimuth / deg')
+		plt.ylabel(r'Counts')
+		
+		px = np.array(muon.momentum)[:, 0]
+		py = np.array(muon.momentum)[:, 1]
+		pz = np.array(muon.momentum)[:, 2]
+		p = np.sqrt(px*px + py*py + pz*pz)
+
+		phi = np.arctan2(py, pz)
+		theta = np.arccos(-pz/p)
+
+		# plot distribution of muon momentum
+		fig2 = plt.figure()
+		plt.hist(np.log10(p), bins=bins, histtype='step', lw=2, color='k')
+		plt.yscale('log')
+		plt.xlabel(r'log10(p / GeV)')
+		plt.ylabel(r'Counts')
+
+		# plot zenith and azimuth distributions
+		fig3 = plt.figure()
+		plt.hist(np.degrees(theta), bins=bins, histtype='step', lw=2, color='k')
+		plt.xlabel(r'Muon Zenith / deg')
+		plt.ylabel(r'Counts')
+
+		fig4 = plt.figure()
+		plt.hist(np.degrees(phi), bins=bins, histtype='step', lw=2, color='k')
+		plt.xlabel(r'Muon Azimuth / deg')
+		plt.ylabel(r'Counts')
+
 		plt.show()
 
 
