@@ -40,7 +40,7 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 	double barLength = detector.GetBarLength();
 	double barThickness = detector.GetBarThickness();
 	double barCoatingThickness = detector.GetBarCoatingThickness();
-	double detectorWidth = nBars * barWidth;
+	double detectorWidth = nBars * (barWidth + barCoatingThickness);
 	double halfWidth = 0.5 * nBars * (barWidth + barCoatingThickness);
 	// detector
 	G4ThreeVector detectorPos = Geometry::ToG4Vector(detector.GetDetectorPosition(), 1.);
