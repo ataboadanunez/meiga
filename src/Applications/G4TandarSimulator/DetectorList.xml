@@ -11,8 +11,8 @@
 	<detector id="0" type="eMudulus">
 		<x unit="m"> 0.0 </x>
 		<y unit="m"> 0.0 </y>
-		<z unit="m"> -122 </z>
-		<distancePanels unit="cm"> 200 </distancePanels>
+		<z unit="m"> -123.6 </z>
+		<distancePanels unit="cm"> 100 </distancePanels>
 		<rotationAngle> 70 </rotationAngle>
 
 	</detector>
