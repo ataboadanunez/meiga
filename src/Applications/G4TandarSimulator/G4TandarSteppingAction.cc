@@ -67,7 +67,10 @@ G4TandarSteppingAction::UserSteppingAction(const G4Step* step)
 
 		string volName = track->GetVolume()->GetName();
 		int volId = track->GetVolume()->GetCopyNo();
-
+		// if ((volName == "physTandar") | (volName == "physTandarTop") | (volName == "physStairsIn") | (volName == "physStairsOut")) {
+		// 	cout << "[DEBUG] Particle killed at  volume = " << volName << endl;
+		// 	track->SetTrackStatus(fStopAndKill);
+		// }
 		// get panel id from volume name
 		string volIdstr = to_string(volId);
 		char panelId = volIdstr[0];
@@ -105,7 +108,7 @@ G4TandarSteppingAction::UserSteppingAction(const G4Step* step)
 			string barIdStr = string(1, barId0) + barId1;
 			// now get the integer bar ID again
 			int barId = stoi(barIdStr);
-			pY_1 = barId - 12;
+			pY_1 = barId - fEventAction->fNBars;
 			fEventAction->fBarsY1.at(pY_1-1) += 1;
 			fEventAction->trigY1 = true;
 
@@ -144,7 +147,7 @@ G4TandarSteppingAction::UserSteppingAction(const G4Step* step)
 			string barIdStr = string(1, barId0) + barId1;
 			// now get the integer bar ID again
 			int barId = stoi(barIdStr);
-			pY_2 = barId - 12;
+			pY_2 = barId - fEventAction->fNBars;
 			fEventAction->fBarsY2.at(pY_2-1) += 1;
 			fEventAction->trigY2 = true;
 
@@ -183,7 +186,7 @@ G4TandarSteppingAction::UserSteppingAction(const G4Step* step)
 			string barIdStr = string(1, barId0) + barId1;
 			// now get the integer bar ID again
 			int barId = stoi(barIdStr);
-			pY_3 = barId - 12;
+			pY_3 = barId - fEventAction->fNBars;
 			fEventAction->fBarsY3.at(pY_3-1) += 1;
 			fEventAction->trigY3 = true;
 

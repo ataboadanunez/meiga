@@ -28,26 +28,30 @@ G4HodoscopeEventAction::~G4HodoscopeEventAction()
 void
 G4HodoscopeEventAction::BeginOfEventAction(const G4Event*)
 {
+	
+	fNBars = fEvent.GetDetector(0).GetNBars();
+	
 	trigX1 = false;
 	trigY1 = false;
 	trig1 = false;
 	
-	fBarsX1 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	fBarsY1 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+	fBarsX1 = vector<int>(fNBars, 0);// = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	fBarsY1 = vector<int>(fNBars, 0);// = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	trigX2 = false;
 	trigY2 = false;
 	trig2 = false;
 	
-	fBarsX2 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	fBarsY2 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	fBarsX2 = vector<int>(fNBars, 0);// = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	fBarsY2 = vector<int>(fNBars, 0);// = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	trigX3 = false;
 	trigY3 = false;
 	trig3 = false;
 	
-	fBarsX3 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	fBarsY3 = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	fBarsX3 = vector<int>(fNBars, 0);// = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	fBarsY3 = vector<int>(fNBars, 0);// = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 }
 

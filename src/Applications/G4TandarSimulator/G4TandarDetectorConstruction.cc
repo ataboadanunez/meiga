@@ -49,7 +49,7 @@ G4TandarDetectorConstruction::CreateWorld()
 	G4double fGroundSizeZ = 1 * CLHEP::m;
 
 	// according to google maps
-	G4double fDistance2Detector = 150 * CLHEP::m;
+	G4double fDistance2Detector = 50 * CLHEP::m;
 
 	auto& simData = fEvent.GetSimData();
 	simData.SetGroundLength(fGroundSizeX);

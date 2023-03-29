@@ -44,6 +44,8 @@ class G4TandarEventAction : public G4UserEventAction
     bool trigX3;
     bool trigY3;
 
+    int fNBars;
+    
   private:
    
    Event& fEvent;
