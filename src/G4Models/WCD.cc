@@ -42,7 +42,8 @@ WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEve
 	G4double fTankRadius = detector.GetTankRadius();
 	G4double fTankHeight = detector.GetTankHeight();
 	G4double fTankHalfHeight = 0.5 * fTankHeight;
-	G4double fTankThickness = 12.7 * CLHEP::mm;
+	G4double fTankThickness = detector.GetTankThickness();
+	
 	// PMT properties photonis-XP1805
 	OptDevice pmt = detector.GetOptDevice(OptDevice::ePMT);
 	G4double fPMTSemiX = pmt.GetSemiAxisX() * CLHEP::cm;
