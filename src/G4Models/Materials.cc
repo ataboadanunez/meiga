@@ -275,7 +275,8 @@ G4Element* Materials::elCa;
 G4Element* Materials::elFe;
 G4Element* Materials::elAl;
 G4Element* Materials::elPb;
-	
+G4Element* Materials::elCl;
+
 G4Material* Materials::SiO2;
 G4Material* Materials::TiO2;
 G4Material* Materials::B2O2;
@@ -287,6 +288,8 @@ G4Material* Materials::Polystyrene;
 // Materials
 G4Material* Materials::Air;
 G4Material* Materials::Water;
+G4Material* Materials::Salt;
+G4Material* Materials::SaltyWater;
 G4Material* Materials::StdRock;
 G4Material* Materials::ScinPlastic;
 G4Material* Materials::ScinCoating;
@@ -301,12 +304,26 @@ G4OpticalSurface* Materials::ScinOptSurf;
 G4OpticalSurface* Materials::LinerOptSurf;
 G4OpticalSurface* Materials::LinerOptSurf2;
 
+G4MaterialPropertiesTable* Materials::waterPT1;
+G4MaterialPropertiesTable* Materials::waterPT2;
+G4MaterialPropertiesTable* Materials::linerPT1;
+G4MaterialPropertiesTable* Materials::scinPT;
+G4MaterialPropertiesTable* Materials::scinOptSurfPT;
+G4MaterialPropertiesTable* Materials::pmmaPT;
+G4MaterialPropertiesTable* Materials::pethylenePT;
+G4MaterialPropertiesTable* Materials::fpethylenePT;
+G4MaterialPropertiesTable* Materials::pyrexPT;
+G4MaterialPropertiesTable* Materials::linerOpticalPT;
+
+double fracMassNaCl;
+
 Materials::Materials() 
 {
+
 	if (isInitialized) {
 		return;
 	}
-	
+
 	isInitialized = true;
 	
 	CreateElements();
@@ -342,6 +359,7 @@ Materials::CreateElements()
 	elFe = new G4Element("Iron", "Fe", 26, 55.850 * g/mole);
 	elAl = new G4Element("Aluminium", "Al", 13, 26.98 * g/mole);
 	elPb = new G4Element("Lead", "Pb", 82, 207.2 * g/mole);
+	elCl = new G4Element("Clhorine", "Cl", 17, 70.906 * g/mole);
 
 }
 
@@ -396,6 +414,14 @@ Materials::CreateCompounds()
 	POPOP->AddElement(elH, 16);
 	POPOP->AddElement(elN, 2);
 	POPOP->AddElement(elO, 2);
+	
+	// H2O:
+
+
+	// Salt
+	Salt = new G4Material("Salt", 2.165 * g/cm3, 2);
+	Salt->AddElement(elCl, 1);
+	Salt->AddElement(elNa, 1);
 
 }
 
@@ -417,13 +443,12 @@ Materials::CreateMaterials()
 	Water->AddElement(elO, 1);
 
 	// Define different PropertiesTable for different water "types"
-
-	G4MaterialPropertiesTable* waterPT1 = new G4MaterialPropertiesTable();
+	waterPT1 = new G4MaterialPropertiesTable();
 	waterPT1->AddProperty("RINDEX", water1PhotonEnergyShort, water1RefIndex, 2);
 	waterPT1->AddProperty("ABSLENGTH", water1PhotonEnergy, water1AbsLen, water1ArrEntries);
 	
 	// --- Material Properties Table from Geant4 OpNovice example.
-	G4MaterialPropertiesTable* waterPT2 = new G4MaterialPropertiesTable();
+	waterPT2 = new G4MaterialPropertiesTable();
 	waterPT2->AddProperty("RINDEX", water2PhotonEnergy, water2RefIndex, water2ArrEntries);
 	waterPT2->AddProperty("ABSLENGTH", water2PhotonEnergy, water2AbsLen, water2ArrEntries);
 	waterPT2->AddProperty("MIEHG", water2PhotonEnergyMie, water2Mie, water2ArrEntries);
@@ -456,7 +481,7 @@ Materials::CreateMaterials()
 	ScinCoating->AddMaterial(Polystyrene, 85*perCent);
 
 	// Add scintillator property table
-	G4MaterialPropertiesTable* scinPT = new G4MaterialPropertiesTable();
+	scinPT = new G4MaterialPropertiesTable();
 	scinPT->AddProperty("RINDEX", scinPhotonEnergy, scinRefIndex, scinArrEntries);
 	scinPT->AddProperty("ABSLENGTH", scinPhotonEnergy, scinAbsLen, scinArrEntries);
 	scinPT->AddProperty("FASTCOMPONENT", scinPhotonEnergy, scinFastComp, scinArrEntries);
@@ -471,7 +496,7 @@ Materials::CreateMaterials()
 	// Add optical skin properties of scintillator (coating)
 	ScinOptSurf = new G4OpticalSurface("ScinOptSurf", glisur, ground, dielectric_metal, fExtrusionPolish);
 
-	G4MaterialPropertiesTable* scinOptSurfPT = new G4MaterialPropertiesTable();
+	scinOptSurfPT = new G4MaterialPropertiesTable();
 	scinOptSurfPT->AddProperty("REFLECTIVITY", scinPhotonEnergy, scinOptSurfRefIndex, scinArrEntries);
 	scinOptSurfPT->AddProperty("EFFICIENCY", scinPhotonEnergy, scinOptSurfEff, scinArrEntries);
 	ScinOptSurf->SetMaterialPropertiesTable(scinOptSurfPT);
@@ -487,7 +512,7 @@ Materials::CreateMaterials()
 	PMMA->AddElement(elO, 2);
 
 	// Add properties to table
-	G4MaterialPropertiesTable* pmmaPT = new G4MaterialPropertiesTable();
+	pmmaPT = new G4MaterialPropertiesTable();
 	pmmaPT->AddProperty("RINDEX", scinPhotonEnergy, pmmaRefIndex, scinArrEntries);
 	pmmaPT->AddProperty("WLSABSLENGTH", scinPhotonEnergy, pmmaAbsLen, scinArrEntries);
 	pmmaPT->AddProperty("WLSCOMPONENT", scinPhotonEnergy, pmmaEmission, scinArrEntries);
@@ -508,7 +533,7 @@ Materials::CreateMaterials()
 	Pethylene->AddElement(elH, 4);
 
 	// Add properties to table
-	G4MaterialPropertiesTable* pethylenePT = new G4MaterialPropertiesTable();
+	pethylenePT = new G4MaterialPropertiesTable();
 	pethylenePT->AddProperty("RINDEX", scinPhotonEnergy, pethyRefIndex, scinArrEntries);
 	pethylenePT->AddProperty("ABSLENGTH", scinPhotonEnergy, pethyAbsLen, scinArrEntries);
 	Pethylene->SetMaterialPropertiesTable(pethylenePT);
@@ -519,7 +544,7 @@ Materials::CreateMaterials()
 	FPethylene->AddElement(elH, 4);
 
 	// Add properties to table
-	G4MaterialPropertiesTable* fpethylenePT = new G4MaterialPropertiesTable();
+	fpethylenePT = new G4MaterialPropertiesTable();
 	fpethylenePT->AddProperty("RINDEX", scinPhotonEnergy, fpethyRefIndex, scinArrEntries);
 	fpethylenePT->AddProperty("ABSLENGTH", scinPhotonEnergy, pethyAbsLen, scinArrEntries);
 	FPethylene->SetMaterialPropertiesTable(fpethylenePT);
@@ -548,7 +573,7 @@ Materials::CreateMaterials()
 
 	// Add properties to table
 	#warning "This properties are for PMTs! Check Pyrex optical properties for SiPMs!!"
-	G4MaterialPropertiesTable* pyrexPT = new G4MaterialPropertiesTable();
+	pyrexPT = new G4MaterialPropertiesTable();
 	pyrexPT->AddProperty("RINDEX", pmtPhotonEnergy, pmtRefIndex, pmtArrEntries);
 	pyrexPT->AddProperty("ABSLENGTH", pmtPhotonEnergy, pmtAbsLength, pmtArrEntries);
 	Pyrex->SetMaterialPropertiesTable(pyrexPT);
@@ -561,12 +586,12 @@ Materials::CreateMaterials()
 	HDPE->AddElement(elC, 2);
 	HDPE->AddElement(elH, 4);
 
-	G4MaterialPropertiesTable* linerPT1 = new G4MaterialPropertiesTable();
+	linerPT1 = new G4MaterialPropertiesTable();
 	linerPT1->AddProperty("ABSLENGTH", water1PhotonEnergy, linerAbsLen, water1ArrEntries);
 	HDPE->SetMaterialPropertiesTable(linerPT1);
 
 	// Liner optical surface properties
-	G4MaterialPropertiesTable* linerOpticalPT = new G4MaterialPropertiesTable();
+	linerOpticalPT = new G4MaterialPropertiesTable();
 	linerOpticalPT->AddProperty("SPECULARLOBECONSTANT", specularLobePhotonEnergy, specularLobe, 3);
 	linerOpticalPT->AddProperty("SPECULARSPIKECONSTANT", specularLobePhotonEnergy, specularSpike, 3);
 	linerOpticalPT->AddProperty("REFLECTIVITY", water1PhotonEnergy, linerReflectivity, water1ArrEntries);
