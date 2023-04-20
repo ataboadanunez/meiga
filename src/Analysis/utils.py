@@ -91,7 +91,7 @@ def GetDepositedEnergy(data, detectors):
 		print("[INFO] GetDepositedEnergy: Accessing data of Detector: %s" %keydet)
 		eDepData = np.array(data[keydet][0][key])
 		# skip particles that did not hit the detector
-		edep = eDepData[eDepData > 0]
+		edep = eDepData[eDepData >= 0]
 		container['EnergyDeposit_%s' %keydet] = edep
 
 	# convert to Pandas DataFrame
@@ -115,8 +115,9 @@ def PlotDepositedEnergy(df):
 		edep = df[name].values
 		bins = max(10, int(np.sqrt(len(edep))))
 
-		plt.hist(edep, bins, histtype='step', lw=1.5, color='k')
-		plt.title('%s' %name)
+		plt.hist(edep[edep>0], bins, histtype='step', lw=1.5, color='k')
+		name = ''.join([s+' ' for s in name.split('_')])
+		plt.title(r'%s' %name)
 
 	return fig
 
@@ -159,7 +160,8 @@ def PlotComponentsDepositedEnergy(df):
 				print("[WARNING] PlotComponentsDepositedEnergy: Component not found in data: ", comp)
 
 		plt.legend(loc='upper right', title='Component:')
-		plt.title('%s' %name)
+		name = ''.join([s+' ' for s in name.split('_')])
+		plt.title(r'%s' %name)
 
 	return fig
 
@@ -196,7 +198,9 @@ def PlotChargeHistogram(df):
 			charge.append(len(trace))
 
 		bins = max(10, int(np.sqrt(len(charge))))
-		plt.hist(charge, bins, histtype='step', lw=1.5, label='%s' %optdev)
+		# remove _ from name for labeling 
+		optdev_name = ''.join([s+' ' for s in optdev.split('_')])
+		plt.hist(charge, bins, histtype='step', lw=1.5, label='%s' %optdev_name)
 
 	plt.legend(loc='upper right')
 	return fig
@@ -260,6 +264,8 @@ def PlotComponentsChargeHistogram(df):
 			except KeyError:
 				print("[WARNING] PlotComponentsChargeHistogram: Component not found in data: ", comp)
 		plt.legend(loc='upper right', title='Component:')
-		plt.title(r'Charge histogram of %s' %optdev)
+		# remove _ from name for labeling 
+		optdev_name = ''.join([s+' ' for s in optdev.split('_')])
+		plt.title(r'Charge histogram of %s' %optdev_name)
 		return fig
 

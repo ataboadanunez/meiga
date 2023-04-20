@@ -16,7 +16,7 @@ from utils import *
 
 import matplotlib.pyplot as plt
 # console for debugging
-from IPython import embed
+# from IPython import embed
 
 def completepath(s, cfiledir):
 	if s[0] == '/':
@@ -168,5 +168,4 @@ if __name__ == "__main__":
 		# :D
 	else:
 		print("Nothing to plot!")
-
 	# ------------------------------------------------------------------------
