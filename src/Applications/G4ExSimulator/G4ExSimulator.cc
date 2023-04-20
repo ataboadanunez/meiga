@@ -172,7 +172,7 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	
 	// initialize G4 kernel
 	fRunManager->Initialize();
-
+	
 	// initialize visualization
 	if ((cfg.fGeoVis || cfg.fTrajVis) && !fVisManager)
 		fVisManager = new G4VisExecutive;

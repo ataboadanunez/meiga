@@ -47,7 +47,7 @@ class G4ExDetectorConstruction : public G4VUserDetectorConstruction {
 		void PlaceDetector(Event& theEvent);  
 		G4VPhysicalVolume* CreateDetector();
 
-		bool fCheckOverlaps = true;
+		bool fCheckOverlaps = false;
 		
 		// solids
 		G4Box* solidWorld = nullptr;
