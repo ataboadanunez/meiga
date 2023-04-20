@@ -6,6 +6,7 @@
 	<tankRadius unit="cm"> 105 </tankRadius>
 	<tankHeight unit="cm"> 90 </tankHeight>
 	<tankThickness unit="mm"> 12 </tankThickness> 
+	<impuritiesFraction> 0.0 </impuritiesFraction>
 	<numberOfBars> 12 </numberOfBars>
 	<numberOfPanels> 1 </numberOfPanels>
 	<barLength unit="mm"> 500 </barLength>

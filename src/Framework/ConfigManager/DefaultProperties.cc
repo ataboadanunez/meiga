@@ -13,7 +13,7 @@ DefaultProperties::SetDefaultProperties(const string &filename)
 {
 	if (filename.empty()) 
 		return;
-
+	std::cout << "[INFO] DefaultProperties::SetDefaultProperties: Setting default properties from file " << filename << std::endl;
 	// read xml and set parameters
 	ptree tree;
 	read_xml(filename, tree);
@@ -22,6 +22,7 @@ DefaultProperties::SetDefaultProperties(const string &filename)
 	gTankRadius = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "tankRadius");
 	gTankHeight = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "tankHeight");
 	gTankThickness = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "tankThickness");
+	gImpuritiesFraction = ConfigManager::GetPropertyFromXML<double>(tree, branchName, "impuritiesFraction", false);
 	
 	gNumberOfBars = ConfigManager::GetPropertyFromXML<int>(tree, branchName, "numberOfBars", false);
 	gNumberOfPanels = ConfigManager::GetPropertyFromXML<int>(tree, branchName, "numberOfPanels", false);

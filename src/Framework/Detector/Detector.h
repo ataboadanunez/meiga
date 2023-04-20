@@ -41,6 +41,7 @@ class Detector
 			eWCD = 3,
 			eScintillator = 4,
 			eHodoscope = 5,
+			eSaltyWCD = 6,
 			eDummy
 		};
 
@@ -106,6 +107,9 @@ class Detector
 		double GetTankThickness() const { return fTankThickness; }
 		void SetTankThickness(double t) { fTankThickness = t; }
 
+		double GetImpuritiesFraction() const { return fImpuritiesFraction; }
+		void SetImpuritiesFraction(double impF) { fImpuritiesFraction = impF; }
+
 		// general detector size parameters
 		double GetLength() const { return fLength; }
 		void SetLength(double l) { fLength = l; }
@@ -155,7 +159,6 @@ class Detector
 		int fNOptDevices = 0;
 
 		// Scintillator bars
-
 		double fBarWidth;
 		double fBarLength;
 		double fBarThickness;
@@ -173,6 +176,7 @@ class Detector
 		double fTankHeight;
 		double fTankRadius;
 		double fTankThickness;
+		double fImpuritiesFraction;
 
 		// general detector size parameters
 		double fLength;

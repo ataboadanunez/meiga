@@ -31,6 +31,8 @@ struct DefaultProperties
 	double gGroundSizeX;
 	double gGroundSizeY;
 	double gGroundSizeZ;
+	// fraction of impurities for detectors in water
+	double gImpuritiesFraction;
 
 };
 

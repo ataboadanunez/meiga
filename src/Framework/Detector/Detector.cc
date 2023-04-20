@@ -5,6 +5,7 @@
 #include "Musaic.h"
 #include "Mudulus.h"
 #include "Hodoscope.h"
+#include "SaltyWCD.h"
 #include "Dummy.h"
 
 #include "G4UnitsTable.hh"
@@ -36,6 +37,8 @@ Detector::StringToType(string name)
 		return Detector::eMudulus;
 	else if (name == "eHodoscope")
 		return Detector::eHodoscope;
+	else if (name == "eSaltyWCD")
+		return Detector::eSaltyWCD;
 	else if (name == "eDummy")
 		return Detector::eDummy;
 	else {
@@ -68,6 +71,7 @@ InitTypeToBuild() {
 	TypeToBuild[Detector::eMusaic]				= Musaic::BuildDetector;
 	TypeToBuild[Detector::eMudulus]				= Mudulus::BuildDetector;
 	TypeToBuild[Detector::eHodoscope]			= Hodoscope::BuildDetector;
+	TypeToBuild[Detector::eSaltyWCD]			= SaltyWCD::BuildDetector;
 	TypeToBuild[Detector::eDummy]					= Dummy::BuildDetector;
 
 }
@@ -138,6 +142,7 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 	SetTankRadius(defProp.gTankRadius);
 	SetTankHeight(defProp.gTankHeight);
 	SetTankThickness(defProp.gTankThickness);
+	SetImpuritiesFraction(defProp.gImpuritiesFraction);
 
 	SetNBars(defProp.gNumberOfBars);
 	SetNPanels(defProp.gNumberOfPanels);
@@ -186,7 +191,10 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
 				SetTankThickness(value * unit);
 			}
-			
+			else if (xmlLabel == "impuritiesFraction") {
+				double value = stod(xmlValue);
+				SetImpuritiesFraction(value);
+			}
 			else if (xmlLabel == "numberOfBars") {
 				int value = stoi(xmlValue);
 				SetNBars(value);
