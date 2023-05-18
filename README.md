@@ -11,6 +11,7 @@
     <li><a href="#framework-structure">Framework structure</a></li>
     <li><a href="#input-flux">Input flux</a></li>
     <li><a href="#applications">Applications</a></li>
+    <li><a href="#simulation-output">Simulation Output</a></li>
   </ol>
 </details>
 
@@ -314,5 +315,3 @@ Running the `read_output.py` script using that configuration produces the follow
 ![energy](src/Documentation/edep.png)
 
 ![charge](src/Documentation/charge_histo.png)
-
-# Adding a new detector
