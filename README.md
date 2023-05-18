@@ -30,7 +30,7 @@ $cmake -DCMAKE_INSTALL_PREFIX=<path-to-install> -DGEANT4_INSTALL_DATA=ON -DGEANT
   See [Geant4 installation guide](https://geant4-userdoc.web.cern.ch/UsersGuides/InstallationGuide/html/) for details.
 
 - **[boost](https://www.boost.org/)** (version > 1.75)\
-  Can be installed via\
+  Can be installed via
 ```bash
 sudo apt-get install libboost-all-dev
 ```
@@ -52,7 +52,7 @@ Before installing Meiga, be sure that Geant4 and the DATA packages are correctly
 # source the Geant4 environment
 source $HOME/lib/geant4/install/bin/geant4.sh
 # export all DATA packages
-G4COMP="$HOME/lib/geant4/install/share/Geant4-10.7.2"
+G4COMP="$HOME/lib/geant4/install/share/Geant4-10.7.3"
 export G4ABLA=$G4COMP/data/G4ABLA3.1
 export G4EMLOW=$G4COMP/data/G4EMLOW7.13
 export G4ENSDFSTATE=$G4COMP/data/G4ENSDFSTATE2.3
@@ -244,7 +244,16 @@ The configuration settings are written in a JSON file like the example below:
 
 ### Detector configuration
 
+The detector's configuration used on each Application are specified in the `DetectorList.xml` file. In this file, each detector is called under the tag `<detector>`, where the `id` and `type` of the detector are given. NOTE: the detector `id` must be **unique**. Detector properties such as position (`<x>`, `<y>`, `<z>`) and custom parameters are defined within the `<detector>` tag. Otherwise, default parameters will be taken (see `src/Framework/ConfigManager/DetectorProperties.xml`).
 
+The `DetectorList.xml` file also sets the particle injection configuration. This is written under the tag `<injectionMode>` where the following injection types are available:
+
+- eCircle: particles are injected in a circle of radius `<radius>` and at height `<height>`.
+- eHalfSphere: partilces are injected over a semi-sphere of radius `<radius>` and origin `<x>`, `<y>`, `<z>`.
+- eVertical: particles are injected vertically at a fixed position (given by `<x>`, `<y>`, `<z>`).
+- eFromFile: injection coordinates are taken from the input file.
+
+An example of a `DetectorList.xml` file is given bellow:
 
 ```XML
 <?xml version='1.0' encoding='ISO-8859-1'?>
@@ -272,3 +281,38 @@ The configuration settings are written in a JSON file like the example below:
 
 </detectorList>
 ```
+
+# Simulation Output
+
+The simulation output is stored in the JSON file whose path and options were specified in the `Configuration.json` file. To extract the data and visualize the simulation output, the user is provided with a Python script in `src/Analysis/read_output.py`. The usage of this script is
+```bash
+./read_output.py -c Configuration.json
+```
+The Python script will fetch the output configuration from the configuration file, read the corresponding data and show relevant statistics as in the example bellow.
+
+### Example
+
+For this example, the `G4WCDSimulator` application was run using the following settings in the `G4WCDSimulator.json` file:
+
+```JSON
+"Input" : {
+  "Mode" : "UseARTI",
+  "InputFileName" : "../../../src/Documentation/SampleFlux/salida_bga_30.shw",
+},
+"Output" : {
+  "OutputFile" : "./output.json",
+  "SaveInput" : true,
+  "SaveComponentsPETimeDistributions" : true,
+  "SaveEnergy" : true
+}
+```
+
+Running the `read_output.py` script using that configuration produces the following plots:
+
+![input](src/Documentation/input.png)
+
+![energy](src/Documentation/edep.png)
+
+![charge](src/Documentation/charge_histo.png)
+
+# Adding a new detector
