@@ -40,7 +40,7 @@ G4AndesPrimaryGeneratorAction::~G4AndesPrimaryGeneratorAction()
 void 
 G4AndesPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 {
-  
+  cout << "[INFO] G4AndesPrimaryGeneratorAction::GeneratePrimaries" << endl;
   // get particle information
   Particle& currParticle = G4AndesSimulator::currentParticle;
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
@@ -63,8 +63,9 @@ G4AndesPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   double injHeight = 1750*CLHEP::m * 0.5 + 1*m;
   double injWidth  = 0.5 * CLHEP::m;
 
-  const double x0 = 0; // RandFlat::shoot(-injWidth, injWidth);
-  const double y0 = 0; // RandFlat::shoot(-injWidth, injWidth);
+  // inject particles over 1 m2
+  const double x0 = RandFlat::shoot(-injWidth, injWidth);
+  const double y0 = RandFlat::shoot(-injWidth, injWidth);
   const double z0 = injHeight;
   // get particle energy and momentum direction
   double fKineticEnergy = currParticle.GetKineticEnergy();
@@ -89,6 +90,8 @@ G4AndesPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 
   const std::vector<double> injectionPosition = {x0, y0, z0};
   currParticle.SetInjectionPosition(injectionPosition);
+  cout << "[INFO] Particle = " << currParticleID << " (" << particleDef->GetParticleName() << ")" << endl;
+  cout << "[INFO] Kinetic Energy = " << fKineticEnergy / CLHEP::GeV << " GeV " << endl; 
   cout << "[INFO] InjectionPosition = (" << x0 / CLHEP::m << ", " << y0 / CLHEP::m << ", " << z0 / CLHEP::m << ") m" << endl;
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(fPx, fPy, -1*fPz));
   fParticleGun->SetParticlePosition(G4ThreeVector(x0, y0, z0));

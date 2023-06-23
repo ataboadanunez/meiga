@@ -12,7 +12,7 @@
 		<x unit="cm"> 0.0 </x>
 		<y unit="cm"> 0.0 </y>
 		<z unit="cm"> -50.0 </z>
-		<barsInPanel> 2 </barsInPanel>
+		<numberOfBars> 2 </numberOfBars>
 		<barLength unit="mm"> 82 </barLength>
 	</detector>
 

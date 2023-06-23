@@ -87,11 +87,13 @@ class Particle {
 		std::string GetComponentName(Particle::Component type);
 
 		// particle momentum
-		const std::vector<double>& GetDirection() const { return fDirection; }
-		void SetDirection(const std::vector<double>& direction) { fDirection = direction; }
-		void SetMomentum(const std::vector<double>& momentum);
+		//const std::vector<double>& GetDirection() const { return fDirection; }
+		//void SetDirection(const std::vector<double>& direction) { fDirection = direction; }
+		void SetMomentumDirection(const std::vector<double>& momentum);
+		const std::vector<double>& GetMomentumDirection() const { return fMomentumDirection; }
+		void SetMomentum(const double p) { fMomentum = p; }
 		double GetMomentum() const { return fMomentum; }
-		
+
 		// particle mass
 		void InsertParticleMass(const Particle::Type id, const double mass);
 		static void InitParticleMassMap();
@@ -105,7 +107,8 @@ class Particle {
 		void SetTotalEnergy(const double totE) { fKineticEnergy = totE - GetMass(); }
 		
 		// particle position
-		std::vector<double>& GetParticlePosition() { return fPosition; }
+		void SetPosition(const std::vector<double>& pos) { fPosition = pos; }
+		std::vector<double>& GetPosition() { return fPosition; }
 		// CAVEAT: this sould be part of Detector SimData
 		// particle injection position
 		const std::vector<double>& GetInjectionPosition() const { return fInjectionPosition; }
@@ -128,10 +131,10 @@ class Particle {
  		double fAzimuth = 0;
  		
  		std::vector<double> fPosition;
-  	std::vector<double> fDirection;
-  	std::vector<double> fInjectionPosition;
-  	static std::map<int, double> gParticleMassMap;
-  	static std::map<Particle::Type, Particle::Component> gComponentMap;
+		std::vector<double> fMomentumDirection;
+		std::vector<double> fInjectionPosition;
+		static std::map<int, double> gParticleMassMap;
+		static std::map<Particle::Type, Particle::Component> gComponentMap;
 		// particle properties for mass
 };
 

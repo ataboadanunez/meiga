@@ -6,18 +6,22 @@
 	<tankRadius unit="cm"> 105 </tankRadius>
 	<tankHeight unit="cm"> 90 </tankHeight>
 	<tankThickness unit="mm"> 12 </tankThickness> 
-	<barsInPanel> 12 </barsInPanel>
+	<impuritiesFraction> 0.0 </impuritiesFraction>
+	<numberOfBars> 12 </numberOfBars>
+	<numberOfPanels> 1 </numberOfPanels>
 	<barLength unit="mm"> 500 </barLength>
 	<barWidth unit="mm"> 40 </barWidth> 
 	<barThickness unit="mm"> 10 </barThickness>
 	<coatingThickness unit="mm"> 0.25 </coatingThickness>
 	<casingThickness unit="mm"> 2 </casingThickness>
+	<rotationAngle> 0 </rotationAngle>
 	<fiberLength unit="mm"> 500 </fiberLength>
 	<fiberRadius unit="mm"> 1.2 </fiberRadius>
 	<claddingThickness unit="mm"> 0.10 </claddingThickness>
 	<length unit="mm"> 1000 </length>
 	<width unit="mm"> 1000 </width>
-	<thickness unit="mm"> 1000 </thickness>	
+	<thickness unit="mm"> 1000 </thickness>
+	<distancePanels unit="mm"> 1000 </distancePanels>
 
 	<groundSizeX unit="m"> 5 </groundSizeX>
 	<groundSizeY unit="m"> 5 </groundSizeY>

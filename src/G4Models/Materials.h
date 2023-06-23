@@ -31,6 +31,11 @@ public:
 	static G4Element* elTi;
 	static G4Element* elB ;
 	static G4Element* elNa;
+	static G4Element* elCa;
+	static G4Element* elFe;
+	static G4Element* elAl;
+	static G4Element* elPb;
+	static G4Element* elCl;
 	
 	// compounds
 	static G4Material* SiO2;
@@ -40,10 +45,12 @@ public:
 	static G4Material* PPO;
 	static G4Material* POPOP;
 	static G4Material* Polystyrene;
+	static G4Material* Lead;
 
 	// Materials
 	static G4Material* Air;
 	static G4Material* Water;
+	static G4Material* Salt;
 	static G4Material* StdRock;
 	static G4Material* ScinPlastic;
 	static G4Material* ScinCoating;
@@ -52,12 +59,28 @@ public:
 	static G4Material* FPethylene;
 	static G4Material* Pyrex;
 	static G4Material* HDPE;
+	static G4Material* Concrete;
+	static G4Material* SaltyWater;
 	static G4OpticalSurface* ScinOptSurf;
 	static G4OpticalSurface* LinerOptSurf;
 	static G4OpticalSurface* LinerOptSurf2;
 
+	static G4MaterialPropertiesTable* waterPT1; 
+	static G4MaterialPropertiesTable* waterPT2;
+	static G4MaterialPropertiesTable* linerPT1;
+	static G4MaterialPropertiesTable* scinPT;
+	static G4MaterialPropertiesTable* scinOptSurfPT;
+	static G4MaterialPropertiesTable* pmmaPT;
+	static G4MaterialPropertiesTable* pethylenePT;
+	static G4MaterialPropertiesTable* fpethylenePT;
+	static G4MaterialPropertiesTable* pyrexPT;
+	static G4MaterialPropertiesTable* linerOpticalPT;
+
 	const G4double* GetScinPhotonEnergyArray() const;
 	const G4double* GetScinRefIndexArray() const;
+
+	void SetNaClFracMass(double fracNaCl) { fFracNaCl = fracNaCl; }
+	double GetNaClFracMass() { return fFracNaCl; }
 	
 
 private:
@@ -76,6 +99,8 @@ private:
 	// pmma
 	// according to datasheet BCF-92 WLS fiber
 	const G4double fPMMADecayTime = 2.5*ns;
+
+	G4double fFracNaCl = 0;
 
 
 

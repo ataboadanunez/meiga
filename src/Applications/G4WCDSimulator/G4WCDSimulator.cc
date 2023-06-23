@@ -10,7 +10,7 @@
 // Headers of this particular application
 #include "G4WCDSimulator.h"
 #include "G4WCDConstruction.h"
-#include "G4WCDPrimaryGeneratorAction.h"
+#include "G4MPrimaryGeneratorAction.h"
 #include "G4WCDStackingAction.h"
 #include "G4WCDEventAction.h"
 #include "G4WCDRunAction.h"
@@ -27,7 +27,6 @@
 // Framework libraries
 #include "ConfigManager.h"
 #include "CorsikaUtilities.h"
-#include "ReadParticleFile.h"
 #include "Event.h"
 #include "SimData.h"
 #include "OptDeviceSimData.h"
@@ -126,6 +125,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 	cout << "[INFO] G4WCDSimulator::RunSimulation" << endl;
 	
 	SimData& simData = theEvent.GetSimData();
+	const Event::Config &cfg = theEvent.GetConfig();
 	const unsigned int numberOfParticles = simData.GetTotalNumberOfParticles();
 	cout << "[INFO] G4WCDSimulator::RunSimulation: Number of particles to be simulated = " << numberOfParticles << endl;
 	
@@ -155,7 +155,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 	
 	fRunManager->SetUserInitialization(new G4MPhysicsList(fPhysicsName));
 
-	G4WCDPrimaryGeneratorAction *fPrimaryGenerator = new G4WCDPrimaryGeneratorAction(theEvent);
+	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
 	
 	G4WCDStackingAction *fStackingAction = new G4WCDStackingAction(theEvent);
@@ -176,7 +176,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 	fRunManager->Initialize();
 
 	// initialize visualization
-	if ((fGeoVisOn || fTrajVisOn) && !fVisManager)
+	if ((cfg.fGeoVis || cfg.fTrajVis) && !fVisManager)
 		fVisManager = new G4VisExecutive;
 
 	// get the pointer to the UI manager and set verbosities
@@ -203,7 +203,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 			fUImanager->ApplyCommand("/tracking/verbose 0");
 		}
 	
-	if (fGeoVisOn || fTrajVisOn) {
+	if (cfg.fGeoVis || cfg.fTrajVis) {
 		fVisManager->Initialize();
 		fUImanager->ApplyCommand(("/vis/open " + fRenderFile).c_str());
 		fUImanager->ApplyCommand("/vis/scene/create");
@@ -220,7 +220,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 
 	}
 
-	if (fTrajVisOn) {
+	if (cfg.fTrajVis) {
 			fUImanager->ApplyCommand("/tracking/storeTrajectory 1");
 			fUImanager->ApplyCommand("/vis/scene/add/trajectories");
 	}

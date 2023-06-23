@@ -86,7 +86,7 @@ G4MPMTAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHist
 		return true; 
 
 	SimData& simData = fEvent.GetSimData();
-	if (simData.GetSimulationMode() == SimData::eFull) {
+	if (simData.GetSimulationMode() == SimData::SimulationMode::eFull) {
 		
 		// kill according to PMT quantum efficiency
 		if (!pmt.IsPhotonDetected(energy)) 

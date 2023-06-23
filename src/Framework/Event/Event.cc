@@ -23,7 +23,7 @@ Event::MakeDetector(const unsigned int id, const Detector::DetectorType type)
 	
 	if (type == Detector::eUnknown) {
 		std::string errmsg;
-		errmsg = "[ERROR] Unknown detector type! Possible causes of this error:\n - Misspelled detector type (in the DetectorList.xml).\n - Type not registered in the Detector class.";
+		errmsg = "[ERROR] Event::MakeDetector: Unknown detector type! Possible causes of this error:\n - Misspelled detector type (in the DetectorList.xml).\n - Type not registered in the Detector class.";
 		throw std::invalid_argument(errmsg);
 
 	}

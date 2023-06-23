@@ -4,6 +4,8 @@
 #include "Scintillator.h"
 #include "Musaic.h"
 #include "Mudulus.h"
+#include "Hodoscope.h"
+#include "SaltyWCD.h"
 #include "Dummy.h"
 
 #include "G4UnitsTable.hh"
@@ -33,6 +35,10 @@ Detector::StringToType(string name)
 		return Detector::eMusaic;
 	else if (name == "eMudulus")
 		return Detector::eMudulus;
+	else if (name == "eHodoscope")
+		return Detector::eHodoscope;
+	else if (name == "eSaltyWCD")
+		return Detector::eSaltyWCD;
 	else if (name == "eDummy")
 		return Detector::eDummy;
 	else {
@@ -64,6 +70,8 @@ InitTypeToBuild() {
 	TypeToBuild[Detector::eScintillator]	= Scintillator::BuildDetector;
 	TypeToBuild[Detector::eMusaic]				= Musaic::BuildDetector;
 	TypeToBuild[Detector::eMudulus]				= Mudulus::BuildDetector;
+	TypeToBuild[Detector::eHodoscope]			= Hodoscope::BuildDetector;
+	TypeToBuild[Detector::eSaltyWCD]			= SaltyWCD::BuildDetector;
 	TypeToBuild[Detector::eDummy]					= Dummy::BuildDetector;
 
 }
@@ -134,16 +142,20 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 	SetTankRadius(defProp.gTankRadius);
 	SetTankHeight(defProp.gTankHeight);
 	SetTankThickness(defProp.gTankThickness);
+	SetImpuritiesFraction(defProp.gImpuritiesFraction);
 
 	SetNBars(defProp.gNumberOfBars);
+	SetNPanels(defProp.gNumberOfPanels);
 	SetBarWidth(defProp.gBarWidth);
 	SetBarLength(defProp.gBarLength);
 	SetBarThickness(defProp.gBarThickness);
 	SetBarCoatingThickness(defProp.gCoatingThickness);
+	SetRotationAngle(defProp.gRotationAngle);
 	SetCasingThickness(defProp.gCasingThickness);
 	SetFiberLength(defProp.gFiberLength);
 	SetFiberRadius(defProp.gFiberRadius);
 	SetCladdingThickness(defProp.gCladdingThickness);
+	SetDistanceBtwPanels(defProp.gDistancePanels);
 
 	SetLength(defProp.gLength);
 	SetWidth(defProp.gWidth);
@@ -179,8 +191,11 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
 				SetTankThickness(value * unit);
 			}
-			
-			else if (xmlLabel == "barsInPanel") {
+			else if (xmlLabel == "impuritiesFraction") {
+				double value = stod(xmlValue);
+				SetImpuritiesFraction(value);
+			}
+			else if (xmlLabel == "numberOfBars") {
 				int value = stoi(xmlValue);
 				SetNBars(value);
 			}
@@ -208,6 +223,10 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 				double value = stod(xmlValue);
 				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
 				SetCasingThickness(value * unit);
+			}
+			else if (xmlLabel == "rotationAngle") {
+				double value = stod(xmlValue);
+				SetRotationAngle(value);
 			}
 			else if (xmlLabel == "fiberLength") {
 				double value = stod(xmlValue);
@@ -239,6 +258,15 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
 				SetThickness(value * unit);
 			}
+			else if (xmlLabel == "distancePanels") {
+				double value = stod(xmlValue);
+				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
+				SetDistanceBtwPanels(value * unit);
+			}
+			else if (xmlLabel == "numberOfPanels") {
+				int value = stoi(xmlValue);
+				SetNPanels(value);
+			}
 			else if (xmlLabel == "groundSizeX") {
 				double value = stod(xmlValue);
 				double unit = G4UnitDefinition::GetValueOf(v.second.get<string>("<xmlattr>.unit"));
@@ -258,3 +286,9 @@ Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 	}
 }
 
+void
+Detector::SetRotationAngle(const double angle)
+{
+	double angle_rad = angle * (M_PI / 180.);
+	fRotationAngle = angle_rad;
+}

@@ -45,6 +45,12 @@ DataWriter::FileWriter(Event& theEvent)
 	json jData;
 
 	SimData& simData = theEvent.GetSimData();
+	
+	if (cfg.fSaveInput) {
+		cout << "[DEBUG] DataWriter::FileWriter: Saving input flux information!" << endl;
+		SaveInputFlux(jData, simData);	
+	}
+	
 
 	// loop over detector range
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
@@ -63,11 +69,9 @@ DataWriter::FileWriter(Event& theEvent)
 		/* 
 			Detector level: access energy deposit, particle counters, etc... 
 		*/
-		if (cfg.fSaveEnergy)
+		if (cfg.fSaveEnergy || cfg.fSaveComponentsEnergy)
 			SaveEnergy(jData, simData, detId, cfg.fSaveComponentsEnergy);
 		
-
-
 		const int nOptDev = currDet.GetNOptDevice();
 		cout << "[INFO] DataWriter::FileWriter: Detector ID: " << detId << " has " << nOptDev << " optical device(s)" << endl; 
 
@@ -92,7 +96,7 @@ DataWriter::FileWriter(Event& theEvent)
 			}
 
 			// save photo-electron time distribution(s)
-			if (cfg.fSavePETimeDistribution)
+			if (cfg.fSavePETimeDistribution || cfg.fSaveComponentsPETimeDistribution)
 				SavePETimeDistribution(jData, detSimData, odId, cfg.fSaveComponentsPETimeDistribution);
 
 			// save time traces
@@ -124,6 +128,26 @@ DataWriter::FileWriter(Event& theEvent)
 		outfile << jData;
 	}
 	
+}
+
+void
+DataWriter::SaveInputFlux(json &jData, SimData& simData)
+{
+	vector<json> jParticles;
+
+	for (auto pIt = simData.GetInjectedParticleVector().begin(); pIt != simData.GetInjectedParticleVector().end(); ++pIt) {
+		json myCurrentParticle;
+		Particle &part = *pIt;
+
+		myCurrentParticle["ID"] = part.GetParticleId();
+		myCurrentParticle["Position"] = part.GetPosition();
+		myCurrentParticle["Momentum"] = part.GetMomentumDirection();
+
+		jParticles.push_back(myCurrentParticle);
+
+	}
+
+	jData["InputFlux"] = jParticles;
 }
 
 
@@ -190,7 +214,7 @@ DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId, const boo
 
 	const DetectorSimData &detSimData = simData.GetDetectorSimData(detId);
 	const vector<double> & energyDeposit = detSimData.GetEnergyDeposit();
-	jEnergyDeposit["EnergyDeposit"] = energyDeposit;
+	jEnergyDeposit = energyDeposit;
 	
 	if (saveComponents) {
 		
@@ -207,16 +231,16 @@ DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId, const boo
 		}
 
 		vector<double> energyDepositComponent = detSimData.GetEnergyDeposit(particleComponent);
-		jEnergyDepositComponent["EnergyDeposit_"+componentName] = energyDepositComponent;
+		jEnergyDepositComponent[componentName] = energyDepositComponent;
 
 		} // end loop particle components
 
-		jData["Detector_"+to_string(detId)]["DetectorSimData"] = jEnergyDepositComponent;	
+		//jData["Detector_"+to_string(detId)]["EnergyDeposit"] = jEnergyDepositComponent;	
 
 	}
 	
 
-	jData["Detector_"+to_string(detId)]["DetectorSimData"] = (saveComponents ? jEnergyDepositComponent : jEnergyDeposit);
+	jData["Detector_"+to_string(detId)]["EnergyDeposit"] = (saveComponents ? jEnergyDepositComponent : jEnergyDeposit);
 	
 
 }

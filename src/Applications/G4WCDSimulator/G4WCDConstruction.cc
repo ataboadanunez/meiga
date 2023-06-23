@@ -13,6 +13,10 @@ G4WCDConstruction::G4WCDConstruction(Event& theEvent) :
 	G4VUserDetectorConstruction(),
 	fEvent(theEvent)
 { 
+
+	cout << "...G4WCDConstruction..." << endl;
+	fCheckOverlaps = fEvent.GetConfig().fCheckOverlaps;
+
 }
 
 G4WCDConstruction::~G4WCDConstruction() 
@@ -58,7 +62,7 @@ G4WCDConstruction::PlaceDetector(Event& theEvent)
 	// loop in detector vector
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 		auto& currentDet = detIt->second;
-		BuildDetector(logicWorld, currentDet, theEvent, true);
+		BuildDetector(logicWorld, currentDet, theEvent, fCheckOverlaps);
 
 	}
 

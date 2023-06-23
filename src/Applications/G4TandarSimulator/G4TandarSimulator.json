@@ -1,0 +1,30 @@
+{
+	"Input" :
+	{
+		"Mode" : "UseARTI",
+		"InputFileName" : "./test.shw",
+		"InputNParticles" : 1
+	},
+	"Output" : 
+	{
+		"OutputFile" : "./output.json",
+		"CompressOutput" : false,
+		"SavePETimeDistribution" : false,
+		"SaveComponentsPETimeDistribution" : false,
+		"SaveEnergy" : false,
+		"SaveComponentsEnergy" : false
+	},
+	"DetectorList" : "./DetectorList.xml",
+	"DetectorProperties" : "./DetectorProperties.xml",
+	"Simulation" :
+	{
+		"SimulationMode" : "eFast",
+		"InjectionMode" : "eRandom",
+		"GeoVisOn" : true,
+		"TrajVisOn" : true,
+		"CheckOverlaps" : false,
+		"Verbosity" : 1,
+		"RenderFile" : "VRML2FILE",
+		"PhysicsName" : "QGSP_BERT_HP"
+	}
+}

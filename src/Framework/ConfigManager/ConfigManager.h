@@ -7,6 +7,9 @@
 #include "Detector.h"
 #include "DefaultProperties.h"
 
+// Geant4 headers
+#include "G4UnitsTable.hh"
+
 // c++ headers
 #include <map>
 #include <string>
@@ -16,7 +19,8 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-
+using boost::property_tree::ptree;
+using namespace std;
 
 class ConfigManager
 {
@@ -24,9 +28,7 @@ class ConfigManager
 
 	public:
 
-		ConfigManager() {
-			//TODO: Mapa que entre por detectorType y entregue una clase con las propiedades por defecto
-		}
+		ConfigManager() { }
 		~ConfigManager() { }
 		// public and static to be called within the applications 'without object'
 		static Event ReadConfigurationFile(const std::string &filename);
@@ -34,9 +36,38 @@ class ConfigManager
 		static void PrintConfig(const Event::Config &cfg);
 
 	private:
-		// static void ActuallyReadDetectorXML(std::string filename, Event& theEvent);
 		
 		static DefaultProperties defProp;
+
+		// return value giving the XML path
+		template <typename T>
+		inline static T GetPropertyFromXML(const ptree &tree, const string &branchName, const string &property, bool hasUnit = true) {
+
+			T res = tree.get<T>(branchName+"."+property);
+			
+			if (hasUnit) {
+				auto unit = G4UnitDefinition::GetValueOf(tree.get<string>(branchName+"."+property+".<xmlattr>.unit"));
+				res *= unit;
+			} 
+			
+			return res;
+		}
+
+		template <typename T>
+		inline static T GetPropertyFromXML(const ptree &tree, const string &branchName, const string &property, const T &defaultVal, bool hasUnit = true, const string &defaultUnit = "mm") {
+			
+			T res = tree.get<T>(branchName+"."+property, defaultVal);
+			
+			if (hasUnit) {
+				auto unit = G4UnitDefinition::GetValueOf(tree.get<string>(branchName+"."+property+".<xmlattr>.unit", defaultUnit));
+				res *= unit;
+			} 
+			
+			return res;
+		}
+
+	friend class DefaultProperties;
+
 };
 
 #endif

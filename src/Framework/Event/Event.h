@@ -55,6 +55,8 @@ class Event
 		// program configuration variables
 
 		// input variables
+		std::string fInputMode;
+		unsigned int fInputNParticles;
 		std::string fInputFileName;
 		std::string fDetectorList;
 		std::string fDetectorProperties;
@@ -72,6 +74,7 @@ class Event
 		// output variables
 		std::string fOutputFileName;
 		bool fCompressOutput;
+		bool fSaveInput;
 		bool fSavePETimeDistribution;
 		bool fSaveComponentsPETimeDistribution;
 		bool fSaveTraces;

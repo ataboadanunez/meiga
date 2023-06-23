@@ -5,6 +5,7 @@
 #include "G4ProcessManager.hh"
 #include "G4ParticleTypes.hh"
 #include "G4ParticleTable.hh"
+#include "G4HadronPhysicsQGSP_BERT.hh"
 #include "FTFP_BERT.hh"
 #include "QGSP_BERT_HP.hh"
 #include "G4Gamma.hh"
@@ -19,6 +20,7 @@
 #include "G4RadioactiveDecayPhysics.hh"
 #include "G4SystemOfUnits.hh"
 //#include "PhysicsListMessenger.hh"
+#include "G4HadronInelasticQBBC.hh"
 
 #include "StepMax.hh"
 #include "ExtraPhysics.hh"
@@ -37,17 +39,12 @@ G4AndesPhysicsList::G4AndesPhysicsList(G4String physName) : G4VModularPhysicsLis
 
 //    G4PhysListFactory factory;
 		G4VModularPhysicsList* phys = NULL;
-		if (physName == "QGSP_BERT_HP") {
-			 phys = new QGSP_BERT_HP;
-		} else {
-			 phys = new FTFP_BERT;
-		}
-//    if (factory.IsReferencePhysList(physName)) {
-//       phys = factory.GetReferencePhysList(physName);
-//       if(!phys)G4Exception("PhysicsList::PhysicsList","InvalidSetup",
-//                            FatalException,"PhysicsList does not exist");
-			 //fMessenger = new PhysicsListMessenger(this);
-//    }
+		
+		if (physName == "QGSP_BERT_HP") 
+			phys = new QGSP_BERT_HP;
+		else 
+			phys = new FTFP_BERT;
+
 
 		for (G4int i = 0; ; ++i) {
 			 G4VPhysicsConstructor* elem =
@@ -61,8 +58,11 @@ G4AndesPhysicsList::G4AndesPhysicsList(G4String physName) : G4VModularPhysicsLis
 		
 		RegisterPhysics(new ExtraPhysics());
 		RegisterPhysics(fOpticalPhysics = new OpticalPhysics(fAbsorptionOn));
-
 		RegisterPhysics(new G4RadioactiveDecayPhysics());
+
+		// Registering G4HadronPhysics_QGSP_BERT
+
+		RegisterPhysics(new G4HadronPhysicsQGSP_BERT);
 
 		fStepMaxProcess = new StepMax();
 }

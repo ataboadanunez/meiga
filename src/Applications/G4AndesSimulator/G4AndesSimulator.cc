@@ -16,7 +16,8 @@
 #include "G4AndesRunAction.h"
 #include "G4AndesTrackingAction.h"
 #include "G4AndesSteppingAction.h"
-#include "G4AndesPhysicsList.h" 
+#include "G4AndesPhysicsList.h"
+#include "G4AndesPhysicsListHad.h"
 
 // Geant4 headers
 #include "FTFP_BERT.hh"
@@ -159,7 +160,8 @@ G4AndesSimulator::RunSimulation(Event& theEvent)
 	auto fDetConstruction = new G4AndesDetectorConstruction(theEvent);
 	fRunManager->SetUserInitialization(fDetConstruction);
 	
-	fRunManager->SetUserInitialization(new G4AndesPhysicsList(fPhysicsName));  
+	fRunManager->SetUserInitialization(new G4AndesPhysicsList(fPhysicsName));
+	// fRunManager->SetUserInitialization(new G4AndesPhysicsListHad());
  
 	G4AndesPrimaryGeneratorAction *fPrimaryGenerator = new G4AndesPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);

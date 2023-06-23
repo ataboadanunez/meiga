@@ -6,7 +6,6 @@
 		"CompressOutput" : false,
 		"SavePETimeDistribution" : true,
 		"SaveComponentsPETimeDistribution" :false,
-		"SaveTraces" : false,
 		"SaveEnergy" : true,
 		"SaveComponentsEnergy" : false
 	},

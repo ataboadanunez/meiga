@@ -14,41 +14,58 @@ SimData::~SimData()
 
 }
 
+
+SimData::InputMode
+SimData::InputModeConversion(string name)
+{
+
+	fInputModeName = name;
+
+	if (name == "UseARTI")
+		return SimData::InputMode::eUseARTI;
+	else if (name == "UseEcoMug")
+		return SimData::InputMode::eUseEcoMug;
+	else {
+		string what = "[ERROR] SimData::InputModeConversion: Unknown input mode: " + name;
+		throw invalid_argument(what);
+		return SimData::InputMode::eUnknown;
+	}
+}
+
+
 SimData::InjectionMode
 SimData::InjectionConversion(string name)
 {
 	
 	fInjectionModeName = name;
 
-	if (name == "eRandom")
-		return SimData::eRandom;
-	else if (name == "ePositionFromFile")
-		return SimData::ePositionFromFile;
+	if (name == "eCircle")
+		return SimData::InjectionMode::eCircle;
+	else if (name == "eHalfSphere")
+		return SimData::InjectionMode::eHalfSphere;
 	else if (name == "eVertical")
-		return SimData::eVertical;
-	else if (name == "eInsideDetector")
-		return SimData::eInsideDetector;
-	else if (name == "eCircle")
-		return SimData::eCircle;
+		return SimData::InjectionMode::eVertical;
+	else if (name == "eFromFile")
+		return SimData::InjectionMode::eFromFile;
 	else {
-		cout << "[WARNING] SimData::StringToType: Unknown injection type!" << endl;
-		return SimData::eUnknown;
+		cout << "[WARNING] SimData::InjectionConversion: Unknown injection type!" << endl;
+		return SimData::InjectionMode::eUnknown;
 	}
 }
 
 SimData::SimulationMode
-SimData::ModeConversion(string name)
+SimData::SimulationModeConversion(string name)
 {
 	
 	fSimulationModeName = name;
 
 	if (name == "eFull")
-		return SimData::eFull;
+		return SimData::SimulationMode::eFull;
 	else if (name == "eFast")
-		return SimData::eFast;
+		return SimData::SimulationMode::eFast;
 	else {
-		cout << "[WARNING] SimData::StringToType: Unknown simulation type! (uwsing Full by default)." << endl;
-		return SimData::eFull;
+		cout << "[WARNING] SimData::SimulationModeConversion: Unknown simulation type! (uwsing Full by default)." << endl;
+		return SimData::SimulationMode::eFull;
 	}
 }
 

@@ -40,6 +40,8 @@ class Detector
 			eMudulus = 2,
 			eWCD = 3,
 			eScintillator = 4,
+			eHodoscope = 5,
+			eSaltyWCD = 6,
 			eDummy
 		};
 
@@ -60,8 +62,13 @@ class Detector
 		// Mechanical properties
 		double GetCasingThickness() const { return fCasingThickness; }
 		void SetCasingThickness(double casingThickness) { fCasingThickness = casingThickness; }
+		double GetRotationAngle() const { return fRotationAngle; }
+		void SetRotationAngle(double angle);
 
 		// scintillator-type detector properties
+		int GetNPanels() const { return fNumberOfPanels; }
+		void SetNPanels(int nPanels) { fNumberOfPanels = nPanels; }
+
 		int GetNBars() const { return fNumberOfBars; }
 		void SetNBars(int nBars) { fNumberOfBars = nBars; }
 
@@ -76,6 +83,9 @@ class Detector
 		
 		double GetBarCoatingThickness() const { return fCoatingThickness; }
 		void SetBarCoatingThickness(double barCoatThickness) { fCoatingThickness = barCoatThickness; }
+
+		double GetDistanceBtwPanels() const { return fDistancePanels; }
+		void SetDistanceBtwPanels( double dist) { fDistancePanels = dist; }
 
 		// WLS fibers
 		double GetFiberRadius() const { return fFiberRadius; }
@@ -96,6 +106,9 @@ class Detector
 
 		double GetTankThickness() const { return fTankThickness; }
 		void SetTankThickness(double t) { fTankThickness = t; }
+
+		double GetImpuritiesFraction() const { return fImpuritiesFraction; }
+		void SetImpuritiesFraction(double impF) { fImpuritiesFraction = impF; }
 
 		// general detector size parameters
 		double GetLength() const { return fLength; }
@@ -146,21 +159,24 @@ class Detector
 		int fNOptDevices = 0;
 
 		// Scintillator bars
-
 		double fBarWidth;
 		double fBarLength;
 		double fBarThickness;
 		double fCasingThickness;
+		double fRotationAngle;
 		double fFiberLength;
 		double fFiberRadius;
 		double fCladdingThickness;
 		double fCoatingThickness;
 		int    fNumberOfBars;
+		int    fNumberOfPanels;
+		double fDistancePanels;
 
 		// Water-Cerenkov Detector parameters
 		double fTankHeight;
 		double fTankRadius;
 		double fTankThickness;
+		double fImpuritiesFraction;
 
 		// general detector size parameters
 		double fLength;
