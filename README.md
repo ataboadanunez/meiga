@@ -1,5 +1,7 @@
 # meiga
 
+[![DOI](https://zenodo.org/badge/595798217.svg)](https://zenodo.org/badge/latestdoi/595798217)
+
 ![Cover](src/Documentation/wcd.png)
 <!-- TABLE OF CONTENTS -->
 <details>
