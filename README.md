@@ -12,8 +12,10 @@
     <li><a href="#input-flux">Input flux</a></li>
     <li><a href="#applications">Applications</a></li>
     <li><a href="#simulation-output">Simulation Output</a></li>
+    <li><a href="#contact">Contact</a></li>
   </ol>
 </details>
+ 
 
 # Introduction
 Meiga is a framework designed to develop astroparticle simulations and their possible applications. It is a set of classes written in C++ that connects the particle flux simulation with the response of a given detector through Geant4. The framework is designed with a hierarchical structure for data transfer and access and also provides an interface for the user to configure the parameters of the simulation or detector design.
@@ -315,3 +317,9 @@ Running the `read_output.py` script using that configuration produces the follow
 ![energy](src/Documentation/edep.png)
 
 ![charge](src/Documentation/charge_histo.png)
+
+# Contact
+
+The Meiga Framework is mainly developed and maintained by [Alvaro Taboada (@ataboadanunez)](https://github.com/ataboadanunez/).
+
+Contact via [email](mailto:alvaro.taboada.nunez@gmail.com).
