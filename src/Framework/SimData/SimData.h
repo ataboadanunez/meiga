@@ -31,7 +31,6 @@ class SimData
 			eCircle = 1,
 			eHalfSphere = 2,
 			eVertical = 3,
-			// particle position given in input file
 			eFromFile
 		};
 
