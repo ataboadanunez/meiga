@@ -16,7 +16,7 @@ from utils import *
 
 import matplotlib.pyplot as plt
 # console for debugging
-# from IPython import embed
+from IPython import embed
 
 def completepath(s, cfiledir):
 	if s[0] == '/':
@@ -122,7 +122,8 @@ def Process(options):
 		processedData['ComponentsPETimeDistribution'] = GetComponentsTraces(data, optdevices)
 	if savePETimeDistribution:
 		processedData['PETimeDistribution'] = GetTraces(data, optdevices)
-	
+
+
 	return processedData, processedcfg
 
 
@@ -144,6 +145,12 @@ if __name__ == "__main__":
 	# and returns a container with all requested information
 	processedData, processedcfg = Process(options)
 	
+	######################
+	# Under development
+	merged_df = MergeInputOutput(processedData, processedcfg)
+	print(merged_df.head())
+	######################
+
 	#########################################################################
 	# PLOTS (section under development)
 	#########################################################################

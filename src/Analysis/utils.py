@@ -5,7 +5,18 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 from IPython import embed
 components = ['eElectromagnetic', 'eHadronic', 'eMuonDecay', 'eMuonic']
+components_id = {
+									'eElectromagnetic' : [1, 2, 3],
+									'eMuonic'          : [5, 6, 95, 96],
+									'eHadronic'        : [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74],
+								}
 
+def IdToComponent(iid):
+	for comp in components_id.keys():
+		if iid in components_id.get(comp):
+			return comp
+	
+	return 'eUnknown'
 
 def GetInputFlux(data):
 	"""
@@ -28,6 +39,7 @@ def GetInputFlux(data):
 		datai = inputData[i]
 		# first element of the dictionary is the particle (CORSIKA) id
 		inputDatadict["particle_id"].append(datai['ID'])
+		inputDatadict["component"].append(IdToComponent(datai['ID']))
 		# the following three elements are the momentum componentes [in MeV]
 		px = datai['Momentum'][0]
 		py = datai['Momentum'][1]
@@ -269,3 +281,83 @@ def PlotComponentsChargeHistogram(df):
 		plt.title(r'Charge histogram of %s' %optdev_name)
 		return fig
 
+
+def MergeInputOutput(processedData, processedCfg, optdevices=['OptDevice_0']):
+	
+	# Fix Iterator over Detectors
+	# Fix Iterator over OptDevices
+	# Include MuonDecay signals
+
+	particle_df = pd.DataFrame()
+	saveInput = processedCfg['InputFlux']
+	saveComponentsEnergy = processedCfg['ComponentsDepositedEnergy']
+	saveEnergy = processedCfg['DepositedEnergy']
+	saveComponentsPETimeDistribution = processedCfg['ComponentsPETimeDistribution']
+	savePETimeDistribution = processedCfg['PETimeDistribution']
+
+	# build particle data
+	if saveInput and (saveComponentsEnergy or saveEnergy) and (saveComponentsPETimeDistribution or savePETimeDistribution):
+		
+		# saveInput option is needed to track particle type
+
+		# get input dataframe
+		input_df = processedData['InputFlux']
+
+		# merge EnergyDeposit
+		if saveEnergy:
+
+			edep_df = processedData['DepositedEnergy']
+			
+			assert len(edep_df) == len(input_df)
+
+			input_df_c = input_df.copy()
+			# merge energy deposited data with input data
+			input_df_c['DepositedEnergy'] = edep_df
+
+		elif saveComponentsEnergy:
+			# separate input data per components
+			muon_df = input_df[input_df.component == 'eMuonic']
+			em_df = input_df[input_df.component == 'eElectromagnetic']
+			had_df = input_df[input_df.component == 'eHadronic']
+
+			muon_df_c = muon_df.copy()
+			em_df_c = em_df.copy()
+			had_df_c = had_df.copy()
+			
+			muon_df_c['DepositedEnergy'] = processedData['ComponentsDepositedEnergy']['Detector_0']['eMuonic']
+			em_df_c['DepositedEnergy'] = processedData['ComponentsDepositedEnergy']['Detector_0']['eElectromagnetic']
+			had_df_c['DepositedEnergy'] = processedData['ComponentsDepositedEnergy']['Detector_0']['eHadronic']
+
+			input_df_c = pd.concat([muon_df_c, em_df_c, had_df_c])
+
+		# merge PETimeDistribution 
+		if savePETimeDistribution:
+			
+			input_df_c2 = input_df_c.copy()
+
+			# loop over opt. devices
+			for odid, optdev in enumerate(optdevices):
+				input_df_c2['PE_%i' %odid] = processedData['PETimeDistribution'][optdev]
+
+			particle_df = input_df_c2
+
+		elif saveComponentsPETimeDistribution:
+			
+			# separate input data per components
+			muon_df = input_df_c[input_df_c.component == 'eMuonic']
+			em_df = input_df_c[input_df_c.component == 'eElectromagnetic']
+			had_df = input_df_c[input_df_c.component == 'eHadronic']
+
+			muon_df_c = muon_df.copy()
+			em_df_c = em_df.copy()
+			had_df_c = had_df.copy()
+
+			for odid, optdev in enumerate(optdevices):
+				pe_ = processedData['ComponentsPETimeDistribution'][optdev]
+				muon_df_c['PE_%i' %odid] = pe_['eMuonic']
+				em_df_c['PE_%i' %odid] = pe_['eElectromagnetic']
+				had_df_c['PE_%i' %odid] = pe_['eHadronic']
+
+			particle_df = pd.concat([muon_df_c, em_df_c, had_df_c])
+
+	return particle_df
