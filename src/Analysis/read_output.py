@@ -123,6 +123,9 @@ def Process(options):
 	if savePETimeDistribution:
 		processedData['PETimeDistribution'] = GetTraces(data, optdevices)
 
+	# add list of detector IDs and optdevice IDs to be handled inside functions
+	processedData['Detector_ID'] = detectors
+	processedData['OptDevice_ID'] = optdevices
 
 	return processedData, processedcfg
 
@@ -149,6 +152,7 @@ if __name__ == "__main__":
 	# Under development
 	merged_df = MergeInputOutput(processedData, processedcfg)
 	print(merged_df.head())
+	muondecay_df = GetMuonDecaySignals(processedData, merged_df)
 	######################
 
 	#########################################################################

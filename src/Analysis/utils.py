@@ -37,6 +37,7 @@ def GetInputFlux(data):
 	for i in range(n_events):
 		# each event is stored as a dictionary in a list of all events
 		datai = inputData[i]
+		inputDatadict["event_id"].append(i)
 		# first element of the dictionary is the particle (CORSIKA) id
 		inputDatadict["particle_id"].append(datai['ID'])
 		inputDatadict["component"].append(IdToComponent(datai['ID']))
@@ -282,11 +283,12 @@ def PlotComponentsChargeHistogram(df):
 		return fig
 
 
-def MergeInputOutput(processedData, processedCfg, optdevices=['OptDevice_0']):
+def MergeInputOutput(processedData, processedCfg):
 	
 	# Fix Iterator over Detectors
-	# Fix Iterator over OptDevices
-	# Include MuonDecay signals
+
+	optdevices = processedData['OptDevice_ID']
+	detectors  = processedData['Detector_ID']
 
 	particle_df = pd.DataFrame()
 	saveInput = processedCfg['InputFlux']
@@ -360,4 +362,38 @@ def MergeInputOutput(processedData, processedCfg, optdevices=['OptDevice_0']):
 
 			particle_df = pd.concat([muon_df_c, em_df_c, had_df_c])
 
+			# sort dataframe by event_id to keep order
+			particle_df = particle_df.sort_values('event_id')
+			particle_df = particle_df.set_index('event_id', drop=False)
+
 	return particle_df
+
+
+def GetMuonDecaySignals(processedData, merged_df):
+
+	"""
+		Returns DataFrame with PE time distributions
+		produced by decayed muons.
+				
+	"""
+
+	optdevices = processedData['OptDevice_ID']
+	# mask muons in merged DataFrame
+	muon_ids = merged_df[merged_df.component == 'eMuonic'].event_id
+	
+	# create container for muon decay signals
+	muonDecaySignals = defaultdict(list)
+
+	for evid in muon_ids:
+		muonDecaySignals['parent_id'].append(evid)
+
+		for odid, optdev in enumerate(optdevices):
+			# get muon decay traces
+			muonDecayTraces = processedData['ComponentsPETimeDistribution'][optdev]['eMuonDecay']
+			assert len(muonDecayTraces) == len(merged_df)
+		
+			muonDecaySignals['PE_%i' %odid].append(muonDecayTraces[evid])
+
+	muonDecaySignals_df = pd.DataFrame(muonDecaySignals)
+
+	return muonDecaySignals_df
