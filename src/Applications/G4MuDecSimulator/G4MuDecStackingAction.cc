@@ -33,7 +33,7 @@ G4MuDecStackingAction::ClassifyNewTrack(const G4Track* const track)
 
   // if not (fast simulation mode), kill Cerenkov photons according 
   // energy and the PMT quantum efficiency
-  if (simMode == SimData::eFull)
+  if (simMode == SimData::SimulationMode::eFull)
     return fWaiting;
 
   // get PMT
