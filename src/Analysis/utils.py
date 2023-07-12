@@ -30,7 +30,7 @@ def GetInputFlux(data):
 	"""
 	print("[INFO] GetInputFlux: Reading information of injected particles")
 	key = 'InputFlux'
-	inputData = data[key][0] # list containing all events
+	inputData = data[key] # list containing all events
 	n_events = len(inputData)
 	print("Number of injected particles = %i" %n_events)
 	inputDatadict = defaultdict(list)
@@ -102,7 +102,7 @@ def GetDepositedEnergy(data, detectors):
 	container = {}
 	for keydet in detectors:
 		print("[INFO] GetDepositedEnergy: Accessing data of Detector: %s" %keydet)
-		eDepData = np.array(data[keydet][0][key])
+		eDepData = np.array(data[keydet][key])
 		# skip particles that did not hit the detector
 		edep = eDepData[eDepData >= 0]
 		container['EnergyDeposit_%s' %keydet] = edep
@@ -179,14 +179,22 @@ def PlotComponentsDepositedEnergy(df):
 	return fig
 
 
-def GetTraces(data, optdevices):
+def GetTraces(data, detectors):
 	print("[INFO] GetTraces: Reading information of Optical Device signals")
-	key = 'PETimeDistribution'
+	keydata = 'PETimeDistribution'
 	container = {}
-	for keyoptdev in optdevices:
-		peTimeDistributions = data[keyoptdev][0][key]
+
+	for keydet in detectors:
+		for name in data[keydet].keys():
+			if 'OptDevice_' in name:
+				keyoptdev = keydet + '/' + name
+				peTimeDistributions = data[keydet][name][keydata]
+				container[keyoptdev] = peTimeDistributions
+
+	# for keyoptdev in optdevices:
+	# 	peTimeDistributions = data[keyoptdev][0][key]
 		
-		container[keyoptdev] = peTimeDistributions
+	# 	container[keyoptdev] = peTimeDistributions
 
 	tracesDf = pd.DataFrame(container)
 	return tracesDf
@@ -219,23 +227,27 @@ def PlotChargeHistogram(df):
 	return fig
 
 
-def GetComponentsTraces(data, optdevices):
+def GetComponentsTraces(data, detectors):
 	"""
 		
 	"""
 	print("[INFO] GetComponentTraces: Reading information of Optical Device signals")
-	key = 'PETimeDistribution'
+	keydata = 'PETimeDistribution'
 	container = {}
-	for keyoptdev in optdevices:
-		# this returns a dictionary where each key contains the PETimeDistributions of the corresponding particle component
-		peTimeDistributions = data[keyoptdev][0][key]
-		component_traces = {}
-		for comp in components:
-			try:
-				component_traces[comp] = peTimeDistributions[comp]
-			except KeyError:
-				print("[WARNING] GetComponentTraces: Component not found in data: ", comp )
-		container[keyoptdev] = component_traces
+
+	for keydet in detectors:
+		for name in data[keydet].keys():
+			if 'OptDevice_' in name:
+				keyoptdev = keydet + '/' + name
+				peTimeDistributions = data[keydet][name][keydata]
+
+				component_traces = {}
+				for comp in components:
+					try:
+						component_traces[comp] = peTimeDistributions[comp]
+					except KeyError:
+						print("[WARNING] GetComponentTraces: Component not found in data: ", comp )
+				container[keyoptdev] = component_traces
 
 	# convert to Pandas DataFrame
 	componentTracesDf = pd.DataFrame(container)
@@ -280,12 +292,15 @@ def PlotComponentsChargeHistogram(df):
 		# remove _ from name for labeling 
 		optdev_name = ''.join([s+' ' for s in optdev.split('_')])
 		plt.title(r'Charge histogram of %s' %optdev_name)
-		return fig
+	return fig
 
 
 def MergeInputOutput(processedData, processedCfg):
 	
 	# Fix Iterator over Detectors
+	print("[INFO] MergeInputOutput: Function needs to be updated to current output format. Skipping...")
+
+	return pd.DataFrame()
 
 	optdevices = processedData['OptDevice_ID']
 	detectors  = processedData['Detector_ID']
