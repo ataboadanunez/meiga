@@ -61,7 +61,7 @@ WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEve
 	int pmtId = 0;
 	ostringstream namedetector;
 	namedetector.str("");
-	namedetector << "WCD";
+	namedetector << "/WCD_"+to_string(detectorId);
 	cout << "[INFO] G4Models::WCD: Building detector " << namedetector.str();
 	cout << " (ID = " << detectorId << ")";
 	cout << " with " << pmt.GetName() << ". " << endl;
@@ -130,17 +130,17 @@ WCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEve
 	//if (!optDevice.HasLogicalVolume(logName))
 		//optDevice.SetLogicalVolume(logName, logPMT);
 
-	string optName = pmt.GetName();
+	string optName = pmt.GetName() + "_"+to_string(pmtId);
 	ostringstream fullName;
 	fullName.str("");
-	fullName << "/WCD/" << optName;
+	fullName << "/WCD_"+to_string(detectorId) << "/" << optName;
 	G4MPMTAction* const pmtSD = new G4MPMTAction(fullName.str().c_str(), detectorId, pmtId, theEvent);
 	sdMan->AddNewDetector(pmtSD);
 	logPMT->SetSensitiveDetector(pmtSD);
 
 
 	// register water volume as sensitive detector
-	G4MDetectorAction* const waterSD = new G4MDetectorAction("physTank", detectorId, theEvent);
+	G4MDetectorAction* const waterSD = new G4MDetectorAction(namedetector.str().c_str(), detectorId, theEvent);
 	sdMan->AddNewDetector(waterSD);
 	logTank->SetSensitiveDetector(waterSD);
 	
