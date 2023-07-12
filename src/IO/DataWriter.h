@@ -20,9 +20,9 @@ class DataWriter {
 		
 		static void SaveInputFlux(nlohmann::json &jData, SimData &simData);
 
-		static void SavePETimeDistribution(nlohmann::json &jData, const DetectorSimData& sim, int id, bool saveComponents);
+		static void SavePETimeDistribution(nlohmann::json &jData, const DetectorSimData& sim, int detId, int odId, bool saveComponents);
 
-		static void SaveTraces(nlohmann::json &jData, const DetectorSimData& sim, int id);
+		static void SaveTraces(nlohmann::json &jData, const DetectorSimData& sim, int detId, int odId);
 
 		static void SaveEnergy(nlohmann::json &jData, const SimData& sim, int id, const bool saveComponents);
 };

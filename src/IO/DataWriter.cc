@@ -47,7 +47,7 @@ DataWriter::FileWriter(Event& theEvent)
 	SimData& simData = theEvent.GetSimData();
 	
 	if (cfg.fSaveInput) {
-		cout << "[DEBUG] DataWriter::FileWriter: Saving input flux information!" << endl;
+		cout << "[INFO] DataWriter::FileWriter: Saving input flux information." << endl;
 		SaveInputFlux(jData, simData);	
 	}
 	
@@ -97,11 +97,11 @@ DataWriter::FileWriter(Event& theEvent)
 
 			// save photo-electron time distribution(s)
 			if (cfg.fSavePETimeDistribution || cfg.fSaveComponentsPETimeDistribution)
-				SavePETimeDistribution(jData, detSimData, odId, cfg.fSaveComponentsPETimeDistribution);
+				SavePETimeDistribution(jData, detSimData, detId, odId, cfg.fSaveComponentsPETimeDistribution);
 
 			// save time traces
 			if (cfg.fSaveTraces)
-				SaveTraces(jData, detSimData, odId);
+				SaveTraces(jData, detSimData, detId, odId);
 
 		} // end loop over optical devices
 
@@ -152,7 +152,7 @@ DataWriter::SaveInputFlux(json &jData, SimData& simData)
 
 
 void
-DataWriter::SavePETimeDistribution(json &jData, const DetectorSimData& detSimData, int odId, const bool saveComponents)
+DataWriter::SavePETimeDistribution(json &jData, const DetectorSimData& detSimData, int detId, int odId, const bool saveComponents)
 {
 
 	const OptDeviceSimData &odSimData = detSimData.GetOptDeviceSimData(odId);
@@ -160,6 +160,7 @@ DataWriter::SavePETimeDistribution(json &jData, const DetectorSimData& detSimDat
 	json jPETimeDistribution;
 	json jComponentPETimeDistribution;
 
+	cout << "[INFO] DataWriter::SavePETimeDistribution: Saving PETimeDistribution of Optical Device with ID " << odId << " from Detector " << detId << endl;
 
 	if (saveComponents) {
 
@@ -179,7 +180,7 @@ DataWriter::SavePETimeDistribution(json &jData, const DetectorSimData& detSimDat
 
 		} // end loop particle components
 
-		jData["OptDevice_"+to_string(odId)]["PETimeDistribution"] = jComponentPETimeDistribution;
+		jData["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["PETimeDistribution"] = jComponentPETimeDistribution;
 
 	}
 	// save PETimeDistributions when components are disabled. do not save both.
@@ -187,21 +188,21 @@ DataWriter::SavePETimeDistribution(json &jData, const DetectorSimData& detSimDat
 
 		auto peTimeDistribution = odSimData.GetPETimeDistribution();	
 		jPETimeDistribution = peTimeDistribution;
-		jData["OptDevice_"+to_string(odId)]["PETimeDistribution"] = jPETimeDistribution;
+		jData["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["PETimeDistribution"] = jPETimeDistribution;
 	}
 	
 }
 
 void
-DataWriter::SaveTraces(json &jData, const DetectorSimData& detSimData, int odId)
+DataWriter::SaveTraces(json &jData, const DetectorSimData& detSimData, int detId, int odId)
 {
 	json jTimeTraces;
 	const OptDeviceSimData &odSimData = detSimData.GetOptDeviceSimData(odId);
 	auto timeTraces = odSimData.GetTimeTraceDistribution();
 	jTimeTraces = timeTraces;
 
-	cout << "[INFO] DataWriter::SaveTraces: Saving time traces of Optical Device with ID " << odId << endl;
-	jData["OptDevice_"+to_string(odId)]["TimeTraces"] = jTimeTraces;
+	cout << "[INFO] DataWriter::SaveTraces: Saving time traces of Optical Device with ID " << odId << " from Detector " << detId << endl;
+	jData["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["TimeTraces"] = jTimeTraces;
 
 }
 
@@ -215,6 +216,8 @@ DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId, const boo
 	const DetectorSimData &detSimData = simData.GetDetectorSimData(detId);
 	const vector<double> & energyDeposit = detSimData.GetEnergyDeposit();
 	jEnergyDeposit = energyDeposit;
+
+	cout << "[INFO] DataWriter::SaveEnergy: Saving Energy Deposited at Detector " << detId << endl;
 	
 	if (saveComponents) {
 		
