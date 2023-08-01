@@ -105,7 +105,7 @@ def GetDepositedEnergy(data, detectors):
 		eDepData = np.array(data[keydet][key])
 		# skip particles that did not hit the detector
 		edep = eDepData[eDepData >= 0]
-		container['EnergyDeposit_%s' %keydet] = edep
+		container[keydet] = edep
 
 	# convert to Pandas DataFrame
 	eDepDf = pd.DataFrame(container)
@@ -142,8 +142,8 @@ def GetComponentsDepositedEnergy(data, detectors):
 	container = {}
 	for keydet in detectors:
 		print("[INFO] GetComponentesDepositedEnergy: Accessing data of Detector: %s" %keydet)
-
-		depositedEnergy = data[keydet][0][key]
+		
+		depositedEnergy = data[keydet][key]
 		component_eDep = {}
 		for comp in components:
 			try:
@@ -297,12 +297,6 @@ def PlotComponentsChargeHistogram(df):
 
 def MergeInputOutput(processedData, processedCfg):
 	
-	# Fix Iterator over Detectors
-	print("[INFO] MergeInputOutput: Function needs to be updated to current output format. Skipping...")
-
-	return pd.DataFrame()
-
-	optdevices = processedData['OptDevice_ID']
 	detectors  = processedData['Detector_ID']
 
 	particle_df = pd.DataFrame()
@@ -323,13 +317,11 @@ def MergeInputOutput(processedData, processedCfg):
 		# merge EnergyDeposit
 		if saveEnergy:
 
-			edep_df = processedData['DepositedEnergy']
-			
-			assert len(edep_df) == len(input_df)
-
 			input_df_c = input_df.copy()
+
 			# merge energy deposited data with input data
-			input_df_c['DepositedEnergy'] = edep_df
+			for detector in detectors:
+				input_df_c['DepositedEnergy_%s' %detector] = processedData['DepositedEnergy'][detector]
 
 		elif saveComponentsEnergy:
 			# separate input data per components
@@ -341,9 +333,10 @@ def MergeInputOutput(processedData, processedCfg):
 			em_df_c = em_df.copy()
 			had_df_c = had_df.copy()
 			
-			muon_df_c['DepositedEnergy'] = processedData['ComponentsDepositedEnergy']['Detector_0']['eMuonic']
-			em_df_c['DepositedEnergy'] = processedData['ComponentsDepositedEnergy']['Detector_0']['eElectromagnetic']
-			had_df_c['DepositedEnergy'] = processedData['ComponentsDepositedEnergy']['Detector_0']['eHadronic']
+			for detector in detectors:
+				muon_df_c['DepositedEnergy_%s' %detector] = processedData['ComponentsDepositedEnergy'][detector]['eMuonic']
+				em_df_c['DepositedEnergy_%s' %detector] = processedData['ComponentsDepositedEnergy'][detector]['eElectromagnetic']
+				had_df_c['DepositedEnergy_%s' %detector] = processedData['ComponentsDepositedEnergy'][detector]['eHadronic']
 
 			input_df_c = pd.concat([muon_df_c, em_df_c, had_df_c])
 
@@ -353,8 +346,8 @@ def MergeInputOutput(processedData, processedCfg):
 			input_df_c2 = input_df_c.copy()
 
 			# loop over opt. devices
-			for odid, optdev in enumerate(optdevices):
-				input_df_c2['PE_%i' %odid] = processedData['PETimeDistribution'][optdev]
+			for odid, optdev in enumerate(processedData['PETimeDistribution'].keys()):
+				input_df_c2['PE_%s' %optdev] = processedData['PETimeDistribution'][optdev]
 
 			particle_df = input_df_c2
 
@@ -369,11 +362,11 @@ def MergeInputOutput(processedData, processedCfg):
 			em_df_c = em_df.copy()
 			had_df_c = had_df.copy()
 
-			for odid, optdev in enumerate(optdevices):
+			for odid, optdev in enumerate(processedData['ComponentsPETimeDistribution'].keys()):
 				pe_ = processedData['ComponentsPETimeDistribution'][optdev]
-				muon_df_c['PE_%i' %odid] = pe_['eMuonic']
-				em_df_c['PE_%i' %odid] = pe_['eElectromagnetic']
-				had_df_c['PE_%i' %odid] = pe_['eHadronic']
+				muon_df_c['PE_%s' %optdev] = pe_['eMuonic']
+				em_df_c['PE_%s' %optdev] = pe_['eElectromagnetic']
+				had_df_c['PE_%s' %optdev] = pe_['eHadronic']
 
 			particle_df = pd.concat([muon_df_c, em_df_c, had_df_c])
 
@@ -392,7 +385,7 @@ def GetMuonDecaySignals(processedData, merged_df):
 				
 	"""
 
-	optdevices = processedData['OptDevice_ID']
+	optdevices = processedData['ComponentsPETimeDistribution'].keys()
 	# mask muons in merged DataFrame
 	muon_ids = merged_df[merged_df.component == 'eMuonic'].event_id
 	
@@ -407,7 +400,7 @@ def GetMuonDecaySignals(processedData, merged_df):
 			muonDecayTraces = processedData['ComponentsPETimeDistribution'][optdev]['eMuonDecay']
 			assert len(muonDecayTraces) == len(merged_df)
 		
-			muonDecaySignals['PE_%i' %odid].append(muonDecayTraces[evid])
+			muonDecaySignals['PE_%s' %optdev].append(muonDecayTraces[evid])
 
 	muonDecaySignals_df = pd.DataFrame(muonDecaySignals)
 

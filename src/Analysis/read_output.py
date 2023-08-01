@@ -154,9 +154,11 @@ if __name__ == "__main__":
 	
 	######################
 	# Under development
-	# merged_df = MergeInputOutput(processedData, processedcfg)
-	# print(merged_df.head())
-	# muondecay_df = GetMuonDecaySignals(processedData, merged_df)
+	merged_df = MergeInputOutput(processedData, processedcfg)
+	print(merged_df.head())
+	if processedcfg['ComponentsPETimeDistribution']:
+		# access muondecay signals only if Component traces were saved
+		muondecay_df = GetMuonDecaySignals(processedData, merged_df)
 	######################
 	
 	#########################################################################
