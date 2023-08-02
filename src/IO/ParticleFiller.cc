@@ -128,7 +128,7 @@ ParticleFiller::FillParticleVector(const std::string &fileName, Event& theEvent)
 		
     vector<double> particlePosition{x, y, z};
     vector<double> particleMomentum{px, py, -1*pz};
-    Particle particle(particleId, particlePosition, particleMomentum);
+    Particle particle(Corsika::CorsikaToPDG(particleId), particlePosition, particleMomentum);
     simData.InsertParticle(particle);
 
     numberOfParticles++;
@@ -161,7 +161,7 @@ ParticleFiller::FillParticleVector(const unsigned int &numberOfParticles, Event 
     
     vector<double> particlePosition{0., 0., 0.};
     vector<double> particleMomentum{0., 0., 0.};
-    Particle particle(0., particlePosition, particleMomentum);
+    Particle particle(Particle::eMuon, particlePosition, particleMomentum);
     simData.InsertParticle(particle);
     n++;
 
