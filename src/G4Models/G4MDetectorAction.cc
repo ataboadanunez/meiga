@@ -37,8 +37,8 @@ G4MDetectorAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 	// get current particle in the event
 	Particle currentParticle = fEvent.GetSimData().GetCurrentParticle();
 	int partId = currentParticle.GetParticleId();
-	Particle::Type particleType = Corsika::CorsikaToPDG(partId);
-	Particle::Component particleComp = currentParticle.GetComponent(particleType);
+	
+	Particle::Component particleComp = currentParticle.GetComponent(/*particleType*/);
 	cout << "[DEBUG] G4MDetectorAction: Energy Deposit at detector " << fDetectorId << " = " << fEdep << endl;
 	detSimData.SetEnergyDeposit(fEdep);
 	detSimData.SetEnergyDeposit(particleComp, fEdep);

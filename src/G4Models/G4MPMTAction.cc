@@ -45,8 +45,7 @@ G4MPMTAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 	int partId = currentParticle.GetParticleId();
 	// time distribution for different particles
 
-	Particle::Type particleType = Corsika::CorsikaToPDG(partId);
-	Particle::Component particleComponent = currentParticle.GetComponent(particleType);
+	Particle::Component particleComponent = currentParticle.GetComponent(/*particleType*/);
 
 	DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData(fDetectorId);
 	OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
