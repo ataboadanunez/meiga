@@ -81,6 +81,7 @@ class Particle {
 		// particle name
 		void InitParticleNameMap();
 		void SetName();
+		void SetName(std::string name) { fName = name; }
 		std::string GetName() { return fName;}
 
 		// methods for nuclei
