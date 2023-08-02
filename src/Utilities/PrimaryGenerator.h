@@ -20,7 +20,8 @@ private:
 
 	std::vector<double> fParticlePosition;
 	std::vector<double> fParticleDirection;
-	int fParticleId;
+	Particle::Type fParticleId;
+	std::string fParticleName;
 	
 	SimData::InjectionMode injMode;
 	// for muon generator using EcoMug

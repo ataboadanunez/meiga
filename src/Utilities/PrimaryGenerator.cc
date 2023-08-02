@@ -116,16 +116,21 @@ PrimaryGenerator::GeneratePrimaryParticle()
 
 		fParticleDirection = {px, py, pz};
 
-		if (fMuonGen.GetCharge() < 0)
-			fParticleId = 6; // muon (mu-)
-		else if (fMuonGen.GetCharge() > 0)
-			fParticleId = 5; // anti-muon (mu+)
+		if (fMuonGen.GetCharge() < 0) {
+			fParticleId = Particle::eMuon; // muon (mu-)
+			fParticleName = "mu-";
+		}
+		else if (fMuonGen.GetCharge() > 0) {
+			fParticleId = Particle::eAntiMuon; // anti-muon (mu+)
+			fParticleName = "mu+";
+		}
 		
 		currentParticle.SetZenith(pTheta);
 		currentParticle.SetAzimuth(pPhi);
 		currentParticle.SetPosition(fParticlePosition);
 		currentParticle.SetMomentumDirection(fParticleDirection);
 		currentParticle.SetParticleId(fParticleId);
+		currentParticle.SetName(fParticleName);
 		currentParticle.SetMomentum(pTot);
 
 	}
