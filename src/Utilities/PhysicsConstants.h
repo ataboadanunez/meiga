@@ -30,6 +30,7 @@ constexpr double kXiMinusMass = 1321.31 * MeV;
 constexpr double kOmegaMinusMass = 1672.45 * MeV;
 constexpr double kLambdacMass = 2286.46 * MeV;
 constexpr double kDeuteronMass = 1875.612762 * MeV;
+constexpr double kAtomicMassUnit = 931.494 * MeV;
 
 
 
