@@ -62,6 +62,8 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	cfg.fSaveTraces     = tree.get<bool>("Output.SaveTraces", false);
 	cfg.fSaveEnergy     = tree.get<bool>("Output.SaveEnergy", false);
 	cfg.fSaveComponentsEnergy = tree.get<bool>("Output.SaveComponentsEnergy", false);
+	cfg.fSaveCharge = tree.get<bool>("Ouput.SaveCharge", false);
+	cfg.fSaveCounts = tree.get<bool>("Output.SaveCounts", false);
 
 	return theEvent;
 
@@ -225,7 +227,9 @@ ConfigManager::PrintConfig(const Event::Config &cfg)
 	cout << "Compress Output = " << (cfg.fCompressOutput ? "yes" : "no") << endl;
 	cout << "Save Traces = " << (cfg.fSaveTraces ? "yes" : "no") << endl;
 	cout << "Save Energy Deposit (components) = " << (cfg.fSaveEnergy ? "yes" : "no") << " (" << (cfg.fSaveComponentsEnergy ? "yes)" : "no)") << endl;
-	
+	cout << "Save Charge (number of PE) = " << (cfg.fSaveCharge ? "yes" : "no") << endl;
+	cout << "Save Bar Counts = " << (cfg.fSaveCounts ? "yes" : "no") << endl;
+
 	cout << " -------- Geant4 Settings ---------" << endl;
 	cout << "VisualizeGeometry = " << (cfg.fGeoVis ? "yes" : "no") << endl;
 	cout << "VisualizeTrajectory = " << (cfg.fTrajVis ? "yes" : "no") << endl;
