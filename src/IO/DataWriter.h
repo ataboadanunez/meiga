@@ -22,9 +22,14 @@ class DataWriter {
 
 		static void SavePETimeDistribution(nlohmann::json &jData, const DetectorSimData& sim, int detId, int odId, bool saveComponents);
 
+		static void SaveCharge(nlohmann::json &jData, const DetectorSimData &sim, int detId, int odId);
+
 		static void SaveTraces(nlohmann::json &jData, const DetectorSimData& sim, int detId, int odId);
 
 		static void SaveEnergy(nlohmann::json &jData, const SimData& sim, int id, const bool saveComponents);
+
+		// for scintillator bar counters
+		static void SaveBinaryCounter(nlohmann::json &jData, const DetectorSimData& sim, int id);
 };
 
 #endif

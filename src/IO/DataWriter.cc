@@ -71,6 +71,9 @@ DataWriter::FileWriter(Event& theEvent)
 		*/
 		if (cfg.fSaveEnergy || cfg.fSaveComponentsEnergy)
 			SaveEnergy(jData, simData, detId, cfg.fSaveComponentsEnergy);
+
+		if (cfg.fSaveCounts)
+			SaveBinaryCounter(jData, detSimData, detId);
 		
 		const int nOptDev = currDet.GetNOptDevice();
 		cout << "[INFO] DataWriter::FileWriter: Detector ID: " << detId << " has " << nOptDev << " optical device(s)" << endl; 
@@ -102,6 +105,10 @@ DataWriter::FileWriter(Event& theEvent)
 			// save time traces
 			if (cfg.fSaveTraces)
 				SaveTraces(jData, detSimData, detId, odId);
+
+			// save charge
+			if (cfg.fSaveCharge)
+				SaveCharge(jData, detSimData, detId, odId);
 
 		} // end loop over optical devices
 
@@ -245,5 +252,33 @@ DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId, const boo
 
 	jData["Detector_"+to_string(detId)]["EnergyDeposit"] = (saveComponents ? jEnergyDepositComponent : jEnergyDeposit);
 	
+
+}
+
+void
+DataWriter::SaveCharge(json &jData, const DetectorSimData &detSimData, int detId, int odId)
+{
+
+	const OptDeviceSimData &odSimData = detSimData.GetOptDeviceSimData(odId);
+
+	json jCharge;
+	cout << "[INFO] DataWriter::SaveCharge: Saving Charge of Optical Device with ID " << odId << " from Detector " << detId << endl;
+	auto charge = odSimData.GetCharge();	
+	jCharge = charge;
+	jData["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["Charge"] = jCharge;
+
+}
+
+void
+DataWriter::SaveBinaryCounter(json &jData, const DetectorSimData &detSimData, int detId)
+{
+	json jBinaryCounter;
+
+	const vector<string>& binaryCounter = detSimData.GetBinaryCounter();
+	jBinaryCounter = binaryCounter;
+
+	jData["Detector_"+to_string(detId)]["BinaryCounter"] = jBinaryCounter;
+
+
 
 }
