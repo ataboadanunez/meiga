@@ -74,7 +74,7 @@ export RealSurface=$G4COMP/data/RealSurface2.2
 
 1. Get the source code from the repository:
 ```bash
-git clone https://gitlab.ahuekna.org.ar/muar/meiga.git
+git clone git@github.com:ataboadanunez/meiga.git
 ``` 
 2. In the cloned directory, create the `build` and `install` directories
 3. In the `build` directory type:
@@ -320,8 +320,15 @@ Running the `read_output.py` script using that configuration produces the follow
 
 ![charge](src/Documentation/charge_histo.png)
 
+# Multiple processes
+
+
+
+
+
+
 # Contact
 
-The Meiga Framework is mainly developed and maintained by [Alvaro Taboada (@ataboadanunez)](https://github.com/ataboadanunez/).
+The Meiga Framework is developed and maintained by [Alvaro Taboada (@ataboadanunez)](https://github.com/ataboadanunez/).
 
 Contact via [email](mailto:alvaro.taboada.nunez@gmail.com).
