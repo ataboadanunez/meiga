@@ -80,6 +80,8 @@ class Event
 		bool fSaveTraces;
 		bool fSaveEnergy;
 		bool fSaveComponentsEnergy;
+		bool fSaveCharge;
+		bool fSaveCounts;
 		// add more stuff below in case is needed
 
 

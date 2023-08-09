@@ -77,13 +77,23 @@ class Particle {
 
 		int GetParticleId() { return fId; }
 		void SetParticleId(const int id) { fId = id; }
-		// calculate particle code for a nucleus given (A, Z)
+
+		// particle name
+		void InitParticleNameMap();
+		void SetName();
+		void SetName(std::string name) { fName = name; }
+		std::string GetName() { return fName;}
+
+		// methods for nuclei
 		static int NucleusCode(const unsigned int theCharge, const unsigned int theAtomicNumber);
+		bool IsNucleus();
+		double GetAtomicNumber();
+		double GetMassNumber();
 
 		// type and components
 		void InsertComponent(const Particle::Type type, const Particle::Component comp);
 		void InitComponentMap();
-		Particle::Component GetComponent(const Particle::Type type);
+		Particle::Component GetComponent(/*const Particle::Type type*/);
 		std::string GetComponentName(Particle::Component type);
 
 		// particle momentum
@@ -97,15 +107,16 @@ class Particle {
 		// particle mass
 		void InsertParticleMass(const Particle::Type id, const double mass);
 		static void InitParticleMassMap();
-		void SetMass(const int id);
+		void SetMass();
 		double GetMass() const { return fMass; }	
 		
 		// particle energy
 		void SetKineticEnergy(const double ke) { fKineticEnergy = ke; }
 		double GetKineticEnergy() { return fKineticEnergy; }
-		double GetTotalEnergy() const { return fKineticEnergy + GetMass(); }
-		void SetTotalEnergy(const double totE) { fKineticEnergy = totE - GetMass(); }
 		
+		void SetTotalEnergy(const double totE) { fKineticEnergy = totE - GetMass(); }
+		double GetTotalEnergy() const { return fKineticEnergy + GetMass(); }
+
 		// particle position
 		void SetPosition(const std::vector<double>& pos) { fPosition = pos; }
 		std::vector<double>& GetPosition() { return fPosition; }
@@ -129,13 +140,16 @@ class Particle {
  		double fKineticEnergy = 0;
  		double fZenith = 0;
  		double fAzimuth = 0;
+ 		std::string fName;
  		
  		std::vector<double> fPosition;
 		std::vector<double> fMomentumDirection;
 		std::vector<double> fInjectionPosition;
 		static std::map<int, double> gParticleMassMap;
-		static std::map<Particle::Type, Particle::Component> gComponentMap;
-		// particle properties for mass
+		static std::map<int, Particle::Component> gComponentMap;
+		static std::map<int, std::string> gParticleNameMap;
+		static std::map<int, std::string> gNuclearNameMap;
+		
 };
 
 #endif 

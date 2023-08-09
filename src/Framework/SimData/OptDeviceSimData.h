@@ -62,6 +62,10 @@ class OptDeviceSimData
 		// this function needs to be generalized for each type of optical device
 		std::vector<double> CalculateTrace(const double fBinSize, const std::vector<double>& peTime, const OptDevice::DeviceType &type, const double pulseLenght = 500.);
 
+		// charge (number of PE)
+		void AddCharge(const int npe);
+		const std::vector<int>& GetCharge() const { return fCharge; }
+
 
 	private:
 
@@ -79,6 +83,9 @@ class OptDeviceSimData
 		std::map<Particle::Component, std::vector<std::vector<double>> > fParticleCompMap;
 
 		std::vector<std::vector<double>> fTimeTraceDistribution;
+
+		// charge (number of PE)
+		std::vector<int> fCharge;
 
 		// access to detector members
 		OptDevice fOptDevice;

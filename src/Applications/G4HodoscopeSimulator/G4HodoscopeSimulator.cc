@@ -255,9 +255,10 @@ G4HodoscopeSimulator::WriteEventInfo(Event& theEvent)
 {
 
 	cout << "[INFO] G4HodoscopeSimulator::WriteEventInfo" << endl;
-	#warning "FileWriter disabled to not overwrite output.dat files"
-	cout << "[WARNING] G4HodoscopeSimulator::WriteEventInfo: FileWriter disabled to not overwrite output.dat files" << endl;
-	// DataWriter::FileWriter(theEvent);
+	DataWriter::FileWriter(theEvent);	
+
+	
+	
 
 	return;
 

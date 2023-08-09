@@ -86,25 +86,29 @@ def Process(options):
 	print("[INFO] Process: Reading output file: %s" %ifile)
 	# check if file is compressed
 	if compressOutput:
-		data = pd.read_json(ifile, lines=True, compression='gzip')
+		with gzip.open(ifile, "rt") as f:
+			data = json.load(f)
+		#data = pd.read_json(ifile, lines=True, compression='gzip')
 	else:
-		data = pd.read_json(ifile, lines=True)
+		with open(ifile) as f:
+			data = json.load(f)
+		#data = pd.read_json(ifile, lines=True)
 
 	detectors = []
-	optdevices = []
-	for name in data.columns:
+	#optdevices = []
+	for name in data.keys():
 		if 'Detector' in name:
 			detectors.append(name)
-		elif 'OptDevice' in name:
-			optdevices.append(name)
+		# elif 'OptDevice' in name:
+		# 	optdevices.append(name)
 
 	print("[INFO] Process: Found information of Detector(s):")
 	for det in detectors:
 		print("%s \n" %det)
 	
-	print("[INFO] Process: Found information of Optical Device(s):")
-	for optdev in optdevices:
-		print("%s \n" %optdev)
+	# print("[INFO] Process: Found information of Optical Device(s):")
+	# for optdev in optdevices:
+	# 	print("%s \n" %optdev)
 
 
 	###########################################################################
@@ -119,10 +123,13 @@ def Process(options):
 	if saveComponentsEnergy:
 		processedData['ComponentsDepositedEnergy'] = GetComponentsDepositedEnergy(data, detectors)
 	if saveComponentsPETimeDistribution:
-		processedData['ComponentsPETimeDistribution'] = GetComponentsTraces(data, optdevices)
+		processedData['ComponentsPETimeDistribution'] = GetComponentsTraces(data, detectors)
 	if savePETimeDistribution:
-		processedData['PETimeDistribution'] = GetTraces(data, optdevices)
+		processedData['PETimeDistribution'] = GetTraces(data, detectors)
 
+	# add list of detector IDs and optdevice IDs to be handled inside functions
+	processedData['Detector_ID'] = detectors
+	#processedData['OptDevice_ID'] = optdevices
 
 	return processedData, processedcfg
 
@@ -149,8 +156,11 @@ if __name__ == "__main__":
 	# Under development
 	merged_df = MergeInputOutput(processedData, processedcfg)
 	print(merged_df.head())
+	if processedcfg['ComponentsPETimeDistribution']:
+		# access muondecay signals only if Component traces were saved
+		muondecay_df = GetMuonDecaySignals(processedData, merged_df)
 	######################
-
+	
 	#########################################################################
 	# PLOTS (section under development)
 	#########################################################################

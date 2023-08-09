@@ -216,7 +216,7 @@ def PrepareConfigFile(job_dir, nlines):
 				inputFileName = name + '_'+ jobid
 		
 		# name of file to store the simulation output
-		outputFileName = 'output' + '_' + jobid + '.dat'
+		outputFileName = 'output' + '_' + jobid + '.json'
 			
 		infile 	= path.join(jobpath, inputFileName)
 		cfgfile = path.join(jobpath, cfgFileName)
@@ -225,11 +225,13 @@ def PrepareConfigFile(job_dir, nlines):
 		outfile = path.join(jobpath, outputFileName)
 
 		# flags to be replaced in the configuration file
-		flags = {"@INPUTFILE@" : infile,
-						 "@NPARTICLES@" : nlines,
-						 "@OUTPUTFILE@" : outfile,
-						 "@DETECTORLIST@" : detlist,
-						 "@DETECTORPROPERTIES@" : detprop
+		flags = {
+							"@INPUTMODE@" : ('UseEcoMug' if ((nlines != 0) and (inputFileName == '')) else 'UseARTI'),
+							"@INPUTFILE@" : ('' if ((nlines != 0) and (inputFileName == '')) else infile),
+							"@NPARTICLES@" : nlines,
+							"@OUTPUTFILE@" : outfile,
+							"@DETECTORLIST@" : detlist,
+							"@DETECTORPROPERTIES@" : detprop
 						 }
 
 		# read json file and replace the key flags
@@ -241,6 +243,7 @@ def PrepareConfigFile(job_dir, nlines):
 
 		# replace values in copy
 		# the following lines may need to be changed if the strcuture of the original JSON file changes.
+		copydata['Input']['Mode'] = flags['@INPUTMODE@']
 		copydata['Input']['InputFileName'] = flags['@INPUTFILE@']		
 		copydata['Input']['InputNParticles'] = flags['@NPARTICLES@']
 		copydata['Output']['OutputFile'] = flags['@OUTPUTFILE@']

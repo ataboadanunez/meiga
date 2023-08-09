@@ -45,12 +45,11 @@ G4MPMTAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 	int partId = currentParticle.GetParticleId();
 	// time distribution for different particles
 
-	Particle::Type particleType = Corsika::CorsikaToPDG(partId);
-	Particle::Component particleComponent = currentParticle.GetComponent(particleType);
+	Particle::Component particleComponent = currentParticle.GetComponent(/*particleType*/);
 
 	DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData(fDetectorId);
 	OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
-	
+	cout << "[DEBUG] G4MPMTAction: Total Signal at OptDevice " << fOptDeviceId << " of Detector " << fDetectorId << " = " << fPETime.size() << endl;
 	// add total PE time distribution
 	odSimData.AddPETimeDistribution(fPETime);
 	// add components PE time distribution

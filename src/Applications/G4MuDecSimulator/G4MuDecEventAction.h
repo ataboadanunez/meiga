@@ -6,7 +6,6 @@
 #include "G4Event.hh"
 
 #include "G4MuDecRunAction.h"
-#include "G4MuDecPrimaryGeneratorAction.h"
 #include "Event.h"
 
 #include <string>

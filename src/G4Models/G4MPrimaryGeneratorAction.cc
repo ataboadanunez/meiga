@@ -7,6 +7,7 @@
 #include "G4RunManager.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
+#include "G4IonTable.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
@@ -45,13 +46,27 @@ G4MPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 	fPrimaryGenerator.GeneratePrimaryParticle();
 
 	Particle & currParticle = simData.GetCurrentParticle();
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  unsigned int currParticleID = currParticle.GetParticleId();
-	int fParticleId = Corsika::CorsikaToPDG(currParticleID);
-	G4ParticleDefinition* particleDef = particleTable->FindParticle(fParticleId);
+	G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+	
+	// Particle ID is its PDG Encoding 
+	const auto fParticleId = currParticle.GetParticleId();
+	
+	G4ParticleDefinition* particleDef = nullptr;
+	if (currParticle.IsNucleus()) {
+
+		const auto z = currParticle.GetAtomicNumber();
+		const auto a = currParticle.GetMassNumber();
+	
+		particleDef = G4IonTable::GetIonTable()->GetIon(z, a, 0.);
+	
+	} else {
+
+		particleDef = particleTable->FindParticle(currParticle.GetName());
+
+	}
 
 	if (!particleDef) {
-		cout << "[WARNING] G4MPrimaryGeneratorAction::GeneratePrimaries: Undefined particle with Corsika ID: " << currParticleID << endl;
+		cout << "[WARNING] G4MPrimaryGeneratorAction::GeneratePrimaries: Undefined particle: " << currParticle.GetName() << " (" << currParticle.GetParticleId() << ") " << endl;
 		return;
 	}
 
@@ -61,9 +76,9 @@ G4MPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 	fParticleGun->SetParticlePosition(Geometry::ToG4Vector(currParticle.GetPosition(), 1.));
 	fParticleGun->SetParticleEnergy(currParticle.GetKineticEnergy());
 	fParticleGun->GeneratePrimaryVertex(event);
-  cout << "[INFO] G4MPrimaryGeneratorAction::GeneratePrimaries: Injecting particle: " << endl;
-  cout << particleDef->GetParticleName() << " with ID " << currParticle.GetParticleId() << endl;
-  cout << "Particle position = (" << currParticle.GetPosition().at(0) / CLHEP::cm << ", " << currParticle.GetPosition().at(1) / CLHEP::cm << ", " << currParticle.GetPosition().at(2) / CLHEP::cm << ") cm" << endl;
+	cout << "[INFO] G4MPrimaryGeneratorAction::GeneratePrimaries: Injecting particle: " << endl;
+	cout << particleDef->GetParticleName() << " with ID " << particleDef->GetPDGEncoding() << endl;
+	cout << "Particle position = (" << currParticle.GetPosition().at(0) / CLHEP::cm << ", " << currParticle.GetPosition().at(1) / CLHEP::cm << ", " << currParticle.GetPosition().at(2) / CLHEP::cm << ") cm" << endl;
 	cout << "Particle direction = (" << currParticle.GetMomentumDirection().at(0) / CLHEP::GeV << ", " << currParticle.GetMomentumDirection().at(1) / CLHEP::GeV << ", " << currParticle.GetMomentumDirection().at(2) / CLHEP::GeV << ") GeV" << endl;
 	cout << "Particle (Theta, Phi) = (" << currParticle.GetZenith() << ", " << currParticle.GetAzimuth() << ") rad" << endl;
 	cout << "Particle Momentum = " << currParticle.GetMomentum() / CLHEP::GeV << " GeV " << endl;

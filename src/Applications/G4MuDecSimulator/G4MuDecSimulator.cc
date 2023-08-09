@@ -10,7 +10,7 @@
 // Headers of this particular application
 #include "G4MuDecSimulator.h"
 #include "G4MuDecConstruction.h"
-#include "G4MuDecPrimaryGeneratorAction.h"
+#include "G4MPrimaryGeneratorAction.h"
 #include "G4MuDecStackingAction.h"
 #include "G4MuDecEventAction.h"
 #include "G4MuDecRunAction.h"
@@ -28,7 +28,6 @@
 // Framework libraries
 #include "ConfigManager.h"
 #include "CorsikaUtilities.h"
-#include "ReadParticleFile.h"
 #include "Event.h"
 #include "SimData.h"
 #include "OptDeviceSimData.h"
@@ -157,7 +156,7 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 	
 	fRunManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
 
-	G4MuDecPrimaryGeneratorAction *fPrimaryGenerator = new G4MuDecPrimaryGeneratorAction(theEvent);
+	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
 	
 	G4MuDecStackingAction *fStackingAction = new G4MuDecStackingAction(theEvent);
