@@ -66,3 +66,9 @@ OptDeviceSimData::CalculateTrace(const double fBinSize, const std::vector<double
 
 	return result;
 }
+
+void
+OptDeviceSimData::AddCharge(const int npe)
+{
+	fCharge.push_back(npe);
+}
