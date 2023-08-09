@@ -42,15 +42,21 @@ class DetectorSimData
 
 		void SetEnergyDeposit(const double eDep);
 		std::vector<double> GetEnergyDeposit() { return fEnergyDeposit; }
-		const std::vector<double> & GetEnergyDeposit() const { return fEnergyDeposit; }
+		const std::vector<double>& GetEnergyDeposit() const { return fEnergyDeposit; }
 		// energy deposit for particle component
 		void SetEnergyDeposit(Particle::Component comp, const double eDep);
 		std::vector<double> GetEnergyDeposit(Particle::Component comp) { return fEDepComponentMap.at(comp); } 
-		const std::vector<double> & GetEnergyDeposit(Particle::Component comp) const { return fEDepComponentMap.at(comp); } 
+		const std::vector<double>& GetEnergyDeposit(Particle::Component comp) const { return fEDepComponentMap.at(comp); } 
 		// a Has method is needed before requesting information to the map
 		bool HasEnergyDeposit(Particle::Component comp) const { return fEDepComponentMap.count(comp) != 0; }
 
+		// bar hits for scintillator detectors
+		void AddHitBarIndex(const int barId) { fHitBarIndices.push_back(barId); }
+		const std::vector<int> GetHitBarIndices() const { return fHitBarIndices; }
+		void ClearHitBarIndices() { fHitBarIndices.clear(); }
 
+		void AddBinaryCounter(const std::string binaryString) { fBinaryCounter.push_back(binaryString); }
+		const std::vector<std::string>& GetBinaryCounter() const { return fBinaryCounter; }
 
 
 	private:
@@ -66,6 +72,9 @@ class DetectorSimData
 		// data holders at detector level
 		std::vector<double> fEnergyDeposit;
 		std::map<Particle::Component, std::vector<double>> fEDepComponentMap;
+
+		std::vector<int> fHitBarIndices;
+		std::vector<std::string> fBinaryCounter;
 };
 
 #endif
