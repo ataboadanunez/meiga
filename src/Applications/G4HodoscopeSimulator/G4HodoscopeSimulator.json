@@ -9,7 +9,9 @@
 	{
 		"OutputFile" : "./output.dat",
 		"CompressOutput" : false,
+		"SaveInput" : true,
 		"SavePETimeDistribution" : false,
+		"SaveCounts" : true,
 		"SaveComponentsPETimeDistribution" : false,
 		"SaveEnergy" : false,
 		"SaveComponentsEnergy" : false
@@ -20,8 +22,8 @@
 	{
 		"SimulationMode" : "eFast",
 		"InjectionMode" : "eRandom",
-		"GeoVisOn" : true,
-		"TrajVisOn" : true,
+		"GeoVisOn" : false,
+		"TrajVisOn" : false,
 		"CheckOverlaps" : false,
 		"Verbosity" : 1,
 		"RenderFile" : "VRML2FILE",

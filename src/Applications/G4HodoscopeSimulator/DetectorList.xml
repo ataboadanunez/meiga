@@ -10,13 +10,24 @@
 		<height unit="m"> 1.5 </height> 
 	</injectionMode>
 
-	<detector id="0" type="eMudulus">
+	<detector id="0" type="eHodoscope">
 		<x unit="m"> 0.0 </x>
 		<y unit="m"> 0.0 </y>
 		<z unit="m"> 0.0 </z>
 
-		<distancePanels unit="m"> 0.53 </distancePanels>
-		<rotationAngle> 0 </rotationAngle>
+	</detector>
+
+	<detector id="1" type="eHodoscope">
+		<x unit="m"> 0.0 </x>
+		<y unit="m"> 0.0 </y>
+		<z unit="m"> 1.0 </z>
+
+	</detector>
+
+	<detector id="2" type="eHodoscope">
+		<x unit="m"> 0.0 </x>
+		<y unit="m"> 0.0 </y>
+		<z unit="m"> -1.0 </z>
 
 	</detector>
 

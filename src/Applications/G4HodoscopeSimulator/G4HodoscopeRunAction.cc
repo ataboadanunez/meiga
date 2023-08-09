@@ -1,10 +1,12 @@
 // implementation of the G4HodoscopeRunAction class
-
 #include "G4Timer.hh"
 #include "G4Run.hh"
 #include "g4root.hh"
 #include "G4AccumulableManager.hh"
 #include "G4HodoscopeRunAction.h"
+
+#include <bitset>
+
 //#include "histosRun.hh"
 
 //#include <TFile.h>
@@ -16,50 +18,19 @@ G4HodoscopeRunAction::G4HodoscopeRunAction(Event& theEvent)
  fEvent(theEvent)
 {
 	G4cout << "...G4HodoscopeRunAction..." << G4endl;
-
-	if (fEvent.GetSimData().GetSimulationMode() == SimData::SimulationMode::eFull) {
-		cout << "[INFO] G4HodoscopeSimulator::G4HodoscopeRunAction: Running Simulation in Full mode" << endl;
-		string fileName = theEvent.GetSimData().GetOutputFileName();
-		cout << "[INFO] G4HodoscopeSimulator::G4HodoscopeRunAction: opening outputfile: " << fileName << endl;
-		fOutFile = std::ofstream(fileName, ofstream::out | ofstream::app);
-		
-	}
-	
 	
 }
 
 
 G4HodoscopeRunAction::~G4HodoscopeRunAction()
 {	
-	if (fEvent.GetSimData().GetSimulationMode() == SimData::SimulationMode::eFull)
-		fOutFile.close();
+
 }
 
 
 void 
 G4HodoscopeRunAction::BeginOfRunAction(const G4Run* aRun)
 {
-
-	if (fEvent.GetSimData().GetSimulationMode() == SimData::SimulationMode::eFull) {
-		// write header only in run = 0.
-
-		G4int g4RunId = aRun->GetRunID();
-		if (g4RunId == 0) {
-			Detector& currDet = fEvent.GetDetector(0);
-			// loop over OptDevices and print output header
-			// #p_momentum Channel_1 Channel_2 ... Channel_n
-			fOutFile << "# p_momentum ";
-			for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
-				auto& currOd = odIt->second;
-				int odId = currOd.GetId();
-				//cout << "[DEBUG] Optical Device ID = " << odId << endl;
-				fOutFile << odId << " ";
-			}
-
-			fOutFile << endl;
-		
-		}
-	}
 	
 }
 
@@ -67,39 +38,54 @@ G4HodoscopeRunAction::BeginOfRunAction(const G4Run* aRun)
 void 
 G4HodoscopeRunAction::EndOfRunAction(const G4Run* aRun)
 { 
+	
 
-	if (fEvent.GetSimData().GetSimulationMode() != SimData::SimulationMode::eFull)
-		return;
-	// get current particle information
-	double particleMomentum = G4HodoscopeSimulator::currentParticle.GetMomentum();
-	fOutFile << particleMomentum / CLHEP::MeV << " ";
+	// loop over scintillator panels (independent detectors) 	
 
-	// loop PMT channels and get signal for each injected particle
+	for (auto detIt = fEvent.DetectorRange().begin(); detIt != fEvent.DetectorRange().end(); detIt++) {
 
-	G4int g4RunId = aRun->GetRunID();
-	Detector& currDet = fEvent.GetDetector(0);
+		G4int g4RunId = aRun->GetRunID();
 
-	int detId = currDet.GetId();
+		Detector& currDet = detIt->second;
+		const unsigned int detId = currDet.GetId();
 
-	DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData(detId);
+		DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData(detId);
 
-	for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
-
-		auto& currOd = odIt->second;
-		int odId = currOd.GetId();
-		// access to optical device signals
-		OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(odId);
-		if (!odSimData.HasPETimeDistribution())
-			continue;
-
-		const auto peTimeDistributionRange = odSimData.GetPETimeDistribution();
+		int nBars = currDet.GetNBars();
+		// initialize string to 0s. total number of bars x2 since is a grid of 2 x NBars
+		string binaryString(2*nBars, '0');
 		
-		// access to PETimeDistribution element by run ID (should match the vector element)
-		auto peTime = peTimeDistributionRange.at(g4RunId);
-		
-		fOutFile << peTime.size() << " ";
-		
+		// loop over optical devices (only in Full mode)
+		if (fEvent.GetSimData().GetSimulationMode() == SimData::SimulationMode::eFull) {
+			
+			for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
+
+				auto& currOd = odIt->second;
+				int odId = currOd.GetId();
+				// access to optical device signals
+				OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(odId);
+				if (!odSimData.HasPETimeDistribution())
+					continue;
+
+				const auto peTimeDistributionRange = odSimData.GetPETimeDistribution();
+				
+				// access to PETimeDistribution element by run ID (should match the vector element)
+				auto peTime = peTimeDistributionRange.at(g4RunId);
+				
+				odSimData.AddCharge(peTime.size());
+
+			}
+
+		}
+
+		for (int hitBarIndex : detSimData.GetHitBarIndices()) {
+	        binaryString[hitBarIndex-1] = '1'; // Set the bit at hitBarIndex to 1
+	  }
+
+	  detSimData.AddBinaryCounter(binaryString);
+	  // this is necessary to not overwrite the binary counter!
+	  detSimData.ClearHitBarIndices();
+
 	}
 
-	fOutFile << endl;
 }
