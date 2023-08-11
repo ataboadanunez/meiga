@@ -4,6 +4,4 @@ add_subdirectory(G4TandarSimulator)
 add_subdirectory(G4WCDSimulator)
 add_subdirectory(G4MuDecSimulator)
 add_subdirectory(G4HodoscopeSimulator)
-#add_subdirectory(G4AndesSimulator)
-#add_subdirectory(G4NeutronSimulator)
 
