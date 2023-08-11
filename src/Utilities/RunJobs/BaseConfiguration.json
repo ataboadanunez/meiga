@@ -1,0 +1,32 @@
+{
+	"Input" :
+	{
+		"Mode" : "@INPUTMODE@",
+		"InputFileName" : "@INPUTFILE@",
+		"InputNParticles" : "@NPARTICLES@"
+	},
+	
+	"Output" : 
+	{
+		"OutputFile" : "@OUTPUTFILE@",
+		"CompressOutput" : true,
+		"SaveInput" : true,
+		"SavePETimeDistribution" : true,
+		"SaveComponentsPETimeDistribution" : false,
+		"SaveEnergy" : false,
+		"SaveComponentsEnergy" : false
+	},
+	"DetectorList" : "@DETECTORLIST@",
+	"DetectorProperties" : "@DETECTORPROPERTIES@",
+	"Simulation" :
+	{
+		"SimulationMode" : "eFast",
+		"InjectionMode" : "eRandom",
+		"GeoVisOn" : false,
+		"TrajVisOn" : false,
+		"CheckOverlaps" : false,
+		"Verbosity" : 1,
+		"RenderFile" : "VRML2FILE",
+		"PhysicsName" : "QGSP_BERT_HP"
+	}
+}
