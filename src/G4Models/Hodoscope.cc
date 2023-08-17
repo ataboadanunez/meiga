@@ -159,7 +159,7 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 		string nameFiber = "Fiber_"+gridName;
 		string namePixel = "Pixel_"+gridName+to_string(barId2);
 		// register pixel in the detector class
-		detector.MakeOptDevice(barId2, OptDevice::eMChPMT);
+		detector.MakeOptDevice(barId, OptDevice::eMChPMT);
 
 		// logical volumes
 		logCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
@@ -188,7 +188,7 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 		new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberPosX, 0, fFiberPosZ), logPixel, namePixel, logScinBar, false, barId2, fCheckOverlaps);
 
 		// registration of pixel as a Sensitive Volume
-		G4MOptDeviceAction* const pixelTopSD = new G4MOptDeviceAction(namedetector.str() + "/" + namePixel, detectorId, barId2, theEvent);
+		G4MOptDeviceAction* const pixelTopSD = new G4MOptDeviceAction(namedetector.str() + "/" + namePixel, detectorId, barId, theEvent);
 		sdMan->AddNewDetector(pixelTopSD);
 		logPixel->SetSensitiveDetector(pixelTopSD);
 
@@ -215,7 +215,7 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 		string nameFiber = "Fiber_"+gridName;
 		string namePixel = "Pixel_"+gridName+to_string(barId2);
 		// register pixel in the detector class
-		detector.MakeOptDevice(barId2, OptDevice::eMChPMT);
+		detector.MakeOptDevice(barId, OptDevice::eMChPMT);
 
 		// logical volumes
 		logCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
@@ -244,7 +244,7 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 		new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberPosX, 0, fFiberPosZ), logPixel, namePixel, logScinBar, false, barId2, fCheckOverlaps);
 
 		// registration of pixel as a Sensitive Volume
-		G4MOptDeviceAction* const pixelBotSD = new G4MOptDeviceAction(namedetector.str() + "/" + namePixel, detectorId, barId2, theEvent);
+		G4MOptDeviceAction* const pixelBotSD = new G4MOptDeviceAction(namedetector.str() + "/" + namePixel, detectorId, barId, theEvent);
 		sdMan->AddNewDetector(pixelBotSD);
 		logPixel->SetSensitiveDetector(pixelBotSD);
 
