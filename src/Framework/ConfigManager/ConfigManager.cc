@@ -62,7 +62,7 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	cfg.fSaveTraces     = tree.get<bool>("Output.SaveTraces", false);
 	cfg.fSaveEnergy     = tree.get<bool>("Output.SaveEnergy", false);
 	cfg.fSaveComponentsEnergy = tree.get<bool>("Output.SaveComponentsEnergy", false);
-	cfg.fSaveCharge = tree.get<bool>("Ouput.SaveCharge", false);
+	cfg.fSaveCharge = tree.get<bool>("Output.SaveCharge", false);
 	cfg.fSaveCounts = tree.get<bool>("Output.SaveCounts", false);
 
 	return theEvent;
@@ -163,6 +163,8 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 			}
 			
 			Detector& detector = theEvent.GetDetector(detId);
+			// set name from XML once the detector was created
+			detector.SetName(detTypestr);
 			string fPropertiesFile = simData.GetDetectorPropertiesFile();
 			
 			// set detector position
