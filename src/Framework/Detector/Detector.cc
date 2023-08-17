@@ -27,6 +27,7 @@ using boost::property_tree::ptree;
 Detector::DetectorType
 Detector::StringToType(string name)
 {
+
 	if (name == "eWCD")
 		return Detector::eWCD;
 	else if (name == "eScintillator")
