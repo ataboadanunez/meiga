@@ -151,4 +151,22 @@ if __name__ == "__main__":
 
 	plt.title(r'Counts of Detector 2')
 
+	
+
+
+	# plot histogram of deposited energy at each detector
+	edep_0 = merged_df['Detector_0/DepositedEnergy']
+	edep_1 = merged_df['Detector_1/DepositedEnergy']
+	edep_2 = merged_df['Detector_2/DepositedEnergy']
+	fig = plt.figure()
+	plt.hist(edep_0[edep_0>0.1], bins=50, lw=1.8, histtype='step', label='Detector 0')
+	plt.hist(edep_1[edep_1>0.1], bins=50, lw=1.8, histtype='step', label='Detector 1')
+	plt.hist(edep_2[edep_2>0.1], bins=50, lw=1.8, histtype='step', label='Detector 2')
+
+	plt.xlabel('Deposited Energy / MeV')
+	plt.ylabel('Counts')
+	plt.legend()
+
 	plt.show()
+
+	embed()
