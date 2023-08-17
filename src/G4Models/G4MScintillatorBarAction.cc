@@ -38,14 +38,17 @@ G4MScintillatorBarAction::G4MScintillatorBarAction(const G4String& barName, cons
 void 
 G4MScintillatorBarAction::Initialize(G4HCofThisEvent* const /*hce*/)
 {
-	
+	fBarEdep = 0;
 }
 
 void
 G4MScintillatorBarAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 {
 
-	
+	DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData(fDetectorId);
+	// adding energy deposited at barId in this event
+	detSimData.AddEnergyDeposit(fBarEdep);
+
 }
 
 G4bool
@@ -61,6 +64,7 @@ G4MScintillatorBarAction::ProcessHits(G4Step* const step, G4TouchableHistory* co
 
 	if (trackId == 1) {
 		detSimData.AddHitBarIndex(fBarId);
+		fBarEdep += step->GetTotalEnergyDeposit();
 	}
 
 	return true;
