@@ -1,0 +1,1 @@
+add_library(meiga_externals INTERFACE)
