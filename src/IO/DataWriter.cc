@@ -19,7 +19,8 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
-using json = nlohmann::json;
+using json = nlohmann::ordered_json;
+//using ordered_json = nlohmann::ordered_json;
 using boost::iostreams::filtering_stream;
 using boost::iostreams::filtering_streambuf;
 using boost::iostreams::file_descriptor;
@@ -45,74 +46,113 @@ DataWriter::FileWriter(Event& theEvent)
 	json jData;
 
 	SimData& simData = theEvent.GetSimData();
-	
-	if (cfg.fSaveInput) {
-		cout << "[INFO] DataWriter::FileWriter: Saving input flux information." << endl;
-		SaveInputFlux(jData, simData);	
-	}
-	
 
-	// loop over detector range
-	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
-
-		// get current detector data
-		Detector& currDet = detIt->second;
-		const unsigned int detId = currDet.GetId();
+	// testing event (particle) loop
+	for (auto pIt = simData.GetParticleVector().begin(); pIt != simData.GetParticleVector().end(); ++pIt) {
 		
-		if (!simData.HasDetectorSimData(detId))
-			continue;
-
-		cout << "[INFO] DataWriter::FileWriter: Accessing data of Detector ID: " << detId << endl;
-
-		DetectorSimData& detSimData = simData.GetDetectorSimData(detId);
-
-		/* 
-			Detector level: access energy deposit, particle counters, etc... 
-		*/
-		if (cfg.fSaveEnergy || cfg.fSaveComponentsEnergy)
-			SaveEnergy(jData, simData, detId, cfg.fSaveComponentsEnergy);
-
-		if (cfg.fSaveCounts)
-			SaveBinaryCounter(jData, detSimData, detId);
 		
-		const int nOptDev = currDet.GetNOptDevice();
-		cout << "[INFO] DataWriter::FileWriter: Detector ID: " << detId << " has " << nOptDev << " optical device(s)" << endl; 
+		Particle &part = *pIt;
+		size_t eventId = std::distance(simData.GetParticleVector().begin(), pIt);
+		
+		// json container to store event information	
+		json jEvent;
 
-		/* 
-				Optical Device Level: Time traces, PE time distribution, charge, etc...
-		*/
-		// loop over optical devices 
-		for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
+		if (cfg.fSaveInput) {
+			SaveInputFlux(jEvent, simData, eventId);
+		}
 
-			OptDevice& currOd = odIt->second;
-			const unsigned int odId = currOd.GetId();
+		
+		// loop over Detector to extract data at Detector level (energy deposits, bar counters, etc...)
+		for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
 
-			if (!detSimData.HasOptDeviceSimData(odId))
+			// get current detector data
+			Detector& currDet = detIt->second;
+			const unsigned int detId = currDet.GetId();
+			
+			if (!simData.HasDetectorSimData(detId))
 				continue;
 
-			OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(odId);
+			// get DetectorSimData
+			DetectorSimData& detSimData = simData.GetDetectorSimData(detId);
 
-			// if has PE time distribution, has signals.
-			if (!odSimData.HasPETimeDistribution()) {
-				cout << "[INFO] DataWriter::FileWriter: photo-electron time distributions not found for Optical Device " << odId << endl;
-				continue;
+			// get deposited energy
+			if (cfg.fSaveEnergy && detSimData.HasEnergyDeposit()) {
+				SaveDepositedEnergy(jEvent, detSimData, detId, eventId);
+			}
+			
+			// get particle counter (for scintillator detectors)
+			if (cfg.fSaveCounts && detSimData.HasBinaryCounter()) {
+				SaveBinaryCounter(jEvent, detSimData, detId, eventId);
 			}
 
-			// save photo-electron time distribution(s)
-			if (cfg.fSavePETimeDistribution || cfg.fSaveComponentsPETimeDistribution)
-				SavePETimeDistribution(jData, detSimData, detId, odId, cfg.fSaveComponentsPETimeDistribution);
+			if (cfg.fSavePETimeDistribution || cfg.fSaveCharge) {
 
-			// save time traces
-			if (cfg.fSaveTraces)
-				SaveTraces(jData, detSimData, detId, odId);
+				// loop over opt devices to extract data at OptDevice level (charge, PE time distributions)
+				for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
+					
+					OptDevice& currOd = odIt->second;
+					const unsigned int odId = currOd.GetId();
 
-			// save charge
-			if (cfg.fSaveCharge)
-				SaveCharge(jData, detSimData, detId, odId);
+					// check if has sim data
+					if (!detSimData.HasOptDeviceSimData(odId))
+						continue;
 
-		} // end loop over optical devices
+					OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(odId);
 
-	} // end loop over detectors
+					// save charge (number of PE)					
+					if (cfg.fSaveCharge && odSimData.HasCharge()) {
+						SaveCharge(jEvent, odSimData, detId, odId, eventId);
+					}
+
+					// save PE time distribution
+					if (cfg.fSavePETimeDistribution && odSimData.HasPETimeDistribution()) {
+
+						// save MuonDecay signals if enabled
+						SavePETimeDistribution(jEvent, odSimData, detId, odId, eventId, (cfg.fSaveComponentsPETimeDistribution && part.GetComponent() == Particle::eMuonic));
+					}
+
+
+				} // end loop over optical devices
+					
+			} // if save optical device data
+
+		} // end loop over detectors
+
+		// store event data tree in main tree
+		jData["Output"]["Event_"+to_string(eventId)] = jEvent;
+
+	} // end loop over events (particles)
+
+
+	// save detector information
+	json jDetectorList;
+	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
+
+		// get pointer to current detector
+		Detector& currDet = detIt->second;
+		const unsigned int detId = currDet.GetId();
+
+		json jcurrentDetector;
+		jcurrentDetector["ID"] = detId;
+		jcurrentDetector["Name"] = currDet.GetName();
+		jcurrentDetector["Position"] = currDet.GetDetectorPosition();
+		
+		// get list of optical device IDs
+		vector<int> optDeviceList;
+		for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
+			OptDevice& currOd = odIt->second;
+			int odId = currOd.GetId();
+			optDeviceList.push_back(odId);
+		}
+
+		jcurrentDetector["OptDeviceList"] = optDeviceList;
+		
+		jDetectorList["Detector_"+to_string(detId)] = jcurrentDetector;
+
+	}
+
+	jData["DetectorList"] = jDetectorList;
+
 
 	// use compress if set in configuration
 	if (compressOutput) {
@@ -134,151 +174,79 @@ DataWriter::FileWriter(Event& theEvent)
 		ofstream outfile(outFileName);
 		outfile << jData;
 	}
+
+
+	return;
 	
 }
 
 void
-DataWriter::SaveInputFlux(json &jData, SimData& simData)
+DataWriter::SaveInputFlux(json& jEvent, SimData& simData, size_t evid)
 {
-	vector<json> jParticles;
-
-	for (auto pIt = simData.GetInjectedParticleVector().begin(); pIt != simData.GetInjectedParticleVector().end(); ++pIt) {
-		json myCurrentParticle;
-		Particle &part = *pIt;
-
-		myCurrentParticle["ID"] = part.GetParticleId();
-		myCurrentParticle["Position"] = part.GetPosition();
-		myCurrentParticle["Momentum"] = part.GetMomentumDirection();
-
-		jParticles.push_back(myCurrentParticle);
-
-	}
-
-	jData["InputFlux"] = jParticles;
-}
-
-
-void
-DataWriter::SavePETimeDistribution(json &jData, const DetectorSimData& detSimData, int detId, int odId, const bool saveComponents)
-{
-
-	const OptDeviceSimData &odSimData = detSimData.GetOptDeviceSimData(odId);
-
-	json jPETimeDistribution;
-	json jComponentPETimeDistribution;
-
-	cout << "[INFO] DataWriter::SavePETimeDistribution: Saving PETimeDistribution of Optical Device with ID " << odId << " from Detector " << detId << endl;
-
-	if (saveComponents) {
-
-		for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
-
-			Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
-			string componentName = aParticle.GetComponentName(particleComponent);
-
-			if (!odSimData.HasPETimeDistribution(particleComponent)) {
-				cout << "[WARNING] DataWriter::FileWriter: OptDevice " << odId << " has no PE time distribution for component " << componentName << endl;
-				continue;
-			}
-
-			auto peTimedistributionRangeComp = odSimData.GetPETimeDistribution(particleComponent);
-
-			jComponentPETimeDistribution[componentName] = peTimedistributionRangeComp;
-
-		} // end loop particle components
-
-		jData["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["PETimeDistribution"] = jComponentPETimeDistribution;
-
-	}
-	// save PETimeDistributions when components are disabled. do not save both.
-	else {
-
-		auto peTimeDistribution = odSimData.GetPETimeDistribution();	
-		jPETimeDistribution = peTimeDistribution;
-		jData["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["PETimeDistribution"] = jPETimeDistribution;
-	}
 	
-}
+	json myCurrentParticle;
+	Particle &part = simData.GetInjectedParticleVector().at(evid);
 
-void
-DataWriter::SaveTraces(json &jData, const DetectorSimData& detSimData, int detId, int odId)
-{
-	json jTimeTraces;
-	const OptDeviceSimData &odSimData = detSimData.GetOptDeviceSimData(odId);
-	auto timeTraces = odSimData.GetTimeTraceDistribution();
-	jTimeTraces = timeTraces;
+	myCurrentParticle["ID"] = part.GetParticleId();
+	myCurrentParticle["Position"] = part.GetInjectionPosition();
+	myCurrentParticle["Momentum"] = part.GetMomentumDirection();
 
-	cout << "[INFO] DataWriter::SaveTraces: Saving time traces of Optical Device with ID " << odId << " from Detector " << detId << endl;
-	jData["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["TimeTraces"] = jTimeTraces;
+	jEvent["InputFlux"] = myCurrentParticle;
 
 }
+
 
 void 
-DataWriter::SaveEnergy(json &jData, const SimData& simData, int detId, const bool saveComponents)
+DataWriter::SaveDepositedEnergy(json &jEvent, const DetectorSimData& detSimData, int detId, size_t eventId)
 {
 
-	json jEnergyDeposit;
-	json jEnergyDepositComponent;
 
-	const DetectorSimData &detSimData = simData.GetDetectorSimData(detId);
-	const vector<double> & energyDeposit = detSimData.GetEnergyDeposit();
-	jEnergyDeposit = energyDeposit;
+	// get vector of energy deposits
+	const auto & energyDeposit = detSimData.GetEnergyDeposit(); 
+	jEvent["Detector_"+to_string(detId)]["EnergyDeposit"] = energyDeposit.at(eventId);
 
-	cout << "[INFO] DataWriter::SaveEnergy: Saving Energy Deposited at Detector " << detId << endl;
-	
+}
+
+
+void
+DataWriter::SavePETimeDistribution(json& jEvent, const OptDeviceSimData& odSimData, int detId, int odId, size_t eventId, const bool saveComponents)
+{
+
+
+	auto peTimeDistribution = odSimData.GetPETimeDistribution().at(eventId);
+
+	jEvent["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["PETimeDistribution"] = peTimeDistribution;
+
+
+	// save muon-decayed signals
 	if (saveComponents) {
-		
-		
+		// get PE time distribution of muon-decayed component
 
-		for (int compIt = Particle::eElectromagnetic; compIt < Particle::eEnd; compIt++) {
+		if (!odSimData.HasPETimeDistribution(Particle::eMuonic))
+			return;
 
-		Particle::Component particleComponent = static_cast<Particle::Component>(compIt);
-		string componentName = aParticle.GetComponentName(particleComponent);
-
-		if (!detSimData.HasEnergyDeposit(particleComponent)) {
-			cout << "[WARNING] DataWriter::SaveEnergy: Detector " << detId << " has no energy deposits of component " << componentName << endl;
-			continue;
-		}
-
-		vector<double> energyDepositComponent = detSimData.GetEnergyDeposit(particleComponent);
-		jEnergyDepositComponent[componentName] = energyDepositComponent;
-
-		} // end loop particle components
-
-		//jData["Detector_"+to_string(detId)]["EnergyDeposit"] = jEnergyDepositComponent;	
-
+		// get PE time distribution of the muon 
+		auto peTimeDistributionMuDec = odSimData.GetPETimeDistribution(Particle::eMuonDecay).at(eventId)
+		;
+		jEvent["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["PETimeDistribution_eMuonDecay"] = peTimeDistributionMuDec;
+	
 	}
-	
-
-	jData["Detector_"+to_string(detId)]["EnergyDeposit"] = (saveComponents ? jEnergyDepositComponent : jEnergyDeposit);
-	
 
 }
 
 void
-DataWriter::SaveCharge(json &jData, const DetectorSimData &detSimData, int detId, int odId)
+DataWriter::SaveCharge(json& jEvent, const OptDeviceSimData& odSimData, int detId, int odId, size_t eventId)
 {
 
-	const OptDeviceSimData &odSimData = detSimData.GetOptDeviceSimData(odId);
-
-	json jCharge;
-	cout << "[INFO] DataWriter::SaveCharge: Saving Charge of Optical Device with ID " << odId << " from Detector " << detId << endl;
-	auto charge = odSimData.GetCharge();	
-	jCharge = charge;
-	jData["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["Charge"] = jCharge;
+	jEvent["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["Charge"] = odSimData.GetCharge().at(eventId);
 
 }
 
 void
-DataWriter::SaveBinaryCounter(json &jData, const DetectorSimData &detSimData, int detId)
+DataWriter::SaveBinaryCounter(json& jEvent, const DetectorSimData &detSimData, int detId, size_t eventId)
 {
-	json jBinaryCounter;
-
-	const vector<string>& binaryCounter = detSimData.GetBinaryCounter();
-	jBinaryCounter = binaryCounter;
-
-	jData["Detector_"+to_string(detId)]["BinaryCounter"] = jBinaryCounter;
-
-
+	
+	const auto & binaryCounter = detSimData.GetBinaryCounter();
+	jEvent["Detector_"+to_string(detId)]["BinaryCounter"] = binaryCounter.at(eventId);
 
 }

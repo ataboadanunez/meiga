@@ -5,8 +5,14 @@
 #include "Event.h"
 #include "SimData.h"
 #include "DetectorSimData.h"
+#include "OptDeviceSimData.h"
 
-#include <nlohmann/json.hpp>
+// unable warning of shadow declarations when including json nlohmann
+// variable `s` is shadow declared with Geant4 unit `second`
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+#include "json.hpp"
+#pragma GCC diagnostic pop
 
 class DataWriter {
 	
@@ -18,18 +24,16 @@ class DataWriter {
 
 	private:
 		
-		static void SaveInputFlux(nlohmann::json &jData, SimData &simData);
+		static void SaveInputFlux(nlohmann::ordered_json &jEvent, SimData &simData, size_t eventId);
 
-		static void SavePETimeDistribution(nlohmann::json &jData, const DetectorSimData& sim, int detId, int odId, bool saveComponents);
+		static void SavePETimeDistribution(nlohmann::ordered_json &jData, const OptDeviceSimData& sim, int detId, int odId, size_t eventId, bool saveComponents);
 
-		static void SaveCharge(nlohmann::json &jData, const DetectorSimData &sim, int detId, int odId);
+		static void SaveCharge(nlohmann::ordered_json &jEvent, const OptDeviceSimData & sim, int detId, int odId, size_t eventId);
 
-		static void SaveTraces(nlohmann::json &jData, const DetectorSimData& sim, int detId, int odId);
-
-		static void SaveEnergy(nlohmann::json &jData, const SimData& sim, int id, const bool saveComponents);
+		static void SaveDepositedEnergy(nlohmann::ordered_json &jEvent, const DetectorSimData& sim, int detId, size_t eventId);
 
 		// for scintillator bar counters
-		static void SaveBinaryCounter(nlohmann::json &jData, const DetectorSimData& sim, int id);
+		static void SaveBinaryCounter(nlohmann::ordered_json& jEvent, const DetectorSimData& sim, int detId, size_t eventId);
 };
 
 #endif
