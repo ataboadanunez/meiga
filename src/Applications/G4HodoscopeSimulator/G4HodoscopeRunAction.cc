@@ -71,7 +71,6 @@ G4HodoscopeRunAction::EndOfRunAction(const G4Run* aRun)
 				
 				// access to PETimeDistribution element by run ID (should match the vector element)
 				auto peTime = peTimeDistributionRange.at(g4RunId);
-				
 				odSimData.AddCharge(peTime.size());
 
 			}
