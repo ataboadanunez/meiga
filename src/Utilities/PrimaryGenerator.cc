@@ -127,7 +127,7 @@ PrimaryGenerator::GeneratePrimaryParticle()
 		
 		currentParticle.SetZenith(pTheta);
 		currentParticle.SetAzimuth(pPhi);
-		currentParticle.SetPosition(fParticlePosition);
+		currentParticle.SetInjectionPosition(fParticlePosition);
 		currentParticle.SetMomentumDirection(fParticleDirection);
 		currentParticle.SetParticleId(fParticleId);
 		currentParticle.SetName(fParticleName);
@@ -164,7 +164,7 @@ PrimaryGenerator::GeneratePrimaryParticle()
 		currentParticle.SetAzimuth(pPhi);
 
 		ComputeInjectionPosition(simData, fParticlePosition);
-		currentParticle.SetPosition(fParticlePosition);
+		currentParticle.SetInjectionPosition(fParticlePosition);
 	}
 
 	if (fSaveInput) {
