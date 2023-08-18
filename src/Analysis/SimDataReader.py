@@ -8,6 +8,8 @@ import gzip
 import numpy as np
 import pandas as pd
 from collections import defaultdict
+# enable console for debugging
+from IPython import embed
 
 def completepath(s, cfiledir):
 	if s[0] == '/':
@@ -307,9 +309,9 @@ class SimDataReader:
 
 				return np.array(charge_list)
 
-			def get_pe_time_distribution(self) -> np.array:
+			def get_pe_time_distribution(self) -> list:
 				"""
-				Returns numpy array (list) with arrival times of
+				Returns list (list) with arrival times of
 				photo-electrons to the optical device.
 
 				Each event contains a list of arrival times.
@@ -335,9 +337,48 @@ class SimDataReader:
 						return
 
 					pe_time = od_data.get("PETimeDistribution")
+
 					if pe_time is not None:
 						pe_time_list.append(pe_time)
 					else:
-						continue
+						pe_time_list.append([])
+				
+				return pe_time_list
 
-				return np.array(pe_time_list)
+			def get_pe_time_distribution(self, component=None) -> list:
+				"""
+				Returns list (list) with PE time distribution
+				by particle component:
+
+				Components: 'eMuonic', 'eElectromagnetic', 'eHadronic', 'eMuonDecay'
+
+				Each event contains a list of arrival times.
+				"""
+
+				detectorkey = 'Detector_' + str(self._det_id)
+				optdevicekey = 'OptDevice_' + str(self._od_id)
+				pe_time_list = []
+
+
+				for eventkey in self._parent_simdata.keys():
+
+					detector_data = self._parent_simdata[eventkey].get(detectorkey)
+
+					if detector_data is None:
+						print('[WARNING] get_charge(): There is no data from detector ', detectorkey)
+						return
+
+					od_data = detector_data.get(optdevicekey)
+
+					if od_data is None:
+						print('[WARNING] get_charge(): There is no data from opt device ', optdevicekey, " in detector ", detectorkey)
+						return
+
+					pe_time = od_data.get("PETimeDistribution_%s" %component)
+
+					if pe_time is not None:
+						pe_time_list.append(pe_time)
+					else:
+						pe_time_list.append([])
+				
+				return pe_time_list
