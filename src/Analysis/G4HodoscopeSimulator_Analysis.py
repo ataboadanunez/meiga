@@ -28,7 +28,7 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="[INFO] This script reads output files from simulations with Meiga.", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 	parser.add_argument("-f",
 											dest="ofile",
-											help="full path to the output file. Example: /home/user/meiga/G4WCDSimulator/output.json",
+											help="full path to the output file. Example: meiga/build/Applications/G4HodoscopeSimulator/output.json.gz",
 											default=None, required=False)
 
 	options = parser.parse_args()
