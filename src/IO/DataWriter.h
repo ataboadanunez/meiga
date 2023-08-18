@@ -26,7 +26,7 @@ class DataWriter {
 		
 		static void SaveInputFlux(nlohmann::ordered_json &jEvent, SimData &simData, size_t eventId);
 
-		static void SavePETimeDistribution(nlohmann::ordered_json &jData, const OptDeviceSimData& sim, int detId, int odId, size_t eventId, bool saveComponents);
+		static void SavePETimeDistribution(nlohmann::ordered_json &jData, const OptDeviceSimData& sim, int detId, int odId, size_t eventId, const bool, const Particle::Component comp);
 
 		static void SaveCharge(nlohmann::ordered_json &jEvent, const OptDeviceSimData & sim, int detId, int odId, size_t eventId);
 

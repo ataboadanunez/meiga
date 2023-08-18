@@ -85,7 +85,7 @@ DataWriter::FileWriter(Event& theEvent)
 				SaveBinaryCounter(jEvent, detSimData, detId, eventId);
 			}
 
-			if (cfg.fSavePETimeDistribution || cfg.fSaveCharge) {
+			if ((cfg.fSavePETimeDistribution || cfg.fSaveComponentsPETimeDistribution) || cfg.fSaveCharge) {
 
 				// loop over opt devices to extract data at OptDevice level (charge, PE time distributions)
 				for (auto odIt = currDet.OptDeviceRange().begin(); odIt != currDet.OptDeviceRange().end(); odIt++) {
@@ -105,10 +105,10 @@ DataWriter::FileWriter(Event& theEvent)
 					}
 
 					// save PE time distribution
-					if (cfg.fSavePETimeDistribution && odSimData.HasPETimeDistribution()) {
+					if ((cfg.fSavePETimeDistribution || cfg.fSaveComponentsPETimeDistribution) && odSimData.HasPETimeDistribution()) {
 
-						// save MuonDecay signals if enabled
-						SavePETimeDistribution(jEvent, odSimData, detId, odId, eventId, (cfg.fSaveComponentsPETimeDistribution && part.GetComponent() == Particle::eMuonic));
+						SavePETimeDistribution(jEvent, odSimData, detId, odId, eventId, cfg.fSaveComponentsPETimeDistribution, part.GetComponent());
+						
 					}
 
 
@@ -209,27 +209,36 @@ DataWriter::SaveDepositedEnergy(json &jEvent, const DetectorSimData& detSimData,
 
 
 void
-DataWriter::SavePETimeDistribution(json& jEvent, const OptDeviceSimData& odSimData, int detId, int odId, size_t eventId, const bool saveComponents)
+DataWriter::SavePETimeDistribution(json& jEvent, const OptDeviceSimData& odSimData, int detId, int odId, size_t eventId, const bool saveComponents, const Particle::Component comp)
 {
 
-
+	// get total component pe time distribution
 	auto peTimeDistribution = odSimData.GetPETimeDistribution().at(eventId);
-
-	jEvent["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["PETimeDistribution"] = peTimeDistribution;
-
 
 	// save muon-decayed signals
 	if (saveComponents) {
-		// get PE time distribution of muon-decayed component
 
-		if (!odSimData.HasPETimeDistribution(Particle::eMuonic))
+		string componentName = aParticle.GetComponentName(comp);
+
+		// skip if component has no PE time distribution
+		if (!odSimData.HasPETimeDistribution(comp))
 			return;
 
-		// get PE time distribution of the muon 
-		auto peTimeDistributionMuDec = odSimData.GetPETimeDistribution(Particle::eMuonDecay).at(eventId)
+		jEvent["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["PETimeDistribution_"+componentName] = peTimeDistribution;
+
+		// treat muons separate to save muon-decay signals
+		if (comp == Particle::eMuonic) {
+
+			// get PE time distribution of the decayed muon
+			auto peTimeDistributionMuDec = odSimData.GetPETimeDistribution(Particle::eMuonDecay).at(eventId)
 		;
-		jEvent["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["PETimeDistribution_eMuonDecay"] = peTimeDistributionMuDec;
+			jEvent["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["PETimeDistribution_eMuonDecay"] = peTimeDistributionMuDec;
+		
+		}
+
 	
+	} else {
+		jEvent["Detector_"+to_string(detId)]["OptDevice_"+to_string(odId)]["PETimeDistribution"] = peTimeDistribution;
 	}
 
 }
