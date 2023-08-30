@@ -28,7 +28,7 @@ Meiga is a framework designed to develop astroparticle simulations and their pos
 Prior to install and use Meiga, the following packages need to be installed:
 
 - **Geant4**:\
-  Meiga uses Geant4 as a toolkit for simulating the interaction of particles with the detector. Current version used is **geant4-07.p03** and can be downloaded from the [source page](https://geant4.web.cern.ch/support/download_archive). Geant4 must be built with X11 OpenGL drivers (in order to enable visualization) and with DATA packages enabled:
+  Meiga uses Geant4 as a toolkit for simulating the interaction of particles with the detector. Current version used is **geant4-10.07.p03** and can be downloaded from the [source page](https://geant4.web.cern.ch/download/10.7.3.html). Geant4 must be built with X11 OpenGL drivers (in order to enable visualization) and with DATA packages enabled:
 ```bash
 $cmake -DCMAKE_INSTALL_PREFIX=<path-to-install> -DGEANT4_INSTALL_DATA=ON -DGEANT_USE_OPENGL_X11=ON <path-to-source>
 ```
@@ -38,12 +38,6 @@ $cmake -DCMAKE_INSTALL_PREFIX=<path-to-install> -DGEANT4_INSTALL_DATA=ON -DGEANT
   Can be installed via
 ```bash
 sudo apt-get install libboost-all-dev
-```
-
-- **[nlohmann-json](https://github.com/nlohmann/json.git)** \
-  For JSON parsers. Can be installed via:
-```bash
-  sudo apt-get install nlohmann-json-dev
 ```
 - **view3dscene** (or similar) for visualization of .wrl files:
 ```bash
@@ -100,9 +94,9 @@ The Meiga framework has a hierarchical structure that allows easy data access.
 - Event:\
 The _Event_ is at the top of the structure and is used as a main vehicle for data flowing. In this sense, an _Event_ object is often passed as argument of the functions in the framework in such a way that data can be accessed to in any part of the code.
 - Detector:\
-The _Detector_ class provides an iterface to the _Event_ from which de detector description can be read. It contains the necessary methods for setting the detector properties and the functions to read these properties from configuration files, i.e., the conection between User and Geant4.
+The _Detector_ class provides an interface to the _Event_ from which de detector description can be read. It contains the necessary methods for setting the detector properties and the functions to read these properties from configuration files, i.e., the connection between User and Geant4.
 - SimData:\
-Data from simulation is stored in the class _SimData_. This class has a hierarchical strcuture itself  for accessing data at different levels, for example, energy deposition of particles in a detector (_DetectorSimData_) or signal produced in a given optical sensor (_OptDeviceSimData_).
+Data from simulation is stored in the class _SimData_. This class has a hierarchical structure itself  for accessing data at different levels, for example, energy deposition of particles in a detector (_DetectorSimData_) or signal produced in a given optical sensor (_OptDeviceSimData_).
 
 An example of how data can be accessed would be:
 
@@ -128,7 +122,7 @@ Contains all functions related to the handling of Input/Output.
 - Utilities:\
 Contains functions and classes which are used by the rest of the framework. Examples are `Geometry` or the `Particle` class.
 
-The strcuture and workflow of the Meiga framework is shown in the diagram below. The _Meiga_ classes are represented in green while external packages (Geant4 and generators of input farticles) are represented in blue. The gray area shows the workflow of an _Application_. Arrows indicate the flow of information and whether a process is done automatically or can be configurable / done by the user.
+The strcuture and workflow of the Meiga framework is shown in the diagram below. The _Meiga_ classes are represented in green while external packages (Geant4 and generators of input particles) are represented in blue. The gray area shows the workflow of an _Application_. Arrows indicate the flow of information and whether a process is done automatically or can be configurable / done by the user.
 
 ![Workflow](src/Documentation/workflow.png)*Structure of the Meiga framework*
 
@@ -180,7 +174,7 @@ that read the configuration, run the simulation, and write the output files, res
   Is called at the beginning of the execution and is used to set up and load information to the `Event` object. It reads the configuration (JSON) file with information about the input type, detector information, simulation and output settings.  
 - `RunSimulation`:
   Invokes the Geant4 classes for running the simulation based on the configuration given previously. Each particle is injected _one-by-one_, i.e., represents a `G4Run` and a `G4Event`, meaning that when Geant4 stops propagating a particle, the next particle in the loop is injected. In this sense, simulation data is stored _particle-by-particle_.
-- `WriteInfo`:
+- `WriteEventInfo`:
   Once the Geant4 simulation ends, this method is called and the output of the simulation is dumped into a JSON file, storing the detector signals produced by each particle in an format easy to read. 
 
 All the relevant information of an application is located in the `main()` function where all the classes and functions are linked. After compilation, an executable is created and is run by typing:
@@ -232,11 +226,11 @@ The configuration settings are written in a JSON file like the example below:
 - `InputFileName`: path to input file in case `UseARTI` is chosen.
 - `InputNParticles`: number of *muons* to be injected in case `UseEcoMug` is chosen.
 - `OutputFile`: path to the output file.
-- `CompressOutput`: if `True`, a `.tar.gz` with the output will be generated.
+- `CompressOutput`: enable compression of output file (.gz).
 - `SavePETimeDistribution`: save photo-electron time distributions for each injected particle.
 - `SaveComponentsPETimeDistribution`: save photo-electron time distributions by particle component (electromagnetic, muons, hadrons).
-- `SaveTraces`: save analog time traces in the detector.
 - `SaveEnergy`: save energy deposits in the detector.
+- `SaveCounts`: save particle counters (for scintillator bars).
 - `SaveComponentsEnergy`: save energy deposits in the detector by particle component.
 - `DetectorList`: path to the detector list file.
 - `DetectorProperties`: path to file with the default detector properties.
@@ -254,7 +248,7 @@ The detector's configuration used on each Application are specified in the `Dete
 The `DetectorList.xml` file also sets the particle injection configuration. This is written under the tag `<injectionMode>` where the following injection types are available:
 
 - eCircle: particles are injected in a circle of radius `<radius>` and at height `<height>`.
-- eHalfSphere: partilces are injected over a semi-sphere of radius `<radius>` and origin `<x>`, `<y>`, `<z>`.
+- eHalfSphere: particles are injected over a semi-sphere of radius `<radius>` and origin `<x>`, `<y>`, `<z>`.
 - eVertical: particles are injected vertically at a fixed position (given by `<x>`, `<y>`, `<z>`).
 - eFromFile: injection coordinates are taken from the input file.
 
@@ -289,36 +283,65 @@ An example of a `DetectorList.xml` file is given bellow:
 
 # Simulation Output
 
-The simulation output is stored in the JSON file whose path and options were specified in the `Configuration.json` file. To extract the data and visualize the simulation output, the user is provided with a Python script in `src/Analysis/read_output.py`. The usage of this script is
-```bash
-./read_output.py -c Configuration.json
-```
-The Python script will fetch the output configuration from the configuration file, read the corresponding data and show relevant statistics as in the example bellow.
+The simulation output is stored in a JSON format using the 
+**[nlohmann-json](https://github.com/nlohmann/json.git)** library. The output is stored on an *event basis*: each "event" is stored with information about the input particle and detector output (such as deposited energy or signals), preserving the hierarchical structure of how data is stored in the framework.
 
-### Example
-
-For this example, the `G4WCDSimulator` application was run using the following settings in the `G4WCDSimulator.json` file:
+The level of output to be stored can be set in the configuration file using the `Output` keys:
 
 ```JSON
-"Input" : {
-  "Mode" : "UseARTI",
-  "InputFileName" : "../../../src/Documentation/SampleFlux/salida_bga_30.shw",
-},
+...
+
 "Output" : {
+  // path to output file
   "OutputFile" : "./output.json",
+  // enable compression of output file (.gz)
+  "CompressOutput" : true,
+  // saves input particle
   "SaveInput" : true,
-  "SaveComponentsPETimeDistributions" : true,
-  "SaveEnergy" : true
+  // saves deposited energy in detector
+  "SaveEnergy" : true,
+  // saves particle counters in scintillator bars
+  "SaveCounts" : true,
+  // saves PE time distribution and charge in opt. devices
+  "SavePETimeDistribution" : true,
+  "SaveCharge" : true
 }
+
+...
+
 ```
+This might depend on the detector configuration or application needs.
 
-Running the `read_output.py` script using that configuration produces the following plots:
+In addition to the simulation output, information of the DetectorList containing detector naming, positioning and list of optical device IDs are also stored in the output file.
 
-![input](src/Documentation/input.png)
+# Analysis
 
-![energy](src/Documentation/edep.png)
+The simulation output is stored in a JSON format which can be easily accessed with a few lines of code. However, Meiga contains its own code to extract information from the output file using Python. The class `SimDataReader`, located in `src/Analysis`, contains methods to access data of the hierarchical structure. An example is given in the following python snippet: 
 
-![charge](src/Documentation/charge_histo.png)
+```python
+from SimDataReader import *
+
+# path to outputfile
+outfile = './output.json.gz'
+# create an instance of SimDataReader to access data
+simData = SimDataReader(outfile)
+
+# get input flux from simData
+inputFlux = simData.get_input_flux()
+
+# access to DetectorSimData by detector ID
+detSimData = simData.GetDetectorSimData(det_id=0)
+
+# example: get energy deposit of detector ID = 0
+energy = detSimData.get_deposited_energy()
+
+# access to OptDeviceSimData
+odSimData = detSimData.GetOptDeviceSimData(od_id=0)
+
+# example: get PE time distribution (time traces)
+peTimeDist = odSimData.get_pe_time_distribution()
+```
+As shown in the example above, one can navigate through the different levels of data and access to detector and optical device data by their ID.
 
 # Multiple processes
 
