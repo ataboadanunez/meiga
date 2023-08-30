@@ -289,26 +289,17 @@ The simulation output is stored in a JSON format using the
 The level of output to be stored can be set in the configuration file using the `Output` keys:
 
 ```JSON
-...
-
 "Output" : {
-  // path to output file
+  
   "OutputFile" : "./output.json",
-  // enable compression of output file (.gz)
   "CompressOutput" : true,
-  // saves input particle
   "SaveInput" : true,
-  // saves deposited energy in detector
   "SaveEnergy" : true,
-  // saves particle counters in scintillator bars
   "SaveCounts" : true,
-  // saves PE time distribution and charge in opt. devices
   "SavePETimeDistribution" : true,
   "SaveCharge" : true
+
 }
-
-...
-
 ```
 This might depend on the detector configuration or application needs.
 
