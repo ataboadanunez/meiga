@@ -14,6 +14,8 @@
     <li><a href="#input-flux">Input flux</a></li>
     <li><a href="#applications">Applications</a></li>
     <li><a href="#simulation-output">Simulation Output</a></li>
+    <li><a href="#analysis">Analysis</a></li>
+    <li><a href="#runjobs">RunJobs</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
 </details>
@@ -334,10 +336,44 @@ peTimeDist = odSimData.get_pe_time_distribution()
 ```
 As shown in the example above, one can navigate through the different levels of data and access to detector and optical device data by their ID.
 
-# Multiple processes
+# RunJobs
 
+Meiga simulations are executed as single processes meaning that only one core is used to run the simulation at a time. Although Geant4 has included multi-threading since version 10.0, this option has not been tested with Meiga applications yet. In the simulation, particles are injected **one-by-one** so simulating large amount of particles will take very long and heavy input files might also cause large RAM consumption. 
 
+Meiga provides a tool called **RunJobs** which can be found in `src/Utilities/RunJobs`. The principle behind RunJobs consists of splitting the simulation of a large number of particles in many simulations of a smaller amount of particles. These simulations (or _jobs_) are then executed in **parallel**, reducing the total simulation time. At the same time, the _jobs_ are stored in a queue such that when one process ends, the next one in the queue is sent **automatically** until all processes are done. 
 
+## How to use
+
+First of all, checkout the `src/Utilities/RunJobs` directory where you will find two Python scripts for creating and executing the jobs:
+
+- `createjobs.py`
+- `runjobs.py`
+
+Then, follow these steps:
+
+1. Create a `base/` directory with the following files:
+    - **Executable** of your Meiga Applications
+    - A **BaseConfiguration.json** file for your application \
+<span style="color:red">IMPORTANT</span>: copy this file from `src/Utilities/RunJobs/BaseConfiguration.json` and edit the settings of your simulation but **do not edit the flags between `@`!!!**
+
+    - The **DetectorList.xml** and **DetectorProperties.xml** files of your application.
+
+2. Create a `jobs/` directory
+
+3. Execute `createjobs`:
+    ```bash
+    ./createjobs -i <path-input-file> -n <n_part> -b <path-to-base> -j <path-to-jobs>
+    ```
+
+This will split the input file containing $N_\mathrm{tot}$ lines into $N = N_\mathrm{tot} / n_\mathrm{part}$ files with $n_\mathrm{part}$ lines each. Then it will create $N$ subdirectories in `jobs/`, each with its corresponding configuration files.
+
+4. Execute `runjobs`:
+
+    ```bash
+    ./runjobs -j <path-to-jobs> -n <n_threads>
+    ```
+
+Will execute the $N$ jobs in a queue using a maximum of $n_\mathrm{threads}$ at a time. Once the simulation finishes, the output file will be located in its corresponding job directory.
 
 
 
