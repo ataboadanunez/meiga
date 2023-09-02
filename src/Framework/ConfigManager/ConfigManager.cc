@@ -25,8 +25,8 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	// input
 	cfg.fInputMode = tree.get<string>("Input.Mode", "UseARTI");
 	simData.SetInputMode(simData.InputModeConversion(cfg.fInputMode));
-	cfg.fInputFileName = tree.get<string>("Input.InputFileName");
-	cfg.fInputNParticles = tree.get<unsigned int>("Input.InputNParticles");
+	cfg.fInputFileName = tree.get<string>("Input.InputFileName", "");
+	cfg.fInputNParticles = tree.get<unsigned int>("Input.InputNParticles", 0);
 
 	// reads the input (ARTI) file and fills the Event with particles
 	if (simData.GetInputMode() == SimData::InputMode::eUseARTI) {
@@ -40,8 +40,6 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	}
 		
 	cfg.fDetectorList  = tree.get<string>("DetectorList", "./DetectorList.xml");
-	cfg.fDetectorProperties = tree.get<string>("DetectorProperties", "./DetectorProperties.xml");
-	defProp.SetDefaultProperties(cfg.fDetectorProperties);
 
 	cfg.fSimulationMode = tree.get<string>("Simulation.SimulationMode", "eFull");
 	simData.SetSimulationMode(simData.SimulationModeConversion(cfg.fSimulationMode));
@@ -62,7 +60,7 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	cfg.fSaveTraces     = tree.get<bool>("Output.SaveTraces", false);
 	cfg.fSaveEnergy     = tree.get<bool>("Output.SaveEnergy", false);
 	cfg.fSaveComponentsEnergy = tree.get<bool>("Output.SaveComponentsEnergy", false);
-	cfg.fSaveCharge = tree.get<bool>("Ouput.SaveCharge", false);
+	cfg.fSaveCharge = tree.get<bool>("Output.SaveCharge", false);
 	cfg.fSaveCounts = tree.get<bool>("Output.SaveCounts", false);
 
 	return theEvent;
@@ -79,6 +77,9 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 	cout << "===========================================" << endl;
 
 	SimData& simData = theEvent.GetSimData();
+
+	// set default detector properties before detector construction
+	defProp.SetDefaultProperties();
 
 	// used to determine maximum value of Z coordinate of current detectors in file
 	double maxHeight = 0.;
@@ -163,6 +164,8 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 			}
 			
 			Detector& detector = theEvent.GetDetector(detId);
+			// set name from XML once the detector was created
+			detector.SetName(detTypestr);
 			string fPropertiesFile = simData.GetDetectorPropertiesFile();
 			
 			// set detector position
@@ -222,12 +225,11 @@ ConfigManager::PrintConfig(const Event::Config &cfg)
 
 	cout << " ------------- Output -------------" << endl;
 	cout << "OutputFile = " << cfg.fOutputFileName << endl;
+	cout << "Compress Output = " << (cfg.fCompressOutput ? "yes" : "no") << endl;
 	cout << "Save Input = " << (cfg.fSaveInput ? "yes" : "no") << endl;
 	cout << "Save PE Time distribution (components) = " << (cfg.fSavePETimeDistribution ? "yes" : "no") << " (" << (cfg.fSaveComponentsPETimeDistribution ? "yes)" : "no)") << endl;
-	cout << "Compress Output = " << (cfg.fCompressOutput ? "yes" : "no") << endl;
-	cout << "Save Traces = " << (cfg.fSaveTraces ? "yes" : "no") << endl;
 	cout << "Save Energy Deposit (components) = " << (cfg.fSaveEnergy ? "yes" : "no") << " (" << (cfg.fSaveComponentsEnergy ? "yes)" : "no)") << endl;
-	cout << "Save Charge (number of PE) = " << (cfg.fSaveCharge ? "yes" : "no") << endl;
+	cout << "Save Charge = " << (cfg.fSaveCharge ? "yes" : "no") << endl;
 	cout << "Save Bar Counts = " << (cfg.fSaveCounts ? "yes" : "no") << endl;
 
 	cout << " -------- Geant4 Settings ---------" << endl;

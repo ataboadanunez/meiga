@@ -3,7 +3,6 @@
 	{
 		"Mode" : "UseARTI",
 		"InputFileName" : "./test.shw",
-		"InputNParticles" : 1
 	},
 	"Output" : 
 	{
@@ -15,7 +14,6 @@
 		"SaveComponentsEnergy" : false
 	},
 	"DetectorList" : "./DetectorList.xml",
-	"DetectorProperties" : "./DetectorProperties.xml",
 	"Simulation" :
 	{
 		"SimulationMode" : "eFast",

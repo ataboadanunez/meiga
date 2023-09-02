@@ -40,6 +40,7 @@ class DetectorSimData
 		std::map<uint64_t, std::vector<uint64_t>>& GetPhotoElectronParentID() { return fPEParentID; }
 		const std::map<uint64_t, std::vector<uint64_t>>& GetPhotoElectronParentID() const { return fPEParentID; }
 
+		// methods to extract deposited energy in a detector
 		void SetEnergyDeposit(const double eDep);
 		std::vector<double> GetEnergyDeposit() { return fEnergyDeposit; }
 		const std::vector<double>& GetEnergyDeposit() const { return fEnergyDeposit; }
@@ -48,7 +49,15 @@ class DetectorSimData
 		std::vector<double> GetEnergyDeposit(Particle::Component comp) { return fEDepComponentMap.at(comp); } 
 		const std::vector<double>& GetEnergyDeposit(Particle::Component comp) const { return fEDepComponentMap.at(comp); } 
 		// a Has method is needed before requesting information to the map
+		bool HasEnergyDeposit() const { return !fEnergyDeposit.empty(); }
 		bool HasEnergyDeposit(Particle::Component comp) const { return fEDepComponentMap.count(comp) != 0; }
+
+		// methods to compute deposited energy at a single event
+		void AddEnergyDeposit(const double e) { fTotalEnergyDeposit += e; }
+		// reset deposited energy counter on a single event
+		void ClearTotalEnergyDeposit() { fTotalEnergyDeposit = 0; }
+		// Total deposited energy on a single event
+		double GetTotalEnergyDeposit() const { return fTotalEnergyDeposit; }
 
 		// bar hits for scintillator detectors
 		void AddHitBarIndex(const int barId) { fHitBarIndices.push_back(barId); }
@@ -57,6 +66,7 @@ class DetectorSimData
 
 		void AddBinaryCounter(const std::string binaryString) { fBinaryCounter.push_back(binaryString); }
 		const std::vector<std::string>& GetBinaryCounter() const { return fBinaryCounter; }
+		bool HasBinaryCounter() const { return !fBinaryCounter.empty(); }
 
 
 	private:
@@ -70,9 +80,15 @@ class DetectorSimData
 		std::map<uint64_t, std::vector<uint64_t> > fPEParentID;
 
 		// data holders at detector level
+
+		// vectors to store deposited energy per event
 		std::vector<double> fEnergyDeposit;
 		std::map<Particle::Component, std::vector<double>> fEDepComponentMap;
 
+		// total deposited energy at a single event
+		double fTotalEnergyDeposit;
+
+		// vectors to store hits at scintillator bars
 		std::vector<int> fHitBarIndices;
 		std::vector<std::string> fBinaryCounter;
 };

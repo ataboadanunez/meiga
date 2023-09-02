@@ -56,6 +56,9 @@ class Detector
 		DetectorType GetType() const { return fType; }
 		void SetType(Detector::DetectorType type) { fType = type; }
 
+		void SetName(const std::string name) { fName = name; }
+		std::string GetName() const { return fName; }
+
 		const std::vector<double>& GetDetectorPosition() const { return fDetectorPosition; }
 		void SetDetectorPosition(const std::vector<double> &pos) { fDetectorPosition = pos; }
 
@@ -151,10 +154,12 @@ class Detector
 		DetectorType StringToType(const std::string name);
 		void SetDefaultProperties(const std::string file);
 		void SetDetectorProperties(const boost::property_tree::ptree &det, DefaultProperties &defProp);
+
 		//std::map<std::string, DetectorType> conversion;
 	private:
 
 		unsigned int fDetectorId = 0;
+		std::string fName;
 		DetectorType fType;
 		int fNOptDevices = 0;
 
@@ -194,8 +199,6 @@ class Detector
 		std::map<OptDevice::DeviceType, OptDevice> fOptDeviceMapT;
 
 		std::map<std::string, G4LogicalVolume*> fLogicalVolumeMap;
-		// configuration file with detector properties
-		std::string fDetectorProperties = "./DetectorProperties.xml";
 
 
 

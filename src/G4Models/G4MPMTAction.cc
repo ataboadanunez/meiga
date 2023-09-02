@@ -49,12 +49,14 @@ G4MPMTAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 
 	DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData(fDetectorId);
 	OptDeviceSimData& odSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
-	cout << "[DEBUG] G4MPMTAction: Total Signal at OptDevice " << fOptDeviceId << " of Detector " << fDetectorId << " = " << fPETime.size() << endl;
+	int charge = fPETime.size();
+	
 	// add total PE time distribution
 	odSimData.AddPETimeDistribution(fPETime);
 	// add components PE time distribution
 	odSimData.AddPETimeDistribution(particleComponent, fPETimeComp);
 	odSimData.AddPETimeDistribution(Particle::eMuonDecay, fPETimeMuDecay);
+	odSimData.AddCharge(charge);
 
 	fPETime.clear();
 	fPETimeComp.clear();

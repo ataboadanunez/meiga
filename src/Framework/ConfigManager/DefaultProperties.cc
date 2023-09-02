@@ -9,8 +9,11 @@ const ptree& empty_ptree(){
 
 
 void
-DefaultProperties::SetDefaultProperties(const string &filename)
+DefaultProperties::SetDefaultProperties()
 {
+	
+	string filename = DETECTORPROPERTIES;
+	
 	if (filename.empty()) 
 		return;
 	std::cout << "[INFO] DefaultProperties::SetDefaultProperties: Setting default properties from file " << filename << std::endl;

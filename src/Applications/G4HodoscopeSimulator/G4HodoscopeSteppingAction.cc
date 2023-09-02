@@ -27,6 +27,12 @@ G4HodoscopeSteppingAction::G4HodoscopeSteppingAction(G4HodoscopeEventAction* G4e
     fEvent(theEvent)
 {
 
+	if (fEvent.GetSimData().GetSimulationMode() == SimData::SimulationMode::eFast) {
+		cout << "[INFO] G4HodoscopeSteppingAction::G4HodoscopeSteppingAction: Running Simulation in Fast mode." << endl;
+		cout << "[INFO] G4HodoscopeSteppingAction::G4HodoscopeSteppingAction: Optical photons will be killed! " << endl;
+		
+	}
+
 }
 
 G4HodoscopeSteppingAction::~G4HodoscopeSteppingAction()
@@ -37,5 +43,12 @@ G4HodoscopeSteppingAction::~G4HodoscopeSteppingAction()
 void
 G4HodoscopeSteppingAction::UserSteppingAction(const G4Step* step)
 {
+
+	G4Track *track = step->GetTrack();
+	// if fast mode activated, kill optical photons
+	if (fEvent.GetSimData().GetSimulationMode() == SimData::SimulationMode::eFast) {
+		if (track->GetParticleDefinition() == G4OpticalPhoton::OpticalPhoton())
+			track->SetTrackStatus(fStopAndKill);
+	}
 
 }

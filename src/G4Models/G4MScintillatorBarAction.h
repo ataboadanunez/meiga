@@ -23,6 +23,7 @@ class G4MScintillatorBarAction : public G4VSensitiveDetector {
 		Event& fEvent;
 		int fDetectorId;
 		int fBarId;
+		double fBarEdep;
 
 };
 

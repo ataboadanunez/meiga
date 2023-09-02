@@ -1,27 +1,25 @@
 {
 	"Input" :
 	{
-		"Mode" : "UseARTI",
-		"InputFileName" : "./vertical_muon.txt",
-		"InputNParticles" : 1
+		"Mode" : "UseEcoMug",
+		"InputNParticles" : 1000
 	},
 	"Output" : 
 	{
-		"OutputFile" : "./output.dat",
-		"CompressOutput" : false,
+		"OutputFile" : "./output.json",
+		"CompressOutput" : true,
 		"SaveInput" : true,
-		"SavePETimeDistribution" : false,
+		
 		"SaveCounts" : true,
-		"SaveComponentsPETimeDistribution" : false,
-		"SaveEnergy" : false,
-		"SaveComponentsEnergy" : false
+		"SaveEnergy" : true,
+		
+		"SaveCharge" : false,
+		"SavePETimeDistribution" : false
 	},
 	"DetectorList" : "./DetectorList.xml",
-	"DetectorProperties" : "./DetectorProperties.xml",
 	"Simulation" :
 	{
 		"SimulationMode" : "eFast",
-		"InjectionMode" : "eRandom",
 		"GeoVisOn" : false,
 		"TrajVisOn" : false,
 		"CheckOverlaps" : false,

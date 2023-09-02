@@ -2,25 +2,24 @@
 	"Input" :
 	{
 		"Mode" : "UseARTI",
-		"InputFileName" : "./vertical_muon.txt",
-		"InputNParticles" : 0
+		"InputFileName" : "../../../src/Documentation/SampleFlux/salida_bga_30.shw"
 	},
 	
 	"Output" : 
 	{
 		"OutputFile" : "./output.json",
 		"CompressOutput" : true,
-		"SavePETimeDistribution" : true,
-		"SaveComponentsPETimeDistribution" : false,
-		"SaveEnergy" : false,
-		"SaveComponentsEnergy" : false
+		"SaveInput" : true,
+
+		"SavePETimeDistribution" : false,
+		"SaveEnergy" : true,
+		"SaveCharge" : true
+	
 	},
 	"DetectorList" : "./DetectorList.xml",
-	"DetectorProperties" : "./DetectorProperties.xml",
 	"Simulation" :
 	{
 		"SimulationMode" : "eFast",
-		"InjectionMode" : "eRandom",
 		"GeoVisOn" : false,
 		"TrajVisOn" : false,
 		"CheckOverlaps" : false,

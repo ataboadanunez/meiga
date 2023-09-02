@@ -9,6 +9,8 @@
 #include "SimData.h"
 #include "Particle.h"
 
+using namespace std;
+
 G4HodoscopeTrackingAction::G4HodoscopeTrackingAction(Event &theEvent) :
 	fEvent(theEvent) 
 {

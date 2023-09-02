@@ -65,6 +65,7 @@ class OptDeviceSimData
 		// charge (number of PE)
 		void AddCharge(const int npe);
 		const std::vector<int>& GetCharge() const { return fCharge; }
+		bool HasCharge() { return !fCharge.empty(); }
 
 
 	private:
