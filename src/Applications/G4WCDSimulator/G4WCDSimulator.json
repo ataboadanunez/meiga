@@ -2,8 +2,7 @@
 	"Input" :
 	{
 		"Mode" : "UseARTI",
-		"InputFileName" : "../../../src/Documentation/SampleFlux/salida_bga_30.shw",
-		"InputNParticles" : 0
+		"InputFileName" : "../../../src/Documentation/SampleFlux/salida_bga_30.shw"
 	},
 	
 	"Output" : 
@@ -18,7 +17,6 @@
 	
 	},
 	"DetectorList" : "./DetectorList.xml",
-	"DetectorProperties" : "./DetectorProperties.xml",
 	"Simulation" :
 	{
 		"SimulationMode" : "eFast",

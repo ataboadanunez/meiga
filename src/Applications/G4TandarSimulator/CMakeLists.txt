@@ -32,44 +32,26 @@ install(TARGETS G4TandarSimulator DESTINATION bin)
 set(config_dir "${CMAKE_CURRENT_SOURCE_DIR}/../../Framework/ConfigManager")
 set(copy_source_dir "${CMAKE_CURRENT_SOURCE_DIR}")
 set(copy_dest_dir "${CMAKE_BINARY_DIR}/Applications/G4TandarSimulator")
+
+add_custom_command(
+  TARGET G4TandarSimulator POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${copy_dest_dir}
+)
+
+
+# Copying G4TandarSimulator.json from source to build directory
 set(copy_file_name "G4TandarSimulator.json")
 add_custom_command(
-  TARGET G4TandarSimulator POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${copy_dest_dir}
-)
-add_custom_command(
   TARGET G4TandarSimulator POST_BUILD 
   COMMAND ${CMAKE_COMMAND} -E copy "${copy_source_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
   COMMENT "Copying ${copy_file_name} to build directory"
 )
+
+# Copying DetectorList.xml from source to build directory
 set(copy_file_name "DetectorList.xml")
 add_custom_command(
-  TARGET G4TandarSimulator POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${copy_dest_dir}
-)
-add_custom_command(
   TARGET G4TandarSimulator POST_BUILD 
   COMMAND ${CMAKE_COMMAND} -E copy "${copy_source_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
-  COMMENT "Copying ${copy_file_name} to build directory"
-)
-set(copy_file_name "vertical_muon.txt")
-add_custom_command(
-  TARGET G4TandarSimulator POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${copy_dest_dir}
-)
-add_custom_command(
-  TARGET G4TandarSimulator POST_BUILD 
-  COMMAND ${CMAKE_COMMAND} -E copy "${copy_source_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
-  COMMENT "Copying ${copy_file_name} to build directory"
-)
-set(copy_file_name "DetectorProperties.xml")
-add_custom_command(
-  TARGET G4TandarSimulator POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${copy_dest_dir}
-)
-add_custom_command(
-  TARGET G4TandarSimulator POST_BUILD 
-  COMMAND ${CMAKE_COMMAND} -E copy "${config_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
   COMMENT "Copying ${copy_file_name} to build directory"
 )
 

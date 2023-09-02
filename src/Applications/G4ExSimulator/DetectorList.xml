@@ -3,13 +3,14 @@
 <detectorList>
 	
 	<injectionMode type="eVertical">
-		<!-- parametros de inyeccion -->
+		<!-- particle injection coordinates -->
 		<x unit="m"> 0 </x>
 		<y unit="m"> 0 </y>
 		<z unit="m"> 1 </z>
 	</injectionMode>
 
 	<detector id="0" type="eScintillator">
+		<!-- detector location coordinates -->
 		<x unit="cm"> 0.0 </x>
 		<y unit="cm"> 0.0 </y>
 		<z unit="cm"> 0.0 </z>

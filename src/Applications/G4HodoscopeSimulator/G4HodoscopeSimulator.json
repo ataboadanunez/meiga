@@ -2,7 +2,6 @@
 	"Input" :
 	{
 		"Mode" : "UseEcoMug",
-		"InputFileName" : "./vertical_muon.txt",
 		"InputNParticles" : 1000
 	},
 	"Output" : 
@@ -18,7 +17,6 @@
 		"SavePETimeDistribution" : false
 	},
 	"DetectorList" : "./DetectorList.xml",
-	"DetectorProperties" : "./DetectorProperties.xml",
 	"Simulation" :
 	{
 		"SimulationMode" : "eFast",

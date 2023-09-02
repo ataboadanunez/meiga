@@ -1,1 +1,40 @@
-Example application of the Meiga framework.
+--------------------------------------------------------------
+   =======================================================
+   MEIGA - Simulations Framework for Astroparticle Physics
+   =======================================================
+
+                       G4ExSimulator
+                       -------------
+--------------------------------------------------------------
+
+
+Example Application of the Meiga Framework. This application 
+is intended for testing after compilation and orienting users 
+through the framework usage.
+
+_How to run_
+After compilation, in the application directory run the
+executable with a configuration file:
+
+./G4ExSimulator -c G4ExSimulator.json
+
+- DetectorList.xml:
+Example detector configuration for this application using
+a simple scintillator detector of 12 plastic bars. 
+Detector construction in src/G4Models/Scintillator.cc
+Just plastic bars with corresponding scintillator properties.
+No optical fibers or optical devices.
+
+- G4ExSimulator.json:
+Standard configuration of the application. 
+* Input: single muon of 1 GeV of energy
+* Output: save input particle information and deposited energy
+	in the detector. PETime and charge not available since no
+	optical device is present in this example detector.
+* TrajVisOn / GeoVisOn: if true, 3D render file with particle
+	trajectory and detector geometry will be built.
+
+
+
+
+

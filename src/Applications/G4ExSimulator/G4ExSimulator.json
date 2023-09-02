@@ -2,23 +2,22 @@
 	"Input" :
 	{
 		"Mode" : "UseARTI",
-		"InputFileName" : "./vertical_muon.txt",
-		"InputNParticles" : 0
+		"InputFileName" : "../../../src/Documentation/SampleFlux/vertical_muon.txt"
 	},
 	"Output" : 
 	{
 		"OutputFile" : "./output.json",
 		"CompressOutput" : true,
-		"SavePETimeDistribution" : true,
-		"SaveComponentsPETimeDistribution" : false,
-		"SaveEnergy" : false,
-		"SaveComponentsEnergy" : false
+		"SaveInput" : true,
+		"SaveEnergy" : true,
+		"SaveCounts" : false,
+		"SavePETimeDistribution" : false,
+		"SaveCharge" : false
 	},
 	"DetectorList" : "./DetectorList.xml",
-	"DetectorProperties" : "./DetectorProperties.xml",
 	"Simulation" :
 	{
-		"SimulationMode" : "eFast",
+		"SimulationMode" : "eFull",
 		"GeoVisOn" : true,
 		"TrajVisOn" : true,
 		"CheckOverlaps" : false,
