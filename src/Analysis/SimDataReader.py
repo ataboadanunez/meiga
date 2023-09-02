@@ -160,12 +160,17 @@ class SimDataReader:
 
 			if inp is not None:
 				# particle ID is the PDG Encoding
+				# TODO: add particle component / CORSIKA ID
 				inpdict['id'].append(inp['ID'])
-				# add particle component / CORSIKA ID
+				# particle momentum components
 				inpdict['px'].append(inp['Momentum'][0])
 				inpdict['py'].append(inp['Momentum'][1])
 				inpdict['pz'].append(inp['Momentum'][2])
-
+				# particle injection position
+				inpdict['x'].append(inp['Position'][0])
+				inpdict['y'].append(inp['Position'][1])
+				inpdict['z'].append(inp['Position'][2])
+				
 		return pd.DataFrame(inpdict)
 
 
