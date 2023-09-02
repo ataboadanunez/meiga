@@ -40,8 +40,6 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	}
 		
 	cfg.fDetectorList  = tree.get<string>("DetectorList", "./DetectorList.xml");
-	cfg.fDetectorProperties = tree.get<string>("DetectorProperties", "./DetectorProperties.xml");
-	defProp.SetDefaultProperties(cfg.fDetectorProperties);
 
 	cfg.fSimulationMode = tree.get<string>("Simulation.SimulationMode", "eFull");
 	simData.SetSimulationMode(simData.SimulationModeConversion(cfg.fSimulationMode));
@@ -79,6 +77,9 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 	cout << "===========================================" << endl;
 
 	SimData& simData = theEvent.GetSimData();
+
+	// set default detector properties before detector construction
+	defProp.SetDefaultProperties();
 
 	// used to determine maximum value of Z coordinate of current detectors in file
 	double maxHeight = 0.;

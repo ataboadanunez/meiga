@@ -199,8 +199,6 @@ class Detector
 		std::map<OptDevice::DeviceType, OptDevice> fOptDeviceMapT;
 
 		std::map<std::string, G4LogicalVolume*> fLogicalVolumeMap;
-		// configuration file with detector properties
-		std::string fDetectorProperties = "./DetectorProperties.xml";
 
 
 

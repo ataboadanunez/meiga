@@ -1,3 +1,8 @@
+# Set the path to DetectorProperties.xml as a CMake variable
+set(PATH_TO_PROPERTIES "${CMAKE_BINARY_DIR}/Framework/ConfigManager/DetectorProperties.xml")
+# Configure the DefaultProperties.h.in file
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/DefaultProperties.h.in ${CMAKE_CURRENT_SOURCE_DIR}/DefaultProperties.h)
+
 file(GLOB sources ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
 file(GLOB headers ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 add_library(meiga_framework_configmanager STATIC ${sources} ${headers})
