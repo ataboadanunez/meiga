@@ -5,3 +5,6 @@ set(MEIGA_LIBRARIES meiga_framework_configmanager ${MEIGA_LIBRARIES} PARENT_SCOP
 target_link_libraries(meiga_io)
 install(FILES ${headers} DESTINATION include)
 install(TARGETS meiga_framework_configmanager DESTINATION lib)
+
+# Copy DetectorProperties.xml to the build directory
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/DetectorProperties.xml DESTINATION ${CMAKE_BINARY_DIR}/Framework/ConfigManager)
