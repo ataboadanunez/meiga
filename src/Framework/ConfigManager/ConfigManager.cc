@@ -25,8 +25,8 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	// input
 	cfg.fInputMode = tree.get<string>("Input.Mode", "UseARTI");
 	simData.SetInputMode(simData.InputModeConversion(cfg.fInputMode));
-	cfg.fInputFileName = tree.get<string>("Input.InputFileName");
-	cfg.fInputNParticles = tree.get<unsigned int>("Input.InputNParticles");
+	cfg.fInputFileName = tree.get<string>("Input.InputFileName", "");
+	cfg.fInputNParticles = tree.get<unsigned int>("Input.InputNParticles", 0);
 
 	// reads the input (ARTI) file and fills the Event with particles
 	if (simData.GetInputMode() == SimData::InputMode::eUseARTI) {
@@ -224,12 +224,11 @@ ConfigManager::PrintConfig(const Event::Config &cfg)
 
 	cout << " ------------- Output -------------" << endl;
 	cout << "OutputFile = " << cfg.fOutputFileName << endl;
+	cout << "Compress Output = " << (cfg.fCompressOutput ? "yes" : "no") << endl;
 	cout << "Save Input = " << (cfg.fSaveInput ? "yes" : "no") << endl;
 	cout << "Save PE Time distribution (components) = " << (cfg.fSavePETimeDistribution ? "yes" : "no") << " (" << (cfg.fSaveComponentsPETimeDistribution ? "yes)" : "no)") << endl;
-	cout << "Compress Output = " << (cfg.fCompressOutput ? "yes" : "no") << endl;
-	cout << "Save Traces = " << (cfg.fSaveTraces ? "yes" : "no") << endl;
 	cout << "Save Energy Deposit (components) = " << (cfg.fSaveEnergy ? "yes" : "no") << " (" << (cfg.fSaveComponentsEnergy ? "yes)" : "no)") << endl;
-	cout << "Save Charge (number of PE) = " << (cfg.fSaveCharge ? "yes" : "no") << endl;
+	cout << "Save Charge = " << (cfg.fSaveCharge ? "yes" : "no") << endl;
 	cout << "Save Bar Counts = " << (cfg.fSaveCounts ? "yes" : "no") << endl;
 
 	cout << " -------- Geant4 Settings ---------" << endl;
