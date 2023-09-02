@@ -1,1 +1,33 @@
-WCDample application of the Meiga framework.
+--------------------------------------------------------------
+   =======================================================
+   MEIGA - Simulations Framework for Astroparticle Physics
+   =======================================================
+
+                       G4WCDSimulator
+                       -------------
+--------------------------------------------------------------
+
+Example Application to simulate a flux of secondary particles
+on a Water-Cerenkov Detector. 
+
+- DetectorList.xml:
+Particles are injected over a circle of radius 1.5 m at a 
+height of 2 m. Detector WCD centered at the origin.
+
+- G4WCDSimulator.json:
+* Input: using ARTI by default. injecting sample file in
+   documentation.
+* Output:
+   CompressOutput = true,
+   SaveInput = true,
+   SavePETimeDistribution = false, if true, lists with the
+   arrival times of the photo-electrons at the PMT will be
+   stored (needed for pulse calculation).
+   SaveEnergy = true (energy deposited per injected particle)
+   SaveCharge = true (number of photo-electrons at PMT)
+
+* Simulation:
+   SimulationMode = eFast. Cerenkov photons are propagated
+   only if they will reach PMT. Saves simulation time.
+   If eFull, all Photons are propagated (with same results).
+   

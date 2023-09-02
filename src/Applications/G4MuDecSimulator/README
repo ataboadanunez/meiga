@@ -1,17 +1,17 @@
+--------------------------------------------------------------
+   =======================================================
+   MEIGA - Simulations Framework for Astroparticle Physics
+   =======================================================
+
+                       G4MuDecSimulator
+                       ----------------
+--------------------------------------------------------------
+
 Application created for the study of the muon decay 
 in a water-Cherenkov Detector
 
-This application is essentially the G4WCDSimulator with some modifications:
+This application is essentially the G4WCDSimulator with some modifications in the UserAction classes to store the
+signals from electrons product of the muon decay in the water.
 
-1. InjectionMode.
-	InjectionMode = 0 (standard way). Particles are injected outside the detector (eg., secondary flux).
-	InjectionMode = 1. Particles are injected inside the detectors (eg., sample of electrons)
-
-2. Geometry.
-	The geometry of the tank is chosen to be r=780 mm and h=1580 mm (Nahuelito, LAGO)
-
-3. Actions.
-	3.1. 
-
-
-
+This Application was used to perform the analysis published in
+https://doi.org/10.1016/j.nima.2023.168567

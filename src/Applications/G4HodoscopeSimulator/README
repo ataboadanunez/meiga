@@ -1,31 +1,45 @@
-Application for simulating a muon telescope using Scintillator Planes.
+--------------------------------------------------------------
+   =======================================================
+   MEIGA - Simulations Framework for Astroparticle Physics
+   =======================================================
 
-The hodoscope consists of planes of scintillator bars, each with
-N bars along the x-direction and N bars along the y-direction 
-such that a grid of NxN pixels is formed.
+                       G4HodoscopeSimulator
+                       --------------------
+--------------------------------------------------------------
+
+
+Application for simulating a muon telescope using Scintillator 
+Planes.
+
+The hodoscope consists of planes of scintillator bars, 
+each with N bars along the x-direction and N bars along 
+the y-direction such that a grid of NxN pixels is formed.
 
 An example isprovided in the detector with type `eHodoscope`,
 which contains 12x12 scintillator bars with default geometry
-values (see the DetetorConstruction in src/G4Models/Hodoscope.cc).
+values (see src/G4Models/Hodoscope.cc).
 
-Fibers and one "pixel" acting as Optical Devices (PMT / SiPM) at the end
-of the fiber are also implemented, giving the possibility of storing
-Photo-electron time traces and Charge (only in Full Simulation mode).
+Fibers and one "pixel" acting as Optical Devices (PMT / SiPM) 
+at the end of the fiber are also implemented, giving the 
+possibility of storing Photo-electron time traces and Charge 
+(only in Full Simulation mode).
 
-Each bar is stored as a Sensitive Detector itself by means of the
-G4MScintillatorBarAction class (in G4Models). 
+Each bar is stored as a Sensitive Detector itself by means of 
+the G4MScintillatorBarAction class (in G4Models). 
 
-The G4HodoscopeAction class computes the `index` of the hit bars along
-each axis in a binary value. This information is then stored in the 
-DetectorSimData class for each injected particle. The binary value 
-reserves the first N bits to store hits of the bars along the X-axis
-and the last N bits to store hits of the bars along the Y-axis.
+The G4HodoscopeAction class computes the `index` of the hit 
+bars alongeach axis in a binary value. This information is then 
+stored in the DetectorSimData class for each injected particle. 
+The binary value reserves the first N bits to store hits of the 
+bars along the X-axis and the last N bits to store hits of the 
+bars along the Y-axis.
 
-For example, a binary value of `001000000000000100000000` means that the
-impinging muon has hit the bar number "3" along the X-axis and the bar
-number "4" along the Y-axis.
+For example, a binary value of `001000000000000100000000` means 
+that the impinging muon has hit the bar number "3" along the 
+X-axis and the bar number "4" along the Y-axis.
 
-The DetectorList.xml provides an example with 3 eHodoscope detectors 
-separated by 1 m each along the Z-axis. By default, particles are injected
-in a circle of 0.5 m radius on top of the upper plane.
+The DetectorList.xml provides an example with 3 eHodoscope 
+detectors separated by 1 m each along the Z-axis. By default, 
+particles are injected in a circle of 0.5 m radius on top of the
+upper plane.
 

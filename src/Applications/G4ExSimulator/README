@@ -33,8 +33,3 @@ Standard configuration of the application.
 	optical device is present in this example detector.
 * TrajVisOn / GeoVisOn: if true, 3D render file with particle
 	trajectory and detector geometry will be built.
-
-
-
-
-
