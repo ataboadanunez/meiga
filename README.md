@@ -336,6 +336,15 @@ peTimeDist = odSimData.get_pe_time_distribution()
 ```
 As shown in the example above, one can navigate through the different levels of data and access to detector and optical device data by their ID.
 
+### Add `SimDataReader` to `PYTHONPATH`
+
+In order to import the `SimDataReader` class from any location in your system, just add the following line to the `PYTHONPATH` in your `~/.bashrc` file:
+
+```bash
+# adding analysis directory to PYTHONPATH
+export PYTHONPATH=$PYTHONPATH:/<path-to>/meiga/src/Analysis/
+```
+
 # RunJobs
 
 Meiga simulations are executed as single processes meaning that only one core is used to run the simulation at a time. Although Geant4 has included multi-threading since version 10.0, this option has not been tested with Meiga applications yet. In the simulation, particles are injected **one-by-one** so simulating large amount of particles will take very long and heavy input files might also cause large RAM consumption. 
@@ -374,6 +383,19 @@ This will split the input file containing $N_\mathrm{tot}$ lines into $N = N_\ma
     ```
 
 Will execute the $N$ jobs in a queue using a maximum of $n_\mathrm{threads}$ at a time. Once the simulation finishes, the output file will be located in its corresponding job directory.
+
+## Add RunJobs to your environment
+
+The `createjobs` and `runjobs` executables can be found in the Meiga `bin` directory after installation. You can add this directory to your environment and create aliases to execute the RunJobs scripts from any location. This is an example of how you can do it in your `~/.bashrc` file:
+
+```bash
+# Path to the Meiga install directory
+MEIGAINSTALL='<path-to>/meiga/install/bin/'
+# Write alias to execute createjobs and runjobs
+alias createjobs='python3 $MEIGAINSTALL/createjobs.py'
+alias runjobs='python3 $MEIGAINSTALL/runjobs.py'
+```
+
 
 
 
