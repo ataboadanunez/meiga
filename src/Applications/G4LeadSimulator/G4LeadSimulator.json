@@ -30,7 +30,7 @@
 	"LeadBrick" :
 	{
 		"Simulate" : true,
-		"Position" : [0, 0, 130],
+		"Position" : [0, -15, 105],
 		"Size"     : [20, 20, 10]
 	}
 }
