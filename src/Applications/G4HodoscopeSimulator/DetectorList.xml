@@ -7,7 +7,7 @@
 		<y unit="m"> 0 </y>
 		<z unit="m"> 0 </z>
 		<radius unit="m"> 0.25 </radius>
-		<height unit="m"> 1.0 </height> 
+		<height unit="m"> 1.5 </height> 
 	</injectionMode>
 
 	<detector id="0" type="eHodoscope">
@@ -20,14 +20,14 @@
 	<detector id="1" type="eHodoscope">
 		<x unit="m"> 0.0 </x>
 		<y unit="m"> 0.0 </y>
-		<z unit="m"> 0.5 </z>
+		<z unit="m"> 1.0 </z>
 
 	</detector>
 
 	<detector id="2" type="eHodoscope">
 		<x unit="m"> 0.0 </x>
 		<y unit="m"> 0.0 </y>
-		<z unit="m"> -0.5 </z>
+		<z unit="m"> -1.0 </z>
 
 	</detector>
 

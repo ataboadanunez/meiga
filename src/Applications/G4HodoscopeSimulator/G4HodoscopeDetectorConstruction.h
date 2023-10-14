@@ -32,7 +32,7 @@ class G4OpticalSkinSurface;
 class G4HodoscopeDetectorConstruction : public G4VUserDetectorConstruction {
 	
 	public:
-		G4HodoscopeDetectorConstruction(Event& theEvent);
+		G4HodoscopeDetectorConstruction(Event& aEvent);
 		virtual ~G4HodoscopeDetectorConstruction();
 		virtual G4VPhysicalVolume* Construct();
 
@@ -40,7 +40,7 @@ class G4HodoscopeDetectorConstruction : public G4VUserDetectorConstruction {
 
 		void CreateWorld();
 		void CreateGround();
-		void PlaceDetector(Event& theEvent);
+		void PlaceDetector(Event& aEvent);
 		G4VPhysicalVolume* CreateDetector();
 		
 		bool fCheckOverlaps = false;
@@ -60,6 +60,16 @@ class G4HodoscopeDetectorConstruction : public G4VUserDetectorConstruction {
 		G4LogicalVolume* logicBrick = nullptr;
 		G4PVPlacement*   physBrick  = nullptr;
 
+		double fWorldSizeX;
+		double fWorldSizeY;
+		double fWorldSizeZ;
+
+		double fBrickSizeX;
+		double fBrickSizeY;
+		double fBrickSizeZ;
+		double fBrickPosX;
+		double fBrickPosY;
+		double fBrickPosZ;
 		
 		Event& fEvent;
 };
