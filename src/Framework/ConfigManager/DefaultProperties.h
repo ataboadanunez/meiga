@@ -5,7 +5,7 @@
 
 // path to DetectorProperties.xml is set from a global variable from CMakeLists.txt
 // this path will be overwritten after compilation
-#define DETECTORPROPERTIES ""
+#define DETECTORPROPERTIES "/home/alvaro/projects/github/meiga/build/Framework/ConfigManager/DetectorProperties.xml"
 
 struct DefaultProperties 
 {

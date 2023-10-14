@@ -20,7 +20,7 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	ptree tree;
 	read_json(fConfigFile, tree);
 	
-
+	cfg.fConfigurationFileName = fConfigFile;
 	SimData& simData = theEvent.GetSimData();
 	// input
 	cfg.fInputMode = tree.get<string>("Input.Mode", "UseARTI");

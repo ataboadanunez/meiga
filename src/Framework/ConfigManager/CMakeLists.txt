@@ -7,7 +7,7 @@ file(GLOB sources ${CMAKE_CURRENT_SOURCE_DIR}/*.cc)
 file(GLOB headers ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 add_library(meiga_framework_configmanager STATIC ${sources} ${headers})
 set(MEIGA_LIBRARIES meiga_framework_configmanager ${MEIGA_LIBRARIES} PARENT_SCOPE)
-target_link_libraries(meiga_io)
+target_link_libraries(meiga_framework_configmanager meiga_framework_event)
 install(FILES ${headers} DESTINATION include)
 install(TARGETS meiga_framework_configmanager DESTINATION lib)
 
