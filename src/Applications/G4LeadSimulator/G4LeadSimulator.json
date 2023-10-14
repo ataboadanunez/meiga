@@ -1,0 +1,36 @@
+{
+	"Input" :
+	{
+		"Mode" : "UseEcoMug",
+		"InputNParticles" : 1000
+	},
+	"Output" : 
+	{
+		"OutputFile" : "./output.json",
+		"CompressOutput" : true,
+		"SaveInput" : true,
+		
+		"SaveCounts" : true,
+		"SaveEnergy" : true,
+		
+		"SaveCharge" : false,
+		"SavePETimeDistribution" : false
+	},
+	"DetectorList" : "./DetectorList.xml",
+	"Simulation" :
+	{
+		"SimulationMode" : "eFast",
+		"GeoVisOn" : false,
+		"TrajVisOn" : false,
+		"CheckOverlaps" : false,
+		"Verbosity" : 1,
+		"RenderFile" : "VRML2FILE",
+		"PhysicsName" : "QGSP_BERT_HP"
+	},
+	"LeadBrick" :
+	{
+		"Simulate" : true,
+		"Position" : [0, 0, 130],
+		"Size"     : [20, 20, 10]
+	}
+}

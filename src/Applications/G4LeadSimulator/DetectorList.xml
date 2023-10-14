@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+
+<detectorList>
+
+	<injectionMode type="eCircle">
+		<x unit="m"> 0 </x>
+		<y unit="m"> 0 </y>
+		<z unit="m"> 0 </z>
+		<radius unit="m"> 0.25 </radius>
+		<height unit="m"> 1.5 </height> 
+	</injectionMode>
+
+	<detector id="0" type="eHodoscope">
+		<x unit="m"> 0.0 </x>
+		<y unit="m"> 0.0 </y>
+		<z unit="m"> 0.0 </z>
+
+	</detector>
+
+	<detector id="1" type="eHodoscope">
+		<x unit="m"> 0.0 </x>
+		<y unit="m"> 0.0 </y>
+		<z unit="m"> 1.0 </z>
+
+	</detector>
+
+	<detector id="2" type="eHodoscope">
+		<x unit="m"> 0.0 </x>
+		<y unit="m"> 0.0 </y>
+		<z unit="m"> -1.0 </z>
+
+	</detector>
+
+
+</detectorList>

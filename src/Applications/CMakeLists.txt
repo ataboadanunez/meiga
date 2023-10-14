@@ -3,4 +3,5 @@ add_subdirectory(G4ExSimulator)
 add_subdirectory(G4WCDSimulator)
 add_subdirectory(G4MuDecSimulator)
 add_subdirectory(G4HodoscopeSimulator)
+add_subdirectory(G4LeadSimulator)
 
