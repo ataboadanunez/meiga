@@ -6,5 +6,7 @@ install
 *.a
 *.swp
 *~
+.vscode
+src/.vscode/
 CMakeCache.txt
 __pycache__
