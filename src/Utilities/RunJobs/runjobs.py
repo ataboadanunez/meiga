@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-
-# description
-# author
-# date
+# run a queue of multiple Meiga simulations in parallel 
+# author: alvaro taboada
 
 import argparse
 import multiprocessing as mp
@@ -18,8 +16,6 @@ import glob
 import time
 
 from createjobs import abspath
-
-from IPython import embed
 
 def check_for_done(joblist):
 	for j, p in enumerate(joblist):
@@ -166,7 +162,6 @@ def main():
 		#Start all "free" processes
 		while len(processes) < queue_size and len(joblist) > 0:
 
-			#embed()
 			#while (true); do ps size ID; sleep 600; done > mem.log 
 			# ps aux | grep meiga
 			processes.append(run(joblist.pop(0)))
@@ -190,33 +185,3 @@ def main():
 if __name__ == "__main__":
 
 	main()
-
-
-if False:
-
-	processes = list()
-	queue = list()
-	queue = prepare_queue(jobdir, queue)
-	# main, run processes in queue
-
-	for process in queue:
-		##p = subprocess.Popen(process)
-
-		
-		processes.append(os.system("./%s -c %s > %s 2>&1 &" %(process[0], process[1], process[2])))
-
-		embed()
-		if len(processes) == numprocesses:
-			wait = True
-			while wait:
-				done, num = check_for_done(processes)
-
-				if done:
-					processes.pop(num)
-					wait = False
-				else:
-					time.sleep(0.5)
-
-
-
-
