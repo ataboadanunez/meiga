@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 from collections import defaultdict
 import matplotlib.pyplot as plt
-from IPython import embed
 
 # definitions
 kNucleusBase = 1000000000

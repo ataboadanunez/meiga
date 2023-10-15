@@ -3,9 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 # import SimDataReader to access data from output file
 from SimDataReader import *
-from IPython import embed
-
-
 
 if __name__ == "__main__":
 

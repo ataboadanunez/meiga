@@ -8,8 +8,6 @@ import gzip
 import numpy as np
 import pandas as pd
 from collections import defaultdict
-# enable console for debugging
-from IPython import embed
 
 def completepath(s, cfiledir):
 	if s[0] == '/':
