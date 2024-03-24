@@ -231,15 +231,36 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
         break;
     }
     case SimData::InjectionMode::eVertical:
-        xInj = x0;
-        yInj = y0;
-        zInj = z0;
+    {   
+        double injRadius = simData.GetInjectionRadius();
+        double injHeight = simData.GetInjectionHeight();
+        if (injHeight != z0){
+            cout << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: in injectionMode = eVertical, `injHeight` does not match with `z-coordinate`. Using `injHeight` as default." << endl;
+            zInj = injHeight;
+        } else {
+            zInj = z0;
+        }
+        if (injRadius) {
+            cout << "[INFO] PrimaryGenerator::ComputeInjectionPosition: Injecting particle vertically over a circle of radius: " << injRadius / CLHEP::m << " m at height: " << zInj / CLHEP::m << endl;
+            double rand = RandFlat::shoot(0., 1.);
+            double r = injRadius * sqrt(rand);
+            double minPhi = simData.GetInjectionMinPhi() * (CLHEP::pi / 180);
+            double maxPhi = simData.GetInjectionMaxPhi() * (CLHEP::pi / 180);
+            double phi = RandFlat::shoot(minPhi, maxPhi);
+            xInj = r * cos(phi) + x0;
+            yInj = r * sin(phi) + y0;
+
+        } else {
+            xInj = x0;
+            yInj = y0;
+        }
         break;
-  case SimData::InjectionMode::eFromFile:
-      xInj = currentParticle.GetPosition().at(0);
-      yInj = currentParticle.GetPosition().at(1);
-      zInj = currentParticle.GetPosition().at(2);
-      break;
+    }
+    case SimData::InjectionMode::eFromFile:
+        xInj = currentParticle.GetPosition().at(0);
+        yInj = currentParticle.GetPosition().at(1);
+        zInj = currentParticle.GetPosition().at(2);
+        break;
     case SimData::InjectionMode::eUnknown:
     default:
         xInj = currentParticle.GetPosition().at(0);
@@ -251,5 +272,6 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
         }
 
     particlePosition = {xInj, yInj, zInj};
+    cout << "[INFO] PrimaryGenerator::ComputeInjectionPosition: Injecting particle at position: x = " << xInj / CLHEP::m << ", y = " << yInj / CLHEP::m << " z = " << zInj / CLHEP::m << " m " << endl;
 
 }
