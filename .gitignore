@@ -8,5 +8,6 @@ install
 *~
 .vscode
 src/.vscode/
+src/_cmake/
 CMakeCache.txt
 __pycache__

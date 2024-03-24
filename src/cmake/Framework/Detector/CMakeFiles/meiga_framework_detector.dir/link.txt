@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmeiga_framework_detector.a  CMakeFiles/meiga_framework_detector.dir/Detector.cc.o CMakeFiles/meiga_framework_detector.dir/Module.cc.o CMakeFiles/meiga_framework_detector.dir/SiPM.cc.o
-/usr/bin/ranlib libmeiga_framework_detector.a
