@@ -13,3 +13,5 @@ install(TARGETS meiga_framework_configmanager DESTINATION lib)
 
 # Copy DetectorProperties.xml to the build directory
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/DetectorProperties.xml DESTINATION ${CMAKE_BINARY_DIR}/Framework/ConfigManager)
+# Copy ExampleG4AppSimulator.json to the build directory (used in UnitTest)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/ExampleG4AppSimulator.json DESTINATION ${CMAKE_BINARY_DIR}/Framework/ConfigManager)

@@ -1,6 +1,7 @@
 // Meiga headers
 #include "ConfigManager.h"
 #include "ParticleFiller.h"
+#include "Utilities.h"
 // Geant4 headers
 #include "G4UnitsTable.hh"
 
@@ -27,7 +28,7 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	simData.SetInputMode(simData.InputModeConversion(cfg.fInputMode));
 	cfg.fInputFileName = tree.get<string>("Input.InputFileName", "");
 	cfg.fInputNParticles = tree.get<unsigned int>("Input.InputNParticles", 0);
-
+	
 	// reads the input (ARTI) file and fills the Event with particles
 	if (simData.GetInputMode() == SimData::InputMode::eUseARTI) {
 		cout << "[WARNING] ConfigManager::ReadConfigurationFile: Selected InputMode = eUseARTI. An input file is needed." << endl;
