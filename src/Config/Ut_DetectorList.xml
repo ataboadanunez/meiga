@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+
+<detectorList>
+	
+	<injectionMode type="eVertical">
+		<!-- particle injection coordinates -->
+		<x unit="m"> 0 </x>
+		<y unit="m"> 0 </y>
+		<z unit="m"> 1 </z>
+	</injectionMode>
+
+	<detector id="0" type="eScintillator">
+		<!-- detector location coordinates -->
+		<x unit="cm"> -1.0 </x>
+		<y unit="cm"> 2.0 </y>
+		<z unit="m"> 0.5 </z>
+		<numberOfBars> 8 </numberOfBars>
+	</detector>
+
+</detectorList>

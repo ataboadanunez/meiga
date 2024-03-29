@@ -4,8 +4,8 @@
 
 int main(int argc, char** argv)
 {
-    std::cout << "hello world!" << std::endl;
     Ut_ConfigManager::test_ReadConfigurationFile();
+    Ut_ConfigManager::test_ReadDetectorList();
 
     return 0;
 }

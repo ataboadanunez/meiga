@@ -5,29 +5,19 @@
 #include <fstream>
 #include <cassert>
 
-const string Ut_ConfigManager::cConfigFilename = Utilities::ConcatenatePaths(CONFIG_FILE_PATH, "ExampleG4AppSimulator.json");
+const string cConfigFilename = Utilities::ConcatenatePaths(CONFIG_FILE_PATH, "Ut_G4AppSimulator.json");
+const string cDetectorFilename = Utilities::ConcatenatePaths(CONFIG_FILE_PATH, "Ut_DetectorList.xml");
 
 bool Ut_ConfigManager::test_ReadConfigurationFile()
 {
-    // lines below are used to replace the identifier @PATH@ inside the ExampleG4AppSimulator.json by the CONFIG_FILE_PATH
-    std::ifstream file(cConfigFilename);
-    // read the json file
-    std::string jsonString((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    file.close();
-    // replace identifier inside the file
-    string processedString = Utilities::ReplacePlaceHolder(jsonString, "@PATH@", CONFIG_FILE_PATH);
-    std::ofstream outFile(cConfigFilename);
-    // write json file with the updated field
-    outFile << processedString;
-    outFile.close();
     
     Event event = ConfigManager::ReadConfigurationFile(cConfigFilename);
     Event::Config &cfg = event.GetConfig();
     int nTestsPassed = 0;
     // input 
-    assert(cfg.fInputMode == "UseARTI");
+    assert(cfg.fInputMode == "UseEcoMug");
     nTestsPassed++;
-    assert(cfg.fInputNParticles == 0);
+    assert(cfg.fInputNParticles == 5);
     nTestsPassed++;
     // output
     assert(cfg.fCompressOutput == true);
@@ -53,7 +43,26 @@ bool Ut_ConfigManager::test_ReadConfigurationFile()
     return true;
 }
 
-bool Ut_ConfigManager::test_ReadDetectorList(const string &aFilename, Event &theEvent)
+bool Ut_ConfigManager::test_ReadDetectorList()
 {
+    
+    Event theEvent;
+    ConfigManager::ReadDetectorList(cDetectorFilename, theEvent);
+    SimData &simData = theEvent.GetSimData();
+    assert(simData.GetInjectionMode() == SimData::InjectionMode::eVertical);
+    const std::vector<double> &injectionOrigin = simData.GetInjectionOrigin();
+    assert(injectionOrigin.at(0) == 0.0 * CLHEP::m);
+    assert(injectionOrigin.at(1) == 0.0 * CLHEP::m);
+    assert(injectionOrigin.at(2) == 1.0 * CLHEP::m);
+    // get instances of Detector with ID 0
+    Detector detector = theEvent.GetDetector(0);
+    assert(detector.isValid());
+    assert(detector.GetType() == Detector::eScintillator);
+    std::vector<double> detPosition = detector.GetDetectorPosition();
+    assert(detPosition.at(0) == -0.01 * CLHEP::m);
+    assert(detPosition.at(1) == 0.02 * CLHEP::m);
+    assert(detPosition.at(2) == 0.5 * CLHEP::m);
+    assert(detector.GetNBars() == 8);
+    
     return true;
 }

@@ -3,9 +3,11 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
   cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 #Adds our organic, home-grown search modules and etc to the module path of CMake
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+# set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+set(CMAKE_BUILD_TYPE Debug)
 
-project(meiga VERSION 1.0)
+project(meiga VERSION 2.0)
+set(CONFIG_FILE_PATH "${CMAKE_SOURCE_DIR}/Config/" CACHE STRING "Path to configuration files")
 
 ################################################################################
 # External Packages                                                            #
@@ -42,4 +44,4 @@ add_subdirectory(Applications)
 add_subdirectory(UnitTest)
 #add_subdirectory(Documentation)
 # Define a variable for the path to the configuration file
-set(CONFIG_FILE_PATH "${CMAKE_SOURCE_DIR}/Framework/ConfigManager/" CACHE STRING "Path to configuration files")
+#set(CONFIG_FILE_PATH "${CMAKE_SOURCE_DIR}/Framework/ConfigManager/" CACHE STRING "Path to configuration files")

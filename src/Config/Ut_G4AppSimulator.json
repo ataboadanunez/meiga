@@ -1,9 +1,9 @@
 {
 	"Input" :
 	{
-		"Mode" : "UseARTI",
-		"InputFileName" : "/home/alvaro/projects/github/meiga/src/UnitTest/files//vertical_muon.txt",
-		"InputNParticles" : 0
+		"Mode" : "UseEcoMug",
+		"InputFileName" : "",
+		"InputNParticles" : 5
 	},
 	
 	"Output" : 

@@ -6,8 +6,6 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 project(runTests)
 
-set(CONFIG_FILE_PATH "${CMAKE_SOURCE_DIR}/UnitTest/files/" CACHE STRING "Path to configuration files")
-
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
 # NB: headers are included so they will show up in IDEs

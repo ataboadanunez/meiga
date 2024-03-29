@@ -1,18 +1,20 @@
 #include "DefaultProperties.h"
 #include "ConfigManager.h"
-
+#include "Utilities.h"
 
 const ptree& empty_ptree(){
 	static ptree t;
 	return t;
 }
 
+const std::string cDetectorPropertiesFile = Utilities::ConcatenatePaths(CONFIG_FILE_PATH, "DetectorProperties.xml");
 
 void
 DefaultProperties::SetDefaultProperties()
 {
 	
-	string filename = DETECTORPROPERTIES;
+	string filename = cDetectorPropertiesFile;
+
 	
 	if (filename.empty()) 
 		return;

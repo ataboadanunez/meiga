@@ -49,6 +49,8 @@ class Detector
 		Detector(){ ; }
 		Detector(const unsigned int id, const DetectorType type);
 		virtual ~Detector() { }
+		
+		bool isValid() { return fType != DetectorType::eUnknown; }
 
 		unsigned int GetId() const { return fDetectorId; }
 		void SetId(int id) { fDetectorId = id; }
