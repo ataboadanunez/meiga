@@ -2,6 +2,7 @@
 #include "CorsikaUtilities.h"
 #include "Geometry.h"
 #include "Particle.h"
+#include "SimData.h"
 
 #include "Randomize.hh"
 #include <CLHEP/Random/Randomize.h>
@@ -17,7 +18,7 @@ PrimaryGenerator::PrimaryGenerator(Event& theEvent) :
     
     SimData &simData = fEvent.GetSimData();
     injMode = simData.GetInjectionMode();
-    fUseEcoMug = (simData.GetInputMode() == simData.InputMode::eUseEcoMug);
+    fUseEcoMug = (simData.GetInputMode() == SimData::InputMode::eUseEcoMug);
     Event::Config &cfg = fEvent.GetConfig();
     fSaveInput = cfg.fSaveInput;
     cout << "[INFO] PrimaryGenerator::PrimaryGenerator: SaveInput = " << (fSaveInput ? "yes" : "no") << endl;
@@ -91,6 +92,8 @@ PrimaryGenerator::GeneratePrimaryParticle()
 
         */
 
+        long int seed = simData.GetSeed();
+        fMuonGen.SetSeed(seed);
         fMuonGen.Generate();
         ComputeInjectionPosition(simData, fParticlePosition);
         pTot = fMuonGen.GetGenerationMomentum() * CLHEP::GeV;
