@@ -1,0 +1,32 @@
+--------------------------------------------------------------
+   =======================================================
+   MEIGA - Simulations Framework for Astroparticle Physics
+   =======================================================
+
+                       G4LeadSimulator
+                       ---------------
+--------------------------------------------------------------
+
+
+Application for simulating the muon tomography of a brick
+of Lead using Scintillator Detectors.
+
+The G4LeadSimulator.json contains a block of settings
+for the simulation of a brick of lead:
+
+"LeadBrick" :
+  {
+    "Simulate" : true,
+    "Position" : [0, -15, 105],
+    "Size"     : [20, 20, 10]
+  }
+
+Position and Size are given in cm.
+
+If the brick simulation is disabled ("Simulate" : false),
+this application is equivalent to G4HodoscopeSimulator.
+ 
+For a more detailed description about the 
+detectors see: src/Applications/G4HodoscopeSimulator/README
+
+

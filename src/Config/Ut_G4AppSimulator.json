@@ -1,0 +1,30 @@
+{
+	"Input" :
+	{
+		"Mode" : "UseEcoMug",
+		"InputFileName" : "",
+		"InputNParticles" : 1
+	},
+	
+	"Output" : 
+	{
+		"OutputFile" : "",
+		"CompressOutput" : true,
+		"SavePETimeDistribution" : true,
+		"SaveComponentsPETimeDistribution" : false,
+		"SaveEnergy" : false,
+		"SaveComponentsEnergy" : false
+	},
+	"DetectorList" : "./DetectorList.xml",
+	"DetectorProperties" : "./DetectorProperties.xml",
+	"Simulation" :
+	{
+		"SimulationMode" : "eFast",
+		"GeoVisOn" : false,
+		"TrajVisOn" : false,
+		"CheckOverlaps" : false,
+		"Verbosity" : 1,
+		"RenderFile" : "VRML2FILE",
+		"PhysicsName" : "QGSP_BERT_HP"
+	}
+}

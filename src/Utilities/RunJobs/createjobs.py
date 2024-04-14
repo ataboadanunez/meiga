@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-
-# description
-# author
-# date
+# creation of directories prepared to run multiple Meiga simulations in parallel
+# author: alvaro taboada
 
 import argparse
 import random
@@ -20,9 +18,6 @@ import tempfile
 import shutil
 
 from datetime import datetime
-
-from IPython import embed
-
 
 def abspath(s):
 	if s[0] == '/':
@@ -264,7 +259,7 @@ def PrepareConfigFile(job_dir, nlines):
 		with open(jobLogName, "w") as f:
 			f.write("executable %s \n" %exeName)
 			f.write("config_file %s \n" %cfgFileName)
-			f.write("finished 0")
+			f.write("output_file %s" %outfile)
 
 		f.close()
 

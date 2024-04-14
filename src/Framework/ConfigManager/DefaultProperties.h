@@ -1,12 +1,6 @@
 #ifndef DefaultProperties_h
 #define DefaultProperties_h 1
 
-#include <string>
-
-// path to DetectorProperties.xml is set from a global variable from CMakeLists.txt
-// this path will be overwritten after compilation
-#define DETECTORPROPERTIES ""
-
 struct DefaultProperties 
 {
 	

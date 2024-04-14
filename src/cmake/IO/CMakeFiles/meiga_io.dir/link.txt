@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmeiga_io.a  CMakeFiles/meiga_io.dir/ReadParticleFile.cc.o
-/usr/bin/ranlib libmeiga_io.a

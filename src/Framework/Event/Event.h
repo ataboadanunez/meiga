@@ -53,7 +53,7 @@ class Event
 		struct Config {
 	
 		// program configuration variables
-
+		std::string fConfigurationFileName;
 		// input variables
 		std::string fInputMode;
 		unsigned int fInputNParticles;

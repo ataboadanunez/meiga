@@ -1,6 +1,6 @@
-// definition of the G4HodoscopeDetectorConstruction class
-#ifndef G4HodoscopeDetectorConstruction_h
-#define G4HodoscopeDetectorConstruction_h 1
+// definition of the G4LeadDetectorConstruction class
+#ifndef G4LeadDetectorConstruction_h
+#define G4LeadDetectorConstruction_h 1
 
 #include "G4VUserDetectorConstruction.hh"
 #include "G4SDManager.hh"
@@ -29,11 +29,11 @@ class G4OpticalSkinSurface;
 
 // Detector construction class to define materials and geometry
 
-class G4HodoscopeDetectorConstruction : public G4VUserDetectorConstruction {
+class G4LeadDetectorConstruction : public G4VUserDetectorConstruction {
 	
 	public:
-		G4HodoscopeDetectorConstruction(Event& aEvent);
-		virtual ~G4HodoscopeDetectorConstruction();
+		G4LeadDetectorConstruction(Event& aEvent);
+		virtual ~G4LeadDetectorConstruction();
 		virtual G4VPhysicalVolume* Construct();
 
 	private:
@@ -64,6 +64,7 @@ class G4HodoscopeDetectorConstruction : public G4VUserDetectorConstruction {
 		double fWorldSizeY;
 		double fWorldSizeZ;
 
+		bool fSimulateBrick;
 		double fBrickSizeX;
 		double fBrickSizeY;
 		double fBrickSizeZ;

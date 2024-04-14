@@ -3,8 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 # import SimDataReader to access data from output file
 from SimDataReader import *
-from IPython import embed
-
 
 
 if __name__ == "__main__":
@@ -79,7 +77,7 @@ if __name__ == "__main__":
 	# convert dictionaries to Pandas DataFrame
 	traces_df = pd.DataFrame(traces)
 	charge_df = pd.DataFrame(charge)
-	embed()
+	
 	# Merging input and output data
 	print("[INFO] Merging input flux and detector signals")
 	

@@ -11,7 +11,6 @@ SimData::SimData()
 
 SimData::~SimData()
 {
-
 }
 
 

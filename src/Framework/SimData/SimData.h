@@ -135,6 +135,9 @@ class SimData
 		void SetInjectionMaxPhi(const double maxPh) { fInjectionMaxPhi = maxPh; }
 		double GetInjectionMaxPhi() { return fInjectionMaxPhi; }
 
+		void SetSeed(const long int aSeed) { fSeed = aSeed; }
+		long int GetSeed() { return fSeed; }
+		bool HasFixedSeed() { return fSeed !=0; }
 
 		// DetectorSimData getters
 		void MakeDetectorSimData(unsigned int id);
@@ -185,6 +188,8 @@ class SimData
 		double fInjectionMaxPhi = 360;
 
 		std::vector<double> fInjectionOrigin;
+
+		long int fSeed = 0;
 };
 
 #endif

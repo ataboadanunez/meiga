@@ -8,14 +8,14 @@
  */
 
 // Headers of this particular application
-#include "G4HodoscopeSimulator.h"
-#include "G4HodoscopeDetectorConstruction.h"
+#include "G4LeadSimulator.h"
+#include "G4LeadDetectorConstruction.h"
 #include "G4MPrimaryGeneratorAction.h"
-#include "G4HodoscopeEventAction.h"
-#include "G4HodoscopeRunAction.h"
-#include "G4HodoscopeTrackingAction.h"
-#include "G4HodoscopeSteppingAction.h"
-#include "G4HodoscopePhysicsList.h" 
+#include "G4LeadEventAction.h"
+#include "G4LeadRunAction.h"
+#include "G4LeadTrackingAction.h"
+#include "G4LeadSteppingAction.h"
+#include "G4LeadPhysicsList.h" 
 
 // Geant4 headers
 #include "FTFP_BERT.hh"
@@ -38,11 +38,11 @@
 
 using namespace std;
 
-Particle G4HodoscopeSimulator::currentParticle;
-G4HodoscopeSimulator* fG4HodoscopeSimulator;
+Particle G4LeadSimulator::currentParticle;
+G4LeadSimulator* fG4LeadSimulator;
 string fCfgFile;
 
-G4HodoscopeSimulator::G4HodoscopeSimulator()
+G4LeadSimulator::G4LeadSimulator()
 {
 
 }
@@ -52,7 +52,7 @@ namespace
 	void ProgramUsage() 
 	{
 		cerr << " Program Usage: " << endl;
-		cerr << " ./G4HodoscopeSimulator [ -c ConfigFile.json ] " << endl;
+		cerr << " ./G4LeadSimulator [ -c ConfigFile.json ] " << endl;
 	}
 
 }
@@ -63,7 +63,7 @@ int main(int argc, char** argv)
 
 	if (argc < 3) {
 		ProgramUsage();
-		throw invalid_argument("[ERROR] G4HodoscopeSimulator::main: A configuration file is needed!");
+		throw invalid_argument("[ERROR] G4LeadSimulator::main: A configuration file is needed!");
 	}
 
 	for (int i=1; i<argc; i=i+2) {
@@ -74,30 +74,30 @@ int main(int argc, char** argv)
 	// for program time calculation
 	time_t start, end;
 	time(&start);
-	fG4HodoscopeSimulator = new G4HodoscopeSimulator();
+	fG4LeadSimulator = new G4LeadSimulator();
 	// Create Event object
 	Event theEvent;
-	fG4HodoscopeSimulator->Initialize(theEvent, fCfgFile);
-	fG4HodoscopeSimulator->RunSimulation(theEvent);
+	fG4LeadSimulator->Initialize(theEvent, fCfgFile);
+	fG4LeadSimulator->RunSimulation(theEvent);
 	/*************************************************
 		Geant4 simulation ended here!
 		What happens next is up to you =)
 	**************************************************/
-	fG4HodoscopeSimulator->WriteEventInfo(theEvent);
+	fG4LeadSimulator->WriteEventInfo(theEvent);
 	time(&end);
 	// Calculating total time taken by the program.
 	double time_taken = double(end - start);
-	cout << "[INFO] G4HodoscopeSimulator: Time taken by program is : " << fixed
+	cout << "[INFO] G4LeadSimulator: Time taken by program is : " << fixed
 			 << time_taken << setprecision(5);
 	cout << " sec " << endl;
 	return 0;
 }
 
 void
-G4HodoscopeSimulator::Initialize(Event& theEvent, string cfgFile)
+G4LeadSimulator::Initialize(Event& theEvent, string cfgFile)
 {
-	cout << "[INFO] G4HodoscopeSimulator::Initialize" << endl;
-	cout << "[INFO] G4HodoscopeSimulator::Initialize: Reading configuration file " << cfgFile << endl;
+	cout << "[INFO] G4LeadSimulator::Initialize" << endl;
+	cout << "[INFO] G4LeadSimulator::Initialize: Reading configuration file " << cfgFile << endl;
 	// Fill Event object from configuration file
 	// Read Simulation configuration
 	theEvent = ConfigManager::ReadConfigurationFile(cfgFile);
@@ -110,15 +110,15 @@ G4HodoscopeSimulator::Initialize(Event& theEvent, string cfgFile)
 
 
 bool
-G4HodoscopeSimulator::RunSimulation(Event& theEvent)
+G4LeadSimulator::RunSimulation(Event& theEvent)
 {
-	cout << "[INFO] G4HodoscopeSimulator::RunSimulation" << endl;
+	cout << "[INFO] G4LeadSimulator::RunSimulation" << endl;
 	const Event::Config &cfg = theEvent.GetConfig();
 	SimData& simData = theEvent.GetSimData();
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
-	cout << "[INFO] G4HodoscopeSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
+	cout << "[INFO] G4LeadSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
 	if (!NumberOfParticles) {
-		cerr << "[ERROR] G4HodoscopeSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
+		cerr << "[ERROR] G4LeadSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
 		return false;
 	}
 	/***************
@@ -132,17 +132,17 @@ G4HodoscopeSimulator::RunSimulation(Event& theEvent)
 	// construct the default run manager
 	auto fRunManager = G4RunManagerFactory::CreateRunManager();
 	// set mandatory initialization classes
-	auto fDetConstruction = new G4HodoscopeDetectorConstruction(theEvent);
+	auto fDetConstruction = new G4LeadDetectorConstruction(theEvent);
 	fRunManager->SetUserInitialization(fDetConstruction);
-	fRunManager->SetUserInitialization(new G4HodoscopePhysicsList(fPhysicsName));  
+	fRunManager->SetUserInitialization(new G4LeadPhysicsList(fPhysicsName));  
 	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
-	G4HodoscopeRunAction *fRunAction = new G4HodoscopeRunAction(theEvent);
+	G4LeadRunAction *fRunAction = new G4LeadRunAction(theEvent);
 	fRunManager->SetUserAction(fRunAction);
-	G4HodoscopeEventAction *fEventAction = new G4HodoscopeEventAction(theEvent);
+	G4LeadEventAction *fEventAction = new G4LeadEventAction(theEvent);
 	fRunManager->SetUserAction(fEventAction);
-	fRunManager->SetUserAction(new G4HodoscopeTrackingAction(theEvent));
-	G4HodoscopeSteppingAction *fSteppingAction = new G4HodoscopeSteppingAction(fEventAction, theEvent);
+	fRunManager->SetUserAction(new G4LeadTrackingAction(theEvent));
+	G4LeadSteppingAction *fSteppingAction = new G4LeadSteppingAction(fEventAction, theEvent);
 	fRunManager->SetUserAction(fSteppingAction);
 	// initialize G4 kernel
 	fRunManager->Initialize();
@@ -199,22 +199,22 @@ G4HodoscopeSimulator::RunSimulation(Event& theEvent)
 	}
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
-		G4HodoscopeSimulator::currentParticle = *it;
+		G4LeadSimulator::currentParticle = *it;
 		simData.SetCurrentParticle(*it);
 		// Run simulation
 		fRunManager->BeamOn(1);
 	}
 	delete fVisManager;
 	delete fRunManager;
-	cout << "[INFO] G4HodoscopeSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
+	cout << "[INFO] G4LeadSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
 	return true;
 }
 
 
 void
-G4HodoscopeSimulator::WriteEventInfo(Event& theEvent)
+G4LeadSimulator::WriteEventInfo(Event& theEvent)
 {
-	cout << "[INFO] G4HodoscopeSimulator::WriteEventInfo" << endl;
+	cout << "[INFO] G4LeadSimulator::WriteEventInfo" << endl;
 	DataWriter::FileWriter(theEvent);	
 	return;
 }
