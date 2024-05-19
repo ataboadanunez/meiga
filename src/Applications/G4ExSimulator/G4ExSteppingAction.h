@@ -19,20 +19,11 @@ class G4ExEventAction;
 class G4ExSteppingAction : public G4UserSteppingAction
 {
     public:
-        G4ExSteppingAction(const G4ExDetectorConstruction* det, G4ExEventAction* event, Event& theEvent);
+        G4ExSteppingAction();
         virtual ~G4ExSteppingAction();
+        virtual void SetSteppingManagerPointer(G4SteppingManager* pValue);
         virtual void UserSteppingAction(const G4Step* step);
 
-    private:
-        const G4ExDetectorConstruction* fDetectorConstruction;
-        G4ExEventAction* fEventAction;
-        std::ofstream* fOutputFile;
-        Event& fEvent;
-
-        G4double fSiPMTime;
-        G4double fScinTime;
-        G4String stepVolume;
-        G4String trackVolume;
 };
 
 #endif

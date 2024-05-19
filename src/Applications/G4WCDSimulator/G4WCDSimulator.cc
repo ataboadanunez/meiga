@@ -10,12 +10,8 @@
 // Headers of this particular application
 #include "G4WCDSimulator.h"
 #include "G4WCDConstruction.h"
+#include "G4WCDActionInitialization.h"
 #include "G4MPrimaryGeneratorAction.h"
-#include "G4WCDStackingAction.h"
-#include "G4WCDEventAction.h"
-#include "G4WCDRunAction.h"
-#include "G4WCDTrackingAction.h"
-#include "G4WCDSteppingAction.h"
 
 // Geant4 headers
 #include "G4RunManagerFactory.hh"
@@ -147,30 +143,13 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 	G4VisManager* fVisManager = nullptr;
 	
 	// construct the default run manager
-	auto fRunManager = G4RunManagerFactory::CreateRunManager();
+	auto fRunManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly);
 
 	// set mandatory initialization classes
 	auto fDetConstruction = new G4WCDConstruction(theEvent);
 	fRunManager->SetUserInitialization(fDetConstruction);
-	
 	fRunManager->SetUserInitialization(new G4MPhysicsList(fPhysicsName));
-
-	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
-	fRunManager->SetUserAction(fPrimaryGenerator);
-	
-	G4WCDStackingAction *fStackingAction = new G4WCDStackingAction(theEvent);
-	fRunManager->SetUserAction(fStackingAction);
-
-	G4WCDRunAction *fRunAction = new G4WCDRunAction();
-	fRunManager->SetUserAction(fRunAction);
-	
-	G4WCDEventAction *fEventAction = new G4WCDEventAction();
-	fRunManager->SetUserAction(fEventAction);
-
-	fRunManager->SetUserAction(new G4WCDTrackingAction());
-
-	G4WCDSteppingAction *fSteppingAction = new G4WCDSteppingAction(fDetConstruction, fEventAction, theEvent);
-	fRunManager->SetUserAction(fSteppingAction);
+	fRunManager->SetUserInitialization(new G4WCDActionInitialization(theEvent));
 	
 	// initialize G4 kernel
 	fRunManager->Initialize();
@@ -231,7 +210,7 @@ G4WCDSimulator::RunSimulation(Event& theEvent)
 		G4WCDSimulator::currentParticle = *it;
 		simData.SetCurrentParticle(*it);
 		// Run simulation
-		fRunManager->BeamOn(1);
+		fRunManager->BeamOn(1000);
 	}
 
 

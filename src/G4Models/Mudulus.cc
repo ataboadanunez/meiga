@@ -4,6 +4,7 @@
 #include "Geometry.h"
 #include "G4MOptDeviceAction.h"
 
+#include "G4SDManager.hh"
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 
@@ -154,7 +155,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	G4VisAttributes black(G4Colour::Black());
 
 	// assemble Mudulus detector
-	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
+	auto sdMan = G4SDManager::GetSDMpointer();
 	logicEnclosure = new G4LogicalVolume(solidEnclosure, Materials().Air, "Enclosure", 0, 0, 0);
 	new G4PVPlacement(rotationCasing, G4ThreeVector(detectorPos.getX(), detectorPos.getY(), detectorPos.getZ()), logicEnclosure, "Enclosure", logMother, false, detectorId, fCheckOverlaps);
 

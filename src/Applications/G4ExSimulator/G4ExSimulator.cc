@@ -12,10 +12,7 @@
 // Headers of this particular application
 #include "G4ExSimulator.h"
 #include "G4ExDetectorConstruction.h"
-#include "G4ExEventAction.h"
-#include "G4ExRunAction.h"
-#include "G4ExTrackingAction.h"
-#include "G4ExSteppingAction.h"
+#include "G4ExActionInitialization.h"
 
 // Geant4 headers
 #include "FTFP_BERT.hh"
@@ -24,6 +21,8 @@
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
 #include "Randomize.hh"
+#include "G4SDManager.hh"
+#include "G4AutoDelete.hh"
 
 // Framework libraries
 #include "ConfigManager.h"
@@ -96,7 +95,7 @@ int main(int argc, char** argv)
          << time_taken << setprecision(5);
     cout << " sec " << endl;
     
-
+	delete fG4ExSimulator;
 	return 0;
 
 }
@@ -147,29 +146,14 @@ G4ExSimulator::RunSimulation(Event& theEvent)
 	G4VisManager* fVisManager = nullptr;
 	
 	// construct the default run manager
-	auto fRunManager = G4RunManagerFactory::CreateRunManager();
-
+	auto* fRunManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly);
+	
 	// set mandatory initialization classes
 	auto fDetConstruction = new G4ExDetectorConstruction(theEvent);
 	fRunManager->SetUserInitialization(fDetConstruction);
-	
 	fRunManager->SetUserInitialization(new G4MPhysicsList(fPhysicsName));
+	fRunManager->SetUserInitialization(new G4ExActionInitialization(theEvent));
 
-	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
-	//G4ExPrimaryGeneratorAction *fPrimaryGenerator = new G4ExPrimaryGeneratorAction(theEvent);
-	fRunManager->SetUserAction(fPrimaryGenerator);
-	
-	G4ExRunAction *fRunAction = new G4ExRunAction();
-	fRunManager->SetUserAction(fRunAction);
-	
-	G4ExEventAction *fEventAction = new G4ExEventAction();
-	fRunManager->SetUserAction(fEventAction);
-
-	fRunManager->SetUserAction(new G4ExTrackingAction());
-
-	G4ExSteppingAction *fSteppingAction = new G4ExSteppingAction(fDetConstruction, fEventAction, theEvent);
-	fRunManager->SetUserAction(fSteppingAction);
-	
 	// initialize G4 kernel
 	fRunManager->Initialize();
 	

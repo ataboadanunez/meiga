@@ -1,7 +1,7 @@
 #ifndef Mudulus_h
 #define Mudulus_h 1
 
-#include "G4SDManager.hh"
+// #include "G4SDManager.hh"
 #include "G4PVPlacement.hh"
 #include "G4LogicalVolume.hh"
 #include "G4Box.hh"

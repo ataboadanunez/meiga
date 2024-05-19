@@ -484,13 +484,13 @@ Materials::CreateMaterials()
 	scinPT = new G4MaterialPropertiesTable();
 	scinPT->AddProperty("RINDEX", scinPhotonEnergy, scinRefIndex, scinArrEntries);
 	scinPT->AddProperty("ABSLENGTH", scinPhotonEnergy, scinAbsLen, scinArrEntries);
-	scinPT->AddProperty("FASTCOMPONENT", scinPhotonEnergy, scinFastComp, scinArrEntries);
-	scinPT->AddProperty("SLOWCOMPONENT", scinPhotonEnergy, scinSlowComp, scinArrEntries);
+	scinPT->AddProperty("SCINTILLATIONCOMPONENT1", scinPhotonEnergy, scinFastComp, scinArrEntries);
+	scinPT->AddProperty("SCINTILLATIONCOMPONENT2", scinPhotonEnergy, scinSlowComp, scinArrEntries);
 	scinPT->AddConstProperty("SCINTILLATIONYIELD", fScintillationYield);
 	scinPT->AddConstProperty("RESOLUTIONSCALE", 1);
-	scinPT->AddConstProperty("FASTTIMECONSTANT", fScinFastTime);
-	scinPT->AddConstProperty("SLOWTIMECONSTANT", fScinSlowTime);
-	scinPT->AddConstProperty("YIELDRATIO", 1);
+	scinPT->AddConstProperty("SCINTILLATIONTIMECONSTANT1", fScinFastTime);
+	scinPT->AddConstProperty("SCINTILLATIONTIMECONSTANT2", fScinSlowTime);
+	scinPT->AddConstProperty("SCINTILLATIONYIELD1", 1);
 	ScinPlastic->SetMaterialPropertiesTable(scinPT);
 
 	// Add optical skin properties of scintillator (coating)

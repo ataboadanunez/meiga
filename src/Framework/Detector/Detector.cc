@@ -23,7 +23,63 @@ using std::map;
 using namespace std;
 using boost::property_tree::ptree;
 
-// function to be used when calling a detector type from an XML file
+Detector::Detector(const unsigned int id, DetectorType type) : 
+	fDetectorId(id),
+	fType(type)
+{
+}
+
+// map from the Detector type to its corresponding BuildDetector function in G4Models
+static map<enum Detector::DetectorType, void(*)(G4LogicalVolume*, Detector&, Event&, G4bool)> TypeToBuild;
+// map from the Detector type to its corresponding ConstructSensitiveDetector function in G4Models
+static map<enum Detector::DetectorType, void(*)(Detector&, Event&)> TypeToConstructSD;
+
+static void 
+InitTypeToBuild() {
+	static bool isInitialized = false;
+	if (isInitialized) 
+		return;
+	
+	// fills map with corresponding BuildDetector function
+	isInitialized = true;
+	TypeToBuild[Detector::eWCD]				= WCD::BuildDetector;
+	TypeToBuild[Detector::eScintillator] 	= Scintillator::BuildDetector;
+	TypeToBuild[Detector::eMusaic]			= Musaic::BuildDetector;
+	TypeToBuild[Detector::eMudulus]			= Mudulus::BuildDetector;
+	TypeToBuild[Detector::eHodoscope]		= Hodoscope::BuildDetector;
+	TypeToBuild[Detector::eSaltyWCD]		= SaltyWCD::BuildDetector;
+	TypeToBuild[Detector::eDummy]			= Dummy::BuildDetector;
+
+	TypeToConstructSD[Detector::eWCD]		= WCD::ConstructSensitiveDetector;
+
+}
+
+void BuildDetector(G4LogicalVolume *logMother, Detector &det, Event &evt, G4bool overlaps) {
+	
+	// initialize maps
+	InitTypeToBuild();
+	
+	try {
+		TypeToBuild[det.GetType()](logMother, det, evt, overlaps);
+	}
+	catch (std::out_of_range &e) {
+		std::cerr << "No BuildDetector for DetectorType " << det.GetType() << std::endl;
+	}
+}
+
+void ConstructSenstiveDetector(Detector &aDetector, Event &aEvent)
+{
+	// initialize maps
+	InitTypeToBuild();
+	
+	try {
+		TypeToConstructSD[aDetector.GetType()](aDetector, aEvent);
+	}
+	catch (std::out_of_range &e) {
+		std::cerr << "No ConstructSensitiveDetector for DetectorType " << aDetector.GetType() << std::endl;
+	}
+}
+
 Detector::DetectorType
 Detector::StringToType(string name)
 {
@@ -45,48 +101,6 @@ Detector::StringToType(string name)
 	else {
 		cout << "[WARNING] Detector::StringToType: Unknown detector type!" << endl;
 		return Detector::eUnknown;
-	}
-}
-
-
-Detector::Detector(const unsigned int id, DetectorType type) : 
-	fDetectorId(id),
-	fType(type)
-{
-	//SetDetectorProperties(type);
-}
-
-
-// this is used to map from the Detector type to its corresponding BuildDetector function in G4Models
-static map<enum Detector::DetectorType, void(*)(G4LogicalVolume*, Detector&, Event&, G4bool)> TypeToBuild;
-
-static void 
-InitTypeToBuild() {
-	static bool isInitialized = false;
-	if (isInitialized) 
-		return;
-	// fills map with corresponding BuildDetector function
-	isInitialized = true;
-	TypeToBuild[Detector::eWCD]						= WCD::BuildDetector;
-	TypeToBuild[Detector::eScintillator]	= Scintillator::BuildDetector;
-	TypeToBuild[Detector::eMusaic]				= Musaic::BuildDetector;
-	TypeToBuild[Detector::eMudulus]				= Mudulus::BuildDetector;
-	TypeToBuild[Detector::eHodoscope]			= Hodoscope::BuildDetector;
-	TypeToBuild[Detector::eSaltyWCD]			= SaltyWCD::BuildDetector;
-	TypeToBuild[Detector::eDummy]					= Dummy::BuildDetector;
-
-}
-
-void BuildDetector(G4LogicalVolume *logMother, Detector &det, Event &evt, G4bool overlaps) {
-	
-	// initialize map
-	InitTypeToBuild();
-	
-	try {
-		TypeToBuild[det.GetType()](logMother, det, evt, overlaps);
-	}
-	catch (std::out_of_range &e) {
-		std::cerr << "No BuildDetector for DetectorType " << det.GetType() << std::endl;
 	}
 }
 
@@ -134,8 +148,6 @@ Detector::SetDefaultProperties(const string file)
 void
 Detector::SetDetectorProperties(const ptree &tree, DefaultProperties &defProp)
 {
-	
-
 	/*	setting the default property values in the Detector:
 			these values are load from the DetectorProperties.xml
 			in Framework/ConfigManager/DefaultProperties.cc 

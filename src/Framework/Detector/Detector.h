@@ -136,13 +136,10 @@ class Detector
 		void SetGroundSizeZ(double gz) { fGroundZ = gz; }
 
 		// Optical device
-		//OptDevice& GetOptDevice() { return fOptDevice; } // to access OptDevice class members
-		// Make, Get and Has optical device by its id
 		void MakeOptDevice(int id, OptDevice::DeviceType type);
 		OptDevice& GetOptDevice(int id) { return fOptDeviceMap[id]; }
-		bool HasOptDevice(int id);
-
 		OptDevice GetOptDevice(OptDevice::DeviceType type) { return OptDevice(type); }
+		bool HasOptDevice(int id);
 		
 		std::map<int, OptDevice>& OptDeviceRange() { return fOptDeviceMap; }
 		const std::map<int, OptDevice>& OptDeviceRange() const { return fOptDeviceMap; }
@@ -157,7 +154,6 @@ class Detector
 		void SetDefaultProperties(const std::string file);
 		void SetDetectorProperties(const boost::property_tree::ptree &det, DefaultProperties &defProp);
 
-		//std::map<std::string, DetectorType> conversion;
 	private:
 
 		unsigned int fDetectorId = 0;
@@ -199,7 +195,6 @@ class Detector
 		OptDevice fOptDevice;
 		std::map<int, OptDevice> fOptDeviceMap;
 		std::map<OptDevice::DeviceType, OptDevice> fOptDeviceMapT;
-
 		std::map<std::string, G4LogicalVolume*> fLogicalVolumeMap;
 
 
@@ -207,5 +202,6 @@ class Detector
 };
 
 void BuildDetector(G4LogicalVolume *logMother, Detector &det, Event &evt, G4bool overlaps = false);
+void ConstructSenstiveDetector(Detector &aDetector, Event &aEvent);
 
 #endif

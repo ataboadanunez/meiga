@@ -5,6 +5,7 @@
 #include "G4MDetectorAction.h"
 
 // Geant4 headers
+#include "G4SDManager.hh"
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 // C++
@@ -54,7 +55,7 @@ Scintillator::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Even
 	G4int fNBars = detector.GetNBars();
 	G4double fHalfWidth = 0.5*fBarWidth*fNBars; 
 
-	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
+	auto sdMan = G4SDManager::GetSDMpointer();
 	
 	// Bars: Coating + Scintillator bar
 	solidCoating  	= new G4Box("BarCoating", 0.5*fBarLength + fCoatingThickness, 0.5*fBarWidth + fCoatingThickness, 0.5*fBarThickness + fCoatingThickness);

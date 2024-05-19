@@ -28,7 +28,6 @@ G4WCDConstruction::CreateDetector()
 {
 
 	CreateWorld();
-	//CreateGround();
 	PlaceDetector(fEvent);
 	return physWorld;
 }
@@ -40,7 +39,7 @@ G4WCDConstruction::CreateWorld()
 
 	solidWorld 	= new G4Box("World", fWorldSizeX/2, fWorldSizeY/2, fWorldSizeZ/2);
 	logicWorld = new G4LogicalVolume(solidWorld, Materials().Air, "World");
-	physWorld	 =  new G4PVPlacement(nullptr, G4ThreeVector(), "World", logicWorld, 0, false, 0, fCheckOverlaps);
+	physWorld =  new G4PVPlacement(nullptr, G4ThreeVector(), "World", logicWorld, 0, false, 0, fCheckOverlaps);
 
 }
 
@@ -58,24 +57,26 @@ G4WCDConstruction::CreateGround()
 void
 G4WCDConstruction::PlaceDetector(Event& theEvent)
 {
-	
-	// loop in detector vector
 	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
-		auto& currentDet = detIt->second;
+		Detector& currentDet = detIt->second;
 		BuildDetector(logicWorld, currentDet, theEvent, fCheckOverlaps);
-
 	}
-
 }
 
 
 G4VPhysicalVolume* 
 G4WCDConstruction::Construct() 
 {
-
 	if (!physWorld) {
 		return CreateDetector();
 	}
 	return physWorld;
+}
 
+void G4WCDConstruction::ConstructSDandField()
+{	
+	for (auto detIt = fEvent.DetectorRange().begin(); detIt != fEvent.DetectorRange().end(); detIt++) {
+		Detector &currentDet = detIt->second;
+		ConstructSenstiveDetector(currentDet, fEvent);
+	}
 }

@@ -3,7 +3,7 @@
 #define G4WCDConstruction_h 1
 
 #include "G4VUserDetectorConstruction.hh"
-#include "G4SDManager.hh"
+// #include "G4SDManager.hh"
 #include "globals.hh"
 #include "G4Element.hh"
 #include "G4ElementTable.hh"
@@ -35,6 +35,7 @@ class G4WCDConstruction : public G4VUserDetectorConstruction {
 		G4WCDConstruction(Event& theEvent);
 		virtual ~G4WCDConstruction();
 		virtual G4VPhysicalVolume* Construct();
+		virtual void ConstructSDandField();
 
 		G4double GetGroundSizeX() const { return fGroundSizeX; }
 		G4double GetGroundSizeY() const { return fGroundSizeY; }

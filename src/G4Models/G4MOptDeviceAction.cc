@@ -48,6 +48,11 @@ G4MOptDeviceAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 
 }
 
+G4VSensitiveDetector *G4MOptDeviceAction::Clone() const
+{
+    return nullptr;
+}
+
 G4bool
 G4MOptDeviceAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHist*/)
 {

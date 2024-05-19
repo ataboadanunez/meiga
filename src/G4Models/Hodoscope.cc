@@ -42,7 +42,7 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 
 	G4LogicalVolume* logPixel = nullptr;
 
-	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
+	auto sdMan = G4SDManager::GetSDMpointer();
 
 	// number of scintillator bars
 	int nBars = detector.GetNBars();

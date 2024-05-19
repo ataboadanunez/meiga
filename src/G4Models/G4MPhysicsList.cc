@@ -18,7 +18,7 @@
 #include "G4MuonRadiativeDecayChannelWithSpin.hh"
 #include "G4RadioactiveDecayPhysics.hh"
 #include "G4SystemOfUnits.hh"
-//#include "PhysicsListMessenger.hh"
+#include "G4UnitsTable.hh"
 
 #include "StepMax.hh"
 #include "ExtraPhysics.hh"
@@ -72,8 +72,6 @@ G4MPhysicsList::G4MPhysicsList(G4String physName) : G4VModularPhysicsList()
 
 G4MPhysicsList::~G4MPhysicsList()
 {
-	//delete fMessenger;
-	delete fStepMaxProcess;
 }
 
 void 

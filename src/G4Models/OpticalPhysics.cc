@@ -70,7 +70,6 @@ void OpticalPhysics::ConstructProcess()
   fProcess = new G4OpWLS();
 
   fScintProcess = new G4Scintillation();
-  fScintProcess->SetScintillationYieldFactor(1.);
   fScintProcess->SetTrackSecondariesFirst(true);
 
   fCerenkovProcess = new G4Cerenkov();
@@ -104,8 +103,8 @@ void OpticalPhysics::ConstructProcess()
 
   pManager->AddDiscreteProcess(fProcess);
 
-  fScintProcess->SetScintillationYieldFactor(1.);
-  fScintProcess->SetScintillationExcitationRatio(0.0);
+  // fScintProcess->SetScintillationYieldFactor(1.);
+  // fScintProcess->SetScintillationExcitationRatio(0.0);
   fScintProcess->SetTrackSecondariesFirst(true);
 
   // Use Birks Correction in the Scintillation process

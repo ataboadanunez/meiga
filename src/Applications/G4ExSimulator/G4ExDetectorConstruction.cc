@@ -18,7 +18,14 @@ G4ExDetectorConstruction::G4ExDetectorConstruction(Event& theEvent) :
 }
 
 G4ExDetectorConstruction::~G4ExDetectorConstruction() 
-	{ }
+{ 
+	delete solidWorld;
+	delete logicWorld;
+	delete physWorld;
+	delete solidGround;
+	delete logicGround;
+	delete physGround;
+}
 
 
 G4VPhysicalVolume*
@@ -26,7 +33,7 @@ G4ExDetectorConstruction::CreateDetector()
 {
 
 	CreateWorld();
-	CreateGround();
+	// CreateGround();
 	PlaceDetector(fEvent);
 	return physWorld;
 }

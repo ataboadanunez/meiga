@@ -54,9 +54,6 @@ private:
 	StepMax* fStepMaxProcess;
 
 	OpticalPhysics* fOpticalPhysics;
-
-	//PhysicsListMessenger* fMessenger;
-
 	G4bool fAbsorptionOn;
 	
 	G4VMPLData::G4PhysConstVectorData* fPhysicsVector;

@@ -64,10 +64,14 @@ G4MPMTAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 
 }
 
+G4VSensitiveDetector *G4MPMTAction::Clone() const
+{
+    return nullptr;
+}
+
 G4bool
 G4MPMTAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHist*/)
 {
-	
 	// reject particle in case it is not a photon
 	if (step->GetTrack()->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition())
 		return true;

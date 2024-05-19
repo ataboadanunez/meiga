@@ -51,6 +51,11 @@ G4MScintillatorBarAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 
 }
 
+G4VSensitiveDetector *G4MScintillatorBarAction::Clone() const
+{
+    return nullptr;
+}
+
 G4bool
 G4MScintillatorBarAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHist*/)
 {

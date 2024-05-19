@@ -61,3 +61,8 @@ G4MDetectorAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*r
 
 	return true;
 }
+
+G4VSensitiveDetector* G4MDetectorAction::Clone() const
+{
+	return nullptr;
+}

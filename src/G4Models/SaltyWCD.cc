@@ -5,7 +5,7 @@
 #include "G4MDetectorAction.h"
 #include "G4MPMTAction.h"
 
-
+#include "G4SDManager.hh"
 #include "G4VisAttributes.hh"
 #include "G4NistManager.hh"
 #include "G4Colour.hh"
@@ -120,7 +120,7 @@ SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 	solidPMT = new G4Ellipsoid("PMT", fPMTSemiX, fPMTSemiY, fPMTSemiZ, -fPMTSemiZ, 0);
 
 	// assemble SaltyWCD 
-	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
+	auto sdMan = G4SDManager::GetSDMpointer();
 
 	// tank casing are made of Stainless-steel
 	logCasingTop = new G4LogicalVolume(solidCasingTop, StainlessSteel, "logCasingTop", 0, 0, 0);

@@ -19,20 +19,9 @@ class G4WCDEventAction;
 class G4WCDSteppingAction : public G4UserSteppingAction
 {
     public:
-        G4WCDSteppingAction(const G4WCDConstruction* det, G4WCDEventAction* event, Event& theEvent);
+        G4WCDSteppingAction();
         virtual ~G4WCDSteppingAction();
         virtual void UserSteppingAction(const G4Step* step);
-
-    private:
-        const G4WCDConstruction* fDetectorConstruction;
-        G4WCDEventAction* fEventAction;
-        std::ofstream* fOutputFile;
-        Event& fEvent;
-
-        G4double fSiPMTime;
-        G4double fScinTime;
-        G4String stepVolume;
-        G4String trackVolume;
 };
 
 #endif

@@ -1,6 +1,8 @@
 #include "Musaic.h"
 #include "Geometry.h"
 #include "G4MOptDeviceAction.h"
+
+#include "G4SDManager.hh"
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 
@@ -63,7 +65,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	const G4double fCasingSizeY = 0.5*fBarLength + fCasingThickness;
 	const G4double fCasingSizeZ = 0.5*fBarThickness * 2 + fCasingThickness; // (x2 = number of panels)
 
-	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
+	auto sdMan = G4SDManager::GetSDMpointer();
 	auto pos = detector.GetDetectorPosition();
 	auto  detectorPos = Geometry::ToG4Vector(pos, 1.);
 	const G4int  detectorId = detector.GetId();
