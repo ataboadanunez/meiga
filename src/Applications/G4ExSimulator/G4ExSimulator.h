@@ -23,9 +23,9 @@ class G4ExSimulator
 		virtual ~G4ExSimulator() {;}
 
 		// main methods of the application
-		void Initialize(Event& evt, std::string fileName);
-		bool RunSimulation(Event& evt);
-		void WriteEventInfo(Event& evt);
+		void Initialize(Event& aEvent, std::string aFileName);
+		bool RunSimulation(Event& aEvent);
+		void WriteEventInfo(Event& aEvent);
 
 		// static members 
 		static Particle currentParticle;
@@ -34,24 +34,6 @@ class G4ExSimulator
 		// name of configuration file
 		std::string fCfgFile;
 
-	private:
-
-		// flags for configuration (see .json file)
-		std::string fInputFile;
-		std::string fOutputFile;
-		std::string fDetectorList;
-		std::string fDetectorProperties;
-		SimData::SimulationMode fSimulationMode;
-		SimData::InjectionMode fInjectionMode;
-
-		bool fGeoVisOn = true;
-		bool fTrajVisOn = false;
-		int fVerbosity = 1;
-		std::string fRenderFile = "VRML2FILE";
-		std::string fPhysicsName = "QGSP_BERT_HP";
-
-		friend class G4ExDetectorConstructor;
-		friend class G4ExPrimaryGenerator;
 };
 
 #endif
