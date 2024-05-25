@@ -16,7 +16,8 @@ G4MuDecConstruction::G4MuDecConstruction(Event& theEvent) :
 }
 
 G4MuDecConstruction::~G4MuDecConstruction() 
-	{ }
+{ 
+}
 
 
 G4VPhysicalVolume*
@@ -64,7 +65,6 @@ G4MuDecConstruction::PlaceDetector(Event& theEvent)
 
 }
 
-
 G4VPhysicalVolume* 
 G4MuDecConstruction::Construct() 
 {
@@ -74,4 +74,12 @@ G4MuDecConstruction::Construct()
 	}
 	return physWorld;
 
+}
+
+void G4MuDecConstruction::ConstructSDandField()
+{	
+	for (auto detIt = fEvent.DetectorRange().begin(); detIt != fEvent.DetectorRange().end(); detIt++) {
+		Detector &currentDet = detIt->second;
+		ConstructSenstiveDetector(currentDet, fEvent);
+	}
 }

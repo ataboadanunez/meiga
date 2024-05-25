@@ -9,20 +9,16 @@ G4MuDecStackingAction::G4MuDecStackingAction(Event& theEvent) :
   fEvent(theEvent)
 
 {
-
 }
 
 G4MuDecStackingAction::~G4MuDecStackingAction() 
 { 
-
 }
 
 
 G4ClassificationOfNewTrack
 G4MuDecStackingAction::ClassifyNewTrack(const G4Track* const track)
 {
-
-
   // if particle is no a photon, track it
   if (track->GetDefinition() != G4OpticalPhoton::OpticalPhoton())
     return fWaiting;

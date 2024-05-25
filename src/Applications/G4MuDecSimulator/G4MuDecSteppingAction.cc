@@ -18,13 +18,9 @@
 #include "SimData.h"
 #include "Detector.h"
 
-G4MuDecSteppingAction::G4MuDecSteppingAction(const G4MuDecConstruction* det, G4MuDecEventAction* G4event, Event& theEvent)
-	:	G4UserSteppingAction(),
-		fDetectorConstruction(det),
-		fEventAction(G4event),
-		fEvent(theEvent)
+G4MuDecSteppingAction::G4MuDecSteppingAction()
+	:	G4UserSteppingAction()
 {
-
 }
 
 G4MuDecSteppingAction::~G4MuDecSteppingAction()

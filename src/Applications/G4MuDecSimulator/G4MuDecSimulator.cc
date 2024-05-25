@@ -10,12 +10,7 @@
 // Headers of this particular application
 #include "G4MuDecSimulator.h"
 #include "G4MuDecConstruction.h"
-#include "G4MPrimaryGeneratorAction.h"
-#include "G4MuDecStackingAction.h"
-#include "G4MuDecEventAction.h"
-#include "G4MuDecRunAction.h"
-#include "G4MuDecTrackingAction.h"
-#include "G4MuDecSteppingAction.h"
+#include "G4MuDecActionInitialization.h"
 
 // Geant4 headers
 #include "FTFP_BERT.hh"
@@ -145,85 +140,68 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
 	G4Random::setTheSeed(myseed);
 
-	G4VisManager* fVisManager = nullptr;
+	G4VisManager* visManager = nullptr;
 	
 	// construct the default run manager
-	auto fRunManager = G4RunManagerFactory::CreateRunManager();
+	auto* runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly);
 
 	// set mandatory initialization classes
 	auto fDetConstruction = new G4MuDecConstruction(theEvent);
-	fRunManager->SetUserInitialization(fDetConstruction);
-	
-	fRunManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
+	runManager->SetUserInitialization(fDetConstruction);
+	runManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
+	runManager->SetUserInitialization(new G4MuDecActionInitialization(theEvent));
 
-	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
-	fRunManager->SetUserAction(fPrimaryGenerator);
-	
-	G4MuDecStackingAction *fStackingAction = new G4MuDecStackingAction(theEvent);
-	fRunManager->SetUserAction(fStackingAction);
-
-	G4MuDecRunAction *fRunAction = new G4MuDecRunAction();
-	fRunManager->SetUserAction(fRunAction);
-	
-	G4MuDecEventAction *fEventAction = new G4MuDecEventAction(theEvent);
-	fRunManager->SetUserAction(fEventAction);
-
-	fRunManager->SetUserAction(new G4MuDecTrackingAction(fEventAction, theEvent));
-
-	G4MuDecSteppingAction *fSteppingAction = new G4MuDecSteppingAction(fDetConstruction, fEventAction, theEvent);
-	fRunManager->SetUserAction(fSteppingAction);
-	
 	// initialize G4 kernel
-	fRunManager->Initialize();
+	runManager->Initialize();
 
 	// initialize visualization
-	if ((cfg.fGeoVis || cfg.fTrajVis) && !fVisManager)
-		fVisManager = new G4VisExecutive;
+	if ((cfg.fGeoVis || cfg.fTrajVis) && !visManager)
+		visManager = new G4VisExecutive;
 
 	// get the pointer to the UI manager and set verbosities
-	G4UImanager* fUImanager = G4UImanager::GetUIpointer();
+	G4UImanager* uiManager = G4UImanager::GetUIpointer();
 	switch (cfg.fVerbosity) {
 		case 1:
-			fUImanager->ApplyCommand("/run/verbose 1");
-			fUImanager->ApplyCommand("/event/verbose 0");
-			fUImanager->ApplyCommand("/tracking/verbose 0");
+			uiManager->ApplyCommand("/run/verbose 1");
+			uiManager->ApplyCommand("/event/verbose 0");
+			uiManager->ApplyCommand("/tracking/verbose 0");
 			break;
 		case 2:
-			fUImanager->ApplyCommand("/run/verbose 1");
-			fUImanager->ApplyCommand("/event/verbose 1");
-			fUImanager->ApplyCommand("/tracking/verbose 0");
+			uiManager->ApplyCommand("/run/verbose 1");
+			uiManager->ApplyCommand("/event/verbose 1");
+			uiManager->ApplyCommand("/tracking/verbose 0");
 			break;
 		case 3:
-			fUImanager->ApplyCommand("/run/verbose 1");
-			fUImanager->ApplyCommand("/event/verbose 1");
-			fUImanager->ApplyCommand("/tracking/verbose 1");
+			uiManager->ApplyCommand("/run/verbose 1");
+			uiManager->ApplyCommand("/event/verbose 1");
+			uiManager->ApplyCommand("/tracking/verbose 1");
 			break;
 		default:
-			fUImanager->ApplyCommand("/run/verbose 0");
-			fUImanager->ApplyCommand("/event/verbose 0");
-			fUImanager->ApplyCommand("/tracking/verbose 0");
+			uiManager->ApplyCommand("/run/verbose 0");
+			uiManager->ApplyCommand("/event/verbose 0");
+			uiManager->ApplyCommand("/tracking/verbose 0");
 		}
 	
 	if (cfg.fGeoVis || cfg.fTrajVis) {
-		fVisManager->Initialize();
-		fUImanager->ApplyCommand(("/vis/open " + cfg.fRenderFile).c_str());
-		fUImanager->ApplyCommand("/vis/scene/create");
-		fUImanager->ApplyCommand("/vis/sceneHandler/attach");
-		fUImanager->ApplyCommand("/vis/scene/add/volume");
-		fUImanager->ApplyCommand("/vis/scene/add/axes 0 0 0 1 m");
-		fUImanager->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 0. 0.");
-		fUImanager->ApplyCommand("/vis/viewer/set/targetPoint 0 0 0");
-		fUImanager->ApplyCommand("/vis/viewer/zoom 1");
-		fUImanager->ApplyCommand("/vis/viewero/set/style/wireframe");
-		fUImanager->ApplyCommand("/vis/drawVolume");
-		fUImanager->ApplyCommand("/vis/scene/notifyHandlers");
-		fUImanager->ApplyCommand("/vis/viewer/update");
+		visManager->Initialize();
+		uiManager->ApplyCommand(("/vis/open " + cfg.fRenderFile).c_str());
+		uiManager->ApplyCommand("/vis/scene/create");
+		uiManager->ApplyCommand("/vis/sceneHandler/attach");
+		uiManager->ApplyCommand("/vis/scene/add/volume");
+		uiManager->ApplyCommand("/vis/scene/add/axes 0 0 0 1 m");
+		uiManager->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 0. 0.");
+		uiManager->ApplyCommand("/vis/viewer/set/targetPoint 0 0 0");
+		uiManager->ApplyCommand("/vis/viewer/zoom 1");
+		uiManager->ApplyCommand("/vis/viewero/set/style/wireframe");
+		uiManager->ApplyCommand("/vis/drawVolume");
+		uiManager->ApplyCommand("/vis/scene/notifyHandlers");
+		uiManager->ApplyCommand("/vis/viewer/update");
 
 	}
 
 	if (cfg.fTrajVis) {
-			fUImanager->ApplyCommand("/tracking/storeTrajectory 1");
-			fUImanager->ApplyCommand("/vis/scene/add/trajectories");
+			uiManager->ApplyCommand("/tracking/storeTrajectory 1");
+			uiManager->ApplyCommand("/vis/scene/add/trajectories");
 	}
 	
 
@@ -232,12 +210,12 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 		G4MuDecSimulator::currentParticle = *it;
 		simData.SetCurrentParticle(*it);
 		// Run simulation
-		fRunManager->BeamOn(1);
+		runManager->BeamOn(1);
 	}
 
 
-	delete fVisManager;
-	delete fRunManager;
+	delete visManager;
+	delete runManager;
 
 	cout << "[INFO] G4MuDecSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
 
