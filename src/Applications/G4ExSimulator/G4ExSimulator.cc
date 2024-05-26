@@ -72,11 +72,11 @@ int main(int argc, char** argv)
 	}
 	
 	// for program time calculation
-  time_t start, end;
-  time(&start);
+  	time_t start, end;
+  	time(&start);
   
 	fG4ExSimulator = new G4ExSimulator();
-	// Create Event object
+	// Initialize Event object
 	Event theEvent;
 	fG4ExSimulator->Initialize(theEvent, fCfgFile);
 	fG4ExSimulator->RunSimulation(theEvent);
@@ -101,29 +101,21 @@ int main(int argc, char** argv)
 }
 
 void
-G4ExSimulator::Initialize(Event& aEvent, string aFileName)
+G4ExSimulator::Initialize(Event &aEvent, string aFileName)
 {
-
-	cout << "[INFO] G4ExSimulator::Initialize" << endl;
-
 	// Fill Event object from configuration file
-	// Read Simulation configuration
-	aEvent = ConfigManager::ReadConfigurationFile(aFileName);
+	ConfigManager::ReadConfigurationFile(aEvent, aFileName);
 	// get simulation simulation settings
 	const Event::Config &cfg = aEvent.GetConfig();
 	ConfigManager::PrintConfig(cfg);
 	// Read Detector Configuration
 	ConfigManager::ReadDetectorList(cfg.fDetectorList, aEvent);
-	
 }            
 
 
 bool
 G4ExSimulator::RunSimulation(Event& aEvent)
 {
-
-	cout << "[INFO] G4ExSimulator::RunSimulation" << endl;
-
 	const Event::Config &cfg = aEvent.GetConfig();
 	SimData& simData = aEvent.GetSimData();
 	const unsigned int numberOfParticles = simData.GetTotalNumberOfParticles();
@@ -133,32 +125,11 @@ G4ExSimulator::RunSimulation(Event& aEvent)
 		return false;
 	}
 	
-	/***************
-
-	Geant4 Setup    
-
-	*****************/
-
 	G4long myseed = time(NULL);
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
 	G4Random::setTheSeed(myseed);
 
-	G4VisManager* visManager = nullptr;
-	// construct the default run manager
-	auto* runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly);
-	// set mandatory initialization classes
-	auto fDetConstruction = new G4ExDetectorConstruction(aEvent);
-	runManager->SetUserInitialization(fDetConstruction);
-	runManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
-	runManager->SetUserInitialization(new G4ExActionInitialization(aEvent));
-
-	// initialize G4 kernel
-	runManager->Initialize();
-	
-	// initialize visualization
-	if ((cfg.fGeoVis || cfg.fTrajVis) && !visManager)
-		visManager = new G4VisExecutive;
-
+	// TODO: move lines below to a function.
 	// get the pointer to the UI manager and set verbosities
 	G4UImanager* uiManager = G4UImanager::GetUIpointer();
 	switch (cfg.fVerbosity) {
@@ -166,14 +137,14 @@ G4ExSimulator::RunSimulation(Event& aEvent)
 			uiManager->ApplyCommand("/run/verbose 1");
 			uiManager->ApplyCommand("/event/verbose 0");
 			uiManager->ApplyCommand("/tracking/verbose 0");
-			break;
+						break;
 		case 2:
 			uiManager->ApplyCommand("/run/verbose 1");
 			uiManager->ApplyCommand("/event/verbose 1");
 			uiManager->ApplyCommand("/tracking/verbose 0");
-			break;
+						break;
 		case 3:
-			uiManager->ApplyCommand("/run/verbose 1");
+						uiManager->ApplyCommand("/run/verbose 1");
 			uiManager->ApplyCommand("/event/verbose 1");
 			uiManager->ApplyCommand("/tracking/verbose 1");
 			break;
@@ -181,9 +152,14 @@ G4ExSimulator::RunSimulation(Event& aEvent)
 			uiManager->ApplyCommand("/run/verbose 0");
 			uiManager->ApplyCommand("/event/verbose 0");
 			uiManager->ApplyCommand("/tracking/verbose 0");
-		}
+	}
 	
-	if (cfg.fGeoVis || cfg.fTrajVis) {
+	// initialize visualization
+	G4VisManager* visManager = nullptr;
+	if ((cfg.fGeoVis || cfg.fTrajVis) && !visManager) {
+		visManager = new G4VisExecutive;
+	}
+	if (visManager) {
 		visManager->Initialize();
 		uiManager->ApplyCommand(("/vis/open " + cfg.fRenderFile).c_str());
 		uiManager->ApplyCommand("/vis/scene/create");
@@ -199,7 +175,6 @@ G4ExSimulator::RunSimulation(Event& aEvent)
 		uiManager->ApplyCommand("/vis/viewer/update");
 
 	}
-
 	if (cfg.fTrajVis) {
 		uiManager->ApplyCommand("/tracking/storeTrajectory 1");
 		uiManager->ApplyCommand("/vis/scene/add/trajectories");
@@ -208,7 +183,16 @@ G4ExSimulator::RunSimulation(Event& aEvent)
 		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
 		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
 	}
-	
+
+	// construct the default run manager
+	auto* runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly);
+	// set mandatory initialization classes
+	auto fDetConstruction = new G4ExDetectorConstruction(aEvent);
+	runManager->SetUserInitialization(fDetConstruction);
+	runManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
+	runManager->SetUserInitialization(new G4ExActionInitialization(aEvent));
+	// initialize G4 kernel
+	runManager->Initialize();
 
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
@@ -233,7 +217,7 @@ void
 G4ExSimulator::WriteEventInfo(Event& aEvent)
 {
 	cout << "[INFO] G4ExSimulator::WriteEventInfo" << endl;
-	DataWriter::FileWriter(aEvent);
+DataWriter::FileWriter(aEvent);
 
 	return;
 

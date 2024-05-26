@@ -10,12 +10,7 @@
 // Headers of this particular application
 #include "G4HodoscopeSimulator.h"
 #include "G4HodoscopeDetectorConstruction.h"
-#include "G4MPrimaryGeneratorAction.h"
-#include "G4HodoscopeEventAction.h"
-#include "G4HodoscopeRunAction.h"
-#include "G4HodoscopeTrackingAction.h"
-#include "G4HodoscopeSteppingAction.h"
-#include "G4HodoscopePhysicsList.h" 
+#include "G4HodoscopeActionInitialization.h"
 
 // Geant4 headers
 #include "FTFP_BERT.hh"
@@ -44,7 +39,6 @@ string fCfgFile;
 
 G4HodoscopeSimulator::G4HodoscopeSimulator()
 {
-
 }
 
 namespace 
@@ -94,18 +88,17 @@ int main(int argc, char** argv)
 }
 
 void
-G4HodoscopeSimulator::Initialize(Event& theEvent, string cfgFile)
+G4HodoscopeSimulator::Initialize(Event &aEvent, string aFileName)
 {
 	cout << "[INFO] G4HodoscopeSimulator::Initialize" << endl;
-	cout << "[INFO] G4HodoscopeSimulator::Initialize: Reading configuration file " << cfgFile << endl;
+	cout << "[INFO] G4HodoscopeSimulator::Initialize: Reading configuration file " << aFileName << endl;
 	// Fill Event object from configuration file
-	// Read Simulation configuration
-	theEvent = ConfigManager::ReadConfigurationFile(cfgFile);
+	ConfigManager::ReadConfigurationFile(aEvent, aFileName);
 	// get simulation simulation settings
-	const Event::Config &cfg = theEvent.GetConfig();
+	const Event::Config &cfg = aEvent.GetConfig();
 	ConfigManager::PrintConfig(cfg);
 	// Read Detector Configuration
-	ConfigManager::ReadDetectorList(cfg.fDetectorList, theEvent);
+	ConfigManager::ReadDetectorList(cfg.fDetectorList, aEvent);
 }            
 
 
@@ -121,100 +114,89 @@ G4HodoscopeSimulator::RunSimulation(Event& theEvent)
 		cerr << "[ERROR] G4HodoscopeSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
 		return false;
 	}
-	/***************
-		Geant4 Setup    
-	*****************/
+	
 	G4long myseed = time(NULL);
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
 	G4Random::setTheSeed(myseed);
-	cout << "Seed for random generation: " << myseed << endl;
-	G4VisManager* fVisManager = nullptr;
+	
+	G4VisManager* visManager = nullptr;
 	// construct the default run manager
-	auto fRunManager = G4RunManagerFactory::CreateRunManager();
+	auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly);
 	// set mandatory initialization classes
-	auto fDetConstruction = new G4HodoscopeDetectorConstruction(theEvent);
-	fRunManager->SetUserInitialization(fDetConstruction);
-	fRunManager->SetUserInitialization(new G4HodoscopePhysicsList(fPhysicsName));  
-	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
-	fRunManager->SetUserAction(fPrimaryGenerator);
-	G4HodoscopeRunAction *fRunAction = new G4HodoscopeRunAction(theEvent);
-	fRunManager->SetUserAction(fRunAction);
-	G4HodoscopeEventAction *fEventAction = new G4HodoscopeEventAction(theEvent);
-	fRunManager->SetUserAction(fEventAction);
-	fRunManager->SetUserAction(new G4HodoscopeTrackingAction(theEvent));
-	G4HodoscopeSteppingAction *fSteppingAction = new G4HodoscopeSteppingAction(fEventAction, theEvent);
-	fRunManager->SetUserAction(fSteppingAction);
+	runManager->SetUserInitialization(new G4HodoscopeDetectorConstruction(theEvent));
+	runManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
+	runManager->SetUserInitialization(new G4HodoscopeActionInitialization(theEvent));
 	// initialize G4 kernel
-	fRunManager->Initialize();
+	runManager->Initialize();
 	// initialize visualization
-	if ((cfg.fGeoVis || cfg.fTrajVis) && !fVisManager)
-		fVisManager = new G4VisExecutive;
+	if ((cfg.fGeoVis || cfg.fTrajVis) && !visManager)
+		visManager = new G4VisExecutive;
 
 	// get the pointer to the UI manager and set verbosities
-	G4UImanager* fUImanager = G4UImanager::GetUIpointer();
+	G4UImanager* uiManager = G4UImanager::GetUIpointer();
 	switch (cfg.fVerbosity) {
 		case 1:
-			fUImanager->ApplyCommand("/run/verbose 1");
-			fUImanager->ApplyCommand("/event/verbose 0");
-			fUImanager->ApplyCommand("/tracking/verbose 0");
+			uiManager->ApplyCommand("/run/verbose 1");
+			uiManager->ApplyCommand("/event/verbose 0");
+			uiManager->ApplyCommand("/tracking/verbose 0");
 			break;
 		case 2:
-			fUImanager->ApplyCommand("/run/verbose 1");
-			fUImanager->ApplyCommand("/event/verbose 1");
-			fUImanager->ApplyCommand("/tracking/verbose 0");
+			uiManager->ApplyCommand("/run/verbose 1");
+			uiManager->ApplyCommand("/event/verbose 1");
+			uiManager->ApplyCommand("/tracking/verbose 0");
 			break;
 		case 3:
-			fUImanager->ApplyCommand("/run/verbose 1");
-			fUImanager->ApplyCommand("/event/verbose 1");
-			fUImanager->ApplyCommand("/tracking/verbose 1");
+			uiManager->ApplyCommand("/run/verbose 1");
+			uiManager->ApplyCommand("/event/verbose 1");
+			uiManager->ApplyCommand("/tracking/verbose 1");
 			break;
 		default:
-			fUImanager->ApplyCommand("/run/verbose 0");
-			fUImanager->ApplyCommand("/event/verbose 0");
-			fUImanager->ApplyCommand("/tracking/verbose 0");
+			uiManager->ApplyCommand("/run/verbose 0");
+			uiManager->ApplyCommand("/event/verbose 0");
+			uiManager->ApplyCommand("/tracking/verbose 0");
 		}
 	
 	if (cfg.fGeoVis || cfg.fTrajVis) {
-		fVisManager->Initialize();
-		fUImanager->ApplyCommand(("/vis/open " + fRenderFile).c_str());
-		fUImanager->ApplyCommand("/vis/scene/create");
-		fUImanager->ApplyCommand("/vis/sceneHandler/attach");
-		fUImanager->ApplyCommand("/vis/scene/add/volume");
-		fUImanager->ApplyCommand("/vis/scene/add/axes");
-		fUImanager->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 0. 0.");
-		fUImanager->ApplyCommand("/vis/viewer/set/targetPoint 0 0 0");
-		fUImanager->ApplyCommand("/vis/viewer/zoom 1");
-		fUImanager->ApplyCommand("/vis/viewero/set/style/wireframe");
-		fUImanager->ApplyCommand("/vis/drawVolume");
-		fUImanager->ApplyCommand("/vis/scene/notifyHandlers");
-		fUImanager->ApplyCommand("/vis/viewer/update");
+		visManager->Initialize();
+		uiManager->ApplyCommand(("/vis/open " + cfg.fRenderFile).c_str());
+		uiManager->ApplyCommand("/vis/scene/create");
+		uiManager->ApplyCommand("/vis/sceneHandler/attach");
+		uiManager->ApplyCommand("/vis/scene/add/volume");
+		uiManager->ApplyCommand("/vis/scene/add/axes");
+		uiManager->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 0. 0.");
+		uiManager->ApplyCommand("/vis/viewer/set/targetPoint 0 0 0");
+		uiManager->ApplyCommand("/vis/viewer/zoom 1");
+		uiManager->ApplyCommand("/vis/viewero/set/style/wireframe");
+		uiManager->ApplyCommand("/vis/drawVolume");
+		uiManager->ApplyCommand("/vis/scene/notifyHandlers");
+		uiManager->ApplyCommand("/vis/viewer/update");
 	}
 	if (cfg.fTrajVis) {
-		fUImanager->ApplyCommand("/tracking/storeTrajectory 1");
-		fUImanager->ApplyCommand("/vis/scene/add/trajectories");
-		fUImanager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");
+		uiManager->ApplyCommand("/tracking/storeTrajectory 1");
+		uiManager->ApplyCommand("/vis/scene/add/trajectories");
+		uiManager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");
 		// for debugging purposes, gammas are not drawn
-		fUImanager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
-		fUImanager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
+		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
+		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
 	}
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
 		G4HodoscopeSimulator::currentParticle = *it;
 		simData.SetCurrentParticle(*it);
 		// Run simulation
-		fRunManager->BeamOn(1);
+		runManager->BeamOn(1);
 	}
-	delete fVisManager;
-	delete fRunManager;
+	delete visManager;
+	delete runManager;
 	cout << "[INFO] G4HodoscopeSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
 	return true;
 }
 
 
 void
-G4HodoscopeSimulator::WriteEventInfo(Event& theEvent)
+G4HodoscopeSimulator::WriteEventInfo(Event &aEvent)
 {
 	cout << "[INFO] G4HodoscopeSimulator::WriteEventInfo" << endl;
-	DataWriter::FileWriter(theEvent);	
+	DataWriter::FileWriter(aEvent);	
 	return;
 }

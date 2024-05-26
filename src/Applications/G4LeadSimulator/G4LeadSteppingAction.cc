@@ -21,10 +21,8 @@
 
 using namespace std;
 
-G4LeadSteppingAction::G4LeadSteppingAction(G4LeadEventAction* G4event, Event& theEvent)
-	: G4UserSteppingAction(),
-		fEventAction(G4event),
-    fEvent(theEvent)
+G4LeadSteppingAction::G4LeadSteppingAction(Event& aEvent)
+	: G4UserSteppingAction(), fEvent(aEvent)
 {
 
 	if (fEvent.GetSimData().GetSimulationMode() == SimData::SimulationMode::eFast) {

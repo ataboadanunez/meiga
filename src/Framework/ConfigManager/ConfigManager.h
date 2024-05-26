@@ -31,7 +31,7 @@ class ConfigManager
 		ConfigManager() { }
 		~ConfigManager() { }
 		// public and static to be called within the applications 'without object'
-		static Event ReadConfigurationFile(const std::string &filename);
+		static void ReadConfigurationFile(Event& aEvent, const std::string &filename);
 		static void ReadDetectorList(const std::string &filename, Event& theEvent);
 		static void PrintConfig(const Event::Config &cfg);
 

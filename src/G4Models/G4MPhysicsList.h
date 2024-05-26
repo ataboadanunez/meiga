@@ -17,7 +17,7 @@ class G4MPhysicsList: public G4VModularPhysicsList
 {
   public:
 
-	G4MPhysicsList(G4String);
+	G4MPhysicsList(G4String, G4int aVerbosity = 0);
 	virtual ~G4MPhysicsList();
 
 	void SetCuts();
@@ -44,6 +44,8 @@ class G4MPhysicsList: public G4VModularPhysicsList
 	void SetNbOfPhotonsCerenkov(G4int);
 
 	void SetVerbose(G4int);
+
+    G4int verboseLevel;
 
 private:
 

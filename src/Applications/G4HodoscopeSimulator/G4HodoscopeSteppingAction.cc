@@ -21,10 +21,8 @@
 
 using namespace std;
 
-G4HodoscopeSteppingAction::G4HodoscopeSteppingAction(G4HodoscopeEventAction* G4event, Event& theEvent)
-	: G4UserSteppingAction(),
-		fEventAction(G4event),
-    fEvent(theEvent)
+G4HodoscopeSteppingAction::G4HodoscopeSteppingAction(Event &aEvent)
+	: G4UserSteppingAction(), fEvent(aEvent)
 {
 
 	if (fEvent.GetSimData().GetSimulationMode() == SimData::SimulationMode::eFast) {

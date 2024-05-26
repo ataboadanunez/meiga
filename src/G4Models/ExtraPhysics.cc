@@ -42,7 +42,9 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 ExtraPhysics::ExtraPhysics()
-    : G4VPhysicsConstructor("Extra") { }
+  : G4VPhysicsConstructor("Extra") 
+{
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

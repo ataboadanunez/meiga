@@ -20,36 +20,24 @@ namespace
 {   
     Event test_ReadConfigurationFile() {
     
-        Event event = ConfigManager::ReadConfigurationFile(cConfigFilename);
+        Event event;
+        ConfigManager::ReadConfigurationFile(event, cConfigFilename);
         Event::Config &cfg = event.GetConfig();
-        int nTestsPassed = 0;
         // input 
         assert(cfg.fInputMode == "UseEcoMug");
-        nTestsPassed++;
         assert(cfg.fInputNParticles == 1);
-        nTestsPassed++;
         // output
         assert(cfg.fCompressOutput == true);
-        nTestsPassed++;
         assert(cfg.fSavePETimeDistribution == true);
-        nTestsPassed++;
         assert(cfg.fSaveComponentsPETimeDistribution == false);
-        nTestsPassed++;
         assert(cfg.fSaveEnergy == false);
-        nTestsPassed++;
         assert(cfg.fSaveComponentsEnergy == false);
-        nTestsPassed++;
         // simulation
         assert(cfg.fSimulationMode == "eFast");
-        nTestsPassed++;
         assert(cfg.fGeoVis == false);
-        nTestsPassed++;
         assert(cfg.fTrajVis == false);
-        nTestsPassed++;
         assert(cfg.fCheckOverlaps == false);
-        nTestsPassed++;
-        std::cout << "[INFO] test_ReadConfigurationFile(): " << nTestsPassed << " / " << nTestsPassed << " PASSED" << std::endl; 
-        
+        std::cout << "[INFO] test_ReadConfigurationFile: OK" << std::endl;
         return event;
     }
 
@@ -71,7 +59,7 @@ namespace
         assert(detPosition.at(1) == 0.02 * CLHEP::m);
         assert(detPosition.at(2) == 0.5 * CLHEP::m);
         assert(detector.GetNBars() == 8);
-        
+        std::cout << "[INFO] test_ReadDetectorList: OK" << std::endl;
         return simData;
     }
 
@@ -89,22 +77,27 @@ namespace
         assert(momentumDirection.at(2) == -449.16473577427365);
         assert(currentParticle.GetZenith() == 2.4114694941536605);
         assert(currentParticle.GetAzimuth() == 3.5926461359435269);
+        std::cout << "[INFO] test_PrimaryGenerator: OK" << std::endl;
     }
 }
 
 int main(int argc, char** argv)
 {
+    int nTestsPassed = 0;
     Event event = test_ReadConfigurationFile();
+    nTestsPassed++;
     Event::Config &cfg = event.GetConfig();
     SimData &simData = test_ReadDetectorList(event);
+    nTestsPassed++;
     
     // prepare simulation
     G4long seed = 123456789;
     simData.SetSeed(seed);
     G4Random::setTheEngine(new CLHEP::RanecuEngine);
 	G4Random::setTheSeed(seed);
-    G4RunManager *runManager = G4RunManagerFactory::CreateRunManager();
-
+    G4RunManager *runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly);
+    runManager->SetVerboseLevel(0);
+    
     if(!runManager) {
         return 1;
     }
@@ -128,7 +121,9 @@ int main(int argc, char** argv)
         runManager->BeamOn(1);
         test_PrimaryGenerator(simData);
     }
+    nTestsPassed++;
+    std::cout << "[INFO] number of tests passed: " << nTestsPassed << std::endl;
     // need another test for output 
-
+    delete runManager;
     return 0;
 }

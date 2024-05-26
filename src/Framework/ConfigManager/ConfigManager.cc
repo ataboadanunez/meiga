@@ -11,18 +11,18 @@ using namespace std;
 /** Static class member definition **/
 DefaultProperties ConfigManager::defProp;
 
-Event
-ConfigManager::ReadConfigurationFile(const string &fConfigFile)
+void
+ConfigManager::ReadConfigurationFile(Event &aEvent, const string &fConfigFile)
 {
 	
 	cout << "[INFO] ConfigManager::ReadConfigurationFile: Reading configuration File " << fConfigFile << endl;
-	Event theEvent;
-	Event::Config &cfg = theEvent.GetConfig();
+	// Event theEvent;
+	Event::Config &cfg = aEvent.GetConfig();
 	ptree tree;
 	read_json(fConfigFile, tree);
 	
 	cfg.fConfigurationFileName = fConfigFile;
-	SimData& simData = theEvent.GetSimData();
+	SimData& simData = aEvent.GetSimData();
 	// input
 	cfg.fInputMode = tree.get<string>("Input.Mode", "UseARTI");
 	simData.SetInputMode(simData.InputModeConversion(cfg.fInputMode));
@@ -32,12 +32,12 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	// reads the input (ARTI) file and fills the Event with particles
 	if (simData.GetInputMode() == SimData::InputMode::eUseARTI) {
 		cout << "[WARNING] ConfigManager::ReadConfigurationFile: Selected InputMode = eUseARTI. An input file is needed." << endl;
-		ParticleFiller::FillParticleVector(cfg.fInputFileName, theEvent);
+		ParticleFiller::FillParticleVector(cfg.fInputFileName, aEvent);
 	}
 	// 
 	else if (simData.GetInputMode() == SimData::InputMode::eUseEcoMug) {
 		cout << "[WARNING] ConfigManager::ReadConfigurationFile: Selected InputMode = eUseEcoMug. An input number of particles is needed." << endl;
-		ParticleFiller::FillParticleVector(cfg.fInputNParticles, theEvent);
+		ParticleFiller::FillParticleVector(cfg.fInputNParticles, aEvent);
 	}
 		
 	cfg.fDetectorList  = tree.get<string>("DetectorList", "./DetectorList.xml");
@@ -63,9 +63,6 @@ ConfigManager::ReadConfigurationFile(const string &fConfigFile)
 	cfg.fSaveComponentsEnergy = tree.get<bool>("Output.SaveComponentsEnergy", false);
 	cfg.fSaveCharge = tree.get<bool>("Output.SaveCharge", false);
 	cfg.fSaveCounts = tree.get<bool>("Output.SaveCounts", false);
-
-	return theEvent;
-
 }
 
 void

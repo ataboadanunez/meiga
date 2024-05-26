@@ -22,9 +22,9 @@ class G4MuDecSimulator
     virtual ~G4MuDecSimulator() {;}
 
     // main methods of the application
-    void Initialize(Event& evt, std::string fileName);
-    bool RunSimulation(Event& evt);
-    void WriteEventInfo(Event& evt);
+    void Initialize(Event& aEvent, std::string aFileName);
+    bool RunSimulation(Event& aEvent);
+    void WriteEventInfo(Event& aEvent);
 
     // static members 
     static Particle currentParticle;

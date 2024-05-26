@@ -96,32 +96,26 @@ int main(int argc, char** argv)
 }
 
 void
-G4MuDecSimulator::Initialize(Event& theEvent, string cfgFile)
+G4MuDecSimulator::Initialize(Event &aEvent, string aFileName)
 {
-
-	cout << "[INFO] G4MuDecSimulator::Initialize" << endl;
-	cout << "[INFO] Reading configuration file " << cfgFile << endl;
-
 	// Fill Event object from configuration file
-	// Read Simulation configuration
-	theEvent = ConfigManager::ReadConfigurationFile(cfgFile);
+	ConfigManager::ReadConfigurationFile(aEvent, aFileName);
 	// get simulation simulation settings
-	const Event::Config &cfg = theEvent.GetConfig();
+	const Event::Config &cfg = aEvent.GetConfig();
 	ConfigManager::PrintConfig(cfg);
 	// Read Detector Configuration
-	ConfigManager::ReadDetectorList(cfg.fDetectorList, theEvent);
-
+	ConfigManager::ReadDetectorList(cfg.fDetectorList, aEvent);
 }            
 
 
 bool
-G4MuDecSimulator::RunSimulation(Event& theEvent)
+G4MuDecSimulator::RunSimulation(Event& aEvent)
 {
 
 	cout << "[INFO] G4MuDecSimulator::RunSimulation" << endl;
 	
-	const Event::Config &cfg = theEvent.GetConfig();
-	SimData& simData = theEvent.GetSimData();
+	const Event::Config &cfg = aEvent.GetConfig();
+	SimData& simData = aEvent.GetSimData();
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
 	cout << "[INFO] G4MuDecSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
 	
@@ -146,10 +140,10 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 	auto* runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly);
 
 	// set mandatory initialization classes
-	auto fDetConstruction = new G4MuDecConstruction(theEvent);
+	auto fDetConstruction = new G4MuDecConstruction(aEvent);
 	runManager->SetUserInitialization(fDetConstruction);
 	runManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
-	runManager->SetUserInitialization(new G4MuDecActionInitialization(theEvent));
+	runManager->SetUserInitialization(new G4MuDecActionInitialization(aEvent));
 
 	// initialize G4 kernel
 	runManager->Initialize();
@@ -225,11 +219,11 @@ G4MuDecSimulator::RunSimulation(Event& theEvent)
 
 
 void
-G4MuDecSimulator::WriteEventInfo(Event& theEvent)
+G4MuDecSimulator::WriteEventInfo(Event& aEvent)
 {
 	cout << "[INFO] G4MuDecSimulator::WriteEventInfo" << endl;
 
-	DataWriter::FileWriter(theEvent);
+	DataWriter::FileWriter(aEvent);
 	
 	return;
 

@@ -1,7 +1,7 @@
 // implementation of the G4LeadRunAction class
 #include "G4Timer.hh"
 #include "G4Run.hh"
-#include "g4root.hh"
+// #include "g4root.hh"
 #include "G4AccumulableManager.hh"
 #include "G4LeadRunAction.h"
 

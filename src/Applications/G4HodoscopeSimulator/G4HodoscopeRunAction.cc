@@ -1,7 +1,7 @@
 // implementation of the G4HodoscopeRunAction class
 #include "G4Timer.hh"
 #include "G4Run.hh"
-#include "g4root.hh"
+// #include "g4root.hh"
 #include "G4AccumulableManager.hh"
 #include "G4HodoscopeRunAction.h"
 
@@ -13,9 +13,8 @@
 
 using namespace std;
 
-G4HodoscopeRunAction::G4HodoscopeRunAction(Event& theEvent)
- : G4UserRunAction(),
- fEvent(theEvent)
+G4HodoscopeRunAction::G4HodoscopeRunAction(Event& theEvent) 
+	: G4UserRunAction(), fEvent(theEvent)
 {
 	G4cout << "...G4HodoscopeRunAction..." << G4endl;
 	
@@ -31,17 +30,13 @@ G4HodoscopeRunAction::~G4HodoscopeRunAction()
 void 
 G4HodoscopeRunAction::BeginOfRunAction(const G4Run* aRun)
 {
-	
 }
 
 
 void 
 G4HodoscopeRunAction::EndOfRunAction(const G4Run* aRun)
 { 
-	
-
 	// loop over scintillator panels (independent detectors) 	
-
 	for (auto detIt = fEvent.DetectorRange().begin(); detIt != fEvent.DetectorRange().end(); detIt++) {
 
 		G4int g4RunId = aRun->GetRunID();

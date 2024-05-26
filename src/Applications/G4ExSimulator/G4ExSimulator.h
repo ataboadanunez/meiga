@@ -23,7 +23,7 @@ class G4ExSimulator
 		virtual ~G4ExSimulator() {;}
 
 		// main methods of the application
-		void Initialize(Event& aEvent, std::string aFileName);
+		void Initialize(Event &aEvent, std::string aFileName);
 		bool RunSimulation(Event& aEvent);
 		void WriteEventInfo(Event& aEvent);
 
