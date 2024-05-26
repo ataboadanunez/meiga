@@ -25,6 +25,7 @@
 #include "G4AutoDelete.hh"
 
 // Framework libraries
+#include "Logger.h"
 #include "ConfigManager.h"
 #include "CorsikaUtilities.h"
 #include "Event.h"
@@ -44,27 +45,17 @@ string fCfgFile;
 
 G4ExSimulator::G4ExSimulator()
 {
-
 }
 
-namespace 
-{
-	void ProgramUsage() 
-	{
-		cerr << " Program Usage: " << endl;
-		cerr << " ./G4ExSimulator [ -c ConfigFile.json ] " << endl;
-	}
-
-}
 
 int main(int argc, char** argv) 
 {
 
+	DisplayLogo();
 	if (argc < 3) {
 		ProgramUsage();
 		throw invalid_argument("[ERROR] G4ExSimulator::main: A configuration file is needed!");
 	}
-
 	for (int i=1; i<argc; i=i+2) {
 		string sarg(argv[i]);
 		if (sarg == "-c")
@@ -100,17 +91,17 @@ int main(int argc, char** argv)
 
 }
 
-void
-G4ExSimulator::Initialize(Event &aEvent, string aFileName)
-{
-	// Fill Event object from configuration file
-	ConfigManager::ReadConfigurationFile(aEvent, aFileName);
-	// get simulation simulation settings
-	const Event::Config &cfg = aEvent.GetConfig();
-	ConfigManager::PrintConfig(cfg);
-	// Read Detector Configuration
-	ConfigManager::ReadDetectorList(cfg.fDetectorList, aEvent);
-}            
+// void
+// G4ExSimulator::Initialize(Event &aEvent, string aFileName)
+// {
+// 	// Fill Event object from configuration file
+// 	ConfigManager::ReadConfigurationFile(aEvent, aFileName);
+// 	// get simulation simulation settings
+// 	const Event::Config &cfg = aEvent.GetConfig();
+// 	ConfigManager::PrintConfig(cfg);
+// 	// Read Detector Configuration
+// 	ConfigManager::ReadDetectorList(cfg.fDetectorList, aEvent);
+// }            
 
 
 bool
@@ -128,6 +119,16 @@ G4ExSimulator::RunSimulation(Event& aEvent)
 	G4long myseed = time(NULL);
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
 	G4Random::setTheSeed(myseed);
+
+	// construct the default run manager
+	auto* runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly);
+	// set mandatory initialization classes
+	auto fDetConstruction = new G4ExDetectorConstruction(aEvent);
+	runManager->SetUserInitialization(fDetConstruction);
+	runManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
+	runManager->SetUserInitialization(new G4ExActionInitialization(aEvent));
+	// initialize G4 kernel
+	runManager->Initialize();
 
 	// TODO: move lines below to a function.
 	// get the pointer to the UI manager and set verbosities
@@ -184,15 +185,6 @@ G4ExSimulator::RunSimulation(Event& aEvent)
 		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
 	}
 
-	// construct the default run manager
-	auto* runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly);
-	// set mandatory initialization classes
-	auto fDetConstruction = new G4ExDetectorConstruction(aEvent);
-	runManager->SetUserInitialization(fDetConstruction);
-	runManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
-	runManager->SetUserInitialization(new G4ExActionInitialization(aEvent));
-	// initialize G4 kernel
-	runManager->Initialize();
 
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
@@ -213,12 +205,12 @@ G4ExSimulator::RunSimulation(Event& aEvent)
 }
 
 
-void
-G4ExSimulator::WriteEventInfo(Event& aEvent)
-{
-	cout << "[INFO] G4ExSimulator::WriteEventInfo" << endl;
-DataWriter::FileWriter(aEvent);
+// void
+// G4ExSimulator::WriteEventInfo(Event& aEvent)
+// {
+// 	cout << "[INFO] G4ExSimulator::WriteEventInfo" << endl;
+// DataWriter::FileWriter(aEvent);
 
-	return;
+// 	return;
 
-}
+// }

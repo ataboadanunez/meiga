@@ -5,7 +5,7 @@
 // Geant4 headers
 #include "globals.hh"
 #include "G4UserRunAction.hh"
-#include "g4root.hh"
+// #include "g4root.hh"
 // Meiga headers
 #include "Event.h"
 #include "G4TandarSimulator.h"
