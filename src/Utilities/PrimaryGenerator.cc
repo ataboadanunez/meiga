@@ -238,8 +238,8 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
         double injRadius = simData.GetInjectionRadius();
         double injHeight = simData.GetInjectionHeight();
         if (injHeight != z0){
-            cout << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: in injectionMode = eVertical, `injHeight` does not match with `z-coordinate`. Using `injHeight` as default." << endl;
-            zInj = injHeight;
+            cout << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: in injectionMode = eVertical, `injHeight` does not match with `z-coordinate`. Using `std::max(injHeight, z0)`." << endl;
+            zInj = std::max(injHeight, z0);
         } else {
             zInj = z0;
         }
