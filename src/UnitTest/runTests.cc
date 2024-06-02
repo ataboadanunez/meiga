@@ -70,7 +70,7 @@ namespace
         const std::vector<double> &injectionPosition = currentParticle.GetInjectionPosition();
         assert(injectionPosition.at(0) == 0.0);
         assert(injectionPosition.at(1) == 0.0);
-        assert(injectionPosition.at(2) == 0.0);
+        assert(injectionPosition.at(2) == 1.0 * CLHEP::m);
         const std::vector<double> &momentumDirection = currentParticle.GetMomentumDirection();
         assert(momentumDirection.at(0) == 0.0);
         assert(momentumDirection.at(1) == 0.0);
@@ -122,7 +122,7 @@ int main(int argc, char** argv)
         test_PrimaryGenerator(simData);
     }
     nTestsPassed++;
-    std::cout << "[INFO] number of tests passed: " << nTestsPassed << std::endl;
+    std::cout << "[INFO] All Unit Tests passed." << std::endl;
     // need another test for output 
     delete runManager;
     return 0;
