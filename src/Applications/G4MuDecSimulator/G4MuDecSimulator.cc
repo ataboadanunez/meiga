@@ -30,35 +30,27 @@
 #include "OptDevice.h"
 #include "G4MPhysicsList.h"
 #include "DataWriter.h"
+#include "Logger.h"
 
 using namespace std;
 
 Particle G4MuDecSimulator::currentParticle;
 G4MuDecSimulator* fG4MuDecSimulator;
 string fCfgFile;
+const string cApplicationName = "G4MuDecSimulator";
 
 G4MuDecSimulator::G4MuDecSimulator()
 {
 
 }
 
-namespace 
-{
-	void ProgramUsage() 
-	{
-		cerr << " Program Usage: " << endl;
-		cerr << " ./G4MuDecSimulator [ -c ConfigFile.json ] " << endl;
-	}
-
-}
-
-
 int main(int argc, char** argv) 
 {
 
+	DisplayLogo();
 	if (argc < 3) {
-		ProgramUsage();
-		throw invalid_argument("[ERROR] G4MuDecSimulator::main: A configuration file is needed!");
+		ProgramUsage(cApplicationName);
+		throw invalid_argument("[ERROR] A configuration file is needed!");
 	}
 
 	for (int i=1; i<argc; i=i+2) {
@@ -95,19 +87,6 @@ int main(int argc, char** argv)
 
 }
 
-void
-G4MuDecSimulator::Initialize(Event &aEvent, string aFileName)
-{
-	// Fill Event object from configuration file
-	ConfigManager::ReadConfigurationFile(aEvent, aFileName);
-	// get simulation simulation settings
-	const Event::Config &cfg = aEvent.GetConfig();
-	ConfigManager::PrintConfig(cfg);
-	// Read Detector Configuration
-	ConfigManager::ReadDetectorList(cfg.fDetectorList, aEvent);
-}            
-
-
 bool
 G4MuDecSimulator::RunSimulation(Event& aEvent)
 {
@@ -123,12 +102,6 @@ G4MuDecSimulator::RunSimulation(Event& aEvent)
 		cerr << "[ERROR] G4MuDecSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
 		return false;
 	}
-
-	/***************
-
-		Geant4 Setup    
-
-	*****************/
 
 	G4long myseed = time(NULL);
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
@@ -214,17 +187,5 @@ G4MuDecSimulator::RunSimulation(Event& aEvent)
 	cout << "[INFO] G4MuDecSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
 
 	return true;
-
-}
-
-
-void
-G4MuDecSimulator::WriteEventInfo(Event& aEvent)
-{
-	cout << "[INFO] G4MuDecSimulator::WriteEventInfo" << endl;
-
-	DataWriter::FileWriter(aEvent);
-	
-	return;
 
 }

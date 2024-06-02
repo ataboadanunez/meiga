@@ -42,6 +42,7 @@ using namespace std;
 Particle G4ExSimulator::currentParticle;
 G4ExSimulator* fG4ExSimulator;
 string fCfgFile;
+const string cApplicationName = "G4ExSimulator";
 
 G4ExSimulator::G4ExSimulator()
 {
@@ -53,8 +54,8 @@ int main(int argc, char** argv)
 
 	DisplayLogo();
 	if (argc < 3) {
-		ProgramUsage();
-		throw invalid_argument("[ERROR] G4ExSimulator::main: A configuration file is needed!");
+		ProgramUsage(cApplicationName);
+		throw invalid_argument("[ERROR] A configuration file is needed!");
 	}
 	for (int i=1; i<argc; i=i+2) {
 		string sarg(argv[i]);
@@ -90,19 +91,6 @@ int main(int argc, char** argv)
 	return 0;
 
 }
-
-// void
-// G4ExSimulator::Initialize(Event &aEvent, string aFileName)
-// {
-// 	// Fill Event object from configuration file
-// 	ConfigManager::ReadConfigurationFile(aEvent, aFileName);
-// 	// get simulation simulation settings
-// 	const Event::Config &cfg = aEvent.GetConfig();
-// 	ConfigManager::PrintConfig(cfg);
-// 	// Read Detector Configuration
-// 	ConfigManager::ReadDetectorList(cfg.fDetectorList, aEvent);
-// }            
-
 
 bool
 G4ExSimulator::RunSimulation(Event& aEvent)
@@ -203,14 +191,3 @@ G4ExSimulator::RunSimulation(Event& aEvent)
 	return true;
 
 }
-
-
-// void
-// G4ExSimulator::WriteEventInfo(Event& aEvent)
-// {
-// 	cout << "[INFO] G4ExSimulator::WriteEventInfo" << endl;
-// DataWriter::FileWriter(aEvent);
-
-// 	return;
-
-// }

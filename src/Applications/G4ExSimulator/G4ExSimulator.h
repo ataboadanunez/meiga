@@ -14,8 +14,6 @@
 #include "Detector.h"
 #include "G4MBaseApplication.h"
 
-class G4RunManager;
-
 class G4ExSimulator : public G4MBaseApplication
 {
 	public:
@@ -23,10 +21,7 @@ class G4ExSimulator : public G4MBaseApplication
 		G4ExSimulator();
 		virtual ~G4ExSimulator() {;}
 
-		// main methods of the application
-		// void Initialize(Event &aEvent, std::string aFileName);
 		bool RunSimulation(Event &aEvent) override;
-		// void WriteEventInfo(Event &aEvent);
 
 		// static members 
 		static Particle currentParticle;

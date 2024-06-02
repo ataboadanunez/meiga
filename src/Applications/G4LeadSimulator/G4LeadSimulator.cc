@@ -30,35 +30,27 @@
 #include "OptDevice.h"
 #include "G4MPhysicsList.h"
 #include "DataWriter.h"
+#include "Logger.h"
 
 using namespace std;
 
 Particle G4LeadSimulator::currentParticle;
 G4LeadSimulator* fG4LeadSimulator;
 string fCfgFile;
+const string cApplicationName = "G4LeadSimulator";
 
 G4LeadSimulator::G4LeadSimulator()
 {
 
 }
 
-namespace 
-{
-	void ProgramUsage() 
-	{
-		cerr << " Program Usage: " << endl;
-		cerr << " ./G4LeadSimulator [ -c ConfigFile.json ] " << endl;
-	}
-
-}
-
-
 int main(int argc, char** argv) 
 {
-
+	
+	DisplayLogo();
 	if (argc < 3) {
-		ProgramUsage();
-		throw invalid_argument("[ERROR] G4LeadSimulator::main: A configuration file is needed!");
+		ProgramUsage(cApplicationName);
+		throw invalid_argument("[ERROR] A configuration file is needed!");
 	}
 
 	for (int i=1; i<argc; i=i+2) {
@@ -87,22 +79,6 @@ int main(int argc, char** argv)
 	cout << " sec " << endl;
 	return 0;
 }
-
-void
-G4LeadSimulator::Initialize(Event &aEvent, string aFileName)
-{
-	cout << "[INFO] G4LeadSimulator::Initialize" << endl;
-	cout << "[INFO] G4LeadSimulator::Initialize: Reading configuration file " << aFileName << endl;
-	// Fill Event object from configuration file
-	// Read Simulation configuration
-	ConfigManager::ReadConfigurationFile(aEvent, aFileName);
-	// get simulation simulation settings
-	const Event::Config &cfg = aEvent.GetConfig();
-	ConfigManager::PrintConfig(cfg);
-	// Read Detector Configuration
-	ConfigManager::ReadDetectorList(cfg.fDetectorList, aEvent);
-}            
-
 
 bool
 G4LeadSimulator::RunSimulation(Event &aEvent)
@@ -192,13 +168,4 @@ G4LeadSimulator::RunSimulation(Event &aEvent)
 	delete runManager;
 	cout << "[INFO] G4LeadSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
 	return true;
-}
-
-
-void
-G4LeadSimulator::WriteEventInfo(Event& theEvent)
-{
-	cout << "[INFO] G4LeadSimulator::WriteEventInfo" << endl;
-	DataWriter::FileWriter(theEvent);	
-	return;
 }

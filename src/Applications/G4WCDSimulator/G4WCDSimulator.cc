@@ -30,25 +30,17 @@
 #include "OptDevice.h"
 #include "G4MPhysicsList.h"
 #include "DataWriter.h"
+#include "Logger.h"
 
 using namespace std;
 
 Particle G4WCDSimulator::currentParticle;
 G4WCDSimulator* fG4WCDSimulator;
 string fCfgFile;
+const string cApplicationName = "G4WCDSimulator";
 
 G4WCDSimulator::G4WCDSimulator()
 {
-
-}
-
-namespace 
-{
-	void ProgramUsage() 
-	{
-		cerr << " Program Usage: " << endl;
-		cerr << " ./G4WCDSimulator [ -c ConfigFile.json ] " << endl;
-	}
 
 }
 
@@ -56,11 +48,11 @@ namespace
 int main(int argc, char** argv) 
 {
 
+	DisplayLogo();
 	if (argc < 3) {
-		ProgramUsage();
-		throw invalid_argument("[ERROR] G4WCDSimulator::main: A configuration file is needed!");
+		ProgramUsage(cApplicationName);
+		throw invalid_argument("[ERROR] A configuration file is needed!");
 	}
-
 	for (int i=1; i<argc; i=i+2) {
 		string sarg(argv[i]);
 		if (sarg == "-c")
@@ -95,19 +87,6 @@ int main(int argc, char** argv)
 
 }
 
-void
-G4WCDSimulator::Initialize(Event &aEvent, string aFileName)
-{
-	// Fill Event object from configuration file
-	ConfigManager::ReadConfigurationFile(aEvent, aFileName);
-	// get simulation simulation settings
-	const Event::Config &cfg = aEvent.GetConfig();
-	ConfigManager::PrintConfig(cfg);
-	// Read Detector Configuration
-	ConfigManager::ReadDetectorList(cfg.fDetectorList, aEvent);
-}                 
-
-
 bool
 G4WCDSimulator::RunSimulation(Event& aEvent)
 {
@@ -123,11 +102,6 @@ G4WCDSimulator::RunSimulation(Event& aEvent)
 		return false;
 	}
 	
-	/***************
-
-		Geant4 Setup    
-
-	*****************/
 
 	G4long myseed = time(NULL);
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
@@ -212,17 +186,5 @@ G4WCDSimulator::RunSimulation(Event& aEvent)
 	cout << "[INFO] G4WCDSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
 
 	return true;
-
-}
-
-
-void
-G4WCDSimulator::WriteEventInfo(Event& theEvent)
-{
-	cout << "[INFO] G4WCDSimulator::WriteEventInfo" << endl;
-
-	DataWriter::FileWriter(theEvent);
-
-	return;
 
 }

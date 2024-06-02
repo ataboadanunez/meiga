@@ -11,20 +11,16 @@
 #include "Particle.h"
 #include "Event.h"
 #include "Detector.h"
+#include "G4MBaseApplication.h"
 
-class G4RunManager;
-
-class G4WCDSimulator 
+class G4WCDSimulator : public G4MBaseApplication
 {
 	public:
 	
 		G4WCDSimulator();
 		virtual ~G4WCDSimulator() {;}
 
-		// main methods of the application
-		void Initialize(Event& aEvent, std::string aFileName);
-		bool RunSimulation(Event& aEvent);
-		void WriteEventInfo(Event& aEvent);
+		bool RunSimulation(Event& aEvent) override;
 
 		// static members 
 		static Particle currentParticle;

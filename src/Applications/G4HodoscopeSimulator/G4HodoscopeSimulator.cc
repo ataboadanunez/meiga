@@ -30,34 +30,26 @@
 #include "OptDevice.h"
 #include "G4MPhysicsList.h"
 #include "DataWriter.h"
+#include "Logger.h"
 
 using namespace std;
 
 Particle G4HodoscopeSimulator::currentParticle;
 G4HodoscopeSimulator* fG4HodoscopeSimulator;
 string fCfgFile;
+const string cApplicationName = "G4HodoscopeSimulator";
 
 G4HodoscopeSimulator::G4HodoscopeSimulator()
 {
 }
 
-namespace 
-{
-	void ProgramUsage() 
-	{
-		cerr << " Program Usage: " << endl;
-		cerr << " ./G4HodoscopeSimulator [ -c ConfigFile.json ] " << endl;
-	}
-
-}
-
-
 int main(int argc, char** argv) 
 {
 
+	DisplayLogo();
 	if (argc < 3) {
-		ProgramUsage();
-		throw invalid_argument("[ERROR] G4HodoscopeSimulator::main: A configuration file is needed!");
+		ProgramUsage(cApplicationName);
+		throw invalid_argument("[ERROR] A configuration file is needed!");
 	}
 
 	for (int i=1; i<argc; i=i+2) {
@@ -86,21 +78,6 @@ int main(int argc, char** argv)
 	cout << " sec " << endl;
 	return 0;
 }
-
-void
-G4HodoscopeSimulator::Initialize(Event &aEvent, string aFileName)
-{
-	cout << "[INFO] G4HodoscopeSimulator::Initialize" << endl;
-	cout << "[INFO] G4HodoscopeSimulator::Initialize: Reading configuration file " << aFileName << endl;
-	// Fill Event object from configuration file
-	ConfigManager::ReadConfigurationFile(aEvent, aFileName);
-	// get simulation simulation settings
-	const Event::Config &cfg = aEvent.GetConfig();
-	ConfigManager::PrintConfig(cfg);
-	// Read Detector Configuration
-	ConfigManager::ReadDetectorList(cfg.fDetectorList, aEvent);
-}            
-
 
 bool
 G4HodoscopeSimulator::RunSimulation(Event& theEvent)
@@ -190,13 +167,4 @@ G4HodoscopeSimulator::RunSimulation(Event& theEvent)
 	delete runManager;
 	cout << "[INFO] G4HodoscopeSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
 	return true;
-}
-
-
-void
-G4HodoscopeSimulator::WriteEventInfo(Event &aEvent)
-{
-	cout << "[INFO] G4HodoscopeSimulator::WriteEventInfo" << endl;
-	DataWriter::FileWriter(aEvent);	
-	return;
 }
