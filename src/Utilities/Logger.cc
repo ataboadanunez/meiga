@@ -1,9 +1,11 @@
 #include "Logger.h"
 #include <iostream>
 
+using namespace std;
+
 void DisplayLogo() {
 	
-    std::cout << R"(	
+  cout << R"(	
   _______ _            __  __      _                    
  |__   __| |          |  \/  |    (_)                   
     | |  | |__   ___  | \  / | ___ _  __ _  __ _        
@@ -19,11 +21,11 @@ void DisplayLogo() {
 	© Alvaro Taboada Nunez - 2023
 	https://github.com/ataboadanunez/meiga
 
-	)" << std::endl;
+	)" << endl;
 
 }
 
-void ProgramUsage() {
-		std::cerr << " Program Usage: " << std::endl;
-		std::cerr << " ./G4ExSimulator [ -c ConfigFile.json ] " << std::endl;
+void ProgramUsage(string aName) {
+	cerr << " [INFO] Example of program usage: " << endl;
+	cerr << " ./"+aName+" -c "+aName+".json" << endl;
 }
