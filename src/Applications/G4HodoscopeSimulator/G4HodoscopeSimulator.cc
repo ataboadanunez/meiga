@@ -51,17 +51,18 @@ int main(int argc, char** argv)
 		ProgramUsage(cApplicationName);
 		throw invalid_argument("[ERROR] A configuration file is needed!");
 	}
-
 	for (int i=1; i<argc; i=i+2) {
 		string sarg(argv[i]);
 		if (sarg == "-c")
 			fCfgFile = argv[i+1];
 	}
+
 	// for program time calculation
 	time_t start, end;
 	time(&start);
+
 	fG4HodoscopeSimulator = new G4HodoscopeSimulator();
-	// Create Event object
+	// Initialize Event object
 	Event theEvent;
 	fG4HodoscopeSimulator->Initialize(theEvent, fCfgFile);
 	fG4HodoscopeSimulator->RunSimulation(theEvent);
@@ -71,20 +72,23 @@ int main(int argc, char** argv)
 	**************************************************/
 	fG4HodoscopeSimulator->WriteEventInfo(theEvent);
 	time(&end);
+	
 	// Calculating total time taken by the program.
 	double time_taken = double(end - start);
 	cout << "[INFO] G4HodoscopeSimulator: Time taken by program is : " << fixed
 			 << time_taken << setprecision(5);
 	cout << " sec " << endl;
+	
+	delete fG4HodoscopeSimulator;
 	return 0;
 }
 
 bool
-G4HodoscopeSimulator::RunSimulation(Event& theEvent)
+G4HodoscopeSimulator::RunSimulation(Event& aEvent)
 {
 	cout << "[INFO] G4HodoscopeSimulator::RunSimulation" << endl;
-	const Event::Config &cfg = theEvent.GetConfig();
-	SimData& simData = theEvent.GetSimData();
+	const Event::Config &cfg = aEvent.GetConfig();
+	SimData& simData = aEvent.GetSimData();
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
 	cout << "[INFO] G4HodoscopeSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
 	if (!NumberOfParticles) {
@@ -96,66 +100,24 @@ G4HodoscopeSimulator::RunSimulation(Event& theEvent)
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
 	G4Random::setTheSeed(myseed);
 	
-	G4VisManager* visManager = nullptr;
 	// construct the default run manager
 	auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly);
 	// set mandatory initialization classes
-	runManager->SetUserInitialization(new G4HodoscopeDetectorConstruction(theEvent));
+	runManager->SetUserInitialization(new G4HodoscopeDetectorConstruction(aEvent));
 	runManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
-	runManager->SetUserInitialization(new G4HodoscopeActionInitialization(theEvent));
+	runManager->SetUserInitialization(new G4HodoscopeActionInitialization(aEvent));
 	// initialize G4 kernel
 	runManager->Initialize();
-	// initialize visualization
-	if ((cfg.fGeoVis || cfg.fTrajVis) && !visManager)
-		visManager = new G4VisExecutive;
-
-	// get the pointer to the UI manager and set verbosities
-	G4UImanager* uiManager = G4UImanager::GetUIpointer();
-	switch (cfg.fVerbosity) {
-		case 1:
-			uiManager->ApplyCommand("/run/verbose 1");
-			uiManager->ApplyCommand("/event/verbose 0");
-			uiManager->ApplyCommand("/tracking/verbose 0");
-			break;
-		case 2:
-			uiManager->ApplyCommand("/run/verbose 1");
-			uiManager->ApplyCommand("/event/verbose 1");
-			uiManager->ApplyCommand("/tracking/verbose 0");
-			break;
-		case 3:
-			uiManager->ApplyCommand("/run/verbose 1");
-			uiManager->ApplyCommand("/event/verbose 1");
-			uiManager->ApplyCommand("/tracking/verbose 1");
-			break;
-		default:
-			uiManager->ApplyCommand("/run/verbose 0");
-			uiManager->ApplyCommand("/event/verbose 0");
-			uiManager->ApplyCommand("/tracking/verbose 0");
-		}
 	
-	if (cfg.fGeoVis || cfg.fTrajVis) {
-		visManager->Initialize();
-		uiManager->ApplyCommand(("/vis/open " + cfg.fRenderFile).c_str());
-		uiManager->ApplyCommand("/vis/scene/create");
-		uiManager->ApplyCommand("/vis/sceneHandler/attach");
-		uiManager->ApplyCommand("/vis/scene/add/volume");
-		uiManager->ApplyCommand("/vis/scene/add/axes");
-		uiManager->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 0. 0.");
-		uiManager->ApplyCommand("/vis/viewer/set/targetPoint 0 0 0");
-		uiManager->ApplyCommand("/vis/viewer/zoom 1");
-		uiManager->ApplyCommand("/vis/viewero/set/style/wireframe");
-		uiManager->ApplyCommand("/vis/drawVolume");
-		uiManager->ApplyCommand("/vis/scene/notifyHandlers");
-		uiManager->ApplyCommand("/vis/viewer/update");
-	}
-	if (cfg.fTrajVis) {
-		uiManager->ApplyCommand("/tracking/storeTrajectory 1");
-		uiManager->ApplyCommand("/vis/scene/add/trajectories");
-		uiManager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");
-		// for debugging purposes, gammas are not drawn
-		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
-		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
-	}
+	// setup ui & visualization managers
+	G4UImanager* uiManager = G4UImanager::GetUIpointer();
+	G4VisManager* visManager = new G4VisExecutive;;
+	SetupManagers(aEvent, *uiManager, *visManager);
+	// for debugging purposes, gammas are not draw:
+	uiManager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");
+	uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
+	uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
+
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
 		G4HodoscopeSimulator::currentParticle = *it;
@@ -165,6 +127,8 @@ G4HodoscopeSimulator::RunSimulation(Event& theEvent)
 	}
 	delete visManager;
 	delete runManager;
+	
 	cout << "[INFO] G4HodoscopeSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
+	
 	return true;
 }

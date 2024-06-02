@@ -48,7 +48,6 @@ G4ExSimulator::G4ExSimulator()
 {
 }
 
-
 int main(int argc, char** argv) 
 {
 
@@ -89,7 +88,6 @@ int main(int argc, char** argv)
     
 	delete fG4ExSimulator;
 	return 0;
-
 }
 
 bool
@@ -118,62 +116,15 @@ G4ExSimulator::RunSimulation(Event& aEvent)
 	// initialize G4 kernel
 	runManager->Initialize();
 
-	// TODO: move lines below to a function.
-	// get the pointer to the UI manager and set verbosities
+	// setup ui & visualization managers
 	G4UImanager* uiManager = G4UImanager::GetUIpointer();
-	switch (cfg.fVerbosity) {
-		case 1:
-			uiManager->ApplyCommand("/run/verbose 1");
-			uiManager->ApplyCommand("/event/verbose 0");
-			uiManager->ApplyCommand("/tracking/verbose 0");
-						break;
-		case 2:
-			uiManager->ApplyCommand("/run/verbose 1");
-			uiManager->ApplyCommand("/event/verbose 1");
-			uiManager->ApplyCommand("/tracking/verbose 0");
-						break;
-		case 3:
-						uiManager->ApplyCommand("/run/verbose 1");
-			uiManager->ApplyCommand("/event/verbose 1");
-			uiManager->ApplyCommand("/tracking/verbose 1");
-			break;
-		default:
-			uiManager->ApplyCommand("/run/verbose 0");
-			uiManager->ApplyCommand("/event/verbose 0");
-			uiManager->ApplyCommand("/tracking/verbose 0");
-	}
+	G4VisManager* visManager = new G4VisExecutive;;
+	SetupManagers(aEvent, *uiManager, *visManager);
+	// for debugging purposes, gammas are not draw:
+	uiManager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");
+	uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
+	uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
 	
-	// initialize visualization
-	G4VisManager* visManager = nullptr;
-	if ((cfg.fGeoVis || cfg.fTrajVis) && !visManager) {
-		visManager = new G4VisExecutive;
-	}
-	if (visManager) {
-		visManager->Initialize();
-		uiManager->ApplyCommand(("/vis/open " + cfg.fRenderFile).c_str());
-		uiManager->ApplyCommand("/vis/scene/create");
-		uiManager->ApplyCommand("/vis/sceneHandler/attach");
-		uiManager->ApplyCommand("/vis/scene/add/volume");
-		uiManager->ApplyCommand("/vis/scene/add/axes 0 0 0 1 m");
-		uiManager->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 0. 0.");
-		uiManager->ApplyCommand("/vis/viewer/set/targetPoint 0 0 0");
-		uiManager->ApplyCommand("/vis/viewer/zoom 1");
-		uiManager->ApplyCommand("/vis/viewero/set/style/wireframe");
-		uiManager->ApplyCommand("/vis/drawVolume");
-		uiManager->ApplyCommand("/vis/scene/notifyHandlers");
-		uiManager->ApplyCommand("/vis/viewer/update");
-
-	}
-	if (cfg.fTrajVis) {
-		uiManager->ApplyCommand("/tracking/storeTrajectory 1");
-		uiManager->ApplyCommand("/vis/scene/add/trajectories");
-		uiManager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");
-		// for debugging purposes, gammas are not drawn
-		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
-		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
-	}
-
-
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
 		G4ExSimulator::currentParticle = *it;
@@ -181,7 +132,6 @@ G4ExSimulator::RunSimulation(Event& aEvent)
 		// Run simulation
 		runManager->BeamOn(1);
 	}
-
 
 	delete visManager;
 	delete runManager;

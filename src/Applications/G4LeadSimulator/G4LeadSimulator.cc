@@ -72,11 +72,14 @@ int main(int argc, char** argv)
 	**************************************************/
 	fG4LeadSimulator->WriteEventInfo(theEvent);
 	time(&end);
+	
 	// Calculating total time taken by the program.
 	double time_taken = double(end - start);
 	cout << "[INFO] G4LeadSimulator: Time taken by program is : " << fixed
 			 << time_taken << setprecision(5);
 	cout << " sec " << endl;
+	
+	delete fG4LeadSimulator;
 	return 0;
 }
 
@@ -96,8 +99,7 @@ G4LeadSimulator::RunSimulation(Event &aEvent)
 	G4long myseed = time(NULL);
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
 	G4Random::setTheSeed(myseed);
-	cout << "Seed for random generation: " << myseed << endl;
-	G4VisManager* visManager = nullptr;
+
 	// construct the default run manager
 	auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly);
 	// set mandatory initialization classes
@@ -106,57 +108,16 @@ G4LeadSimulator::RunSimulation(Event &aEvent)
 	runManager->SetUserInitialization(new G4LeadActionInitialization(aEvent));
 	// initialize G4 kernel
 	runManager->Initialize();
-	// initialize visualization
-	if ((cfg.fGeoVis || cfg.fTrajVis) && !visManager)
-		visManager = new G4VisExecutive;
-
-	// get the pointer to the UI manager and set verbosities
-	G4UImanager* uiManager = G4UImanager::GetUIpointer();
-	switch (cfg.fVerbosity) {
-		case 1:
-			uiManager->ApplyCommand("/run/verbose 1");
-			uiManager->ApplyCommand("/event/verbose 0");
-			uiManager->ApplyCommand("/tracking/verbose 0");
-			break;
-		case 2:
-			uiManager->ApplyCommand("/run/verbose 1");
-			uiManager->ApplyCommand("/event/verbose 1");
-			uiManager->ApplyCommand("/tracking/verbose 0");
-			break;
-		case 3:
-			uiManager->ApplyCommand("/run/verbose 1");
-			uiManager->ApplyCommand("/event/verbose 1");
-			uiManager->ApplyCommand("/tracking/verbose 1");
-			break;
-		default:
-			uiManager->ApplyCommand("/run/verbose 0");
-			uiManager->ApplyCommand("/event/verbose 0");
-			uiManager->ApplyCommand("/tracking/verbose 0");
-		}
 	
-	if (cfg.fGeoVis || cfg.fTrajVis) {
-		visManager->Initialize();
-		uiManager->ApplyCommand(("/vis/open " + cfg.fRenderFile).c_str());
-		uiManager->ApplyCommand("/vis/scene/create");
-		uiManager->ApplyCommand("/vis/sceneHandler/attach");
-		uiManager->ApplyCommand("/vis/scene/add/volume");
-		uiManager->ApplyCommand("/vis/scene/add/axes");
-		uiManager->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 0. 0.");
-		uiManager->ApplyCommand("/vis/viewer/set/targetPoint 0 0 0");
-		uiManager->ApplyCommand("/vis/viewer/zoom 1");
-		uiManager->ApplyCommand("/vis/viewero/set/style/wireframe");
-		uiManager->ApplyCommand("/vis/drawVolume");
-		uiManager->ApplyCommand("/vis/scene/notifyHandlers");
-		uiManager->ApplyCommand("/vis/viewer/update");
-	}
-	if (cfg.fTrajVis) {
-		uiManager->ApplyCommand("/tracking/storeTrajectory 1");
-		uiManager->ApplyCommand("/vis/scene/add/trajectories");
-		uiManager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");
-		// for debugging purposes, gammas are not drawn
-		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
-		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
-	}
+	// setup ui & visualization managers
+	G4UImanager* uiManager = G4UImanager::GetUIpointer();
+	G4VisManager* visManager = new G4VisExecutive;;
+	SetupManagers(aEvent, *uiManager, *visManager);
+	// for debugging purposes, gammas are not draw:
+	uiManager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");
+	uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
+	uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
+	
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
 		G4LeadSimulator::currentParticle = *it;
@@ -164,8 +125,10 @@ G4LeadSimulator::RunSimulation(Event &aEvent)
 		// Run simulation
 		runManager->BeamOn(1);
 	}
+	
 	delete visManager;
 	delete runManager;
+	
 	cout << "[INFO] G4LeadSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
 	return true;
 }
