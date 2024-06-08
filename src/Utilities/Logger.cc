@@ -1,11 +1,12 @@
 #include "Logger.h"
-#include <iostream>
 
 using namespace std;
 
-void DisplayLogo() {
+
+
+void Logger::DisplayLogo() {
 	
-  cout << R"(	
+  	cout << R"(	
   _______ _            __  __      _                    
  |__   __| |          |  \/  |    (_)                   
     | |  | |__   ___  | \  / | ___ _  __ _  __ _        
@@ -23,9 +24,61 @@ void DisplayLogo() {
 
 	)" << endl;
 
+	}
+
+void Logger::ProgramUsage(string aName) {
+	ostringstream msg;
+	msg << "Example of program usage: ./"+aName+" -c "+aName+".json";
+	Print(msg, LogType::INFO);
 }
 
-void ProgramUsage(string aName) {
-	cerr << " [INFO] Example of program usage: " << endl;
-	cerr << " ./"+aName+" -c "+aName+".json" << endl;
+void Logger::CheckCommandLineParameters(int argc, char** argv, string &aCfgFile, string aContext)
+{
+	if(argc != 3) {
+		throw invalid_argument("Invalid parameters.");
+	}
+	if(string(argv[1]) != "-c") {
+		throw invalid_argument("Invalid command line parameter: " + string(argv[1]));
+	}
+	aCfgFile = argv[2];
+}
+
+void Logger::Print(const string &aMessage, LogType aType, string aContext)
+{
+	string typeStr = LogTypeToString(aType);
+	if(aContext != "") {
+		aContext = aContext + ": ";
+	}
+	if(aType != LogType::ERROR) {
+		cout << "[" << typeStr << "] "+aContext << aMessage << endl;
+	}
+	else {
+		cerr << "[" << typeStr << "] "+aContext << aMessage << endl;
+	}
+}
+
+void Logger::Print(const char *aMessage, LogType aType, std::string aContext)
+{
+	Print(string(aMessage), aType, aContext);
+}
+
+void Logger::Print(const ostringstream &aMessage, LogType aType, std::string aContext)
+{
+	Print(aMessage.str(), aType, aContext);
+}
+
+string Logger::LogTypeToString(LogType aType)
+{
+	switch (aType) {
+		case LogType::INFO: 
+			return "INFO";
+		case LogType::DEBUG:
+			return "DEBUG";
+		case LogType::WARNING:
+			return "WARNING";
+		case LogType::ERROR:
+			return "ERROR";
+		default:
+			return " ";
+	}
 }

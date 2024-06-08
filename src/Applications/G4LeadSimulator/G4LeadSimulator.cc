@@ -41,43 +41,30 @@ const string cApplicationName = "G4LeadSimulator";
 
 G4LeadSimulator::G4LeadSimulator()
 {
-
 }
 
 int main(int argc, char** argv) 
 {
 	
-	DisplayLogo();
-	if (argc < 3) {
-		ProgramUsage(cApplicationName);
-		throw invalid_argument("[ERROR] A configuration file is needed!");
+	Logger::DisplayLogo();
+	try {
+		Logger::CheckCommandLineParameters(argc, argv, fCfgFile, cApplicationName);
+	} catch (const std::invalid_argument &e) {
+		Logger::Print(e.what(), ERROR, cApplicationName);
+		Logger::ProgramUsage(cApplicationName);
+		return 1;
 	}
+	
+	Timer timer;
 
-	for (int i=1; i<argc; i=i+2) {
-		string sarg(argv[i]);
-		if (sarg == "-c")
-			fCfgFile = argv[i+1];
-	}
-	// for program time calculation
-	time_t start, end;
-	time(&start);
 	fG4LeadSimulator = new G4LeadSimulator();
 	// Create Event object
 	Event theEvent;
 	fG4LeadSimulator->Initialize(theEvent, fCfgFile);
-	fG4LeadSimulator->RunSimulation(theEvent);
-	/*************************************************
-		Geant4 simulation ended here!
-		What happens next is up to you =)
-	**************************************************/
-	fG4LeadSimulator->WriteEventInfo(theEvent);
-	time(&end);
-	
-	// Calculating total time taken by the program.
-	double time_taken = double(end - start);
-	cout << "[INFO] G4LeadSimulator: Time taken by program is : " << fixed
-			 << time_taken << setprecision(5);
-	cout << " sec " << endl;
+	if(fG4LeadSimulator->RunSimulation(theEvent)) {
+		fG4LeadSimulator->WriteEventInfo(theEvent);
+	}
+	timer.PrintElapsedTime();
 	
 	delete fG4LeadSimulator;
 	return 0;
@@ -86,15 +73,17 @@ int main(int argc, char** argv)
 bool
 G4LeadSimulator::RunSimulation(Event &aEvent)
 {
-	cout << "[INFO] G4LeadSimulator::RunSimulation" << endl;
 	const Event::Config &cfg = aEvent.GetConfig();
 	SimData& simData = aEvent.GetSimData();
-	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
-	cout << "[INFO] G4LeadSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
-	if (!NumberOfParticles) {
-		cerr << "[ERROR] G4LeadSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
+	const unsigned int numberOfParticles = simData.GetTotalNumberOfParticles();
+	ostringstream msg;
+	if (!numberOfParticles) {
+		msg << "No particles in the Event! Exiting...";
+		Logger::Print(msg, ERROR, "RunSimulation");	
 		return false;
 	}
+	msg << "Number of particles to be simulated: " << numberOfParticles;
+	Logger::Print(msg, INFO, "RunSimulation");
 	
 	G4long myseed = time(NULL);
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
@@ -129,6 +118,6 @@ G4LeadSimulator::RunSimulation(Event &aEvent)
 	delete visManager;
 	delete runManager;
 	
-	cout << "[INFO] G4LeadSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
+	Logger::Print("Geant4 Simulation ended successfully.", INFO, "RunSimulation");
 	return true;
 }
