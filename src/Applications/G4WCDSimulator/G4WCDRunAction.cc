@@ -13,7 +13,6 @@
 G4WCDRunAction::G4WCDRunAction()
  : G4UserRunAction()
 {
-  G4cout << "...G4WCDRunAction..." << G4endl;
 }
 
 

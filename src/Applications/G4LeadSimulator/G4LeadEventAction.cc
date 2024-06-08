@@ -8,13 +8,11 @@ using namespace std;
 G4LeadEventAction::G4LeadEventAction(Event& theEvent) : 
 	fEvent(theEvent),
 	G4UserEventAction()
-{
-		
+{		
 }
 
 G4LeadEventAction::~G4LeadEventAction()
-{
-		
+{		
 }
 
 void

@@ -13,7 +13,6 @@ G4ExDetectorConstruction::G4ExDetectorConstruction(Event& theEvent) :
 	G4VUserDetectorConstruction(),
 	fEvent(theEvent)
 {
-	cout << "...G4ExDetectorConstruction..." << endl;
 	fCheckOverlaps = theEvent.GetConfig().fCheckOverlaps;
 }
 

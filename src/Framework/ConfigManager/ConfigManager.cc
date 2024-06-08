@@ -2,6 +2,7 @@
 #include "ConfigManager.h"
 #include "ParticleFiller.h"
 #include "Utilities.h"
+#include "Logger.h"
 // Geant4 headers
 #include "G4UnitsTable.hh"
 
@@ -14,8 +15,8 @@ DefaultProperties ConfigManager::defProp;
 void
 ConfigManager::ReadConfigurationFile(Event &aEvent, const string &fConfigFile)
 {
+	Logger::Print("Reading configuration file: " + fConfigFile, INFO, "ReadConfigurationFile");
 	
-	cout << "[INFO] ConfigManager::ReadConfigurationFile: Reading configuration File " << fConfigFile << endl;
 	// Event theEvent;
 	Event::Config &cfg = aEvent.GetConfig();
 	ptree tree;
@@ -31,12 +32,12 @@ ConfigManager::ReadConfigurationFile(Event &aEvent, const string &fConfigFile)
 	
 	// reads the input (ARTI) file and fills the Event with particles
 	if (simData.GetInputMode() == SimData::InputMode::eUseARTI) {
-		cout << "[WARNING] ConfigManager::ReadConfigurationFile: Selected InputMode = eUseARTI. An input file is needed." << endl;
+		Logger::Print("Selected InputMode = eUseARTI. An input file is needed.", WARNING, "ReadConfigurationFile");
 		ParticleFiller::FillParticleVector(cfg.fInputFileName, aEvent);
 	}
 	// 
 	else if (simData.GetInputMode() == SimData::InputMode::eUseEcoMug) {
-		cout << "[WARNING] ConfigManager::ReadConfigurationFile: Selected InputMode = eUseEcoMug. An input number of particles is needed." << endl;
+		Logger::Print("Selected InputMode = eUseEcoMug. An input number of particles is needed.", WARNING, "ReadConfigurationFile");
 		ParticleFiller::FillParticleVector(cfg.fInputNParticles, aEvent);
 	}
 		
@@ -68,11 +69,11 @@ ConfigManager::ReadConfigurationFile(Event &aEvent, const string &fConfigFile)
 void
 ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 {
-	
-	cout << "[INFO] ConfigManager::ReadDetectorList: Reading DetectorList File " << fDetectorList << endl;
+	ostringstream msg;
+	msg << "Reading DetectorList File " << fDetectorList << "\n";
 	// print detector configuration
-	cout << "Using the following detector configuration: " << endl;
-	cout << "===========================================" << endl;
+	msg << "Using the following detector configuration: " << "\n";
+	msg << "===========================================" << "\n";
 
 	SimData& simData = theEvent.GetSimData();
 
@@ -92,52 +93,53 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 	string injModestr = tree.get<string>(injectionBranch + ".<xmlattr>.type");
 	SimData::InjectionMode injMode = simData.InjectionConversion(injModestr);
 	simData.SetInjectionMode(injMode);
-	cout << "---------- Particle Injection ------------- " << endl;
-	cout << "Injection Mode: " << simData.GetInjectionModeName() << endl;
+	msg << "---------- Particle Injection ------------- " << "\n";
+	msg << "Injection Mode: " << simData.GetInjectionModeName() << "\n";
 
 	double posX = GetPropertyFromXML<double>(tree, injectionBranch, "x");
 	double posY = GetPropertyFromXML<double>(tree, injectionBranch, "y");
 	double posZ = GetPropertyFromXML<double>(tree, injectionBranch, "z");
 	vector<double> injectionOrigin = {posX, posY, posZ}; 
 	simData.SetInjectionOrigin(injectionOrigin);
-	cout << "Origin of injection coordinates: " << endl;
-	cout << "(x0, y0, z0) = (" << posX / CLHEP::m << ", " << posY / CLHEP::m << ", " << posZ / CLHEP::m << ") m" << endl;
+	msg << "Origin of injection coordinates: " << "\n";
+	msg << "(x0, y0, z0) = (" << posX / CLHEP::m << ", " << posY / CLHEP::m << ", " << posZ / CLHEP::m << ") m" << "\n";
 
  	// injection radius
 	double defInjRadius = simData.GetInjectionRadius();
 	double xmlInjRadius = GetPropertyFromXML<double>(tree, injectionBranch, "radius", defInjRadius);
 	simData.SetInjectionRadius(xmlInjRadius);
-	cout << "Injection Radius = " << xmlInjRadius / CLHEP::m << " m" << endl;
+	msg << "Injection Radius = " << xmlInjRadius / CLHEP::m << " m" << "\n";
 	// injection height
 	double defInjHeight = simData.GetInjectionHeight();
 	double xmlInjHeight = GetPropertyFromXML<double>(tree, injectionBranch, "height", defInjHeight);
 	simData.SetInjectionHeight(xmlInjHeight);
-	cout << "Injection Height = " << xmlInjHeight / CLHEP::m << " m" << endl;
+	msg << "Injection Height = " << xmlInjHeight / CLHEP::m << " m" << "\n";
 	// injection min theta
 	double defMinTheta = simData.GetInjectionMinTheta();
 	double xmlMinTheta = GetPropertyFromXML<double>(tree, injectionBranch, "minTheta", defMinTheta, false);
 	simData.SetInjectionMinTheta(xmlMinTheta);
-	cout << "Injection MinTheta = " << xmlMinTheta << " deg" << endl; 
+	msg << "Injection MinTheta = " << xmlMinTheta << " deg" << "\n"; 
 	// injection max theta
 	double defMaxTheta = simData.GetInjectionMaxTheta();
 	double xmlMaxTheta = GetPropertyFromXML<double>(tree, injectionBranch, "maxTheta", defMaxTheta, false);
 	simData.SetInjectionMaxTheta(xmlMaxTheta);
-	cout << "Injection MaxTheta = " << xmlMaxTheta << " deg" << endl;
+	msg << "Injection MaxTheta = " << xmlMaxTheta << " deg" << "\n";
 	// injection min phi
 	double defMinPhi = simData.GetInjectionMinPhi();
 	double xmlMinPhi = GetPropertyFromXML<double>(tree, injectionBranch, "minPhi", defMinPhi, false);
 	simData.SetInjectionMinPhi(xmlMinPhi);
-	cout << "Injection MinPhi = " << xmlMinPhi << " deg" << endl;
+	msg << "Injection MinPhi = " << xmlMinPhi << " deg" << "\n";
 	// injection max phi
 	double defMaxPhi = simData.GetInjectionMaxPhi();
 	double xmlMaxPhi = GetPropertyFromXML<double>(tree, injectionBranch, "maxPhi", defMaxPhi, false);
 	simData.SetInjectionMaxPhi(xmlMaxPhi);
-	cout << "Injection MaxPhi = " << xmlMaxPhi << " deg" << endl;
-	cout << "===========================================" << endl;
-	cout << "===========================================" << endl;
-
-	cout << "------------ Detector Info -------------- " << endl;
+	msg << "Injection MaxPhi = " << xmlMaxPhi << " deg" << "\n";
+	msg << "===========================================" << "\n";
+	msg << "===========================================" << "\n";
+	Logger::Print(msg, INFO, "ReadDetectorList");
+	cout << "------------ Detector Info -------------- " << "\n";
 	for (const auto& i : tree.get_child("detectorList")) {
+		ostringstream msg2;
 		ptree subtree;
 		string name;
 		tie(name, subtree) = i;
@@ -150,14 +152,13 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 			int detId = stoi(detIdstr);
 			Detector::DetectorType detType = theEvent.GetDetector().StringToType(detTypestr);
 			detPosition.clear();
-
-			cout << "Reading configuration of detector " << detTypestr << " with ID = " << detId << endl;
+			msg2 << "Reading configuration of detector " << detTypestr << " with ID = " << detId << "\n";
 			// register detector in the Event
 			if (!theEvent.HasDetector(detId)) {
 				theEvent.MakeDetector(detId, detType);
 			}
 			else {
-				cout << "[WARNING] Detector " << " with ID = " << detId << " already registered! IDs must be unique, please check your DetectorList.xml" << endl;
+				Logger::Print("Detector with ID = "+detIdstr+" already registered! IDs must be unique, please check your DetectorList.xml", WARNING, "ReadDetectorList");
 				continue;
 			}
 			
@@ -188,8 +189,10 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 			// shouldn't be part of DetectorSimData?
 			theEvent.SetMaximumHeight(maxHeight);
 			detector.SetDetectorPosition(detPosition);
-			cout << "Detector position " << endl;
-			cout << "(x0, y0, z0) = (" << detPosition.at(0) / CLHEP::m << ", " << detPosition.at(1) / CLHEP::m << ", " << detPosition.at(2) / CLHEP::m << ") m" << endl; 
+			msg2 << "Detector position: " << "(x0, y0, z0) = (" << detPosition.at(0) / CLHEP::m << ", " 
+																<< detPosition.at(1) / CLHEP::m << ", " 
+																<< detPosition.at(2) / CLHEP::m << ") m";
+			Logger::Print(msg2, INFO);
 			// search for another detector properties in the DetectorList.xml
 			detector.SetDetectorProperties(subtree, defProp);
 		}
@@ -205,37 +208,38 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 
 void
 ConfigManager::PrintConfig(const Event::Config &cfg)
-{
-	cout << "[INFO] ConfigManager::PrintConfig:" << endl;
-	cout << "Using the following configuration:" << endl;
-	cout << "==================================" << endl;
-	cout << " ------------- Input --------------" << endl;
-	cout << "Input Mode = " << cfg.fInputMode << endl;
+{	
+	ostringstream msg;
+	msg << "Using the following configuration:" << endl;
+	msg << "==================================" << endl;
+	msg << " ------------- Input --------------" << endl;
+	msg << "Input Mode = " << cfg.fInputMode << endl;
 
 	if (cfg.fInputMode == "UseARTI") {
-		cout << "InputFile = " << cfg.fInputFileName << endl;
+		msg << "InputFile = " << cfg.fInputFileName << endl;
 	}
 	else if (cfg.fInputMode == "UseEcoMug") {
-		cout << "InputNParticles = " << cfg.fInputNParticles << endl;
+		msg << "InputNParticles = " << cfg.fInputNParticles << endl;
 	} else {
-		cout << "Unknown input mode!" << endl;
+		msg << "Unknown input mode!" << endl;
 	}
 
-	cout << " ------------- Output -------------" << endl;
-	cout << "OutputFile = " << cfg.fOutputFileName << endl;
-	cout << "Compress Output = " << (cfg.fCompressOutput ? "yes" : "no") << endl;
-	cout << "Save Input = " << (cfg.fSaveInput ? "yes" : "no") << endl;
-	cout << "Save PE Time distribution (components) = " << (cfg.fSavePETimeDistribution ? "yes" : "no") << " (" << (cfg.fSaveComponentsPETimeDistribution ? "yes)" : "no)") << endl;
-	cout << "Save Energy Deposit (components) = " << (cfg.fSaveEnergy ? "yes" : "no") << " (" << (cfg.fSaveComponentsEnergy ? "yes)" : "no)") << endl;
-	cout << "Save Charge = " << (cfg.fSaveCharge ? "yes" : "no") << endl;
-	cout << "Save Bar Counts = " << (cfg.fSaveCounts ? "yes" : "no") << endl;
+	msg << " ------------- Output -------------" << endl;
+	msg << "OutputFile = " << cfg.fOutputFileName << endl;
+	msg << "Compress Output = " << (cfg.fCompressOutput ? "yes" : "no") << endl;
+	msg << "Save Input = " << (cfg.fSaveInput ? "yes" : "no") << endl;
+	msg << "Save PE Time distribution (components) = " << (cfg.fSavePETimeDistribution ? "yes" : "no") << " (" << (cfg.fSaveComponentsPETimeDistribution ? "yes)" : "no)") << endl;
+	msg << "Save Energy Deposit (components) = " << (cfg.fSaveEnergy ? "yes" : "no") << " (" << (cfg.fSaveComponentsEnergy ? "yes)" : "no)") << endl;
+	msg << "Save Charge = " << (cfg.fSaveCharge ? "yes" : "no") << endl;
+	msg << "Save Bar Counts = " << (cfg.fSaveCounts ? "yes" : "no") << endl;
 
-	cout << " -------- Geant4 Settings ---------" << endl;
-	cout << "VisualizeGeometry = " << (cfg.fGeoVis ? "yes" : "no") << endl;
-	cout << "VisualizeTrajectory = " << (cfg.fTrajVis ? "yes" : "no") << endl;
-	cout << "RenderFile = " << cfg.fRenderFile << endl;
-	cout << "PhysicsList = " << cfg.fPhysicsListName << endl;
-	cout << "CheckOverlaps = " << (cfg.fCheckOverlaps ? "yes" : "no") << endl;
-	cout << "==================================" << endl;
-	cout << "==================================" << endl;
+	msg << " -------- Geant4 Settings ---------" << endl;
+	msg << "VisualizeGeometry = " << (cfg.fGeoVis ? "yes" : "no") << endl;
+	msg << "VisualizeTrajectory = " << (cfg.fTrajVis ? "yes" : "no") << endl;
+	msg << "RenderFile = " << cfg.fRenderFile << endl;
+	msg << "PhysicsList = " << cfg.fPhysicsListName << endl;
+	msg << "CheckOverlaps = " << (cfg.fCheckOverlaps ? "yes" : "no") << endl;
+	msg << "==================================" << endl;
+	msg << "==================================" << endl;
+	Logger::Print(msg, INFO, "PrintConfig");
 }

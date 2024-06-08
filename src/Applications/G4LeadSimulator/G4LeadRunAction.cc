@@ -16,22 +16,18 @@ using namespace std;
 G4LeadRunAction::G4LeadRunAction(Event& theEvent)
  : G4UserRunAction(),
  fEvent(theEvent)
-{
-	G4cout << "...G4LeadRunAction..." << G4endl;
-	
+{	
 }
 
 
 G4LeadRunAction::~G4LeadRunAction()
 {	
-
 }
 
 
 void 
 G4LeadRunAction::BeginOfRunAction(const G4Run* aRun)
 {
-	
 }
 
 
@@ -39,9 +35,7 @@ void
 G4LeadRunAction::EndOfRunAction(const G4Run* aRun)
 { 
 	
-
 	// loop over scintillator panels (independent detectors) 	
-
 	for (auto detIt = fEvent.DetectorRange().begin(); detIt != fEvent.DetectorRange().end(); detIt++) {
 
 		G4int g4RunId = aRun->GetRunID();

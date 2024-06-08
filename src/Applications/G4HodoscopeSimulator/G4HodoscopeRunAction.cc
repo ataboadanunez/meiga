@@ -15,9 +15,7 @@ using namespace std;
 
 G4HodoscopeRunAction::G4HodoscopeRunAction(Event& theEvent) 
 	: G4UserRunAction(), fEvent(theEvent)
-{
-	G4cout << "...G4HodoscopeRunAction..." << G4endl;
-	
+{	
 }
 
 

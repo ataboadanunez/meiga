@@ -11,12 +11,10 @@
 void
 G4ExTrackingAction::PreUserTrackingAction(const G4Track* track)
 { 
-  
 }
 
 
 void
 G4ExTrackingAction::PostUserTrackingAction(const G4Track* track)
 {
-  
 }

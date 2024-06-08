@@ -13,6 +13,7 @@
 #include "G4MuonPlus.hh"
 #include "G4MuonMinus.hh"
 
+#include "Logger.h"
 #include "SimData.h"
 #include "OptDeviceSimData.h"
 #include "Detector.h"
@@ -26,8 +27,9 @@ G4LeadSteppingAction::G4LeadSteppingAction(Event& aEvent)
 {
 
 	if (fEvent.GetSimData().GetSimulationMode() == SimData::SimulationMode::eFast) {
-		cout << "[INFO] G4LeadSteppingAction::G4LeadSteppingAction: Running Simulation in Fast mode." << endl;
-		cout << "[INFO] G4LeadSteppingAction::G4LeadSteppingAction: Optical photons will be killed! " << endl;
+		ostringstream msg;
+		msg << "Running Simulation in Fast mode: Optical photons will be killed!";
+		Logger::Print(msg, INFO, "G4LeadSteppingAction");
 		
 	}
 

@@ -1,6 +1,7 @@
 #include "DefaultProperties.h"
 #include "ConfigManager.h"
 #include "Utilities.h"
+#include "Logger.h"
 
 const ptree& empty_ptree(){
 	static ptree t;
@@ -18,7 +19,7 @@ DefaultProperties::SetDefaultProperties()
 	
 	if (filename.empty()) 
 		return;
-	std::cout << "[INFO] DefaultProperties::SetDefaultProperties: Setting default properties from file " << filename << std::endl;
+	Logger::Print("DefaultProperties::SetDefaultProperties: Setting default properties from file "+filename, INFO, "SetDefaultProperties");
 	// read xml and set parameters
 	ptree tree;
 	read_xml(filename, tree);

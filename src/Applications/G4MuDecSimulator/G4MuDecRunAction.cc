@@ -13,7 +13,6 @@
 G4MuDecRunAction::G4MuDecRunAction()
  : G4UserRunAction()
 {
-  G4cout << "...G4MuDecRunAction..." << G4endl;
 }
 
 

@@ -1,4 +1,5 @@
 #include "Detector.h"
+#include "Logger.h"
 
 #include "WCD.h"
 #include "Scintillator.h"
@@ -99,7 +100,7 @@ Detector::StringToType(string name)
 	else if (name == "eDummy")
 		return Detector::eDummy;
 	else {
-		cout << "[WARNING] Detector::StringToType: Unknown detector type!" << endl;
+		Logger::Print("Unknown detector type!", WARNING, "StringToType");
 		return Detector::eUnknown;
 	}
 }

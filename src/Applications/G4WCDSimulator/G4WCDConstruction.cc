@@ -13,10 +13,7 @@ G4WCDConstruction::G4WCDConstruction(Event& theEvent) :
 	G4VUserDetectorConstruction(),
 	fEvent(theEvent)
 { 
-
-	cout << "...G4WCDConstruction..." << endl;
 	fCheckOverlaps = fEvent.GetConfig().fCheckOverlaps;
-
 }
 
 G4WCDConstruction::~G4WCDConstruction() 

@@ -3,6 +3,7 @@
 
 #include "G4LeadDetectorConstruction.h"
 #include "Materials.h"
+#include "Logger.h"
 
 #include <G4SDManager.hh>
 #include <G4UnitsTable.hh>
@@ -19,7 +20,9 @@ G4LeadDetectorConstruction::G4LeadDetectorConstruction(Event& aEvent) :
 	
 	Event::Config &cfg = aEvent.GetConfig();
 	string aConfigFileName = cfg.fConfigurationFileName;
-	cout << "[INFO] G4LeadDetectorConstruction::G4LeadDetectorConstruction: Reading Lead information from Configuration File " << aConfigFileName << endl;
+	ostringstream msg;
+	msg << "Reading position and size of lead brick from Configuration file: " << aConfigFileName;
+	Logger::Print(msg, INFO, "G4LeadDetectorConstruction");
 	ptree tree;
 	read_json(aConfigFileName, tree);
 	
@@ -72,9 +75,12 @@ G4LeadDetectorConstruction::CreateWorld()
 	logicWorld = new G4LogicalVolume(solidWorld, Materials().Air, "World");
 	physWorld  =  new G4PVPlacement(nullptr, G4ThreeVector(), "World", logicWorld, 0, false, 0, fCheckOverlaps);
 	if (fSimulateBrick) {
-		cout << "[INFO] G4LeadDetectorConstruction::CreateWorld: Simulating Lead Brick with the following properties:" << endl;
-		cout << "Size: [" << fBrickSizeX / CLHEP::cm << ", " << fBrickSizeY / CLHEP::cm << ", " << fBrickSizeZ / CLHEP::cm << "] cm" << endl;
-		cout << "Position: [" << fBrickPosX / CLHEP::cm << ", " << fBrickPosY / CLHEP::cm << ", " << fBrickPosZ / CLHEP::cm << "] cm" << endl;
+		ostringstream msg;
+		msg << "Simulating Lead Brick with the following properties:" << "\n";
+		msg << "Size: [" << fBrickSizeX / CLHEP::cm << ", " << fBrickSizeY / CLHEP::cm << ", " << fBrickSizeZ / CLHEP::cm << "] cm" << "\n";
+		msg << "Position: [" << fBrickPosX / CLHEP::cm << ", " << fBrickPosY / CLHEP::cm << ", " << fBrickPosZ / CLHEP::cm << "] cm" << "\n";
+		Logger::Print(msg, INFO, "G4LeadDetectorConstruction");
+
 		solidBrick = new G4Box("LeadBrick", fBrickSizeX/2, fBrickSizeY/2, fBrickSizeZ/2);
 		G4VisAttributes cgray(G4Colour::Gray());
 		logicBrick = new G4LogicalVolume(solidBrick, Materials().Lead, "LeadBrick");
