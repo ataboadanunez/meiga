@@ -50,9 +50,9 @@ G4HodoscopeDetectorConstruction::PlaceDetector(Event& aEvent)
 	
 	const Event::Config &cfg = aEvent.GetConfig();
 	// loop in detector vector
-	for (auto detIt = aEvent.DetectorRange().begin(); detIt != aEvent.DetectorRange().end(); detIt++) {
-		auto& currentDet = detIt->second;
-		BuildDetector(logicWorld, currentDet, aEvent, cfg.fCheckOverlaps);
+	for (auto &pair : aEvent.DetectorRange()) {
+		auto& currentDet = *(pair.second);
+		currentDet.BuildDetector(logicWorld, aEvent, cfg.fCheckOverlaps);
 	}
 
 }

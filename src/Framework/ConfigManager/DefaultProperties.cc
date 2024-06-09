@@ -19,7 +19,7 @@ DefaultProperties::SetDefaultProperties()
 	
 	if (filename.empty()) 
 		return;
-	Logger::Print("DefaultProperties::SetDefaultProperties: Setting default properties from file "+filename, INFO, "SetDefaultProperties");
+	Logger::Print("Setting default properties from file "+filename, INFO, "SetDefaultProperties");
 	// read xml and set parameters
 	ptree tree;
 	read_xml(filename, tree);

@@ -52,11 +52,11 @@ G4WCDConstruction::CreateGround()
 
 
 void
-G4WCDConstruction::PlaceDetector(Event& theEvent)
+G4WCDConstruction::PlaceDetector(Event& aEvent)
 {
-	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
-		Detector& currentDet = detIt->second;
-		BuildDetector(logicWorld, currentDet, theEvent, fCheckOverlaps);
+	for (auto &pair : aEvent.DetectorRange()) {
+		Detector& currentDet = *(pair.second);
+		currentDet.BuildDetector(logicWorld, aEvent, fCheckOverlaps);
 	}
 }
 
@@ -72,8 +72,8 @@ G4WCDConstruction::Construct()
 
 void G4WCDConstruction::ConstructSDandField()
 {	
-	for (auto detIt = fEvent.DetectorRange().begin(); detIt != fEvent.DetectorRange().end(); detIt++) {
-		Detector &currentDet = detIt->second;
-		ConstructSenstiveDetector(currentDet, fEvent);
-	}
+	// for (auto detIt = fEvent.DetectorRange().begin(); detIt != fEvent.DetectorRange().end(); detIt++) {
+	// 	Detector &currentDet = detIt->second;
+	// 	ConstructSenstiveDetector(currentDet, fEvent);
+	// }
 }

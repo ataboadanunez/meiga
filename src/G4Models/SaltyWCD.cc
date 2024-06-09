@@ -12,11 +12,15 @@
 
 using namespace std;
 
-void 
-SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOVerlaps)
+SaltyWCD::SaltyWCD(const int aId, const Detector::DetectorType aType) :
+	Detector(aId, aType)
 {
+	fName = "SaltyWCD";
+}
 
-	
+void 
+SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheckOVerlaps)
+{
 	// solids
 	G4Tubs* solidCasingTop = nullptr;
 	G4Tubs* solidCasingSide = nullptr;
@@ -52,11 +56,11 @@ SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 	G4PVPlacement* physSide = nullptr;
 
 	// SaltyWCD dimensions
-	G4double fTankRadius = detector.GetTankRadius();
-	G4double fTankHeight = detector.GetTankHeight();
+	G4double fTankRadius = GetTankRadius();
+	G4double fTankHeight = GetTankHeight();
 	G4double fTankHalfHeight = 0.5 * fTankHeight;
-	G4double fTankThickness = detector.GetTankThickness();
-	G4double fNaClFracMass = detector.GetImpuritiesFraction();
+	G4double fTankThickness = GetTankThickness();
+	G4double fNaClFracMass = GetImpuritiesFraction();
 	// --------------------------------------------------------------------
 	// SaltyWater defined here for this particular detector
 	// --------------------------------------------------------------------
@@ -69,19 +73,19 @@ SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 	G4Material* StainlessSteel = nist->FindOrBuildMaterial("G4_STAINLESS-STEEL");
 	
 	// PMT properties photonis-XP1805
-	OptDevice pmt = detector.GetOptDevice(OptDevice::ePMT);
+	OptDevice pmt = GetOptDevice(OptDevice::ePMT);
 	G4double fPMTSemiX = pmt.GetSemiAxisX() * CLHEP::cm;
 	G4double fPMTSemiY = pmt.GetSemiAxisY() * CLHEP::cm;
 	G4double fPMTSemiZ = pmt.GetSemiAxisZ() * CLHEP::cm;
 
-	G4ThreeVector detectorPos = Geometry::ToG4Vector(detector.GetDetectorPosition(), 1.);
+	G4ThreeVector detectorPos = Geometry::ToG4Vector(GetDetectorPosition(), 1.);
 	G4double fTankPosX = detectorPos.getX();
 	G4double fTankPosY = detectorPos.getY();
 	G4double fTankPosZ = detectorPos.getZ();
 	
 	// define PMT position as the center of the tank
 	G4ThreeVector fTankCenter = detectorPos + G4ThreeVector(0, 0, fTankHalfHeight + fTankThickness);
-	int detectorId = detector.GetId();
+	int detectorId = GetId();
 	int pmtId = 0;
 	ostringstream namedetector;
 	namedetector.str("");
@@ -137,8 +141,8 @@ SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 	logTank  = new G4LogicalVolume(solidTank, SaltyWater, "logTank", 0, 0, 0);
 	physTank = new G4PVPlacement(nullptr, fTankCenter, logTank, "physTank", logMother, false, 0, fCheckOVerlaps);
 	// register water logical volume in the Detector
-	if (!detector.HasLogicalVolume("logTank"))
-		detector.SetLogicalVolume("logTank", logTank);
+	if (!HasLogicalVolume("logTank"))
+		SetLogicalVolume("logTank", logTank);
 
 	// top, bottom and side walls of the tank
 	logTop  = new G4LogicalVolume(solidTop, Materials().HDPE, "logTop", 0, 0, 0);
@@ -161,11 +165,11 @@ SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 	new G4PVPlacement(nullptr, G4ThreeVector(0, 0, fTankHalfHeight), logPMT, "physPMT", logTank, false, pmtId, fCheckOVerlaps);
 
 	// register PMT in the Detector
-	if (!detector.HasOptDevice(pmtId)) {
-		detector.MakeOptDevice(pmtId, OptDevice::ePMT);
+	if (!HasOptDevice(pmtId)) {
+		MakeOptDevice(pmtId, OptDevice::ePMT);
 		cout << "[DEBUG] Adding PMT id = " << pmtId << endl;
 	}
-	OptDevice optDevice = detector.GetOptDevice(pmtId);
+	OptDevice optDevice = GetOptDevice(pmtId);
 	cout << "[DEBUG] Getting " << optDevice.GetName() << " with id " << optDevice.GetId() << endl;
 	// register PMT logical volume
 	//if (!optDevice.HasLogicalVolume(logName))
@@ -175,14 +179,15 @@ SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& t
 	ostringstream fullName;
 	fullName.str("");
 	fullName << "/SaltyWCD_/"+to_string(detectorId) << "/" << optName;
-	G4MPMTAction* const pmtSD = new G4MPMTAction(fullName.str().c_str(), detectorId, pmtId, theEvent);
+	G4MPMTAction* const pmtSD = new G4MPMTAction(fullName.str().c_str(), detectorId, pmtId, aEvent);
 	sdMan->AddNewDetector(pmtSD);
 	logPMT->SetSensitiveDetector(pmtSD);
 
-
 	// register water volume as sensitive detector
-	G4MDetectorAction* const waterSD = new G4MDetectorAction(namedetector.str().c_str(), detectorId, theEvent);
+	G4MDetectorAction* const waterSD = new G4MDetectorAction(namedetector.str().c_str(), detectorId, aEvent);
 	sdMan->AddNewDetector(waterSD);
 	logTank->SetSensitiveDetector(waterSD);
 	
 }
+
+

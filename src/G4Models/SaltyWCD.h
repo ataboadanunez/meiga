@@ -20,15 +20,13 @@ class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4OpticalSkinSurface;
 
-class SaltyWCD {
-	// Basic Geant4 model for a Water-Cerenkov Detector
+class SaltyWCD : public Detector
+{
+	// Basic Geant4 model for a NaCl-Water-Cerenkov Detector
 	
 public:
-	static void BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps = true);
-	
-private:
-	SaltyWCD();
-	virtual ~SaltyWCD();
+	SaltyWCD(const int aId, const Detector::DetectorType aType);
+	void BuildDetector(G4LogicalVolume* logMother, Event& theEvent, G4bool fCheckOverlaps = true) override;
 
 };
 

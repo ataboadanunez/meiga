@@ -33,7 +33,7 @@ G4MuDecStackingAction::ClassifyNewTrack(const G4Track* const track)
     return fWaiting;
 
   // get PMT
-  OptDevice pmt = fEvent.GetDetector().GetOptDevice(OptDevice::ePMT);
+  OptDevice pmt = OptDevice(OptDevice::ePMT);
   double energy = track->GetKineticEnergy() / CLHEP::eV;
 
   bool isDetected = pmt.IsPhotonDetected(energy);

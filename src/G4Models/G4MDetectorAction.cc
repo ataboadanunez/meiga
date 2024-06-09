@@ -14,11 +14,8 @@ G4MDetectorAction::G4MDetectorAction(const G4String& name, const G4int dId, Even
 	G4VSensitiveDetector(name),
 	fEvent(theEvent),
 	fDetectorId(dId)
-
 	{
-
 		cout << "[INFO] G4Models::G4MDetectorAction: Registering Sensitive Detector " << name << endl;
-
 	}
 
 

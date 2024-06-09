@@ -7,26 +7,21 @@
 #include "G4Box.hh"
 #include "G4Tubs.hh"
 
-#include "Event.h"
 #include "Detector.h"
 #include "Materials.h"
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4OpticalSkinSurface;
+class Event;
 
-class Scintillator {
-	// basic scintillator detector
+class Scintillator : public Detector
+{
+	// model class for a basic scintillator detector
 
 	public:
-
-		static void BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps = true);
-
-	private:
-		Scintillator();
-		virtual ~Scintillator();
-
-
+		Scintillator(const int id, const Detector::DetectorType type);
+		virtual void BuildDetector(G4LogicalVolume *logMother, Event& aEvent, G4bool overlaps = false) override;
 };
 
 #endif

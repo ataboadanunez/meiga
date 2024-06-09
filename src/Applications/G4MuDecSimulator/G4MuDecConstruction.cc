@@ -57,9 +57,9 @@ G4MuDecConstruction::PlaceDetector(Event& theEvent)
 {
 	
 	// loop in detector vector
-	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
-		auto& currentDet = detIt->second;
-		BuildDetector(logicWorld, currentDet, theEvent, true);
+	for (auto &pair : theEvent.DetectorRange()) {
+		auto& currentDet = *(pair.second);
+		currentDet.BuildDetector(logicWorld, theEvent, true);
 
 	}
 
@@ -74,12 +74,4 @@ G4MuDecConstruction::Construct()
 	}
 	return physWorld;
 
-}
-
-void G4MuDecConstruction::ConstructSDandField()
-{	
-	for (auto detIt = fEvent.DetectorRange().begin(); detIt != fEvent.DetectorRange().end(); detIt++) {
-		Detector &currentDet = detIt->second;
-		ConstructSenstiveDetector(currentDet, fEvent);
-	}
 }

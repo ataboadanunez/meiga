@@ -60,13 +60,14 @@ G4ExDetectorConstruction::CreateGround()
 
 
 void
-G4ExDetectorConstruction::PlaceDetector(Event& theEvent)
+G4ExDetectorConstruction::PlaceDetector(Event& aEvent)
 {
 	
 	// loop in Detectors Range
-	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
-		auto& currentDet = detIt->second;
-		BuildDetector(logicWorld, currentDet, theEvent, fCheckOverlaps);
+	for (auto & detPair : aEvent.DetectorRange()) {
+		auto& currentDet = *(detPair.second);
+		// BuildDetector(logicWorld, currentDet, theEvent, fCheckOverlaps);
+		currentDet.BuildDetector(logicWorld, aEvent, fCheckOverlaps);
 
 	}
 

@@ -47,8 +47,10 @@ class Detector
 
 
 		Detector(){ ; }
-		Detector(const unsigned int id, const DetectorType type);
-		virtual ~Detector() { }
+		Detector(const int id, const DetectorType type);
+		virtual ~Detector() = default;
+
+		virtual void BuildDetector(G4LogicalVolume *logMother, Event &aEvent, G4bool overlaps = false) = 0;
 		
 		bool isValid() { return fType != DetectorType::eUnknown; }
 
@@ -150,11 +152,10 @@ class Detector
 		G4LogicalVolume* GetLogicalVolume(std::string volName) { return fLogicalVolumeMap[volName]; }
 		bool HasLogicalVolume(std::string volName);
 
-		DetectorType StringToType(const std::string name);
-		void SetDefaultProperties(const std::string file);
+		static DetectorType StringToType(const std::string name);
 		void SetDetectorProperties(const boost::property_tree::ptree &det, DefaultProperties &defProp);
 
-	private:
+	protected:
 
 		unsigned int fDetectorId = 0;
 		std::string fName;
@@ -200,8 +201,5 @@ class Detector
 
 
 };
-
-void BuildDetector(G4LogicalVolume *logMother, Detector &det, Event &evt, G4bool overlaps = false);
-void ConstructSenstiveDetector(Detector &aDetector, Event &aEvent);
 
 #endif

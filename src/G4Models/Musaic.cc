@@ -10,13 +10,16 @@
 
 using namespace std;
 
-void 
-Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps)
+Musaic::Musaic(const int aId, const Detector::DetectorType aType) :
+	Detector(aId, aType)
 {
+	fName = "Musaic";
+}
 
-	// the following variables need to be declared here as
-	// BuildDetector() is a static method of the Class.
 
+void 
+Musaic::BuildDetector(G4LogicalVolume* logMother, Event& theEvent, G4bool fCheckOverlaps)
+{
 	// solids
 	G4Box* solidCasing = nullptr;
 	G4Box* solidCoating = nullptr;
@@ -40,22 +43,22 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	G4LogicalVolume* logicSiPM = nullptr;
 	
 	// detector properties 
-	const G4double fCasingThickness = detector.GetCasingThickness() * CLHEP::mm;
+	const G4double fCasingThickness = GetCasingThickness() * CLHEP::mm;
 	
 	// scintillator bar properties
 #warning "Bar size parameters are fixed for this detector"
 	const G4double fBarWidth  = 41*CLHEP::mm;
 	const G4double fBarLength = 82*CLHEP::mm;
 	const G4double fBarThickness = 10*CLHEP::mm;
-	const G4double fCoatingThickness = detector.GetBarCoatingThickness();
+	const G4double fCoatingThickness = GetBarCoatingThickness();
 	const G4int  nBars = 2;
 	
 	// fiber properties
-	const G4double fCladdingThickness = detector.GetCladdingThickness();
-	const G4double fFiberRadius = detector.GetFiberRadius();
+	const G4double fCladdingThickness = GetCladdingThickness();
+	const G4double fFiberRadius = GetFiberRadius();
 
 	// Optical device properties
-	OptDevice sipm = detector.GetOptDevice(OptDevice::eSiPM);
+	OptDevice sipm = GetOptDevice(OptDevice::eSiPM);
 	const G4double fSiPMSizeX = sipm.GetLength() * CLHEP::mm;
 	const G4double fSiPMSizeY = sipm.GetWidth() * CLHEP::mm;
 	const G4double fSiPMSizeZ = sipm.GetThickness() * CLHEP::mm;
@@ -66,9 +69,9 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 	const G4double fCasingSizeZ = 0.5*fBarThickness * 2 + fCasingThickness; // (x2 = number of panels)
 
 	auto sdMan = G4SDManager::GetSDMpointer();
-	auto pos = detector.GetDetectorPosition();
+	auto pos = GetDetectorPosition();
 	auto  detectorPos = Geometry::ToG4Vector(pos, 1.);
-	const G4int  detectorId = detector.GetId();
+	const G4int  detectorId = GetId();
 
 	ostringstream namedetector;
 	namedetector.str("");
@@ -138,7 +141,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 		G4String nameFiber = "Fiber_"+to_string(barId);
 		G4String nameSiPM = "SiPM_"+to_string(barId);
 		// register SiPM in the detector class
-		detector.MakeOptDevice(barId, OptDevice::eSiPM);
+		MakeOptDevice(barId, OptDevice::eSiPM);
 
 		// logical volumes
 		logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
@@ -171,7 +174,6 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 		sdMan->AddNewDetector(SiPMTopSD);
 		logicSiPM->SetSensitiveDetector(SiPMTopSD);
 
-		
 	}
 
 	
@@ -191,7 +193,7 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& the
 		G4String nameFiber = "Fiber_"+to_string(barId);
 		G4String nameSiPM = "SiPM_"+to_string(barId);
 		// register SiPM in the detector class
-		detector.MakeOptDevice(barId, OptDevice::eSiPM);
+		MakeOptDevice(barId, OptDevice::eSiPM);
 		
 		// logical volumes
 		logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);

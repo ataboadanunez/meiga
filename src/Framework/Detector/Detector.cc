@@ -1,14 +1,6 @@
 #include "Detector.h"
 #include "Logger.h"
 
-#include "WCD.h"
-#include "Scintillator.h"
-#include "Musaic.h"
-#include "Mudulus.h"
-#include "Hodoscope.h"
-#include "SaltyWCD.h"
-#include "Dummy.h"
-
 #include "G4UnitsTable.hh"
 
 #include <map>
@@ -24,61 +16,10 @@ using std::map;
 using namespace std;
 using boost::property_tree::ptree;
 
-Detector::Detector(const unsigned int id, DetectorType type) : 
+Detector::Detector(const int id, const DetectorType type) : 
 	fDetectorId(id),
 	fType(type)
 {
-}
-
-// map from the Detector type to its corresponding BuildDetector function in G4Models
-static map<enum Detector::DetectorType, void(*)(G4LogicalVolume*, Detector&, Event&, G4bool)> TypeToBuild;
-// map from the Detector type to its corresponding ConstructSensitiveDetector function in G4Models
-static map<enum Detector::DetectorType, void(*)(Detector&, Event&)> TypeToConstructSD;
-
-static void 
-InitTypeToBuild() {
-	static bool isInitialized = false;
-	if (isInitialized) 
-		return;
-	
-	// fills map with corresponding BuildDetector function
-	isInitialized = true;
-	TypeToBuild[Detector::eWCD]				= WCD::BuildDetector;
-	TypeToBuild[Detector::eScintillator] 	= Scintillator::BuildDetector;
-	TypeToBuild[Detector::eMusaic]			= Musaic::BuildDetector;
-	TypeToBuild[Detector::eMudulus]			= Mudulus::BuildDetector;
-	TypeToBuild[Detector::eHodoscope]		= Hodoscope::BuildDetector;
-	TypeToBuild[Detector::eSaltyWCD]		= SaltyWCD::BuildDetector;
-	TypeToBuild[Detector::eDummy]			= Dummy::BuildDetector;
-
-	TypeToConstructSD[Detector::eWCD]		= WCD::ConstructSensitiveDetector;
-
-}
-
-void BuildDetector(G4LogicalVolume *logMother, Detector &det, Event &evt, G4bool overlaps) {
-	
-	// initialize maps
-	InitTypeToBuild();
-	
-	try {
-		TypeToBuild[det.GetType()](logMother, det, evt, overlaps);
-	}
-	catch (std::out_of_range &e) {
-		std::cerr << "No BuildDetector for DetectorType " << det.GetType() << std::endl;
-	}
-}
-
-void ConstructSenstiveDetector(Detector &aDetector, Event &aEvent)
-{
-	// initialize maps
-	InitTypeToBuild();
-	
-	try {
-		TypeToConstructSD[aDetector.GetType()](aDetector, aEvent);
-	}
-	catch (std::out_of_range &e) {
-		std::cerr << "No ConstructSensitiveDetector for DetectorType " << aDetector.GetType() << std::endl;
-	}
 }
 
 Detector::DetectorType
@@ -128,22 +69,6 @@ bool
 Detector::HasLogicalVolume(string volName)
 {	
 	return fLogicalVolumeMap.find(volName) != fLogicalVolumeMap.end();
-}
-
-void
-Detector::SetDefaultProperties(const string file)
-{
-	ptree tree;
-	read_xml(file, tree);
-	for (const auto& i : tree.get_child("detectorList")) {
-		ptree subtree;
-		string name;
-		tie(name, subtree) = i;
-		if (name != "detector")
-			continue;
-
-		//SetDetectorProperties(subtree);
-	}	
 }
 
 void

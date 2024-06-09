@@ -36,11 +36,11 @@ G4LeadRunAction::EndOfRunAction(const G4Run* aRun)
 { 
 	
 	// loop over scintillator panels (independent detectors) 	
-	for (auto detIt = fEvent.DetectorRange().begin(); detIt != fEvent.DetectorRange().end(); detIt++) {
+	for (auto &pair : fEvent.DetectorRange()) {
 
 		G4int g4RunId = aRun->GetRunID();
 
-		Detector& currDet = detIt->second;
+		Detector& currDet = *(pair.second);
 		const unsigned int detId = currDet.GetId();
 
 		DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData(detId);

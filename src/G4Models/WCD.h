@@ -2,7 +2,7 @@
 #define WCD_h 1
 
 // Meiga classes
-#include "Event.h"
+//#include "Event.h"
 #include "Detector.h"
 #include "Materials.h"
 
@@ -19,16 +19,19 @@
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4OpticalSkinSurface;
+class Event;
 
-class WCD {
+class WCD : public Detector 
+{
 	// Basic Geant4 model for a Water-Cerenkov Detector
 public:
-	static void BuildDetector(G4LogicalVolume* aLogMother, Detector& aDetector, Event& aEvent, G4bool aCheckOverlaps = true);
+	WCD(const int id, const DetectorType type);
+	
+	// static void BuildDetector(G4LogicalVolume* aLogMother, Detector& aDetector, Event& aEvent, G4bool aCheckOverlaps = true);
+	virtual void BuildDetector(G4LogicalVolume *logMother, Event &aEvent, G4bool overlaps = false) override;
 	static void ConstructSensitiveDetector(Detector &aDetector, Event &aEvent);
 	
 private:
-	WCD();
-	virtual ~WCD();
 
 	static std::ostringstream fNameDetector;
 	static std::ostringstream fFullName;

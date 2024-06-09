@@ -13,23 +13,18 @@
 
 using namespace std;
 
-Scintillator::Scintillator()
-{
 
+Scintillator::Scintillator(const int id, const Detector::DetectorType type) :
+	Detector(id, DetectorType::eScintillator)
+{
+	fName = "Scintillator";
 }
 
-Scintillator::~Scintillator()
+void Scintillator::BuildDetector(G4LogicalVolume *logMother, Event &aEvent, G4bool fCheckOverlaps)
 {
 
-}
-
-void 
-Scintillator::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps)
-{
-
-
-	int detectorId = detector.GetId();
-	G4ThreeVector  detectorPos = Geometry::ToG4Vector(detector.GetDetectorPosition(), 1.);
+	int detectorId = fDetectorId; //detector.GetId();
+	G4ThreeVector  detectorPos = Geometry::ToG4Vector(GetDetectorPosition(), 1.);
 
 	ostringstream namedetector;
 	namedetector.str("");
@@ -48,11 +43,11 @@ Scintillator::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Even
 	G4LogicalVolume* logicScinBar = nullptr;
 
 	// following variables are read from Detector class
-	G4double fCoatingThickness = detector.GetBarCoatingThickness();
-	G4double fBarWidth = detector.GetBarWidth();
-	G4double fBarLength = detector.GetBarLength();
-	G4double fBarThickness = detector.GetBarThickness();
-	G4int fNBars = detector.GetNBars();
+	G4double fCoatingThickness = GetBarCoatingThickness();
+	G4double fBarWidth = GetBarWidth();
+	G4double fBarLength = GetBarLength();
+	G4double fBarThickness = GetBarThickness();
+	G4int fNBars = GetNBars();
 	G4double fHalfWidth = 0.5*fBarWidth*fNBars; 
 
 	auto sdMan = G4SDManager::GetSDMpointer();
@@ -92,11 +87,8 @@ Scintillator::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Even
 
   }
 
-  // register scintillator bar as sensitive detector
-	G4MDetectorAction* const scinSD = new G4MDetectorAction("BarScin", detectorId, theEvent);
+  	// register scintillator bar as sensitive detector
+	G4MDetectorAction* const scinSD = new G4MDetectorAction("BarScin", detectorId, aEvent);
 	sdMan->AddNewDetector(scinSD);
 	logicScinBar->SetSensitiveDetector(scinSD);
-
-  
-
 }

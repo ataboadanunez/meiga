@@ -32,10 +32,10 @@ G4HodoscopeEventAction::EndOfEventAction(const G4Event*)
 	// the deposits per bar are calculated by the G4MScintillatorBarAction
 
 	// loop over detectors in the event
-	for (auto detIt = fEvent.DetectorRange().begin(); detIt != fEvent.DetectorRange().end(); detIt++) {
+	for (auto &pair : fEvent.DetectorRange()) {
 
 		// get current detector data
-		Detector& currDet = detIt->second;
+		Detector& currDet = *(pair.second);
 		const unsigned int detId = currDet.GetId();
 		
 		// skip if detector is not an hodoscope

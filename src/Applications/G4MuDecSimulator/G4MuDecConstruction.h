@@ -35,7 +35,6 @@ class G4MuDecConstruction : public G4VUserDetectorConstruction {
 		G4MuDecConstruction(Event& theEvent);
 		virtual ~G4MuDecConstruction();
 		virtual G4VPhysicalVolume* Construct();
-		virtual void ConstructSDandField();
 
 		G4double GetGroundSizeX() const { return fGroundSizeX; }
 		G4double GetGroundSizeY() const { return fGroundSizeY; }

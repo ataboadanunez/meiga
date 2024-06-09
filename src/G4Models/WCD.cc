@@ -16,31 +16,37 @@ G4LogicalVolume *WCD::fLogPMT = nullptr;
 std::ostringstream WCD::fNameDetector;
 std::ostringstream WCD::fFullName;
 
-void WCD::BuildDetector(G4LogicalVolume *aLogMother, Detector &aDetector, Event &aEvent, G4bool aCheckOVerlaps)
+WCD::WCD(const int id, const DetectorType type) :
+	Detector(id, type)
+{
+	fName = "WCD";
+}
+
+void WCD::BuildDetector(G4LogicalVolume *aLogMother, Event &aEvent, G4bool aCheckOVerlaps)
 {
 	// solids
 	G4Tubs* solidBot  = nullptr;
 
 	// WCD dimensions
-	G4double fTankRadius = aDetector.GetTankRadius();
-	G4double fTankHeight = aDetector.GetTankHeight();
+	G4double fTankRadius = GetTankRadius();
+	G4double fTankHeight = GetTankHeight();
 	G4double fTankHalfHeight = 0.5 * fTankHeight;
-	G4double fTankThickness = aDetector.GetTankThickness();
+	G4double fTankThickness = GetTankThickness();
 	
 	// PMT properties photonis-XP1805
-	OptDevice pmt = aDetector.GetOptDevice(OptDevice::ePMT);
+	OptDevice pmt = GetOptDevice(OptDevice::ePMT);
 	G4double fPMTSemiX = pmt.GetSemiAxisX() * CLHEP::cm;
 	G4double fPMTSemiY = pmt.GetSemiAxisY() * CLHEP::cm;
 	G4double fPMTSemiZ = pmt.GetSemiAxisZ() * CLHEP::cm;
 
-	G4ThreeVector detectorPos = Geometry::ToG4Vector(aDetector.GetDetectorPosition(), 1.);
+	G4ThreeVector detectorPos = Geometry::ToG4Vector(GetDetectorPosition(), 1.);
 	G4double fTankPosX = detectorPos.getX();
 	G4double fTankPosY = detectorPos.getY();
 	G4double fTankPosZ = detectorPos.getZ();
 	
 	// define PMT position as the center of the tank
 	G4ThreeVector fTankCenter = detectorPos + G4ThreeVector(0, 0, fTankHalfHeight + fTankThickness);
-	int detectorId = aDetector.GetId();
+	int detectorId = GetId();
 	int pmtId = 0;
 	fNameDetector.str("");
 	fNameDetector << "/WCD_"+to_string(detectorId);
@@ -75,8 +81,8 @@ void WCD::BuildDetector(G4LogicalVolume *aLogMother, Detector &aDetector, Event 
 	fLogTank  = new G4LogicalVolume(solidTank, Materials().Water, "logTank", 0, 0, 0);
 	G4PVPlacement* physTank = new G4PVPlacement(nullptr, fTankCenter, fLogTank, "physTank", aLogMother, false, 0, aCheckOVerlaps);
 	// register water logical volume in the Detector
-	if (!aDetector.HasLogicalVolume("logTank"))
-		aDetector.SetLogicalVolume("logTank", fLogTank);
+	if (!HasLogicalVolume("logTank"))
+		SetLogicalVolume("logTank", fLogTank);
 	
 	// top, bottom and side walls of the tank
 	G4LogicalVolume* logTop  = new G4LogicalVolume(solidTop, Materials().HDPE, "logTop", 0, 0, 0);
@@ -108,24 +114,25 @@ void WCD::BuildDetector(G4LogicalVolume *aLogMother, Detector &aDetector, Event 
 	new G4PVPlacement(nullptr, G4ThreeVector(0, 0, fTankHalfHeight), fLogPMT, "physPMT", fLogTank, false, pmtId, aCheckOVerlaps);
 
 	// register PMT in the Detector
-	if (!aDetector.HasOptDevice(pmtId)) {
-		aDetector.MakeOptDevice(pmtId, OptDevice::ePMT);
+	if (!HasOptDevice(pmtId)) {
+		MakeOptDevice(pmtId, OptDevice::ePMT);
 		cout << "[INFO] Adding PMT id = " << pmtId << endl;
 	}
-	OptDevice optDevice = aDetector.GetOptDevice(pmtId);
+	OptDevice optDevice = GetOptDevice(pmtId);
 	string optName = pmt.GetName() + "_"+to_string(pmtId);
 	fFullName.str("");
 	fFullName << "/WCD_"+to_string(detectorId) << "/" << optName;
 
-	// // register PMT as sensitive detector	
-	// G4MPMTAction* const pmtSD = new G4MPMTAction(fullName.str().c_str(), detectorId, pmtId, aEvent);
-	// sdMan->AddNewDetector(pmtSD);
-	// logPMT->SetSensitiveDetector(pmtSD);
+	// // register PMT as sensitive detector
+	auto sdMan = G4SDManager::GetSDMpointer();	
+	G4MPMTAction* const pmtSD = new G4MPMTAction(fFullName.str().c_str(), detectorId, pmtId, aEvent);
+	sdMan->AddNewDetector(pmtSD);
+	fLogPMT->SetSensitiveDetector(pmtSD);
 
-	// // register water volume as sensitive detector
-	// G4MDetectorAction* const waterSD = new G4MDetectorAction(namedetector.str().c_str(), detectorId, aEvent);
-	// sdMan->AddNewDetector(waterSD);
-	// logTank->SetSensitiveDetector(waterSD);
+	// register water volume as sensitive detector
+	G4MDetectorAction* const waterSD = new G4MDetectorAction(fNameDetector.str().c_str(), detectorId, aEvent);
+	sdMan->AddNewDetector(waterSD);
+	fLogTank->SetSensitiveDetector(waterSD);
 	
 }
 

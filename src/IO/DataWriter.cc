@@ -63,10 +63,10 @@ DataWriter::FileWriter(Event& theEvent)
 
 		
 		// loop over Detector to extract data at Detector level (energy deposits, bar counters, etc...)
-		for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
+		for (auto & detPair : theEvent.DetectorRange()) {
 
 			// get current detector data
-			Detector& currDet = detIt->second;
+			Detector& currDet = *(detPair.second);
 			const unsigned int detId = currDet.GetId();
 			
 			if (!simData.HasDetectorSimData(detId))
@@ -126,10 +126,10 @@ DataWriter::FileWriter(Event& theEvent)
 
 	// save detector information
 	json jDetectorList;
-	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
+	for (auto & detPair : theEvent.DetectorRange()) {
 
 		// get pointer to current detector
-		Detector& currDet = detIt->second;
+		Detector& currDet = *(detPair.second);
 		const unsigned int detId = currDet.GetId();
 
 		json jcurrentDetector;

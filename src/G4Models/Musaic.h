@@ -16,18 +16,12 @@ class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4OpticalSkinSurface;
 
-class Musaic {
-	// description
+class Musaic : public Detector
+{
 
 public:
-
-	static void BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps = false);
-
-private:
-	Musaic();
-	virtual ~Musaic();
-
-
+	Musaic(const int aId, const Detector::DetectorType aType);
+	void BuildDetector(G4LogicalVolume* logMother, Event& theEvent, G4bool fCheckOverlaps = false) override;
 
 };
 

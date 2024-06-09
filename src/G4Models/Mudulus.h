@@ -15,15 +15,13 @@ class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4OpticalSkinSurface;
 
-class Mudulus {
-	// description
+class Mudulus : public Detector
+{
+	// an hodoscope-like muon detector with SiPM in both of the fiber endpoints.
 
 public:
-	static void BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps = false);
-
-private:
-	Mudulus();
-	virtual ~Mudulus();
+	Mudulus(const int aId, const Detector::DetectorType aType);
+	void BuildDetector(G4LogicalVolume* logMother, Event& theEvent, G4bool fCheckOverlaps = false) override;
 
 	static G4double GetFiberXCoordinate(G4int barId, G4double barLength, G4double fiberLength);
 

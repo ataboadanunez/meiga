@@ -51,7 +51,7 @@ namespace
         assert(injectionOrigin.at(1) == 0.0 * CLHEP::m);
         assert(injectionOrigin.at(2) == 1.0 * CLHEP::m);
         // get instances of Detector with ID 0
-        Detector detector = aEvent.GetDetector(0);
+        Detector& detector = aEvent.GetDetector(0);
         assert(detector.isValid());
         assert(detector.GetType() == Detector::eScintillator);
         std::vector<double> detPosition = detector.GetDetectorPosition();

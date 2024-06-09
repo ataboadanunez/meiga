@@ -150,7 +150,7 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 			string detIdstr = subtree.get<string>("<xmlattr>.id");
 			string detTypestr = subtree.get<string>("<xmlattr>.type");
 			int detId = stoi(detIdstr);
-			Detector::DetectorType detType = theEvent.GetDetector().StringToType(detTypestr);
+			Detector::DetectorType detType = Detector::StringToType(detTypestr);
 			detPosition.clear();
 			msg2 << "Reading configuration of detector " << detTypestr << " with ID = " << detId << "\n";
 			// register detector in the Event
@@ -163,10 +163,6 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 			}
 			
 			Detector& detector = theEvent.GetDetector(detId);
-			// set name from XML once the detector was created
-			detector.SetName(detTypestr);
-			string fPropertiesFile = simData.GetDetectorPropertiesFile();
-			
 			// set detector position
 			for (const auto &v : subtree.get_child("")) {
 				string label = v.first;
@@ -201,10 +197,7 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 
 	cout << "===========================================" << endl;
 	cout << "===========================================" << endl;
-
-
 }
-
 
 void
 ConfigManager::PrintConfig(const Event::Config &cfg)

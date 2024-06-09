@@ -4,6 +4,8 @@
 #include "Particle.h"
 #include "SimData.h"
 #include "Detector.h"
+#include "DetectorFactory.h"
+
 #include <vector>
 #include <string>
 
@@ -13,8 +15,6 @@
 	This class is intended to store methods and variables
 	that will be handled during the simulation / reconstruction
 	processes. 
-
-	todo: Description about "event" concept.
 
 	author: Alvaro Taboada
 	date: 16 June 2021
@@ -26,66 +26,54 @@
 class Event 
 {
 
-	public:
-		
-		Event();
-		virtual ~Event();
+public:
+	struct Config {
+	
+			// program configuration variables
+			std::string fConfigurationFileName;
+			// input variables
+			std::string fInputMode;
+			unsigned int fInputNParticles;
+			std::string fInputFileName;
+			std::string fDetectorList;
+			std::string fDetectorProperties;
 
+			// simulation variables
+			std::string fSimulationMode;
+			std::string fInjectionMode;
+			bool fGeoVis;
+			bool fTrajVis;
+			bool fCheckOverlaps;
+			std::string fRenderFile;
+			std::string fPhysicsListName;
+			int fVerbosity;
+
+			// output variables
+			std::string fOutputFileName;
+			bool fCompressOutput;
+			bool fSaveInput;
+			bool fSavePETimeDistribution;
+			bool fSaveComponentsPETimeDistribution;
+			bool fSaveTraces;
+			bool fSaveEnergy;
+			bool fSaveComponentsEnergy;
+			bool fSaveCharge;
+			bool fSaveCounts;
+			// add more stuff below in case is needed
+		};
+
+		using DetectorMap = std::map<int, std::unique_ptr<Detector>>;
 		// interface to fwk/SimData
 		SimData& GetSimData() { return fSimData; }
 
-		// interface to fwk/Detector
-		Detector& GetDetector() { return fDetector; }
-		Detector& GetDetector(unsigned int id) { return fDetectorMap[id]; }
-		bool HasDetector(unsigned int id);
-		void MakeDetector(unsigned int id);
-		void MakeDetector(unsigned int id, Detector::DetectorType type);
-
+		Detector& GetDetector(const int id);
+		bool HasDetector(const int id);
+		void MakeDetector(const int id, const Detector::DetectorType type);
+		const DetectorMap& DetectorRange() const { return fDetectorMap; }
 		int GetNDetectors() {return fNDetectors; }
 
-//#warning "move to DetectorSimData!"
 		void SetMaximumHeight(double maxH) { fMaximumHeight = maxH; }
 		double GetMaximumHeight() { return fMaximumHeight; }
-		
-		std::map<int, Detector>& DetectorRange() { return fDetectorMap; }
-		const std::map<int, Detector>& DetectorRange() const { return fDetectorMap; }
-
-		struct Config {
-	
-		// program configuration variables
-		std::string fConfigurationFileName;
-		// input variables
-		std::string fInputMode;
-		unsigned int fInputNParticles;
-		std::string fInputFileName;
-		std::string fDetectorList;
-		std::string fDetectorProperties;
-
-		// simulation variables
-		std::string fSimulationMode;
-		std::string fInjectionMode;
-		bool fGeoVis;
-		bool fTrajVis;
-		bool fCheckOverlaps;
-		std::string fRenderFile;
-		std::string fPhysicsListName;
-		int fVerbosity;
-
-		// output variables
-		std::string fOutputFileName;
-		bool fCompressOutput;
-		bool fSaveInput;
-		bool fSavePETimeDistribution;
-		bool fSaveComponentsPETimeDistribution;
-		bool fSaveTraces;
-		bool fSaveEnergy;
-		bool fSaveComponentsEnergy;
-		bool fSaveCharge;
-		bool fSaveCounts;
-		// add more stuff below in case is needed
-
-
-		};
 
 		Config& GetConfig() { return cfg; }
 		const Config& GetConfig() const { return cfg; }
@@ -95,13 +83,9 @@ class Event
 
 		Config cfg;
 		SimData fSimData;
-		Detector fDetector;
-
-		std::map<int, Detector> fDetectorMap;
+		DetectorMap fDetectorMap;
 		int fNDetectors = 0;
 		double fMaximumHeight;
-
-
 };
 
 

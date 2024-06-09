@@ -1,23 +1,28 @@
 // implementation of Event class
 #include "Event.h"
+#include "DetectorFactory.h"
 #include "Particle.h"
 #include "Logger.h"
+
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
+// Event::Event()
+// {
+// }
 
-Event::Event()
-{
+// Event::~Event()
+// {
+// }
+
+bool Event::HasDetector(const int id)
+{	
+	return fDetectorMap.find(id) != fDetectorMap.end();
 }
 
-Event::~Event()
-{
-}
-
-void
-Event::MakeDetector(const unsigned int id, const Detector::DetectorType type)
+void Event::MakeDetector(const int id, const Detector::DetectorType type)
 {
 	if (type == Detector::eUnknown) {
 		std::ostringstream errmsg;
@@ -28,12 +33,15 @@ Event::MakeDetector(const unsigned int id, const Detector::DetectorType type)
 		
 		throw std::invalid_argument("Invalid detector type");
 	}
-	fDetectorMap.emplace(id, Detector(id, type));
+	// fDetectorMap.emplace(id, Detector(id, type));
+	fDetectorMap.emplace(id, DetectorFactory::CreateDetector(id, type));
 	fNDetectors = fDetectorMap.size();	
 }
 
-bool
-Event::HasDetector(unsigned int id)
-{	
-	return fDetectorMap.find(id) != fDetectorMap.end();
+Detector& Event::GetDetector(const int id)
+{
+	if(!HasDetector(id)) {
+		throw std::runtime_error("Not found detector with ID: "+id);
+	}
+	return *(fDetectorMap.at(id));
 }
