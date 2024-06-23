@@ -24,6 +24,8 @@ message(STATUS "Geant4 include directories: ${Geant4_INCLUDE_DIRS}")
 
 # Find boost package
 find_package(Boost 1.34 REQUIRED COMPONENTS system filesystem iostreams)
+# fixes boost/bind.hpp annoying warning during compilation
+add_definitions(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
 
 ################################################################################
 # Subdirectories                                                               #
