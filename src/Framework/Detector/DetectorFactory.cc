@@ -21,6 +21,8 @@ DetectorFactory::CreateDetector(const int aId, const Detector::DetectorType aTyp
             return std::make_unique<Hodoscope>(aId, aType);
         case Detector::eMudulus:
             return std::make_unique<Mudulus>(aId, aType);
+        case Detector::eMusaic:
+            return std::make_unique<Musaic>(aId, aType);
         case Detector::eDummy:
             return std::make_unique<Dummy>(aId, aType);
     }
