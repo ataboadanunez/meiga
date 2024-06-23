@@ -2,6 +2,7 @@
 #include "SimData.h"
 #include "DetectorSimData.h"
 #include "OptDeviceSimData.h"
+#include "Logger.h"
 
 using namespace std;
 
@@ -44,6 +45,7 @@ G4LeadEventAction::EndOfEventAction(const G4Event*)
 		DetectorSimData &detSimData = fEvent.GetSimData().GetDetectorSimData(detId);
 		// get total deposited energy at the event
 		double totalEdep = detSimData.GetTotalEnergyDeposit();
+		cout << "Detector " << currDet.GetId() << " total Energy Deposit = " << totalEdep / CLHEP::MeV << " MeV" << endl;
 		// set it to the deposited energy vector
 		detSimData.SetEnergyDeposit(totalEdep);
 		// clear total energy deposit after the event is terminated to reset counter

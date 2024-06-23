@@ -5,6 +5,8 @@
 #include "G4AccumulableManager.hh"
 #include "G4LeadRunAction.h"
 
+#include "Scintillator.h"
+
 #include <bitset>
 
 //#include "histosRun.hh"
@@ -41,11 +43,17 @@ G4LeadRunAction::EndOfRunAction(const G4Run* aRun)
 		G4int g4RunId = aRun->GetRunID();
 
 		Detector& currDet = *(pair.second);
-		const unsigned int detId = currDet.GetId();
+		if(currDet.GetType() != Detector::eHodoscope)
+			continue;
 
+		const unsigned int detId = currDet.GetId();
 		DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData(detId);
 
-		int nBars = currDet.GetNBars();
+		int nBars;
+		const Scintillator *scintDet = dynamic_cast<const Scintillator*>(&currDet);
+		if(scintDet) {
+			nBars = scintDet->GetNBars();
+		}
 		// initialize string to 0s. total number of bars x2 since is a grid of 2 x NBars
 		string binaryString(2*nBars, '0');
 		
