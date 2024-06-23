@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 #include <iomanip>
 #include <chrono>
 
@@ -22,7 +23,11 @@ public:
     static void Print(const std::ostringstream& aMessage, LogType aType, std::string aContext = "");
     static void Print(const std::string& aMessage, LogType aType, std::string aContext = "");
     static void Print(const char *aMessage, LogType aType, std::string aContext = "");
-
+    static void PrintVector(const std::vector<std::string> &aVector, const std::ostringstream& aMessage, LogType aType, std::string aContext = "");
+    static void PrintVector(const std::vector<std::string> &aVector, const std::string& aMessage, LogType aType, std::string aContext = "");
+    static void PrintVector(const std::vector<std::string> &aVector, const char* aMessage, LogType aType, std::string aContext = "");
+    static void PrintVector(const std::vector<double> &aVector, const char* aMessage, LogType aType, std::string aContext = "");
+    
 private:
     static std::string LogTypeToString(LogType aType);
 

@@ -67,6 +67,39 @@ void Logger::Print(const ostringstream &aMessage, LogType aType, std::string aCo
 	Print(aMessage.str(), aType, aContext);
 }
 
+void Logger::PrintVector(const std::vector<std::string> &aVector, const std::string &aMessage, LogType aType, std::string aContext)
+{
+	if(aContext != "") {
+		aContext = aContext + ": ";
+	}
+	ostringstream outputStream;
+	outputStream << "[" << LogTypeToString(aType) << "] " + aContext << aMessage << std::endl;
+	for (const auto& prop : aVector) {
+		outputStream << "  " << prop << std::endl;
+	}
+	cout << outputStream.str();
+}
+
+void Logger::PrintVector(const vector<string> &aVector, const ostringstream &aMessage, LogType aType, string aContext)
+{
+	PrintVector(aVector, aMessage.str(), aType, aContext);
+}
+
+void Logger::PrintVector(const std::vector<std::string> &aVector, const char *aMessage, LogType aType, std::string aContext)
+{
+	PrintVector(aVector, string(aMessage), aType, aContext);
+}
+
+void Logger::PrintVector(const std::vector<double> &aVector, const char *aMessage, LogType aType, std::string aContext)
+{
+	vector<string> strVector;
+	strVector.reserve(aVector.size());
+	for(const double& val : aVector) {
+		strVector.push_back(std::to_string(val));
+	}
+	PrintVector(strVector, aMessage, aType, aContext);
+}
+
 string Logger::LogTypeToString(LogType aType)
 {
 	switch (aType) {
