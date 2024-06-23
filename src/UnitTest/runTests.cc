@@ -4,6 +4,8 @@
 #include "G4MDetectorConstruction.h"
 #include "G4MPhysicsList.h"
 #include "G4MPrimaryGeneratorAction.h"
+#include "ConfigFilePath.h"
+#include "Scintillator.h"
 
 // Geant4 headers
 #include "G4RunManagerFactory.hh"
@@ -13,8 +15,8 @@
 #include <iostream>
 
 
-const string cConfigFilename = Utilities::ConcatenatePaths(CONFIG_FILE_PATH, "Ut_G4AppSimulator.json");
-const string cDetectorFilename = Utilities::ConcatenatePaths(CONFIG_FILE_PATH, "Ut_DetectorList.xml");
+const string cConfigFilename = Utilities::ConcatenatePaths(GetConfigFilePath(), "Ut_G4AppSimulator.json");
+const string cDetectorFilename = Utilities::ConcatenatePaths(GetConfigFilePath(), "Ut_DetectorList.xml");
 
 namespace
 {   
@@ -58,7 +60,10 @@ namespace
         assert(detPosition.at(0) == -0.01 * CLHEP::m);
         assert(detPosition.at(1) == 0.02 * CLHEP::m);
         assert(detPosition.at(2) == 0.5 * CLHEP::m);
-        assert(detector.GetNBars() == 8);
+        Scintillator *scinDet = dynamic_cast<Scintillator*>(&detector);
+        assert(scinDet);
+        int nBars = scinDet->GetNBars();
+        assert(nBars == 8);
         std::cout << "[INFO] test_ReadDetectorList: OK" << std::endl;
         return simData;
     }
