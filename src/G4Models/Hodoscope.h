@@ -5,12 +5,13 @@
 
 #include "Event.h"
 #include "Detector.h"
+#include "Scintillator.h"
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4OpticalSkinSurface;
 
-class Hodoscope : public Detector
+class Hodoscope : public Scintillator
 {
 	/*
 		Model class for an hodoscope-like detector.

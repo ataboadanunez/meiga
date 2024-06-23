@@ -14,7 +14,7 @@
 using namespace std;
 
 Hodoscope::Hodoscope(const int id, const Detector::DetectorType type) :
-	Detector(id, type)
+	Scintillator(id, type)
 {
 	fName = "Hodoscope";
 }

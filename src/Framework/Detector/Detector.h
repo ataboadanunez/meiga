@@ -1,8 +1,6 @@
 #ifndef Detector_h
 #define Detector_h
-
 #include "OptDevice.h"
-#include "DefaultProperties.h"
 
 #include "G4SystemOfUnits.hh"
 #include "G4LogicalVolume.hh"
@@ -32,6 +30,9 @@ class Event;
 
 class Detector
 {
+	friend class ConfigManager;
+	// friend class DataWriter;
+
 	public:
 
 		enum DetectorType {
@@ -50,73 +51,38 @@ class Detector
 		Detector(const int id, const DetectorType type);
 		virtual ~Detector() = default;
 
-		virtual void BuildDetector(G4LogicalVolume *logMother, Event &aEvent, G4bool overlaps = false) = 0;
+public:
+	void SetId(int id) { fDetectorId = id; }
+	virtual unsigned int GetId() const { return fDetectorId; }
+	
+	void SetType(Detector::DetectorType type) { fType = type; }
+	DetectorType GetType() const { return fType; }
+	bool isValid() { return fType != DetectorType::eUnknown; }
+	
+	static DetectorType StringToType(const std::string name);
+	static std::string TypeToString(const DetectorType aType);
+
+	void SetName(const std::string name) { fName = name; }
+	std::string GetName() const { return fName; }
+
+	const std::vector<double>& GetDetectorPosition() const { return fDetectorPosition; }
+	void SetDetectorPosition(const std::vector<double> &pos) { fDetectorPosition = pos; }
+
+	// Optical device
+	void MakeOptDevice(int id, OptDevice::DeviceType type);
+	OptDevice& GetOptDevice(int id) { return fOptDeviceMap[id]; }
+	OptDevice GetOptDevice(OptDevice::DeviceType type) { return OptDevice(type); }
+	bool HasOptDevice(int id);
+	
+	std::map<int, OptDevice>& OptDeviceRange() { return fOptDeviceMap; }
+	const std::map<int, OptDevice>& OptDeviceRange() const { return fOptDeviceMap; }
+	int GetNOptDevice() const { return fNOptDevices; }
+
+	virtual void BuildDetector(G4LogicalVolume *logMother, Event &aEvent, G4bool overlaps = false) = 0;
+	virtual void SetDetectorProperties(const boost::property_tree::ptree &aTree);
+	virtual void SetDefaultProperties();
 		
-		bool isValid() { return fType != DetectorType::eUnknown; }
-
-		unsigned int GetId() const { return fDetectorId; }
-		void SetId(int id) { fDetectorId = id; }
-
-		DetectorType GetType() const { return fType; }
-		void SetType(Detector::DetectorType type) { fType = type; }
-
-		void SetName(const std::string name) { fName = name; }
-		std::string GetName() const { return fName; }
-
-		const std::vector<double>& GetDetectorPosition() const { return fDetectorPosition; }
-		void SetDetectorPosition(const std::vector<double> &pos) { fDetectorPosition = pos; }
-
-		// Mechanical properties
-		double GetCasingThickness() const { return fCasingThickness; }
-		void SetCasingThickness(double casingThickness) { fCasingThickness = casingThickness; }
-		double GetRotationAngle() const { return fRotationAngle; }
-		void SetRotationAngle(double angle);
-
-		// scintillator-type detector properties
-		int GetNPanels() const { return fNumberOfPanels; }
-		void SetNPanels(int nPanels) { fNumberOfPanels = nPanels; }
-
-		int GetNBars() const { return fNumberOfBars; }
-		void SetNBars(int nBars) { fNumberOfBars = nBars; }
-
-		double GetBarLength() const { return fBarLength; }
-		void SetBarLength(double barLength) { fBarLength = barLength; }
-		
-		double GetBarWidth() const { return fBarWidth; }
-		void SetBarWidth(double barWidth) { fBarWidth = barWidth; }
-		
-		double GetBarThickness() const { return fBarThickness; }
-		void SetBarThickness(double barThickness) { fBarThickness = barThickness; }
-		
-		double GetBarCoatingThickness() const { return fCoatingThickness; }
-		void SetBarCoatingThickness(double barCoatThickness) { fCoatingThickness = barCoatThickness; }
-
-		double GetDistanceBtwPanels() const { return fDistancePanels; }
-		void SetDistanceBtwPanels( double dist) { fDistancePanels = dist; }
-
-		// WLS fibers
-		double GetFiberRadius() const { return fFiberRadius; }
-		void SetFiberRadius(double fiberRad) { fFiberRadius = fiberRad; }
-
-		double GetFiberLength() const { return fFiberLength; }
-		void SetFiberLength(double fiberLength) { fFiberLength = fiberLength; }
-
-		double GetCladdingThickness() const { return fCladdingThickness; }
-		void SetCladdingThickness(double cladThickness) { fCladdingThickness = cladThickness; }
-
-		// WCD 
-		double GetTankHeight() const { return fTankHeight; }
-		void SetTankHeight(double h) { fTankHeight = h; }
-		
-		double GetTankRadius() const { return fTankRadius; }
-		void SetTankRadius(double r) { fTankRadius = r; }
-
-		double GetTankThickness() const { return fTankThickness; }
-		void SetTankThickness(double t) { fTankThickness = t; }
-
-		double GetImpuritiesFraction() const { return fImpuritiesFraction; }
-		void SetImpuritiesFraction(double impF) { fImpuritiesFraction = impF; }
-
+	protected:
 		// general detector size parameters
 		double GetLength() const { return fLength; }
 		void SetLength(double l) { fLength = l; }
@@ -127,6 +93,8 @@ class Detector
 		double GetThickness() const { return fThickness; }
 		void SetThickness(double t) { fThickness = t; }
 
+		// methods below should be private
+
 		// ground size
 		double GetGroundSizeX() const { return fGroundX; }
 		void SetGroundSizeX(double gx) { fGroundX = gx; }
@@ -136,51 +104,18 @@ class Detector
 
 		double GetGroundSizeZ() const { return fGroundZ; }
 		void SetGroundSizeZ(double gz) { fGroundZ = gz; }
-
-		// Optical device
-		void MakeOptDevice(int id, OptDevice::DeviceType type);
-		OptDevice& GetOptDevice(int id) { return fOptDeviceMap[id]; }
-		OptDevice GetOptDevice(OptDevice::DeviceType type) { return OptDevice(type); }
-		bool HasOptDevice(int id);
-		
-		std::map<int, OptDevice>& OptDeviceRange() { return fOptDeviceMap; }
-		const std::map<int, OptDevice>& OptDeviceRange() const { return fOptDeviceMap; }
-		int GetNOptDevice() const { return fNOptDevices; }
 		
 		// Setters & Getters for Geant4 logical volumes
 		void SetLogicalVolume(std::string volName, G4LogicalVolume* log);
 		G4LogicalVolume* GetLogicalVolume(std::string volName) { return fLogicalVolumeMap[volName]; }
 		bool HasLogicalVolume(std::string volName);
 
-		static DetectorType StringToType(const std::string name);
-		void SetDetectorProperties(const boost::property_tree::ptree &det, DefaultProperties &defProp);
-
 	protected:
-
 		unsigned int fDetectorId = 0;
 		std::string fName;
 		DetectorType fType;
 		int fNOptDevices = 0;
-
-		// Scintillator bars
-		double fBarWidth;
-		double fBarLength;
-		double fBarThickness;
-		double fCasingThickness;
-		double fRotationAngle;
-		double fFiberLength;
-		double fFiberRadius;
-		double fCladdingThickness;
-		double fCoatingThickness;
-		int    fNumberOfBars;
-		int    fNumberOfPanels;
-		double fDistancePanels;
-
-		// Water-Cerenkov Detector parameters
-		double fTankHeight;
-		double fTankRadius;
-		double fTankThickness;
-		double fImpuritiesFraction;
+		std::string fDefaultPropertiesFile;
 
 		// general detector size parameters
 		double fLength;
@@ -197,9 +132,7 @@ class Detector
 		std::map<int, OptDevice> fOptDeviceMap;
 		std::map<OptDevice::DeviceType, OptDevice> fOptDeviceMapT;
 		std::map<std::string, G4LogicalVolume*> fLogicalVolumeMap;
-
-
-
+		std::vector<std::string> fOverwrittenPropertiesVector;
 };
 
 #endif

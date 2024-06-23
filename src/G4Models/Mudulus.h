@@ -9,13 +9,14 @@
 
 #include "Event.h"
 #include "Detector.h"
+#include "Scintillator.h"
 #include "Materials.h"
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4OpticalSkinSurface;
 
-class Mudulus : public Detector
+class Mudulus : public Scintillator
 {
 	// an hodoscope-like muon detector with SiPM in both of the fiber endpoints.
 

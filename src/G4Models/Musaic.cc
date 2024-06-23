@@ -11,7 +11,7 @@
 using namespace std;
 
 Musaic::Musaic(const int aId, const Detector::DetectorType aType) :
-	Detector(aId, aType)
+	Scintillator(aId, aType)
 {
 	fName = "Musaic";
 }
@@ -225,7 +225,5 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Event& theEvent, G4bool fCheck
 		G4MOptDeviceAction* const SiPMBotSD = new G4MOptDeviceAction(namedetector.str() + "/" + nameSiPM, detectorId, barId, theEvent);
 		sdMan->AddNewDetector(SiPMBotSD);
 		logicSiPM->SetSensitiveDetector(SiPMBotSD);
-	
 	}
-
 }

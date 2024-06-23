@@ -4,16 +4,19 @@
 #include "Geometry.h"
 #include "G4MDetectorAction.h"
 #include "G4MPMTAction.h"
+#include "ConfigManager.h"
 
 #include "G4SDManager.hh"
 #include "G4VisAttributes.hh"
 #include "G4NistManager.hh"
 #include "G4Colour.hh"
+#include <boost/property_tree/xml_parser.hpp>
 
 using namespace std;
+using boost::property_tree::ptree;
 
 SaltyWCD::SaltyWCD(const int aId, const Detector::DetectorType aType) :
-	Detector(aId, aType)
+	WCD(aId, aType)
 {
 	fName = "SaltyWCD";
 }
@@ -56,17 +59,17 @@ SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheck
 	G4PVPlacement* physSide = nullptr;
 
 	// SaltyWCD dimensions
-	G4double fTankRadius = GetTankRadius();
-	G4double fTankHeight = GetTankHeight();
-	G4double fTankHalfHeight = 0.5 * fTankHeight;
-	G4double fTankThickness = GetTankThickness();
-	G4double fNaClFracMass = GetImpuritiesFraction();
+	G4double tankRadius = GetTankRadius();
+	G4double tankHeight = GetTankHeight();
+	G4double tankHalfHeight = 0.5 * fTankHeight;
+	G4double tankThickness = GetTankThickness();
+	G4double NaClFracMass = GetImpuritiesFraction();
 	// --------------------------------------------------------------------
 	// SaltyWater defined here for this particular detector
 	// --------------------------------------------------------------------
 	G4Material* SaltyWater = new G4Material("SaltyWater", 1.1 * g/cm3, 2);
-	SaltyWater->AddMaterial(Materials().Water,1-fNaClFracMass);
-	SaltyWater->AddMaterial(Materials().Salt, fNaClFracMass);
+	SaltyWater->AddMaterial(Materials().Water,1-NaClFracMass);
+	SaltyWater->AddMaterial(Materials().Salt, NaClFracMass);
 	SaltyWater->SetMaterialPropertiesTable(Materials().waterPT1);
 
 	G4NistManager* nist = G4NistManager::Instance();
@@ -74,17 +77,17 @@ SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheck
 	
 	// PMT properties photonis-XP1805
 	OptDevice pmt = GetOptDevice(OptDevice::ePMT);
-	G4double fPMTSemiX = pmt.GetSemiAxisX() * CLHEP::cm;
-	G4double fPMTSemiY = pmt.GetSemiAxisY() * CLHEP::cm;
-	G4double fPMTSemiZ = pmt.GetSemiAxisZ() * CLHEP::cm;
+	G4double pmtSemiX = pmt.GetSemiAxisX() * CLHEP::cm;
+	G4double pmtSemiY = pmt.GetSemiAxisY() * CLHEP::cm;
+	G4double pmtSemiZ = pmt.GetSemiAxisZ() * CLHEP::cm;
 
 	G4ThreeVector detectorPos = Geometry::ToG4Vector(GetDetectorPosition(), 1.);
-	G4double fTankPosX = detectorPos.getX();
-	G4double fTankPosY = detectorPos.getY();
-	G4double fTankPosZ = detectorPos.getZ();
+	G4double tankPosX = detectorPos.getX();
+	G4double tankPosY = detectorPos.getY();
+	G4double tankPosZ = detectorPos.getZ();
 	
 	// define PMT position as the center of the tank
-	G4ThreeVector fTankCenter = detectorPos + G4ThreeVector(0, 0, fTankHalfHeight + fTankThickness);
+	G4ThreeVector fTankCenter = detectorPos + G4ThreeVector(0, 0, tankHalfHeight + tankThickness);
 	int detectorId = GetId();
 	int pmtId = 0;
 	ostringstream namedetector;
@@ -94,9 +97,9 @@ SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheck
 	cout << " (ID = " << detectorId << ")";
 	cout << " with " << pmt.GetName() << ". " << endl;
 	cout << "[INFO] G4Models::SaltyWCD: Detector Dimensions:" << endl;
-	cout << "Tank Radius = " << fTankRadius / CLHEP::cm << " cm " << endl;
-	cout << "Tank Height = " << fTankHeight / CLHEP::cm << " cm " << endl;
-	cout << "Fraction of Water Impurities = " << fNaClFracMass << endl;
+	cout << "Tank Radius = " << tankRadius / CLHEP::cm << " cm " << endl;
+	cout << "Tank Height = " << tankHeight / CLHEP::cm << " cm " << endl;
+	cout << "Fraction of Water Impurities = " << NaClFracMass << endl;
 	/****************************************************************
 		
 		Geant4 Volume construction
@@ -113,28 +116,28 @@ SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheck
 		and its response is computed by the G4MPMTAction class.
 
 	****************************************************************/
-	solidCasingTop = new G4Tubs("CasingTop", 0, fTankRadius + fTankThickness, fTankThickness/2, 0, 360*deg);
-	solidCasingSide = new G4Tubs("CasingSide", fTankRadius, fTankRadius + fTankThickness, fTankHalfHeight, 0, 360*deg);
+	solidCasingTop = new G4Tubs("CasingTop", 0, tankRadius + tankThickness, tankThickness/2, 0, 360*deg);
+	solidCasingSide = new G4Tubs("CasingSide", tankRadius, tankRadius + tankThickness, tankHalfHeight, 0, 360*deg);
 
-	solidTank = new G4Tubs("Tank", 0, fTankRadius, fTankHalfHeight, 0, 360*deg);
-	solidTop = new G4Tubs("Top", 0, fTankRadius, fTankThickness/2, 0, 360*deg);
-	solidSide = new G4Tubs("Side", fTankRadius, fTankRadius + fTankThickness, fTankHalfHeight, 0, 360*deg);
+	solidTank = new G4Tubs("Tank", 0, tankRadius, tankHalfHeight, 0, 360*deg);
+	solidTop = new G4Tubs("Top", 0, tankRadius, tankThickness/2, 0, 360*deg);
+	solidSide = new G4Tubs("Side", tankRadius, tankRadius + tankThickness, tankHalfHeight, 0, 360*deg);
 
 	// pmt solids 
-	solidPMT = new G4Ellipsoid("PMT", fPMTSemiX, fPMTSemiY, fPMTSemiZ, -fPMTSemiZ, 0);
+	solidPMT = new G4Ellipsoid("PMT", pmtSemiX, pmtSemiY, pmtSemiZ, -pmtSemiZ, 0);
 
 	// assemble SaltyWCD 
 	auto sdMan = G4SDManager::GetSDMpointer();
 
 	// tank casing are made of Stainless-steel
 	logCasingTop = new G4LogicalVolume(solidCasingTop, StainlessSteel, "logCasingTop", 0, 0, 0);
-	physCasingTop = new G4PVPlacement(nullptr, G4ThreeVector(fTankPosX, fTankPosY, fTankPosZ + 2*fTankHalfHeight + 1.5*fTankThickness), logCasingTop, "physCasingTop", logMother, false, 0, fCheckOVerlaps);
+	physCasingTop = new G4PVPlacement(nullptr, G4ThreeVector(tankPosX, tankPosY, tankPosZ + 2*tankHalfHeight + 1.5*tankThickness), logCasingTop, "physCasingTop", logMother, false, 0, fCheckOVerlaps);
 	
 	logCasingBot = new G4LogicalVolume(solidCasingTop, StainlessSteel, "logCasingBot", 0, 0, 0);
-	physCasingBot = new G4PVPlacement(nullptr, G4ThreeVector(fTankPosX, fTankPosY, fTankPosZ + 0.5*fTankThickness), logCasingBot, "physCasingBot", logMother, false, 0);
+	physCasingBot = new G4PVPlacement(nullptr, G4ThreeVector(tankPosX, tankPosY, tankPosZ + 0.5*tankThickness), logCasingBot, "physCasingBot", logMother, false, 0);
 
 	logCasingSide = new G4LogicalVolume(solidCasingSide, StainlessSteel, "logCasingSide", 0, 0, 0);
-	physCasingSide = new G4PVPlacement(nullptr, G4ThreeVector(fTankPosX, fTankPosY, fTankPosZ + fTankHalfHeight + fTankThickness), logCasingSide, "physCasingSide", logMother, false, 0, fCheckOVerlaps);
+	physCasingSide = new G4PVPlacement(nullptr, G4ThreeVector(tankPosX, tankPosY, tankPosZ + tankHalfHeight + tankThickness), logCasingSide, "physCasingSide", logMother, false, 0, fCheckOVerlaps);
 
 
 	// water part
@@ -162,7 +165,7 @@ SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheck
 	// PMT
 	string logName = "logPMT_"+to_string(pmtId);
 	logPMT = new G4LogicalVolume(solidPMT, Materials().Pyrex, logName, 0, 0, 0);
-	new G4PVPlacement(nullptr, G4ThreeVector(0, 0, fTankHalfHeight), logPMT, "physPMT", logTank, false, pmtId, fCheckOVerlaps);
+	new G4PVPlacement(nullptr, G4ThreeVector(0, 0, tankHalfHeight), logPMT, "physPMT", logTank, false, pmtId, fCheckOVerlaps);
 
 	// register PMT in the Detector
 	if (!HasOptDevice(pmtId)) {
@@ -189,5 +192,3 @@ SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheck
 	logTank->SetSensitiveDetector(waterSD);
 	
 }
-
-

@@ -1,15 +1,18 @@
-#include <iostream>
-
 #include "WCD.h"
 #include "Geometry.h"
 #include "G4MDetectorAction.h"
 #include "G4MPMTAction.h"
+#include "ConfigManager.h"
 
 #include "G4SDManager.hh"
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 
+#include <iostream>
+#include <boost/property_tree/xml_parser.hpp>
+
 using namespace std;
+using boost::property_tree::ptree;
 
 G4LogicalVolume *WCD::fLogTank = nullptr;
 G4LogicalVolume *WCD::fLogPMT = nullptr;
@@ -20,6 +23,8 @@ WCD::WCD(const int id, const DetectorType type) :
 	Detector(id, type)
 {
 	fName = "WCD";
+	fOverwrittenPropertiesVector.clear();
+	SetDefaultProperties();
 }
 
 void WCD::BuildDetector(G4LogicalVolume *aLogMother, Event &aEvent, G4bool aCheckOVerlaps)
@@ -28,24 +33,24 @@ void WCD::BuildDetector(G4LogicalVolume *aLogMother, Event &aEvent, G4bool aChec
 	G4Tubs* solidBot  = nullptr;
 
 	// WCD dimensions
-	G4double fTankRadius = GetTankRadius();
-	G4double fTankHeight = GetTankHeight();
-	G4double fTankHalfHeight = 0.5 * fTankHeight;
-	G4double fTankThickness = GetTankThickness();
+	G4double tankRadius = GetTankRadius();
+	G4double tankHeight = GetTankHeight();
+	G4double tankHalfHeight = 0.5 * fTankHeight;
+	G4double tankThickness = GetTankThickness();
 	
 	// PMT properties photonis-XP1805
 	OptDevice pmt = GetOptDevice(OptDevice::ePMT);
-	G4double fPMTSemiX = pmt.GetSemiAxisX() * CLHEP::cm;
-	G4double fPMTSemiY = pmt.GetSemiAxisY() * CLHEP::cm;
-	G4double fPMTSemiZ = pmt.GetSemiAxisZ() * CLHEP::cm;
+	G4double pmtSemiX = pmt.GetSemiAxisX() * CLHEP::cm;
+	G4double pmtSemiY = pmt.GetSemiAxisY() * CLHEP::cm;
+	G4double pmtSemiZ = pmt.GetSemiAxisZ() * CLHEP::cm;
 
 	G4ThreeVector detectorPos = Geometry::ToG4Vector(GetDetectorPosition(), 1.);
-	G4double fTankPosX = detectorPos.getX();
-	G4double fTankPosY = detectorPos.getY();
-	G4double fTankPosZ = detectorPos.getZ();
+	G4double tankPosX = detectorPos.getX();
+	G4double tankPosY = detectorPos.getY();
+	G4double tankPosZ = detectorPos.getZ();
 	
 	// define PMT position as the center of the tank
-	G4ThreeVector fTankCenter = detectorPos + G4ThreeVector(0, 0, fTankHalfHeight + fTankThickness);
+	G4ThreeVector tankCenter = detectorPos + G4ThreeVector(0, 0, tankHalfHeight + tankThickness);
 	int detectorId = GetId();
 	int pmtId = 0;
 	fNameDetector.str("");
@@ -54,8 +59,8 @@ void WCD::BuildDetector(G4LogicalVolume *aLogMother, Event &aEvent, G4bool aChec
 	cout << " (ID = " << detectorId << ")";
 	cout << " with " << pmt.GetName() << ". " << endl;
 	cout << "[INFO] G4Models::WCD: Detector Dimensions:" << endl;
-	cout << "Tank Radius = " << fTankRadius / CLHEP::cm << " cm " << endl;
-	cout << "Tank Height = " << fTankHeight / CLHEP::cm << " cm " << endl;
+	cout << "Tank Radius = " << tankRadius / CLHEP::cm << " cm " << endl;
+	cout << "Tank Height = " << tankHeight / CLHEP::cm << " cm " << endl;
 	/****************************************************************
 		
 		Geant4 Volume construction
@@ -73,13 +78,13 @@ void WCD::BuildDetector(G4LogicalVolume *aLogMother, Event &aEvent, G4bool aChec
 
 	****************************************************************/
 	// Tank
-	G4Tubs* solidTank = new G4Tubs("Tank", 0, fTankRadius, fTankHalfHeight, 0, 360*deg);
-	G4Tubs* solidTop = new G4Tubs("Top", 0, fTankRadius + fTankThickness, fTankThickness/2, 0, 360*deg);
-	G4Tubs* solidSide = new G4Tubs("Side", fTankRadius, fTankRadius + fTankThickness, fTankHalfHeight, 0, 360*deg);
+	G4Tubs* solidTank = new G4Tubs("Tank", 0, tankRadius, tankHalfHeight, 0, 360*deg);
+	G4Tubs* solidTop = new G4Tubs("Top", 0, tankRadius + tankThickness, tankThickness/2, 0, 360*deg);
+	G4Tubs* solidSide = new G4Tubs("Side", tankRadius, tankRadius + tankThickness, tankHalfHeight, 0, 360*deg);
 
 	// water part
 	fLogTank  = new G4LogicalVolume(solidTank, Materials().Water, "logTank", 0, 0, 0);
-	G4PVPlacement* physTank = new G4PVPlacement(nullptr, fTankCenter, fLogTank, "physTank", aLogMother, false, 0, aCheckOVerlaps);
+	G4PVPlacement* physTank = new G4PVPlacement(nullptr, tankCenter, fLogTank, "physTank", aLogMother, false, 0, aCheckOVerlaps);
 	// register water logical volume in the Detector
 	if (!HasLogicalVolume("logTank"))
 		SetLogicalVolume("logTank", fLogTank);
@@ -87,19 +92,19 @@ void WCD::BuildDetector(G4LogicalVolume *aLogMother, Event &aEvent, G4bool aChec
 	// top, bottom and side walls of the tank
 	G4LogicalVolume* logTop  = new G4LogicalVolume(solidTop, Materials().HDPE, "logTop", 0, 0, 0);
 	G4PVPlacement* physTop = new G4PVPlacement(nullptr, 
-												G4ThreeVector(fTankPosX, fTankPosY, fTankPosZ + 2*fTankHalfHeight + 1.5*fTankThickness), 
+												G4ThreeVector(tankPosX, tankPosY, tankPosZ + 2*tankHalfHeight + 1.5*tankThickness), 
 												logTop, "physTop", aLogMother, 
 												false, 0, aCheckOVerlaps);
 	// solidBot = nullptr??
 	G4LogicalVolume* logBot = new G4LogicalVolume(solidBot, Materials().HDPE, "logBot", 0, 0, 0);
 	G4PVPlacement* physBot = new G4PVPlacement(nullptr, 
-												G4ThreeVector(fTankPosX, fTankPosY, fTankPosZ + 0.5*fTankThickness), 
+												G4ThreeVector(tankPosX, tankPosY, tankPosZ + 0.5*tankThickness), 
 												logTop, "physBot", aLogMother, 
 												false, 0, aCheckOVerlaps);
 	
 	G4LogicalVolume* logSide  = new G4LogicalVolume(solidSide, Materials().HDPE, "logSide", 0, 0, 0);
 	G4PVPlacement* physSide = new G4PVPlacement(nullptr, 
-												G4ThreeVector(fTankPosX, fTankPosY, fTankPosZ + fTankHalfHeight + fTankThickness), logSide, "physSide", aLogMother, 
+												G4ThreeVector(tankPosX, tankPosY, tankPosZ + tankHalfHeight + tankThickness), logSide, "physSide", aLogMother, 
 												false, 0, aCheckOVerlaps);
 
 	// tank liner surface
@@ -108,10 +113,10 @@ void WCD::BuildDetector(G4LogicalVolume *aLogMother, Event &aEvent, G4bool aChec
 	new G4LogicalBorderSurface("SideSurface", physTank, physSide, Materials().LinerOptSurf);
 
 	// PMT
-	G4Ellipsoid* solidPMT = new G4Ellipsoid("PMT", fPMTSemiX, fPMTSemiY, fPMTSemiZ, -fPMTSemiZ, 0);
+	G4Ellipsoid* solidPMT = new G4Ellipsoid("PMT", pmtSemiX, pmtSemiY, pmtSemiZ, -pmtSemiZ, 0);
 	string logName = "logPMT_"+to_string(pmtId);
 	fLogPMT = new G4LogicalVolume(solidPMT, Materials().Pyrex, logName, 0, 0, 0);
-	new G4PVPlacement(nullptr, G4ThreeVector(0, 0, fTankHalfHeight), fLogPMT, "physPMT", fLogTank, false, pmtId, aCheckOVerlaps);
+	new G4PVPlacement(nullptr, G4ThreeVector(0, 0, tankHalfHeight), fLogPMT, "physPMT", fLogTank, false, pmtId, aCheckOVerlaps);
 
 	// register PMT in the Detector
 	if (!HasOptDevice(pmtId)) {
@@ -140,7 +145,7 @@ void WCD::ConstructSensitiveDetector(Detector &aDetector, Event &aEvent)
 {
 
 	auto sdMan = G4SDManager::GetSDMpointer();
-	// register PMT as sensitive detector	
+	// register PMT as sensitive detector
 	G4MPMTAction* const pmtSD = new G4MPMTAction(fFullName.str().c_str(), aDetector.GetId(), 0, aEvent);
 	sdMan->AddNewDetector(pmtSD);
 	if(fLogPMT != nullptr) {
@@ -153,4 +158,78 @@ void WCD::ConstructSensitiveDetector(Detector &aDetector, Event &aEvent)
 		fLogTank->SetSensitiveDetector(waterSD);
 	}
 
+}
+
+void WCD::SetDefaultProperties()
+{
+	if (fDefaultPropertiesFile.empty()) 
+		return;
+	
+	Logger::Print("Setting default properties from file "+fDefaultPropertiesFile, INFO, "SetDefaultProperties");
+	ptree tree;
+	read_xml(fDefaultPropertiesFile, tree);
+	string branchName = "detectorProperties";
+
+	SetTankRadius( ConfigManager::GetPropertyFromXML<double>(tree, branchName, "tankRadius") );
+	SetTankHeight( ConfigManager::GetPropertyFromXML<double>(tree, branchName, "tankHeight") );
+	SetTankThickness( ConfigManager::GetPropertyFromXML<double>(tree, branchName, "tankThickness") );
+	SetImpuritiesFraction( ConfigManager::GetPropertyFromXML<double>(tree, branchName, "impuritiesFraction", false) );
+}
+
+void WCD::SetDetectorProperties(const boost::property_tree::ptree &aTree)
+{
+	vector<double> detPosition;
+	detPosition.reserve(3);
+
+	for (const auto& property : aTree) {
+		string xmlLabel = property.first;
+		string xmlValue = property.second.data();
+
+		if(xmlLabel == "<xmlattr>")
+			continue;
+		if(xmlLabel == "<xmlcomment>")
+			continue;
+
+		if ( xmlLabel == "x" || xmlLabel == "y" || xmlLabel == "z") {
+			string value = property.second.data();
+			boost::algorithm::trim(value);
+			double dValue = stod(value);
+			string unit = property.second.get<string>("<xmlattr>.unit");
+			double coord = G4UnitDefinition::GetValueOf(unit) * dValue;
+			detPosition.push_back(coord);
+		} else if (xmlLabel == "tankRadius") {
+				double value = stod(xmlValue);
+				double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
+				fOverwrittenPropertiesVector.push_back(xmlLabel);
+				SetTankRadius(value * unit);
+			}
+			else if (xmlLabel == "tankHeight") {
+				double value = stod(xmlValue);
+				double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
+				fOverwrittenPropertiesVector.push_back(xmlLabel);
+				SetTankHeight(value * unit);
+			}
+			else if (xmlLabel == "tankThickness") {
+				double value = stod(xmlValue);
+				double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
+				fOverwrittenPropertiesVector.push_back(xmlLabel);
+				SetTankThickness(value * unit);
+			}
+			else if (xmlLabel == "impuritiesFraction") {
+				double value = stod(xmlValue);
+				fOverwrittenPropertiesVector.push_back(xmlLabel);
+				SetImpuritiesFraction(value);
+			}
+			else {
+				ostringstream msg;
+				msg << xmlLabel << " is not a property of detector " << TypeToString(fType) << ". Skipping...";
+				Logger::Print(msg, WARNING, "SetDetectorProperties");
+		}
+	}
+	SetDetectorPosition(detPosition);
+	Logger::PrintVector(fDetectorPosition, "Detector position: ", INFO, "SetDetectorProperties");
+	
+	if(!fOverwrittenPropertiesVector.empty()) {
+		Logger::PrintVector(fOverwrittenPropertiesVector, "Overwritten properties for detector " + TypeToString(fType), INFO, "SetDetectorProperties");
+	}
 }

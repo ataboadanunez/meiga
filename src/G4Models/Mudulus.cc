@@ -11,7 +11,7 @@
 using namespace std;
 
 Mudulus::Mudulus(const int aId, const Detector::DetectorType aType) :
-	Detector(aId, aType)
+	Scintillator(aId, aType)
 {
 	fName = "Mudulus";
 }

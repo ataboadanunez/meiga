@@ -24,19 +24,39 @@ class Event;
 class WCD : public Detector 
 {
 	// Basic Geant4 model for a Water-Cerenkov Detector
+	friend class SaltyWCD;
+
 public:
 	WCD(const int id, const DetectorType type);
-	
-	// static void BuildDetector(G4LogicalVolume* aLogMother, Detector& aDetector, Event& aEvent, G4bool aCheckOverlaps = true);
 	virtual void BuildDetector(G4LogicalVolume *logMother, Event &aEvent, G4bool overlaps = false) override;
 	static void ConstructSensitiveDetector(Detector &aDetector, Event &aEvent);
-	
-private:
 
+private:
+	virtual void SetDefaultProperties() override;
+	virtual void SetDetectorProperties(const boost::property_tree::ptree &aTree) override;
+	
+	double GetTankHeight() const { return fTankHeight; }
+	void SetTankHeight(double h) { fTankHeight = h; }
+	
+	double GetTankRadius() const { return fTankRadius; }
+	void SetTankRadius(double r) { fTankRadius = r; }
+
+	double GetTankThickness() const { return fTankThickness; }
+	void SetTankThickness(double t) { fTankThickness = t; }
+
+	double GetImpuritiesFraction() const { return fImpuritiesFraction; }
+	void SetImpuritiesFraction(double impF) { fImpuritiesFraction = impF; }
+
+private:
 	static std::ostringstream fNameDetector;
 	static std::ostringstream fFullName;
 	static G4LogicalVolume* fLogTank;
 	static G4LogicalVolume* fLogPMT;
+
+	double fTankHeight;
+	double fTankRadius;
+	double fTankThickness;
+	double fImpuritiesFraction;
 
 };
 

@@ -10,13 +10,14 @@
 
 #include "Event.h"
 #include "Detector.h"
+#include "Scintillator.h"
 #include "Materials.h"
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4OpticalSkinSurface;
 
-class Musaic : public Detector
+class Musaic : public Scintillator
 {
 
 public:
