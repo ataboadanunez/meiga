@@ -1,11 +1,9 @@
 #ifndef ConfigManager_h
 #define ConfigManager_h 1
-
 // Meiga headers
 #include "Event.h"
 #include "SimData.h"
 #include "Detector.h"
-#include "DefaultProperties.h"
 
 // Geant4 headers
 #include "G4UnitsTable.hh"
@@ -35,10 +33,6 @@ class ConfigManager
 		static void ReadDetectorList(const std::string &filename, Event& theEvent);
 		static void PrintConfig(const Event::Config &cfg);
 
-	private:
-		
-		static DefaultProperties defProp;
-
 		// return value giving the XML path
 		template <typename T>
 		inline static T GetPropertyFromXML(const ptree &tree, const string &branchName, const string &property, bool hasUnit = true) {
@@ -65,9 +59,6 @@ class ConfigManager
 			
 			return res;
 		}
-
-	friend class DefaultProperties;
-
 };
 
 #endif

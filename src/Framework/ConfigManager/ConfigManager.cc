@@ -9,9 +9,6 @@
 using boost::property_tree::ptree;
 using namespace std;
 
-/** Static class member definition **/
-DefaultProperties ConfigManager::defProp;
-
 void
 ConfigManager::ReadConfigurationFile(Event &aEvent, const string &fConfigFile)
 {
@@ -76,10 +73,6 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 	msg << "===========================================" << "\n";
 
 	SimData& simData = theEvent.GetSimData();
-
-	// set default detector properties before detector construction
-	defProp.SetDefaultProperties();
-
 	// used to determine maximum value of Z coordinate of current detectors in file
 	double maxHeight = 0.;
 	
@@ -137,22 +130,14 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 	msg << "===========================================" << "\n";
 	msg << "===========================================" << "\n";
 	Logger::Print(msg, INFO, "ReadDetectorList");
-	cout << "------------ Detector Info -------------- " << "\n";
-	for (const auto& i : tree.get_child("detectorList")) {
-		ostringstream msg2;
-		ptree subtree;
-		string name;
-		tie(name, subtree) = i;
-
-		// accessing detector settings
-		if (name == "detector") {
-			vector<double> detPosition;
-			string detIdstr = subtree.get<string>("<xmlattr>.id");
-			string detTypestr = subtree.get<string>("<xmlattr>.type");
+	std::cout << "------------ Detector Info -------------- " << "\n";
+	for (const auto& det : tree.get_child("detectorList")) {
+		if (det.first == "detector") {
+			string detIdstr = det.second.get<string>("<xmlattr>.id");
+			string detTypestr = det.second.get<string>("<xmlattr>.type");
 			int detId = stoi(detIdstr);
 			Detector::DetectorType detType = Detector::StringToType(detTypestr);
-			detPosition.clear();
-			msg2 << "Reading configuration of detector " << detTypestr << " with ID = " << detId << "\n";
+			std::cout << "Reading configuration of detector " << detTypestr << " with ID = " << detId << "\n";
 			// register detector in the Event
 			if (!theEvent.HasDetector(detId)) {
 				theEvent.MakeDetector(detId, detType);
@@ -163,40 +148,12 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 			}
 			
 			Detector& detector = theEvent.GetDetector(detId);
-			// set detector position
-			for (const auto &v : subtree.get_child("")) {
-				string label = v.first;
-
-				if ( label != "<xmlattr>" ) {
-					if ((label == "x") || (label == "y") || (label == "z")) {
-						string value = v.second.data();
-						boost::algorithm::trim(value);
-						double dValue = stod(value);
-						string unit = v.second.get<string>("<xmlattr>.unit");
-						double coord = G4UnitDefinition::GetValueOf(unit) * dValue;
-						detPosition.push_back(coord);
-						// compute maximum height according to Z coordinate
-						if ((label == "z") && (coord > maxHeight))
-							maxHeight = coord;	
-					}
-				}
-			}
-			
-			// shouldn't be part of DetectorSimData?
-			theEvent.SetMaximumHeight(maxHeight);
-			detector.SetDetectorPosition(detPosition);
-			msg2 << "Detector position: " << "(x0, y0, z0) = (" << detPosition.at(0) / CLHEP::m << ", " 
-																<< detPosition.at(1) / CLHEP::m << ", " 
-																<< detPosition.at(2) / CLHEP::m << ") m";
-			Logger::Print(msg2, INFO);
-			// search for another detector properties in the DetectorList.xml
-			detector.SetDetectorProperties(subtree, defProp);
+			detector.SetDetectorProperties(det.second);
 		}
 
 	}
-
-	cout << "===========================================" << endl;
-	cout << "===========================================" << endl;
+	std::cout << "===========================================" << endl;
+	std::cout << "===========================================" << endl;
 }
 
 void
