@@ -90,11 +90,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheckO
 	ostringstream namedetector;
 	namedetector.str("");
 	namedetector << "Mudulus";
-	cout << "[INFO] Mudulus::BuildDetector: Building detector " << namedetector.str();
-	cout << " (ID = " << detectorId << ")";
-	cout << " with " << pmt.GetName() << ". " << endl;
-	cout << "Distance between panels = " << fDistanceBtwPanels / CLHEP::mm << " mm " << endl;
-
+	
 	/*************************************************
 		
 		Geant4 Volume construction
@@ -150,7 +146,6 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheckO
 	G4RotationMatrix* rotationFiber = new G4RotationMatrix();
 	G4RotationMatrix* rotationBot = new G4RotationMatrix();
 	G4double alpha = GetRotationAngle();
-	cout << "[DEBUG] G4Models::Mudulus: Rotation Angle = " << alpha << endl;
 	rotationCasing->rotateX(alpha);
 	rotationFiber->rotateY(M_PI/2);
 	rotationBot->rotateZ(M_PI/2);

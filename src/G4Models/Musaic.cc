@@ -76,14 +76,6 @@ Musaic::BuildDetector(G4LogicalVolume* logMother, Event& theEvent, G4bool fCheck
 	ostringstream namedetector;
 	namedetector.str("");
 	namedetector << "Musaic" << '_' << detectorId;
-	cout << "G4Models::Musaic: Building detector " << namedetector.str();
-	cout << " with " << sipm.GetName() << ". " << endl;
-	
-	/****************************
-		
-		Geant4 Volume construction
-	
-	****************************/ 
 
 	// Casing
 	solidCasing = new G4Box("Casing", fCasingSizeX, fCasingSizeY, fCasingSizeZ);

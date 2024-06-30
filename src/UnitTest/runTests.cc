@@ -39,7 +39,8 @@ namespace
         assert(cfg.fGeoVis == false);
         assert(cfg.fTrajVis == false);
         assert(cfg.fCheckOverlaps == false);
-        std::cout << "[INFO] test_ReadConfigurationFile: OK" << std::endl;
+        Logger::Print("PASS", INFO, "test_ReadConfigurationFile");
+        
         return event;
     }
 
@@ -64,7 +65,8 @@ namespace
         assert(scinDet);
         int nBars = scinDet->GetNBars();
         assert(nBars == 8);
-        std::cout << "[INFO] test_ReadDetectorList: OK" << std::endl;
+        Logger::Print("PASS", INFO, "test_ReadDetectorList");
+
         return simData;
     }
 
@@ -82,7 +84,7 @@ namespace
         assert(momentumDirection.at(2) == -449.16473577427365);
         assert(currentParticle.GetZenith() == 2.4114694941536605);
         assert(currentParticle.GetAzimuth() == 3.5926461359435269);
-        std::cout << "[INFO] test_PrimaryGenerator: OK" << std::endl;
+        Logger::Print("PASS", INFO, "test_PrimaryGenerator");
     }
 }
 
@@ -127,7 +129,7 @@ int main(int argc, char** argv)
         test_PrimaryGenerator(simData);
     }
     nTestsPassed++;
-    std::cout << "[INFO] All Unit Tests passed." << std::endl;
+    Logger::Print("All Unit Tests passed.", INFO);
     // need another test for output 
     delete runManager;
     return 0;

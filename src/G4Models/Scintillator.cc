@@ -33,10 +33,10 @@ void Scintillator::BuildDetector(G4LogicalVolume *logMother, Event &aEvent, G4bo
 	ostringstream namedetector;
 	namedetector.str("");
 	namedetector << "Scintillator";
-	cout << "[INFO] G4Models::Scintillator: Building detector " << namedetector.str();
-	cout << " (ID = " << detectorId << ")" << endl;
-	cout << "[INFO] G4Models::Scintillator: Detector Position = ";
-	cout << "(" << detectorPos.getX() / CLHEP::cm << ", " << detectorPos.getY() << ", " << detectorPos.getZ() << ") " << endl;
+	ostringstream msg; 
+	msg << "Building detector: " << namedetector.str() << ", ID: " << detectorId;
+	msg << "Detector position: " << "(" << detectorPos.getX() / CLHEP::cm << ", " << detectorPos.getY() << ", " << detectorPos.getZ() << ")";
+	Logger::Print(msg, INFO, "BuildDetector");
 
 	// solids
 	G4Box* solidCoating = nullptr;

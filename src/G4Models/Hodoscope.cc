@@ -22,8 +22,6 @@ Hodoscope::Hodoscope(const int id, const Detector::DetectorType type) :
 void
 Hodoscope::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheckOverlaps)
 {
-
-
 	// solids
 	G4Box* solidEnclosure = nullptr;
 	G4Box* solidCasing = nullptr;
@@ -77,9 +75,9 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fChec
 	ostringstream namedetector;
 	namedetector.str("");
 	namedetector << "Hodoscope_"+to_string(detectorId);
-	cout << "[INFO] Hodoscope::BuildDetector: Building detector " << namedetector.str();
-	cout << " (ID = " << detectorId << ")";
-	cout << " with " << nBars << " scintillator bars " << endl;
+	ostringstream msg; 
+	msg << "Building detector: " << namedetector.str() << ", ID: " << detectorId;
+	Logger::Print(msg, INFO, "BuildDetector");
 
 	// determine casing size
 	double maxLength;
@@ -121,7 +119,7 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fChec
 	G4RotationMatrix* rotationFiber = new G4RotationMatrix();
 	G4RotationMatrix* rotationBot = new G4RotationMatrix();
 	double alpha = GetRotationAngle();
-	cout << "[INFO] Hodoscope::BuildDetector: Rotation Angle = " << alpha << endl;
+	Logger::Print("Rotation angle: " + std::to_string(alpha), INFO, "BuildDetector");
 	rotationEnclosure->rotateX(alpha);
 	rotationFiber->rotateY(M_PI/2);
 	rotationBot->rotateZ(M_PI/2);

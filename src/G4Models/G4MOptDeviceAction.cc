@@ -3,6 +3,7 @@
 #include "DetectorSimData.h"
 #include "OptDeviceSimData.h"
 #include "OptDevice.h"
+#include "Logger.h"
 
 #include <G4Step.hh>
 #include <G4TouchableHistory.hh>
@@ -20,32 +21,24 @@ G4MOptDeviceAction::G4MOptDeviceAction(const G4String& name, const G4int dId, co
 		SimData& simData = fEvent.GetSimData();
 		DetectorSimData& detSimData = simData.GetDetectorSimData(fDetectorId);
 		detSimData.MakeOptDeviceSimData(fOptDeviceId);
-		// OptDeviceSimData& OptDeviceSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
 		OptDevice& optDevice = fEvent.GetDetector(fDetectorId).GetOptDevice(fOptDeviceId);
-		// fPETimeDistribution = OptDeviceSimData.PETimeDistributionRange();
-
-		std::cout << "[INFO] G4Models::G4MOptDeviceAction: Registering OptDevice " << optDevice.GetName() << " " << name << " " << fOptDeviceId << std::endl;
-
+		std::ostringstream msg;
+		msg << "Registering Optical Device " << optDevice.GetName() << " with ID " << fOptDeviceId; 
+		Logger::Print(msg, INFO, "G4MOptDeviceAction");
 	}
 
 void
 G4MOptDeviceAction::Initialize(G4HCofThisEvent* const /*hce*/)
 {
-	
-	// fPETime = new std::vector<double>();
 
 }
 
 void
 G4MOptDeviceAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 {
-	
 	OptDeviceSimData& odSimData = fEvent.GetSimData().GetDetectorSimData(fDetectorId).GetOptDeviceSimData(fOptDeviceId);
 	odSimData.AddPETimeDistribution(fPETime);
-
-	// clear PE time vector
 	fPETime.clear();
-
 }
 
 G4VSensitiveDetector *G4MOptDeviceAction::Clone() const
@@ -56,7 +49,6 @@ G4VSensitiveDetector *G4MOptDeviceAction::Clone() const
 G4bool
 G4MOptDeviceAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHist*/)
 {
-	
 	// If it is not an opticalphoton, continue
 	if (step->GetTrack()->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition())
 		return true;
@@ -80,7 +72,6 @@ G4MOptDeviceAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*
 
 	}
 	
-
 	return true;
 }
 

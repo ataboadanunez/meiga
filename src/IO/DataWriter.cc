@@ -39,8 +39,7 @@ DataWriter::FileWriter(Event& theEvent)
 	
 	string& outFileName = cfg.fOutputFileName;
 	const bool& compressOutput = cfg.fCompressOutput;
-
-	cout << "[INFO] DataWriter::FileWriter: Writing output to file " << outFileName << endl;
+	Logger::Print("Writing output to file " + outFileName, INFO, "FileWriter");
 
 	// prepare json data holder
 	json jData;

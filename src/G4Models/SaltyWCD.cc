@@ -93,13 +93,12 @@ SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheck
 	ostringstream namedetector;
 	namedetector.str("");
 	namedetector << "/SaltyWCD"+to_string(detectorId);
-	cout << "[INFO] G4Models::SaltyWCD: Building detector " << namedetector.str();
-	cout << " (ID = " << detectorId << ")";
-	cout << " with " << pmt.GetName() << ". " << endl;
-	cout << "[INFO] G4Models::SaltyWCD: Detector Dimensions:" << endl;
-	cout << "Tank Radius = " << tankRadius / CLHEP::cm << " cm " << endl;
-	cout << "Tank Height = " << tankHeight / CLHEP::cm << " cm " << endl;
-	cout << "Fraction of Water Impurities = " << NaClFracMass << endl;
+	ostringstream msg;
+	msg << "Building detector: " << namedetector.str() << ", ID: " << detectorId << endl;
+	msg << "Tank Radius: " << tankRadius / CLHEP::cm << " cm" << endl;
+	msg << "Tank Height: " << tankHeight / CLHEP::cm << " cm" << endl;
+	msg << "Water impurities: " << NaClFracMass * 100 << "%" << endl;
+	Logger::Print(msg, INFO, "BuildDetector");
 	/****************************************************************
 		
 		Geant4 Volume construction
@@ -170,14 +169,10 @@ SaltyWCD::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheck
 	// register PMT in the Detector
 	if (!HasOptDevice(pmtId)) {
 		MakeOptDevice(pmtId, OptDevice::ePMT);
-		cout << "[DEBUG] Adding PMT id = " << pmtId << endl;
+		Logger::Print("Adding PMT with ID: " + std::to_string(pmtId), DEBUG, "BuildDetector");
 	}
 	OptDevice optDevice = GetOptDevice(pmtId);
-	cout << "[DEBUG] Getting " << optDevice.GetName() << " with id " << optDevice.GetId() << endl;
-	// register PMT logical volume
-	//if (!optDevice.HasLogicalVolume(logName))
-		//optDevice.SetLogicalVolume(logName, logPMT);
-
+	
 	string optName = pmt.GetName() + "_"+to_string(pmtId);
 	ostringstream fullName;
 	fullName.str("");

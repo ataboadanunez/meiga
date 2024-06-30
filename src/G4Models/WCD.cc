@@ -55,12 +55,11 @@ void WCD::BuildDetector(G4LogicalVolume *aLogMother, Event &aEvent, G4bool aChec
 	int pmtId = 0;
 	fNameDetector.str("");
 	fNameDetector << "/WCD_"+to_string(detectorId);
-	cout << "[INFO] G4Models::WCD: Building detector " << fNameDetector.str();
-	cout << " (ID = " << detectorId << ")";
-	cout << " with " << pmt.GetName() << ". " << endl;
-	cout << "[INFO] G4Models::WCD: Detector Dimensions:" << endl;
-	cout << "Tank Radius = " << tankRadius / CLHEP::cm << " cm " << endl;
-	cout << "Tank Height = " << tankHeight / CLHEP::cm << " cm " << endl;
+	ostringstream msg;
+	msg << "Building detector: " << fNameDetector.str() << ", ID: " << detectorId << endl;
+	msg << "Tank Radius: " << tankRadius / CLHEP::cm << " cm" << endl;
+	msg << "Tank Height: " << tankHeight / CLHEP::cm << " cm" << endl;
+	Logger::Print(msg, INFO, "BuildDetector");
 	/****************************************************************
 		
 		Geant4 Volume construction

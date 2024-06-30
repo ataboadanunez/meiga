@@ -41,9 +41,10 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-ExtraPhysics::ExtraPhysics()
-  : G4VPhysicsConstructor("Extra") 
+ExtraPhysics::ExtraPhysics(int aVerboseLevel)
+  : G4VPhysicsConstructor("Extra"), fVerboseLevel(aVerboseLevel)
 {
+  SetVerboseLevel(aVerboseLevel);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -58,9 +59,10 @@ void ExtraPhysics::ConstructParticle() { }
 
 void ExtraPhysics::ConstructProcess()
 {
-    G4cout << "ExtraPhysics:: Add Extra Physics Processes"
-              << G4endl;
-
+    if(GetVerboseLevel()) {
+        G4cout << "ExtraPhysics:: Add Extra Physics Processes" << G4endl;
+    }
+    
     auto particleIterator=GetParticleIterator();
     particleIterator->reset();
 
@@ -76,6 +78,7 @@ void ExtraPhysics::ConstructProcess()
             G4Exception("ExtraPhysics::ConstructProcess()","",
                          FatalException,o.str().c_str());
         }
+        pmanager->SetVerboseLevel(fVerboseLevel);
 
         if (particleName == "opticalphoton") break;
 

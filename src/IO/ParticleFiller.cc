@@ -41,10 +41,8 @@ ParticleFiller::FillParticleVector(const std::string &fileName, Event& theEvent)
 
 
   */
-  
-  cout << "[INFO] ParticleFiller::FillParticleVector: Reading Input File " << fileName << endl;
-  string errmsg;
-  string info;
+  Logger::Print("Reading input file " + fileName, INFO, "FillParticleVector");
+  ostringstream errmsg;
 
   ifstream fInputStream(fileName);
   //Event ret;
@@ -70,8 +68,11 @@ ParticleFiller::FillParticleVector(const std::string &fileName, Event& theEvent)
     std::string line;
     
     if (!fInputStream) {
-      errmsg = "[ERROR] ParticleFiller::FillParticleVector: Error(s) occurred while reading input file!\n Possible causes of this fail:\n - Misspelled file name\n - Wrong file location\n - Wrong file format ";
-      cerr << errmsg << endl;
+		errmsg  << "Error(s) occurred while reading input file. Possible causes of this fail: " << endl
+	  			<< "- Misspelled file name" 													<< endl
+				<< "- Wrong file location" 														<< endl
+				<< "- Wrong file format ";
+      Logger::Print(errmsg, ERROR, "FillParticleVector");
     }
     
     if (!getline(fInputStream, line)) {
@@ -95,7 +96,7 @@ ParticleFiller::FillParticleVector(const std::string &fileName, Event& theEvent)
               >> primaryTheta
               >> primaryPhi)){
       
-      cerr << "[ERROR] ParticleFiller::FillParticleVector: Malformed line !!!" << endl;
+      Logger::Print("Error while parsing input file: malformed line: " + line, ERROR, "FillParticleVector");
       break;
     }
 

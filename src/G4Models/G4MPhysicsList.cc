@@ -59,9 +59,9 @@ G4MPhysicsList::G4MPhysicsList(G4String physName, G4int aVerbosity) : G4VModular
 	}
 
 	fAbsorptionOn = true;
-	RegisterPhysics(new ExtraPhysics());
+	RegisterPhysics(new ExtraPhysics(verboseLevel));
 	RegisterPhysics(fOpticalPhysics = new OpticalPhysics(fAbsorptionOn));
-	RegisterPhysics(new G4RadioactiveDecayPhysics());
+	RegisterPhysics(new G4RadioactiveDecayPhysics(verboseLevel));
 
 	fStepMaxProcess = new StepMax();
 	fStepMaxProcess->SetVerboseLevel(verboseLevel);
