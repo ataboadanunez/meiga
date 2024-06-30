@@ -36,14 +36,9 @@ class G4ExDetectorConstruction : public G4VUserDetectorConstruction {
 		virtual ~G4ExDetectorConstruction();
 		virtual G4VPhysicalVolume* Construct();
 
-		G4double GetGroundSizeX() const { return fGroundSizeX; }
-		G4double GetGroundSizeY() const { return fGroundSizeY; }
-		G4double GetGroundSizeZ() const { return fGroundSizeZ; }
-
 	private:
 		
 		void CreateWorld();
-		void CreateGround();
 		void PlaceDetector(Event& theEvent);  
 		G4VPhysicalVolume* CreateDetector();
 
@@ -61,14 +56,9 @@ class G4ExDetectorConstruction : public G4VUserDetectorConstruction {
 		G4PVPlacement*   physGround  = nullptr;
 
 		// size definitions
-		
-		G4double fGroundSizeX = 5 * CLHEP::m;
-		G4double fGroundSizeY = 5 * CLHEP::m;
-		G4double fGroundSizeZ = 1 * CLHEP::m;
-
-		G4double fWorldSizeX = fGroundSizeX + 0.5 * CLHEP::m;
-		G4double fWorldSizeY = fGroundSizeY + 0.5 * CLHEP::m;
-		G4double fWorldSizeZ = fGroundSizeZ + 5 * CLHEP::m;
+		G4double fWorldSizeX = 5 * CLHEP::m;
+		G4double fWorldSizeY = 5 * CLHEP::m;
+		G4double fWorldSizeZ = 5 * CLHEP::m;
 
 		Event& fEvent;
 };

@@ -81,34 +81,10 @@ public:
 	virtual void BuildDetector(G4LogicalVolume *logMother, Event &aEvent, G4bool overlaps = false) = 0;
 	virtual void SetDetectorProperties(const boost::property_tree::ptree &aTree);
 	virtual void SetDefaultProperties();
-		
-	protected:
-		// general detector size parameters
-		double GetLength() const { return fLength; }
-		void SetLength(double l) { fLength = l; }
 
-		double GetWidth() const { return fWidth; }
-		void SetWidth(double w) { fWidth = w; }
-
-		double GetThickness() const { return fThickness; }
-		void SetThickness(double t) { fThickness = t; }
-
-		// methods below should be private
-
-		// ground size
-		double GetGroundSizeX() const { return fGroundX; }
-		void SetGroundSizeX(double gx) { fGroundX = gx; }
-
-		double GetGroundSizeY() const { return fGroundY; }
-		void SetGroundSizeY(double gy) { fGroundY = gy; }
-
-		double GetGroundSizeZ() const { return fGroundZ; }
-		void SetGroundSizeZ(double gz) { fGroundZ = gz; }
-		
-		// Setters & Getters for Geant4 logical volumes
-		void SetLogicalVolume(std::string volName, G4LogicalVolume* log);
-		G4LogicalVolume* GetLogicalVolume(std::string volName) { return fLogicalVolumeMap[volName]; }
-		bool HasLogicalVolume(std::string volName);
+	void SetLogicalVolume(std::string volName, G4LogicalVolume* log);
+	G4LogicalVolume* GetLogicalVolume(std::string volName) { return fLogicalVolumeMap[volName]; }
+	bool HasLogicalVolume(std::string volName);
 
 	protected:
 		unsigned int fDetectorId = 0;
@@ -116,16 +92,6 @@ public:
 		DetectorType fType;
 		int fNOptDevices = 0;
 		std::string fDefaultPropertiesFile;
-
-		// general detector size parameters
-		double fLength;
-		double fWidth;
-		double fThickness;
-		
-		// ground size parameters
-		double fGroundX;
-		double fGroundY;
-		double fGroundZ;
 
 		std::vector<double> fDetectorPosition;
 		OptDevice fOptDevice;

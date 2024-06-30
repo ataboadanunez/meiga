@@ -39,7 +39,6 @@ class G4LeadDetectorConstruction : public G4VUserDetectorConstruction {
 	private:
 
 		void CreateWorld();
-		void CreateGround();
 		void PlaceDetector(Event& aEvent);
 		G4VPhysicalVolume* CreateDetector();
 		
@@ -60,9 +59,9 @@ class G4LeadDetectorConstruction : public G4VUserDetectorConstruction {
 		G4LogicalVolume* logicBrick = nullptr;
 		G4PVPlacement*   physBrick  = nullptr;
 
-		double fWorldSizeX;
-		double fWorldSizeY;
-		double fWorldSizeZ;
+		double fWorldSizeX = 5 * CLHEP::m;;
+		double fWorldSizeY = 5 * CLHEP::m;;
+		double fWorldSizeZ = 5 * CLHEP::m;;
 
 		bool fSimulateBrick;
 		double fBrickSizeX;

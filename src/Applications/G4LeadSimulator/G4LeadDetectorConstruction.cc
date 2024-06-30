@@ -57,7 +57,6 @@ G4LeadDetectorConstruction::CreateDetector()
 {
 
 	CreateWorld();
-	//CreateGround();
 	PlaceDetector(fEvent);
 	return physWorld;
 }
@@ -66,11 +65,6 @@ void
 G4LeadDetectorConstruction::CreateWorld()
 {
 	const Event::Config &cfg = fEvent.GetConfig();	
-	// world size definitions
-	fWorldSizeX = 5 * CLHEP::m;
-	fWorldSizeY = 5 * CLHEP::m;
-	fWorldSizeZ = 5 * CLHEP::m;
-
 	solidWorld  = new G4Box("World", fWorldSizeX/2, fWorldSizeY/2, fWorldSizeZ/2);
 	logicWorld = new G4LogicalVolume(solidWorld, Materials().Air, "World");
 	physWorld  =  new G4PVPlacement(nullptr, G4ThreeVector(), "World", logicWorld, 0, false, 0, fCheckOverlaps);

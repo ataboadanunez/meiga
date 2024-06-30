@@ -32,7 +32,6 @@ G4ExDetectorConstruction::CreateDetector()
 {
 
 	CreateWorld();
-	// CreateGround();
 	PlaceDetector(fEvent);
 	return physWorld;
 }
@@ -40,24 +39,10 @@ G4ExDetectorConstruction::CreateDetector()
 void
 G4ExDetectorConstruction::CreateWorld()
 {
-
-
 	solidWorld 	= new G4Box("World", fWorldSizeX/2, fWorldSizeY/2, fWorldSizeZ/2);
 	logicWorld = new G4LogicalVolume(solidWorld, Materials().Air, "World");
 	physWorld	 =  new G4PVPlacement(nullptr, G4ThreeVector(), "World", logicWorld, 0, false, 0, fCheckOverlaps);
-
 }
-
-void
-G4ExDetectorConstruction::CreateGround()
-{
-	solidGround = new G4Box("Ground", fGroundSizeX/2, fGroundSizeY/2, fGroundSizeZ/2);
-	G4VisAttributes brown(G4Colour::Brown());
-	logicGround = new G4LogicalVolume(solidGround, Materials().StdRock, "Ground");
-	logicGround->SetVisAttributes(brown);
-	physGround  =  new G4PVPlacement(nullptr, G4ThreeVector(0, 0, -fWorldSizeZ/2 + fGroundSizeZ/2), logicGround, "Ground", logicWorld, false, 0, fCheckOverlaps);
-}
-
 
 void
 G4ExDetectorConstruction::PlaceDetector(Event& aEvent)
