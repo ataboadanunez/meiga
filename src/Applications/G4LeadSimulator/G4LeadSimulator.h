@@ -1,6 +1,9 @@
 #ifndef G4LeadSimulator_h
 #define G4LeadSimulator_h 1
-
+#include "G4RunManagerFactory.hh"
+#include "G4UImanager.hh"
+#include "G4VisExecutive.hh"
+#include "G4UIExecutive.hh"
 // C++ libraries
 #include <sstream>
 #include <fstream>
@@ -19,21 +22,31 @@ class G4LeadSimulator
   public:
   
     G4LeadSimulator();
-    virtual ~G4LeadSimulator() {;}
+    virtual ~G4LeadSimulator();
 
     // main methods of the application
     void Initialize(Event& evt, std::string fileName);
     bool RunSimulation(Event& evt);
     void WriteEventInfo(Event& evt);
 
+    inline void AddBrickEnergyDeposit(const G4double aEnergy) { fBrickTotalEnergyDepositVector.push_back(aEnergy); }
+    std::vector<G4double> GetBrickEnergyDeposit() const { return fBrickTotalEnergyDepositVector; }
+
     // static members 
     static Particle currentParticle;
-    static G4LeadSimulator* fG4LeadSimulator;
+    
+    G4LeadSimulator* fG4LeadSimulator;
+    bool fSimulateBrick;
+    std::vector<G4double> fBrickTotalEnergyDepositVector;
 
     // name of configuration file
     std::string fCfgFile;
 
   private:
+    
+    G4VisManager* fVisManager = nullptr;
+    G4RunManager* fRunManager = nullptr;
+
 
 		// flags for configuration (see .json file)
     std::string fInputFile;

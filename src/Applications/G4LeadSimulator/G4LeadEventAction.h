@@ -17,14 +17,18 @@
 #include <fstream>
 #include <iostream>
 
+class G4LeadSimulator;
+
 class G4LeadEventAction : public G4UserEventAction
 {
   public:
-    G4LeadEventAction(Event& theEvent);
+    G4LeadEventAction(Event& theEvent, G4LeadSimulator* aSimulator);
     virtual ~G4LeadEventAction();
 
     virtual void BeginOfEventAction(const G4Event *event);
     virtual void EndOfEventAction(const G4Event *event);
+
+    inline void AddEnergy(G4double aEnergy) { fBrickTotalEnergyDeposit += aEnergy; }
     
     std::vector<int> fBarsX1;
     std::vector<int> fBarsY1;
@@ -50,9 +54,10 @@ class G4LeadEventAction : public G4UserEventAction
    
    Event& fEvent;
    std::ofstream fOutFile;
+   G4double fBrickTotalEnergyDeposit;
+   G4LeadSimulator *fG4LeadSimulator;
 
-  friend class G4LeadSimulator;
-
+friend class G4LeadSimulator;
 
 };
 

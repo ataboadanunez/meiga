@@ -19,10 +19,6 @@
 
 // Geant4 headers
 #include "FTFP_BERT.hh"
-#include "G4RunManagerFactory.hh"
-#include "G4UImanager.hh"
-#include "G4VisExecutive.hh"
-#include "G4UIExecutive.hh"
 #include "Randomize.hh"
 
 // Framework libraries
@@ -41,10 +37,16 @@ using namespace std;
 Particle G4LeadSimulator::currentParticle;
 G4LeadSimulator* fG4LeadSimulator;
 string fCfgFile;
+// bool G4LeadSimulator::fSimulateBrick;
 
 G4LeadSimulator::G4LeadSimulator()
 {
+}
 
+G4LeadSimulator::~G4LeadSimulator()
+{
+	delete fRunManager;
+	delete fVisManager;
 }
 
 namespace 
@@ -101,6 +103,10 @@ G4LeadSimulator::Initialize(Event& theEvent, string cfgFile)
 	// Fill Event object from configuration file
 	// Read Simulation configuration
 	theEvent = ConfigManager::ReadConfigurationFile(cfgFile);
+	// extra flag to handle lead brick simulation
+	ptree tree;
+	read_json(cfgFile, tree);
+	fSimulateBrick = tree.get<bool>("LeadBrick.Simulate", false);
 	// get simulation simulation settings
 	const Event::Config &cfg = theEvent.GetConfig();
 	ConfigManager::PrintConfig(cfg);
@@ -116,6 +122,7 @@ G4LeadSimulator::RunSimulation(Event& theEvent)
 	const Event::Config &cfg = theEvent.GetConfig();
 	SimData& simData = theEvent.GetSimData();
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
+	fBrickTotalEnergyDepositVector.resize(NumberOfParticles);
 	cout << "[INFO] G4LeadSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
 	if (!NumberOfParticles) {
 		cerr << "[ERROR] G4LeadSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
@@ -128,18 +135,17 @@ G4LeadSimulator::RunSimulation(Event& theEvent)
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
 	G4Random::setTheSeed(myseed);
 	cout << "Seed for random generation: " << myseed << endl;
-	G4VisManager* fVisManager = nullptr;
 	// construct the default run manager
-	auto fRunManager = G4RunManagerFactory::CreateRunManager();
+	fRunManager = G4RunManagerFactory::CreateRunManager();
 	// set mandatory initialization classes
-	auto fDetConstruction = new G4LeadDetectorConstruction(theEvent);
+	auto fDetConstruction = new G4LeadDetectorConstruction(theEvent, this);
 	fRunManager->SetUserInitialization(fDetConstruction);
 	fRunManager->SetUserInitialization(new G4LeadPhysicsList(fPhysicsName));  
 	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
 	G4LeadRunAction *fRunAction = new G4LeadRunAction(theEvent);
 	fRunManager->SetUserAction(fRunAction);
-	G4LeadEventAction *fEventAction = new G4LeadEventAction(theEvent);
+	G4LeadEventAction *fEventAction = new G4LeadEventAction(theEvent, this);
 	fRunManager->SetUserAction(fEventAction);
 	fRunManager->SetUserAction(new G4LeadTrackingAction(theEvent));
 	G4LeadSteppingAction *fSteppingAction = new G4LeadSteppingAction(fEventAction, theEvent);
@@ -204,8 +210,6 @@ G4LeadSimulator::RunSimulation(Event& theEvent)
 		// Run simulation
 		fRunManager->BeamOn(1);
 	}
-	delete fVisManager;
-	delete fRunManager;
 	cout << "[INFO] G4LeadSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
 	return true;
 }
@@ -215,6 +219,15 @@ void
 G4LeadSimulator::WriteEventInfo(Event& theEvent)
 {
 	cout << "[INFO] G4LeadSimulator::WriteEventInfo" << endl;
-	DataWriter::FileWriter(theEvent);	
+	DataWriter::FileWriter(theEvent);
+	if (fSimulateBrick) {
+		string jsonData = DataWriter::ReadFile(theEvent.GetConfig().fOutputFileName, theEvent.GetConfig().fCompressOutput);
+		nlohmann::json jsonObject = nlohmann::json::parse(jsonData);
+		const std::vector<G4double>& depositedEnergy = fBrickTotalEnergyDepositVector;
+		jsonObject["BrickDepositedEnergy"] = depositedEnergy;
+		string updatedJsonData = jsonObject.dump();
+		DataWriter::WriteFile(theEvent.GetConfig().fOutputFileName, updatedJsonData, theEvent.GetConfig().fCompressOutput);
+	}
+
 	return;
 }

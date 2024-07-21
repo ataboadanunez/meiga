@@ -26,9 +26,7 @@ class G4LeadSteppingAction : public G4UserSteppingAction
 	private:
 		G4LeadEventAction* fEventAction;
 		Event& fEvent;
-
-		//std::vector<int> fBarsX1;
-		//std::vector<int> fBarsY1;
+		G4double fBrickTotalEnergyDeposit;
 };
 
 #endif

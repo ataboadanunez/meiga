@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "G4LeadDetectorConstruction.h"
+#include "G4LeadSimulator.h"
 #include "Materials.h"
 
 #include <G4SDManager.hh>
@@ -12,42 +13,45 @@ using boost::property_tree::ptree;
 using namespace std;
 
 
-G4LeadDetectorConstruction::G4LeadDetectorConstruction(Event& aEvent) : 
+G4LeadDetectorConstruction::G4LeadDetectorConstruction(Event& aEvent, G4LeadSimulator *aSimulator) : 
 	G4VUserDetectorConstruction(),
-	fEvent(aEvent)
+	fEvent(aEvent),
+	fG4LeadSimulator(aSimulator)
 { 
-	
-	Event::Config &cfg = aEvent.GetConfig();
-	string aConfigFileName = cfg.fConfigurationFileName;
-	cout << "[INFO] G4LeadDetectorConstruction::G4LeadDetectorConstruction: Reading Lead information from Configuration File " << aConfigFileName << endl;
-	ptree tree;
-	read_json(aConfigFileName, tree);
-	
-	fSimulateBrick = tree.get<bool>("LeadBrick.Simulate", false);
-	if (tree.get_child_optional("LeadBrick.Position")) {
-		vector<double> brickPosition;
-		for (const auto &item : tree.get_child("LeadBrick.Position")) {
-			brickPosition.push_back(item.second.get_value<double>());
+	if(fG4LeadSimulator->fSimulateBrick) {
+		Event::Config &cfg = aEvent.GetConfig();
+		string aConfigFileName = cfg.fConfigurationFileName;
+		cout << "[INFO] G4LeadDetectorConstruction::G4LeadDetectorConstruction: Reading Lead information from Configuration File " << aConfigFileName << endl;
+		ptree tree;
+		read_json(aConfigFileName, tree);
+
+		if (tree.get_child_optional("LeadBrick.Position")) {
+			vector<double> brickPosition;
+			for (const auto &item : tree.get_child("LeadBrick.Position")) {
+				brickPosition.push_back(item.second.get_value<double>());
+			}
+			// brick position coordinates in cm
+			fBrickPosX = brickPosition[0] * CLHEP::cm;
+			fBrickPosY = brickPosition[1] * CLHEP::cm;
+			fBrickPosZ = brickPosition[2] * CLHEP::cm;
 		}
-		// brick position coordinates in cm
-		fBrickPosX = brickPosition[0] * CLHEP::cm;
-		fBrickPosY = brickPosition[1] * CLHEP::cm;
-		fBrickPosZ = brickPosition[2] * CLHEP::cm;
-	}
-	if (tree.get_child_optional("LeadBrick.Size")) {
-		vector<double> brickSize;
-		for (const auto &item : tree.get_child("LeadBrick.Size")) {
-			brickSize.push_back(item.second.get_value<double>());
+		if (tree.get_child_optional("LeadBrick.Size")) {
+			vector<double> brickSize;
+			for (const auto &item : tree.get_child("LeadBrick.Size")) {
+				brickSize.push_back(item.second.get_value<double>());
+			}
+			// brick size in cm
+			fBrickSizeX = brickSize[0] * CLHEP::cm;
+			fBrickSizeY = brickSize[1] * CLHEP::cm;
+			fBrickSizeZ = brickSize[2] * CLHEP::cm;
 		}
-		// brick size in cm
-		fBrickSizeX = brickSize[0] * CLHEP::cm;
-		fBrickSizeY = brickSize[1] * CLHEP::cm;
-		fBrickSizeZ = brickSize[2] * CLHEP::cm;
 	}
 }	
 
 G4LeadDetectorConstruction::~G4LeadDetectorConstruction() 
-	{ }
+{
+	delete fG4LeadSimulator;
+}
 
 G4VPhysicalVolume*
 G4LeadDetectorConstruction::CreateDetector()
@@ -71,7 +75,7 @@ G4LeadDetectorConstruction::CreateWorld()
 	solidWorld  = new G4Box("World", fWorldSizeX/2, fWorldSizeY/2, fWorldSizeZ/2);
 	logicWorld = new G4LogicalVolume(solidWorld, Materials().Air, "World");
 	physWorld  =  new G4PVPlacement(nullptr, G4ThreeVector(), "World", logicWorld, 0, false, 0, fCheckOverlaps);
-	if (fSimulateBrick) {
+	if (fG4LeadSimulator->fSimulateBrick) {
 		cout << "[INFO] G4LeadDetectorConstruction::CreateWorld: Simulating Lead Brick with the following properties:" << endl;
 		cout << "Size: [" << fBrickSizeX / CLHEP::cm << ", " << fBrickSizeY / CLHEP::cm << ", " << fBrickSizeZ / CLHEP::cm << "] cm" << endl;
 		cout << "Position: [" << fBrickPosX / CLHEP::cm << ", " << fBrickPosY / CLHEP::cm << ", " << fBrickPosZ / CLHEP::cm << "] cm" << endl;

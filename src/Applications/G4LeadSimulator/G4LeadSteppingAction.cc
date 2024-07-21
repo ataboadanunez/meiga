@@ -24,13 +24,12 @@ using namespace std;
 G4LeadSteppingAction::G4LeadSteppingAction(G4LeadEventAction* G4event, Event& theEvent)
 	: G4UserSteppingAction(),
 		fEventAction(G4event),
-    fEvent(theEvent)
+    	fEvent(theEvent)
 {
 
 	if (fEvent.GetSimData().GetSimulationMode() == SimData::SimulationMode::eFast) {
 		cout << "[INFO] G4LeadSteppingAction::G4LeadSteppingAction: Running Simulation in Fast mode." << endl;
 		cout << "[INFO] G4LeadSteppingAction::G4LeadSteppingAction: Optical photons will be killed! " << endl;
-		
 	}
 
 }
@@ -51,4 +50,12 @@ G4LeadSteppingAction::UserSteppingAction(const G4Step* step)
 			track->SetTrackStatus(fStopAndKill);
 	}
 
+	G4VPhysicalVolume* volume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
+	if (volume->GetName() == "LeadBrick") {
+		G4double edep = step->GetTotalEnergyDeposit();
+		if (edep > 0) {
+            G4LeadEventAction* eventAction = (G4LeadEventAction*)G4EventManager::GetEventManager()->GetUserEventAction();
+            eventAction->AddEnergy(edep);
+        }
+	}
 }
