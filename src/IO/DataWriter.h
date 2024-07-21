@@ -21,6 +21,8 @@ class DataWriter {
 		virtual ~DataWriter();
 
 		static void FileWriter(Event& theEvent);
+		static std::string ReadFile(const std::string &aFilePath, bool aIsZipped);
+		static void WriteFile(const std::string &aFilePath, const std::string &aContent, bool aIsZipped);
 
 	private:
 		
