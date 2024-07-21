@@ -122,7 +122,7 @@ G4LeadSimulator::RunSimulation(Event& theEvent)
 	const Event::Config &cfg = theEvent.GetConfig();
 	SimData& simData = theEvent.GetSimData();
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
-	fBrickTotalEnergyDepositVector.resize(NumberOfParticles);
+	fBrickTotalEnergyDepositVector.reserve(NumberOfParticles);
 	cout << "[INFO] G4LeadSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
 	if (!NumberOfParticles) {
 		cerr << "[ERROR] G4LeadSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
@@ -223,8 +223,11 @@ G4LeadSimulator::WriteEventInfo(Event& theEvent)
 	if (fSimulateBrick) {
 		string jsonData = DataWriter::ReadFile(theEvent.GetConfig().fOutputFileName, theEvent.GetConfig().fCompressOutput);
 		nlohmann::json jsonObject = nlohmann::json::parse(jsonData);
-		const std::vector<G4double>& depositedEnergy = fBrickTotalEnergyDepositVector;
-		jsonObject["BrickDepositedEnergy"] = depositedEnergy;
+		cout << "[DEBUG] size of deposited energy vector: " << fBrickTotalEnergyDepositVector.size();
+		for(int i=0; i<fBrickTotalEnergyDepositVector.size(); i++) {
+			jsonObject["Output"]["Event_"+to_string(i)]["BrickDepositedEnergy"] = fBrickTotalEnergyDepositVector.at(i);
+		}
+		
 		string updatedJsonData = jsonObject.dump();
 		DataWriter::WriteFile(theEvent.GetConfig().fOutputFileName, updatedJsonData, theEvent.GetConfig().fCompressOutput);
 	}
