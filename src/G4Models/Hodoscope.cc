@@ -93,12 +93,8 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 	// Panel casing
 	solidCasing = new G4Box("Casing", 0.5*fCasingSizeX, 0.5*fCasingSizeY, 0.5*fCasingSizeZ);
 	// Scintillator bars
-	solidCoating = new G4Box("BarCoating", 0.5*barLength + barCoatingThickness,
-																				 0.5*barWidth + barCoatingThickness,
-																				 0.5*barThickness + barCoatingThickness);
-	solidScinBar = new G4Box("BarScin", 0.5*barLength,
-																			0.5*barWidth,
-																			0.5*barThickness);
+	solidCoating = new G4Box("BarCoating", 0.5*barLength, 0.5*barWidth, 0.5*barThickness);
+	solidScinBar = new G4Box("BarScin", 0.5*(barLength-barCoatingThickness), 0.5*(barWidth-barCoatingThickness), 0.5*(barThickness-barCoatingThickness));
 	// Optical Fibers
 	solidClad2  = new G4Tubs("Clad2", 0, fiberRadius, barLength/2-2*barCoatingThickness-pixelSizeZ, 0, 360*deg);
 	solidClad1  = new G4Tubs("Clad1", 0, fiberRadius - claddingThickness, barLength/2-2*barCoatingThickness-pixelSizeZ, 0, 360*deg);
@@ -106,7 +102,6 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 	// Pixel
 	solidPixel   = new G4Box("Pixel", pixelSizeX, pixelSizeY, pixelSizeZ);
 	
-
 	// Defne BarCoating as LogicalSkingSurface
 	new G4LogicalSkinSurface("BarCoating", logCoating, Materials().ScinOptSurf);
 
@@ -145,12 +140,12 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 		int barId = bIt+1;
 		int barId2 = 100*panelId + barId;
 
-		double fBarPosX = -0.5*barWidth;
-		double fBarPosY = bIt * (barWidth + 2*barCoatingThickness);
+		double fBarPosX = 0;
+		double fBarPosY = (bIt - nBars/2) * barWidth + barWidth/2;
 		// center bar at top of the casing
 		double fBarPosZ = 0.5*(0.5*barThickness*2 + fCasingThickness);
 		
-		G4ThreeVector barPosition = G4ThreeVector(fBarPosX+0.5*barWidth, fBarPosY-halfWidth+0.5*barWidth, fBarPosZ);
+		G4ThreeVector barPosition = G4ThreeVector(fBarPosX, fBarPosY, fBarPosZ);
 		
 		string nameCoating = "BarCoating_"+gridName;
 		string nameScinBar = "BarScin_"+gridName;
@@ -201,12 +196,12 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 		int barId = bIt+1+nBars;
 		int barId2 = 100*panelId + barId;
 
-		double fBarPosX = bIt * (barWidth + 2*barCoatingThickness);
-		double fBarPosY = -0.5*barWidth;
+		double fBarPosX = (bIt - nBars/2) * barWidth + barWidth/2;
+		double fBarPosY = 0;
 		// center bar at top of the casing
 		double fBarPosZ = -0.5*(0.5*barThickness*2 + fCasingThickness);
 
-		G4ThreeVector barPosition = G4ThreeVector(fBarPosX-halfWidth+0.5*barWidth, fBarPosY+0.5*barWidth, fBarPosZ);
+		G4ThreeVector barPosition = G4ThreeVector(fBarPosX, fBarPosY, fBarPosZ);
 
 		string nameCoating = "BarCoating_"+gridName;
 		string nameScinBar = "BarScin_"+gridName;
