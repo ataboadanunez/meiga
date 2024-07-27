@@ -3,8 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 # import SimDataReader to access data from output file
 from SimDataReader import *
-from IPython import embed
-
 
 def ConvertBinaryPixel(value, matrix, nBars=12):
 	"""
@@ -79,13 +77,19 @@ if __name__ == "__main__":
 	print("[INFO] Merging input flux and deposited energy data")
 	merged_df = inputFlux.copy()
 	merged_df["evid"] = event_ids
-
+	
 	for detId in detector_ids:
 		detSimData = simData.GetDetectorSimData(det_id=detId)
 		edep = detSimData.get_deposited_energy()
-		barCounter = detSimData.get_binary_counter()		
-		merged_df['Detector_%i/DepositedEnergy' %detId] = edep
-		merged_df['Detector_%i/BinaryCounter' %detId] = barCounter
+		barCounter = detSimData.get_binary_counter()
+		if len(edep) != len(event_ids):
+			print("[WARNING] Length of deposited energy (%i) for detector %i does not match length of number of events (%i). Data will not be merged." %(len(edep), detId, len(event_ids)))
+		else:
+			merged_df['Detector_%i/DepositedEnergy' %detId] = edep
+		if len(barCounter) != len(event_ids):
+			print("[WARNING] Length of bar counter (%i) for detector %i does not match length of number of events (%i). Data will not be merged." %(len(barCounter), detId, len(event_ids)))
+		else:
+			merged_df['Detector_%i/BinaryCounter' %detId] = barCounter
 		
 	print(merged_df.head())
 
@@ -162,21 +166,13 @@ if __name__ == "__main__":
 	plt.ylabel('Counts')
 	plt.legend()
 
-	# access to extra fields
-	data = simData.get_data()
-	edep_brick = []
-	for eventkey in data.keys():
-		value = data[eventkey].get('BrickDepositedEnergy')
-		if value is not None:
-			edep_brick.append(value)
-	edep_brick = np.array(edep_brick)
-	if edep_brick.size != 0:
+	# access to deposited energy in lead brick (see G4LeadSimulator application)
+	edep_brick = merged_df.get('Detector_4/DepositedEnergy')
+	if edep_brick is not None:
 		fig = plt.figure()
 		plt.hist(edep_brick[edep_brick>0.1], bins=50, lw=1.8, color='gray', histtype='step', label='Lead Brick')
 		plt.xlabel('Deposited Energy / MeV')
 		plt.ylabel('Counts')
 		plt.legend()
-	else:
-		print("Not found 'BrickDepositedEnergy' field in output file")
 
 	plt.show()
