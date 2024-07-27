@@ -140,7 +140,7 @@ G4LeadSimulator::RunSimulation(Event& theEvent)
 	// set mandatory initialization classes
 	auto fDetConstruction = new G4LeadDetectorConstruction(theEvent, this);
 	fRunManager->SetUserInitialization(fDetConstruction);
-	fRunManager->SetUserInitialization(new G4LeadPhysicsList(fPhysicsName));  
+	fRunManager->SetUserInitialization(new G4LeadPhysicsList(cfg.fPhysicsListName));  
 	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
 	fRunManager->SetUserAction(fPrimaryGenerator);
 	G4LeadRunAction *fRunAction = new G4LeadRunAction(theEvent);
@@ -220,17 +220,6 @@ G4LeadSimulator::WriteEventInfo(Event& theEvent)
 {
 	cout << "[INFO] G4LeadSimulator::WriteEventInfo" << endl;
 	DataWriter::FileWriter(theEvent);
-	if (fSimulateBrick) {
-		string jsonData = DataWriter::ReadFile(theEvent.GetConfig().fOutputFileName, theEvent.GetConfig().fCompressOutput);
-		nlohmann::json jsonObject = nlohmann::json::parse(jsonData);
-		cout << "[DEBUG] size of deposited energy vector: " << fBrickTotalEnergyDepositVector.size();
-		for(int i=0; i<fBrickTotalEnergyDepositVector.size(); i++) {
-			jsonObject["Output"]["Event_"+to_string(i)]["BrickDepositedEnergy"] = fBrickTotalEnergyDepositVector.at(i);
-		}
-		
-		string updatedJsonData = jsonObject.dump();
-		DataWriter::WriteFile(theEvent.GetConfig().fOutputFileName, updatedJsonData, theEvent.GetConfig().fCompressOutput);
-	}
 
 	return;
 }

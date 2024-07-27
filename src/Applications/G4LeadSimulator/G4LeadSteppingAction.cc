@@ -49,13 +49,5 @@ G4LeadSteppingAction::UserSteppingAction(const G4Step* step)
 		if (track->GetParticleDefinition() == G4OpticalPhoton::OpticalPhoton())
 			track->SetTrackStatus(fStopAndKill);
 	}
-
-	G4VPhysicalVolume* volume = step->GetPreStepPoint()->GetTouchableHandle()->GetVolume();
-	if (volume->GetName() == "LeadBrick") {
-		G4double edep = step->GetTotalEnergyDeposit();
-		if (edep > 0) {
-            G4LeadEventAction* eventAction = (G4LeadEventAction*)G4EventManager::GetEventManager()->GetUserEventAction();
-            eventAction->AddEnergy(edep);
-        }
-	}
+	
 }

@@ -4,6 +4,7 @@
 #include "G4LeadDetectorConstruction.h"
 #include "G4LeadSimulator.h"
 #include "Materials.h"
+#include "G4MDetectorAction.h"
 
 #include <G4SDManager.hh>
 #include <G4UnitsTable.hh>
@@ -81,9 +82,19 @@ G4LeadDetectorConstruction::CreateWorld()
 		cout << "Position: [" << fBrickPosX / CLHEP::cm << ", " << fBrickPosY / CLHEP::cm << ", " << fBrickPosZ / CLHEP::cm << "] cm" << endl;
 		solidBrick = new G4Box("LeadBrick", fBrickSizeX/2, fBrickSizeY/2, fBrickSizeZ/2);
 		G4VisAttributes cgray(G4Colour::Gray());
+		G4NistManager* nist = G4NistManager::Instance();
 		logicBrick = new G4LogicalVolume(solidBrick, Materials().Lead, "LeadBrick");
 		logicBrick->SetVisAttributes(cgray);
 		physBrick = new G4PVPlacement(nullptr, G4ThreeVector(fBrickPosX, fBrickPosY, fBrickPosZ), logicBrick, "LeadBrick", logicWorld, false, 0, cfg.fCheckOverlaps);
+		
+		// register brick as detector in the framework with ID = 4
+		fEvent.MakeDetector(4, Detector::eDummy);
+		Detector &brickDetector = fEvent.GetDetector(4);
+		brickDetector.SetName("LeadBrick");
+		G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
+		G4MDetectorAction* const brickSD = new G4MDetectorAction(brickDetector.GetName(), brickDetector.GetId(), fEvent);
+		sdMan->AddNewDetector(brickSD);
+		logicBrick->SetSensitiveDetector(brickSD);
 	}
 }
 
