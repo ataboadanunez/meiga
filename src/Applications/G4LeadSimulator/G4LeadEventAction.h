@@ -22,14 +22,12 @@ class G4LeadSimulator;
 class G4LeadEventAction : public G4UserEventAction
 {
   public:
-    G4LeadEventAction(Event& theEvent, G4LeadSimulator* aSimulator);
+    G4LeadEventAction(Event& theEvent);
     virtual ~G4LeadEventAction();
 
     virtual void BeginOfEventAction(const G4Event *event);
     virtual void EndOfEventAction(const G4Event *event);
 
-    inline void AddEnergy(G4double aEnergy) { fBrickTotalEnergyDeposit += aEnergy; }
-    
     std::vector<int> fBarsX1;
     std::vector<int> fBarsY1;
     bool trig1;
@@ -53,9 +51,6 @@ class G4LeadEventAction : public G4UserEventAction
   private:
    
    Event& fEvent;
-   std::ofstream fOutFile;
-   G4double fBrickTotalEnergyDeposit;
-   G4LeadSimulator *fG4LeadSimulator;
 
 friend class G4LeadSimulator;
 

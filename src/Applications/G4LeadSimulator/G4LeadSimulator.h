@@ -44,10 +44,6 @@ class G4LeadSimulator
 
   private:
     
-    G4VisManager* fVisManager = nullptr;
-    G4RunManager* fRunManager = nullptr;
-
-
 		// flags for configuration (see .json file)
     std::string fInputFile;
     std::string fOutputFile;

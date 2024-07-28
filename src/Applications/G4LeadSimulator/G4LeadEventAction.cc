@@ -6,22 +6,19 @@
 
 using namespace std;
 
-G4LeadEventAction::G4LeadEventAction(Event& theEvent, G4LeadSimulator *aSimulator) : 
+G4LeadEventAction::G4LeadEventAction(Event& theEvent) : 
 	fEvent(theEvent),
-	fG4LeadSimulator(aSimulator),
 	G4UserEventAction()
 {
 }
 
 G4LeadEventAction::~G4LeadEventAction()
 {
-	delete fG4LeadSimulator;
 }
 
 void
 G4LeadEventAction::BeginOfEventAction(const G4Event*)
 {
-	fBrickTotalEnergyDeposit = 0;
 }
 
 void 
@@ -52,8 +49,6 @@ G4LeadEventAction::EndOfEventAction(const G4Event*)
 		// clear total energy deposit after the event is terminated to reset counter
 		detSimData.ClearTotalEnergyDeposit();
 	}
-
-	fG4LeadSimulator->AddBrickEnergyDeposit(fBrickTotalEnergyDeposit);
 
 }
 

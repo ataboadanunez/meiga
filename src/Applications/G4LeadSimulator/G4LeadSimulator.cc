@@ -45,8 +45,6 @@ G4LeadSimulator::G4LeadSimulator()
 
 G4LeadSimulator::~G4LeadSimulator()
 {
-	delete fRunManager;
-	delete fVisManager;
 }
 
 namespace 
@@ -136,80 +134,83 @@ G4LeadSimulator::RunSimulation(Event& theEvent)
 	G4Random::setTheSeed(myseed);
 	cout << "Seed for random generation: " << myseed << endl;
 	// construct the default run manager
-	fRunManager = G4RunManagerFactory::CreateRunManager();
+	G4VisManager *visManager = nullptr;
+	G4RunManager *runManager = G4RunManagerFactory::CreateRunManager();
 	// set mandatory initialization classes
-	auto fDetConstruction = new G4LeadDetectorConstruction(theEvent, this);
-	fRunManager->SetUserInitialization(fDetConstruction);
-	fRunManager->SetUserInitialization(new G4LeadPhysicsList(cfg.fPhysicsListName));  
+	auto fDetConstruction = new G4LeadDetectorConstruction(theEvent, fSimulateBrick);
+	runManager->SetUserInitialization(fDetConstruction);
+	runManager->SetUserInitialization(new G4LeadPhysicsList(cfg.fPhysicsListName));  
 	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
-	fRunManager->SetUserAction(fPrimaryGenerator);
+	runManager->SetUserAction(fPrimaryGenerator);
 	G4LeadRunAction *fRunAction = new G4LeadRunAction(theEvent);
-	fRunManager->SetUserAction(fRunAction);
-	G4LeadEventAction *fEventAction = new G4LeadEventAction(theEvent, this);
-	fRunManager->SetUserAction(fEventAction);
-	fRunManager->SetUserAction(new G4LeadTrackingAction(theEvent));
+	runManager->SetUserAction(fRunAction);
+	G4LeadEventAction *fEventAction = new G4LeadEventAction(theEvent);
+	runManager->SetUserAction(fEventAction);
+	runManager->SetUserAction(new G4LeadTrackingAction(theEvent));
 	G4LeadSteppingAction *fSteppingAction = new G4LeadSteppingAction(fEventAction, theEvent);
-	fRunManager->SetUserAction(fSteppingAction);
+	runManager->SetUserAction(fSteppingAction);
 	// initialize G4 kernel
-	fRunManager->Initialize();
+	runManager->Initialize();
 	// initialize visualization
-	if ((cfg.fGeoVis || cfg.fTrajVis) && !fVisManager)
-		fVisManager = new G4VisExecutive;
+	if ((cfg.fGeoVis || cfg.fTrajVis) && !visManager)
+		visManager = new G4VisExecutive;
 
 	// get the pointer to the UI manager and set verbosities
-	G4UImanager* fUImanager = G4UImanager::GetUIpointer();
+	G4UImanager* uiManager = G4UImanager::GetUIpointer();
 	switch (cfg.fVerbosity) {
 		case 1:
-			fUImanager->ApplyCommand("/run/verbose 1");
-			fUImanager->ApplyCommand("/event/verbose 0");
-			fUImanager->ApplyCommand("/tracking/verbose 0");
+			uiManager->ApplyCommand("/run/verbose 1");
+			uiManager->ApplyCommand("/event/verbose 0");
+			uiManager->ApplyCommand("/tracking/verbose 0");
 			break;
 		case 2:
-			fUImanager->ApplyCommand("/run/verbose 1");
-			fUImanager->ApplyCommand("/event/verbose 1");
-			fUImanager->ApplyCommand("/tracking/verbose 0");
+			uiManager->ApplyCommand("/run/verbose 1");
+			uiManager->ApplyCommand("/event/verbose 1");
+			uiManager->ApplyCommand("/tracking/verbose 0");
 			break;
 		case 3:
-			fUImanager->ApplyCommand("/run/verbose 1");
-			fUImanager->ApplyCommand("/event/verbose 1");
-			fUImanager->ApplyCommand("/tracking/verbose 1");
+			uiManager->ApplyCommand("/run/verbose 1");
+			uiManager->ApplyCommand("/event/verbose 1");
+			uiManager->ApplyCommand("/tracking/verbose 1");
 			break;
 		default:
-			fUImanager->ApplyCommand("/run/verbose 0");
-			fUImanager->ApplyCommand("/event/verbose 0");
-			fUImanager->ApplyCommand("/tracking/verbose 0");
+			uiManager->ApplyCommand("/run/verbose 0");
+			uiManager->ApplyCommand("/event/verbose 0");
+			uiManager->ApplyCommand("/tracking/verbose 0");
 		}
 	
 	if (cfg.fGeoVis || cfg.fTrajVis) {
-		fVisManager->Initialize();
-		fUImanager->ApplyCommand(("/vis/open " + fRenderFile).c_str());
-		fUImanager->ApplyCommand("/vis/scene/create");
-		fUImanager->ApplyCommand("/vis/sceneHandler/attach");
-		fUImanager->ApplyCommand("/vis/scene/add/volume");
-		fUImanager->ApplyCommand("/vis/scene/add/axes");
-		fUImanager->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 0. 0.");
-		fUImanager->ApplyCommand("/vis/viewer/set/targetPoint 0 0 0");
-		fUImanager->ApplyCommand("/vis/viewer/zoom 1");
-		fUImanager->ApplyCommand("/vis/viewero/set/style/wireframe");
-		fUImanager->ApplyCommand("/vis/drawVolume");
-		fUImanager->ApplyCommand("/vis/scene/notifyHandlers");
-		fUImanager->ApplyCommand("/vis/viewer/update");
+		visManager->Initialize();
+		uiManager->ApplyCommand(("/vis/open " + fRenderFile).c_str());
+		uiManager->ApplyCommand("/vis/scene/create");
+		uiManager->ApplyCommand("/vis/sceneHandler/attach");
+		uiManager->ApplyCommand("/vis/scene/add/volume");
+		uiManager->ApplyCommand("/vis/scene/add/axes");
+		uiManager->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 0. 0.");
+		uiManager->ApplyCommand("/vis/viewer/set/targetPoint 0 0 0");
+		uiManager->ApplyCommand("/vis/viewer/zoom 1");
+		uiManager->ApplyCommand("/vis/viewero/set/style/wireframe");
+		uiManager->ApplyCommand("/vis/drawVolume");
+		uiManager->ApplyCommand("/vis/scene/notifyHandlers");
+		uiManager->ApplyCommand("/vis/viewer/update");
 	}
 	if (cfg.fTrajVis) {
-		fUImanager->ApplyCommand("/tracking/storeTrajectory 1");
-		fUImanager->ApplyCommand("/vis/scene/add/trajectories");
-		fUImanager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");
+		uiManager->ApplyCommand("/tracking/storeTrajectory 1");
+		uiManager->ApplyCommand("/vis/scene/add/trajectories");
+		uiManager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");
 		// for debugging purposes, gammas are not drawn
-		fUImanager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
-		fUImanager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
+		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
+		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
 	}
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
 		G4LeadSimulator::currentParticle = *it;
 		simData.SetCurrentParticle(*it);
 		// Run simulation
-		fRunManager->BeamOn(1);
+		runManager->BeamOn(1);
 	}
+	delete runManager;
+	delete visManager;
 	cout << "[INFO] G4LeadSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
 	return true;
 }

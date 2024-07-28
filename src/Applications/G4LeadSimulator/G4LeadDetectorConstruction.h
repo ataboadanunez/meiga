@@ -33,7 +33,7 @@ class G4LeadSimulator;
 class G4LeadDetectorConstruction : public G4VUserDetectorConstruction {
 	
 	public:
-		G4LeadDetectorConstruction(Event& aEvent, G4LeadSimulator *aSimulator);
+		G4LeadDetectorConstruction(Event& aEvent, bool aSimulateBrick);
 		virtual ~G4LeadDetectorConstruction();
 		virtual G4VPhysicalVolume* Construct();
 
@@ -73,7 +73,7 @@ class G4LeadDetectorConstruction : public G4VUserDetectorConstruction {
 		double fBrickPosZ;
 		
 		Event& fEvent;
-		G4LeadSimulator *fG4LeadSimulator;
+		bool fSimulateBrick;
 };
 
 

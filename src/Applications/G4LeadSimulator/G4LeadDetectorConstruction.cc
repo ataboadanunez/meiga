@@ -14,12 +14,12 @@ using boost::property_tree::ptree;
 using namespace std;
 
 
-G4LeadDetectorConstruction::G4LeadDetectorConstruction(Event& aEvent, G4LeadSimulator *aSimulator) : 
+G4LeadDetectorConstruction::G4LeadDetectorConstruction(Event& aEvent, bool aSimulateBrick) : 
 	G4VUserDetectorConstruction(),
 	fEvent(aEvent),
-	fG4LeadSimulator(aSimulator)
+	fSimulateBrick(aSimulateBrick)
 { 
-	if(fG4LeadSimulator->fSimulateBrick) {
+	if(fSimulateBrick) {
 		Event::Config &cfg = aEvent.GetConfig();
 		string aConfigFileName = cfg.fConfigurationFileName;
 		cout << "[INFO] G4LeadDetectorConstruction::G4LeadDetectorConstruction: Reading Lead information from Configuration File " << aConfigFileName << endl;
@@ -51,7 +51,6 @@ G4LeadDetectorConstruction::G4LeadDetectorConstruction(Event& aEvent, G4LeadSimu
 
 G4LeadDetectorConstruction::~G4LeadDetectorConstruction() 
 {
-	delete fG4LeadSimulator;
 }
 
 G4VPhysicalVolume*
@@ -76,21 +75,31 @@ G4LeadDetectorConstruction::CreateWorld()
 	solidWorld  = new G4Box("World", fWorldSizeX/2, fWorldSizeY/2, fWorldSizeZ/2);
 	logicWorld = new G4LogicalVolume(solidWorld, Materials().Air, "World");
 	physWorld  =  new G4PVPlacement(nullptr, G4ThreeVector(), "World", logicWorld, 0, false, 0, fCheckOverlaps);
-	if (fG4LeadSimulator->fSimulateBrick) {
+	if (fSimulateBrick) {
 		cout << "[INFO] G4LeadDetectorConstruction::CreateWorld: Simulating Lead Brick with the following properties:" << endl;
 		cout << "Size: [" << fBrickSizeX / CLHEP::cm << ", " << fBrickSizeY / CLHEP::cm << ", " << fBrickSizeZ / CLHEP::cm << "] cm" << endl;
 		cout << "Position: [" << fBrickPosX / CLHEP::cm << ", " << fBrickPosY / CLHEP::cm << ", " << fBrickPosZ / CLHEP::cm << "] cm" << endl;
 		solidBrick = new G4Box("LeadBrick", fBrickSizeX/2, fBrickSizeY/2, fBrickSizeZ/2);
 		G4VisAttributes cgray(G4Colour::Gray());
-		G4NistManager* nist = G4NistManager::Instance();
 		logicBrick = new G4LogicalVolume(solidBrick, Materials().Lead, "LeadBrick");
 		logicBrick->SetVisAttributes(cgray);
 		physBrick = new G4PVPlacement(nullptr, G4ThreeVector(fBrickPosX, fBrickPosY, fBrickPosZ), logicBrick, "LeadBrick", logicWorld, false, 0, cfg.fCheckOverlaps);
 		
 		// register brick as detector in the framework with ID = 4
-		fEvent.MakeDetector(4, Detector::eDummy);
-		Detector &brickDetector = fEvent.GetDetector(4);
+		int brickDetectorId = -1;
+		vector<double> brickPosition {fBrickPosX, fBrickPosY, fBrickPosZ};
+		vector<int> detectorIds = fEvent.GetDetectorIds();
+		for (int id : detectorIds) {
+			brickDetectorId = id+1;
+			if (!fEvent.HasDetector(brickDetectorId)) {
+				fEvent.MakeDetector(brickDetectorId, Detector::eDummy);
+				cout << "[INFO] Brick of Lead was registered as detector with ID " << brickDetectorId << endl;
+				break;
+			}
+		}
+		Detector &brickDetector = fEvent.GetDetector(brickDetectorId);
 		brickDetector.SetName("LeadBrick");
+		brickDetector.SetDetectorPosition(brickPosition);
 		G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
 		G4MDetectorAction* const brickSD = new G4MDetectorAction(brickDetector.GetName(), brickDetector.GetId(), fEvent);
 		sdMan->AddNewDetector(brickSD);
