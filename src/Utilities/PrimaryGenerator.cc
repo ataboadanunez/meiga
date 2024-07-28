@@ -180,9 +180,12 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
     auto mode = simData.GetInjectionMode();
     Particle &currentParticle = simData.GetCurrentParticle();
     vector<double> injectionOrigin = simData.GetInjectionOrigin();
+    bool isDefaultOrigin = true;
     double x0 = injectionOrigin[0];
     double y0 = injectionOrigin[1];
     double z0 = injectionOrigin[2];
+    if (x0 != 0.0 || y0 != 0.0 || z0 != 0.0)
+        isDefaultOrigin = false;
 
     double xInj;
     double yInj;
@@ -196,7 +199,7 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
         double injRadius = simData.GetInjectionRadius();
         double injHeight = simData.GetInjectionHeight();
         if (injHeight != z0){
-            cout << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: in injectionMode = eCircle, `injHeight` does not match with `z-coordinate` of the circle. Using `injHeight` as default." << endl;
+            cout << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: in injection mode 'eCircle', `injHeight` does not match with `z-coordinate` of the circle. Using `injHeight` as default." << endl;
         }
 
 
@@ -238,7 +241,7 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
         double injRadius = simData.GetInjectionRadius();
         double injHeight = simData.GetInjectionHeight();
         if (injHeight != z0){
-            cout << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: in injectionMode = eVertical, `injHeight` does not match with `z-coordinate`. Using `injHeight` as default." << endl;
+            cout << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: in injection mode 'eVertical', `injHeight` does not match with `z-coordinate`. Using `injHeight` as default." << endl;
             zInj = injHeight;
         } else {
             zInj = z0;
@@ -260,6 +263,15 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
         break;
     }
     case SimData::InjectionMode::eFromFile:
+        if (isDefaultOrigin) {
+            cout    << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: in injection mode 'eFromFile', found coordinates for the origin position: (" 
+                    << x0 / CLHEP::m << ", " << y0 / CLHEP::m << ", " << z0 / CLHEP::m 
+                    << ") m. These will be ignored." << endl;
+        }
+
+        if (fUseEcoMug) {
+            cout << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: using injection mode 'eFromFile' with EcoMug particle generator might not produce the desired results." << endl;
+        }
         xInj = currentParticle.GetPosition().at(0);
         yInj = currentParticle.GetPosition().at(1);
         zInj = currentParticle.GetPosition().at(2);
@@ -275,6 +287,6 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
         }
 
     particlePosition = {xInj, yInj, zInj};
-    cout << "[INFO] PrimaryGenerator::ComputeInjectionPosition: Injecting particle at position: x = " << xInj / CLHEP::m << ", y = " << yInj / CLHEP::m << " z = " << zInj / CLHEP::m << " m " << endl;
+    cout << "[INFO] PrimaryGenerator::ComputeInjectionPosition: Injecting particle at position: x = " << xInj / CLHEP::m << ", y = " << yInj / CLHEP::m << ", z = " << zInj / CLHEP::m << " m " << endl;
 
 }

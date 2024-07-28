@@ -98,9 +98,9 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 	cout << "---------- Particle Injection ------------- " << endl;
 	cout << "Injection Mode: " << simData.GetInjectionModeName() << endl;
 
-	double posX = GetPropertyFromXML<double>(tree, injectionBranch, "x");
-	double posY = GetPropertyFromXML<double>(tree, injectionBranch, "y");
-	double posZ = GetPropertyFromXML<double>(tree, injectionBranch, "z");
+	double posX = GetPropertyFromXML<double>(tree, injectionBranch, "x", 0.0);
+	double posY = GetPropertyFromXML<double>(tree, injectionBranch, "y", 0.0);
+	double posZ = GetPropertyFromXML<double>(tree, injectionBranch, "z", 0.0);
 	vector<double> injectionOrigin = {posX, posY, posZ}; 
 	simData.SetInjectionOrigin(injectionOrigin);
 	cout << "Origin of injection coordinates: " << endl;
