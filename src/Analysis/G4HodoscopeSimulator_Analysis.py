@@ -167,7 +167,7 @@ if __name__ == "__main__":
 	plt.legend()
 
 	# access to deposited energy in lead brick (see G4LeadSimulator application)
-	edep_brick = merged_df.get('Detector_4/DepositedEnergy')
+	edep_brick = merged_df.get('Detector_3/DepositedEnergy')
 	if edep_brick is not None:
 		fig = plt.figure()
 		plt.hist(edep_brick[edep_brick>0.1], bins=50, lw=1.8, color='gray', histtype='step', label='Lead Brick')
