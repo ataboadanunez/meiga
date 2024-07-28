@@ -31,60 +31,56 @@ class Event
 		Event();
 		virtual ~Event();
 
-		// interface to fwk/SimData
 		SimData& GetSimData() { return fSimData; }
 
-		// interface to fwk/Detector
 		Detector& GetDetector() { return fDetector; }
 		Detector& GetDetector(unsigned int id) { return fDetectorMap[id]; }
 		bool HasDetector(unsigned int id);
-		void MakeDetector(unsigned int id);
 		void MakeDetector(unsigned int id, Detector::DetectorType type);
+		void MakeDetector(const Detector & aDetector);
 
-		int GetNDetectors() {return fNDetectors; }
-
-//#warning "move to DetectorSimData!"
-		void SetMaximumHeight(double maxH) { fMaximumHeight = maxH; }
-		double GetMaximumHeight() { return fMaximumHeight; }
-		
 		std::map<int, Detector>& DetectorRange() { return fDetectorMap; }
 		const std::map<int, Detector>& DetectorRange() const { return fDetectorMap; }
+		int GetNDetectors() {return fNDetectors; }
+		std::vector<int> GetDetectorIds();
+
+		// should be part of DetectorSimData
+		void SetMaximumHeight(double maxH) { fMaximumHeight = maxH; }
+		double GetMaximumHeight() { return fMaximumHeight; }
 
 		struct Config {
 	
-		// program configuration variables
-		std::string fConfigurationFileName;
-		// input variables
-		std::string fInputMode;
-		unsigned int fInputNParticles;
-		std::string fInputFileName;
-		std::string fDetectorList;
-		std::string fDetectorProperties;
+			// program configuration variables
+			std::string fConfigurationFileName;
+			// input variables
+			std::string fInputMode;
+			unsigned int fInputNParticles;
+			std::string fInputFileName;
+			std::string fDetectorList;
+			std::string fDetectorProperties;
 
-		// simulation variables
-		std::string fSimulationMode;
-		std::string fInjectionMode;
-		bool fGeoVis;
-		bool fTrajVis;
-		bool fCheckOverlaps;
-		std::string fRenderFile;
-		std::string fPhysicsListName;
-		int fVerbosity;
+			// simulation variables
+			std::string fSimulationMode;
+			std::string fInjectionMode;
+			bool fGeoVis;
+			bool fTrajVis;
+			bool fCheckOverlaps;
+			std::string fRenderFile;
+			std::string fPhysicsListName;
+			int fVerbosity;
 
-		// output variables
-		std::string fOutputFileName;
-		bool fCompressOutput;
-		bool fSaveInput;
-		bool fSavePETimeDistribution;
-		bool fSaveComponentsPETimeDistribution;
-		bool fSaveTraces;
-		bool fSaveEnergy;
-		bool fSaveComponentsEnergy;
-		bool fSaveCharge;
-		bool fSaveCounts;
-		// add more stuff below in case is needed
-
-
+			// output variables
+			std::string fOutputFileName;
+			bool fCompressOutput;
+			bool fSaveInput;
+			bool fSavePETimeDistribution;
+			bool fSaveComponentsPETimeDistribution;
+			bool fSaveTraces;
+			bool fSaveEnergy;
+			bool fSaveComponentsEnergy;
+			bool fSaveCharge;
+			bool fSaveCounts;
+			// add more stuff below in case is needed
 		};
 
 		Config& GetConfig() { return cfg; }
