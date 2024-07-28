@@ -19,14 +19,12 @@ class G4LeadEventAction;
 class G4LeadSteppingAction : public G4UserSteppingAction
 {
 	public:
-		G4LeadSteppingAction(G4LeadEventAction* event, Event& theEvent);
+		G4LeadSteppingAction(Event& theEvent);
 		virtual ~G4LeadSteppingAction();
 		virtual void UserSteppingAction(const G4Step* step);
 
 	private:
-		G4LeadEventAction* fEventAction;
 		Event& fEvent;
-		G4double fBrickTotalEnergyDeposit;
 };
 
 #endif

@@ -28,16 +28,12 @@ class G4LeadSimulator
     void Initialize(Event& evt, std::string fileName);
     bool RunSimulation(Event& evt);
     void WriteEventInfo(Event& evt);
-
-    inline void AddBrickEnergyDeposit(const G4double aEnergy) { fBrickTotalEnergyDepositVector.push_back(aEnergy); }
-    std::vector<G4double> GetBrickEnergyDeposit() const { return fBrickTotalEnergyDepositVector; }
-
+    
     // static members 
     static Particle currentParticle;
     
     G4LeadSimulator* fG4LeadSimulator;
     bool fSimulateBrick;
-    std::vector<G4double> fBrickTotalEnergyDepositVector;
 
     // name of configuration file
     std::string fCfgFile;

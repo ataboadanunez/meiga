@@ -21,9 +21,8 @@
 
 using namespace std;
 
-G4LeadSteppingAction::G4LeadSteppingAction(G4LeadEventAction* G4event, Event& theEvent)
+G4LeadSteppingAction::G4LeadSteppingAction(Event& theEvent)
 	: G4UserSteppingAction(),
-		fEventAction(G4event),
     	fEvent(theEvent)
 {
 

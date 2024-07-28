@@ -37,7 +37,6 @@ using namespace std;
 Particle G4LeadSimulator::currentParticle;
 G4LeadSimulator* fG4LeadSimulator;
 string fCfgFile;
-// bool G4LeadSimulator::fSimulateBrick;
 
 G4LeadSimulator::G4LeadSimulator()
 {
@@ -120,7 +119,6 @@ G4LeadSimulator::RunSimulation(Event& theEvent)
 	const Event::Config &cfg = theEvent.GetConfig();
 	SimData& simData = theEvent.GetSimData();
 	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
-	fBrickTotalEnergyDepositVector.reserve(NumberOfParticles);
 	cout << "[INFO] G4LeadSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
 	if (!NumberOfParticles) {
 		cerr << "[ERROR] G4LeadSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
@@ -147,7 +145,7 @@ G4LeadSimulator::RunSimulation(Event& theEvent)
 	G4LeadEventAction *fEventAction = new G4LeadEventAction(theEvent);
 	runManager->SetUserAction(fEventAction);
 	runManager->SetUserAction(new G4LeadTrackingAction(theEvent));
-	G4LeadSteppingAction *fSteppingAction = new G4LeadSteppingAction(fEventAction, theEvent);
+	G4LeadSteppingAction *fSteppingAction = new G4LeadSteppingAction(theEvent);
 	runManager->SetUserAction(fSteppingAction);
 	// initialize G4 kernel
 	runManager->Initialize();
