@@ -26,13 +26,14 @@
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4OpticalSkinSurface;
+class G4LeadSimulator;
 
 // Detector construction class to define materials and geometry
 
 class G4LeadDetectorConstruction : public G4VUserDetectorConstruction {
 	
 	public:
-		G4LeadDetectorConstruction(Event& aEvent);
+		G4LeadDetectorConstruction(Event& aEvent, bool aSimulateBrick);
 		virtual ~G4LeadDetectorConstruction();
 		virtual G4VPhysicalVolume* Construct();
 
@@ -64,7 +65,6 @@ class G4LeadDetectorConstruction : public G4VUserDetectorConstruction {
 		double fWorldSizeY;
 		double fWorldSizeZ;
 
-		bool fSimulateBrick;
 		double fBrickSizeX;
 		double fBrickSizeY;
 		double fBrickSizeZ;
@@ -73,6 +73,7 @@ class G4LeadDetectorConstruction : public G4VUserDetectorConstruction {
 		double fBrickPosZ;
 		
 		Event& fEvent;
+		bool fSimulateBrick;
 };
 
 

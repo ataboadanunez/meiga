@@ -47,6 +47,8 @@ G4LeadRunAction::EndOfRunAction(const G4Run* aRun)
 		G4int g4RunId = aRun->GetRunID();
 
 		Detector& currDet = detIt->second;
+		if(currDet.GetType() != Detector::eHodoscope)
+			continue;
 		const unsigned int detId = currDet.GetId();
 
 		DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData(detId);

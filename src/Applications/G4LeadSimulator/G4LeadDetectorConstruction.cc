@@ -2,7 +2,9 @@
 #include <iostream>
 
 #include "G4LeadDetectorConstruction.h"
+#include "G4LeadSimulator.h"
 #include "Materials.h"
+#include "G4MDetectorAction.h"
 
 #include <G4SDManager.hh>
 #include <G4UnitsTable.hh>
@@ -12,42 +14,44 @@ using boost::property_tree::ptree;
 using namespace std;
 
 
-G4LeadDetectorConstruction::G4LeadDetectorConstruction(Event& aEvent) : 
+G4LeadDetectorConstruction::G4LeadDetectorConstruction(Event& aEvent, bool aSimulateBrick) : 
 	G4VUserDetectorConstruction(),
-	fEvent(aEvent)
+	fEvent(aEvent),
+	fSimulateBrick(aSimulateBrick)
 { 
-	
-	Event::Config &cfg = aEvent.GetConfig();
-	string aConfigFileName = cfg.fConfigurationFileName;
-	cout << "[INFO] G4LeadDetectorConstruction::G4LeadDetectorConstruction: Reading Lead information from Configuration File " << aConfigFileName << endl;
-	ptree tree;
-	read_json(aConfigFileName, tree);
-	
-	fSimulateBrick = tree.get<bool>("LeadBrick.Simulate", false);
-	if (tree.get_child_optional("LeadBrick.Position")) {
-		vector<double> brickPosition;
-		for (const auto &item : tree.get_child("LeadBrick.Position")) {
-			brickPosition.push_back(item.second.get_value<double>());
+	if(fSimulateBrick) {
+		Event::Config &cfg = aEvent.GetConfig();
+		string aConfigFileName = cfg.fConfigurationFileName;
+		cout << "[INFO] G4LeadDetectorConstruction::G4LeadDetectorConstruction: Reading Lead information from Configuration File " << aConfigFileName << endl;
+		ptree tree;
+		read_json(aConfigFileName, tree);
+
+		if (tree.get_child_optional("LeadBrick.Position")) {
+			vector<double> brickPosition;
+			for (const auto &item : tree.get_child("LeadBrick.Position")) {
+				brickPosition.push_back(item.second.get_value<double>());
+			}
+			// brick position coordinates in cm
+			fBrickPosX = brickPosition[0] * CLHEP::cm;
+			fBrickPosY = brickPosition[1] * CLHEP::cm;
+			fBrickPosZ = brickPosition[2] * CLHEP::cm;
 		}
-		// brick position coordinates in cm
-		fBrickPosX = brickPosition[0] * CLHEP::cm;
-		fBrickPosY = brickPosition[1] * CLHEP::cm;
-		fBrickPosZ = brickPosition[2] * CLHEP::cm;
-	}
-	if (tree.get_child_optional("LeadBrick.Size")) {
-		vector<double> brickSize;
-		for (const auto &item : tree.get_child("LeadBrick.Size")) {
-			brickSize.push_back(item.second.get_value<double>());
+		if (tree.get_child_optional("LeadBrick.Size")) {
+			vector<double> brickSize;
+			for (const auto &item : tree.get_child("LeadBrick.Size")) {
+				brickSize.push_back(item.second.get_value<double>());
+			}
+			// brick size in cm
+			fBrickSizeX = brickSize[0] * CLHEP::cm;
+			fBrickSizeY = brickSize[1] * CLHEP::cm;
+			fBrickSizeZ = brickSize[2] * CLHEP::cm;
 		}
-		// brick size in cm
-		fBrickSizeX = brickSize[0] * CLHEP::cm;
-		fBrickSizeY = brickSize[1] * CLHEP::cm;
-		fBrickSizeZ = brickSize[2] * CLHEP::cm;
 	}
 }	
 
 G4LeadDetectorConstruction::~G4LeadDetectorConstruction() 
-	{ }
+{
+}
 
 G4VPhysicalVolume*
 G4LeadDetectorConstruction::CreateDetector()
@@ -80,6 +84,26 @@ G4LeadDetectorConstruction::CreateWorld()
 		logicBrick = new G4LogicalVolume(solidBrick, Materials().Lead, "LeadBrick");
 		logicBrick->SetVisAttributes(cgray);
 		physBrick = new G4PVPlacement(nullptr, G4ThreeVector(fBrickPosX, fBrickPosY, fBrickPosZ), logicBrick, "LeadBrick", logicWorld, false, 0, cfg.fCheckOverlaps);
+		
+		// register brick as detector in the framework with ID = 4
+		int brickDetectorId = -1;
+		vector<double> brickPosition {fBrickPosX, fBrickPosY, fBrickPosZ};
+		vector<int> detectorIds = fEvent.GetDetectorIds();
+		for (int id : detectorIds) {
+			brickDetectorId = id+1;
+			if (!fEvent.HasDetector(brickDetectorId)) {
+				fEvent.MakeDetector(brickDetectorId, Detector::eDummy);
+				cout << "[INFO] Brick of Lead was registered as detector with ID " << brickDetectorId << endl;
+				break;
+			}
+		}
+		Detector &brickDetector = fEvent.GetDetector(brickDetectorId);
+		brickDetector.SetName("LeadBrick");
+		brickDetector.SetDetectorPosition(brickPosition);
+		G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
+		G4MDetectorAction* const brickSD = new G4MDetectorAction(brickDetector.GetName(), brickDetector.GetId(), fEvent);
+		sdMan->AddNewDetector(brickSD);
+		logicBrick->SetSensitiveDetector(brickSD);
 	}
 }
 
