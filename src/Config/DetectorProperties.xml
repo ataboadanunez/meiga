@@ -9,7 +9,7 @@
 	<impuritiesFraction> 0.0 </impuritiesFraction>
 	<numberOfBars> 12 </numberOfBars>
 	<numberOfPanels> 1 </numberOfPanels>
-	<barLength unit="mm"> 500 </barLength>
+	<barLength unit="mm"> 480 </barLength>
 	<barWidth unit="mm"> 40 </barWidth> 
 	<barThickness unit="mm"> 10 </barThickness>
 	<coatingThickness unit="mm"> 0.25 </coatingThickness>

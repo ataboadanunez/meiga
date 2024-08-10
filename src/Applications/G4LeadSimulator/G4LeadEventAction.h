@@ -17,6 +17,8 @@
 #include <fstream>
 #include <iostream>
 
+class G4LeadSimulator;
+
 class G4LeadEventAction : public G4UserEventAction
 {
   public:
@@ -25,7 +27,7 @@ class G4LeadEventAction : public G4UserEventAction
 
     virtual void BeginOfEventAction(const G4Event *event);
     virtual void EndOfEventAction(const G4Event *event);
-    
+
     std::vector<int> fBarsX1;
     std::vector<int> fBarsY1;
     bool trig1;
@@ -49,10 +51,8 @@ class G4LeadEventAction : public G4UserEventAction
   private:
    
    Event& fEvent;
-   std::ofstream fOutFile;
 
-  friend class G4LeadSimulator;
-
+friend class G4LeadSimulator;
 
 };
 

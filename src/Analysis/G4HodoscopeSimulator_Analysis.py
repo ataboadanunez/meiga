@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 # import SimDataReader to access data from output file
 from SimDataReader import *
 
-
 def ConvertBinaryPixel(value, matrix, nBars=12):
 	"""
 	Add description
@@ -76,15 +75,21 @@ if __name__ == "__main__":
 	# keep detector id in the column name
 
 	print("[INFO] Merging input flux and deposited energy data")
-
 	merged_df = inputFlux.copy()
-
+	merged_df["evid"] = event_ids
+	
 	for detId in detector_ids:
 		detSimData = simData.GetDetectorSimData(det_id=detId)
 		edep = detSimData.get_deposited_energy()
-		barCounter = detSimData.get_binary_counter()		
-		merged_df['Detector_%i/DepositedEnergy' %detId] = edep
-		merged_df['Detector_%i/BinaryCounter' %detId] = barCounter
+		barCounter = detSimData.get_binary_counter()
+		if len(edep) != len(event_ids):
+			print("[WARNING] Length of deposited energy (%i) for detector %i does not match length of number of events (%i). Data will not be merged." %(len(edep), detId, len(event_ids)))
+		else:
+			merged_df['Detector_%i/DepositedEnergy' %detId] = edep
+		if len(barCounter) != len(event_ids):
+			print("[WARNING] Length of bar counter (%i) for detector %i does not match length of number of events (%i). Data will not be merged." %(len(barCounter), detId, len(event_ids)))
+		else:
+			merged_df['Detector_%i/BinaryCounter' %detId] = barCounter
 		
 	print(merged_df.head())
 
@@ -100,6 +105,7 @@ if __name__ == "__main__":
 	plane_0 = np.zeros((12,12))
 	plane_1 = np.zeros((12,12))
 	plane_2 = np.zeros((12,12))
+	coincidence_event_ids = []
 
 	n_events = len(event_ids)
 
@@ -115,6 +121,7 @@ if __name__ == "__main__":
 			plane_0 = ConvertBinaryPixel(binary_0, plane_0)
 			plane_1 = ConvertBinaryPixel(binary_1, plane_1)
 			plane_2 = ConvertBinaryPixel(binary_2, plane_2)
+			coincidence_event_ids.append(event_ids[i])
 
 	# create plots
 	fig = plt.figure()
@@ -122,10 +129,8 @@ if __name__ == "__main__":
 	plt.colorbar(im_0, orientation='vertical', label=r'Counts')
 	plt.xlabel(r'Bar number')
 	plt.ylabel(r'Bar number')
-
 	plt.xticks(ticks=[1, 3, 5, 7, 9, 11], labels=[2, 4, 6, 8, 10, 12])
 	plt.yticks(ticks=[1, 3, 5, 7, 9, 11], labels=[2, 4, 6, 8, 10, 12])
-
 	plt.title(r'Counts of Detector 0')
 
 	fig = plt.figure()
@@ -133,10 +138,8 @@ if __name__ == "__main__":
 	plt.colorbar(im_1, orientation='vertical', label=r'Counts')
 	plt.xlabel(r'Bar number')
 	plt.ylabel(r'Bar number')
-
 	plt.xticks(ticks=[1, 3, 5, 7, 9, 11], labels=[2, 4, 6, 8, 10, 12])
 	plt.yticks(ticks=[1, 3, 5, 7, 9, 11], labels=[2, 4, 6, 8, 10, 12])
-
 	plt.title(r'Counts of Detector 1')
 
 	fig = plt.figure()
@@ -144,19 +147,16 @@ if __name__ == "__main__":
 	plt.colorbar(im_1, orientation='vertical', label=r'Counts')
 	plt.xlabel(r'Bar number')
 	plt.ylabel(r'Bar number')
-
 	plt.xticks(ticks=[1, 3, 5, 7, 9, 11], labels=[2, 4, 6, 8, 10, 12])
 	plt.yticks(ticks=[1, 3, 5, 7, 9, 11], labels=[2, 4, 6, 8, 10, 12])
-
 	plt.title(r'Counts of Detector 2')
 
 	
-
-
 	# plot histogram of deposited energy at each detector
-	edep_0 = merged_df['Detector_0/DepositedEnergy']
-	edep_1 = merged_df['Detector_1/DepositedEnergy']
-	edep_2 = merged_df['Detector_2/DepositedEnergy']
+	coincidence_df = merged_df[merged_df['evid'].isin(coincidence_event_ids)]
+	edep_0 = coincidence_df['Detector_0/DepositedEnergy']
+	edep_1 = coincidence_df['Detector_1/DepositedEnergy']
+	edep_2 = coincidence_df['Detector_2/DepositedEnergy']
 	fig = plt.figure()
 	plt.hist(edep_0[edep_0>0.1], bins=50, lw=1.8, histtype='step', label='Detector 0')
 	plt.hist(edep_1[edep_1>0.1], bins=50, lw=1.8, histtype='step', label='Detector 1')
@@ -165,5 +165,14 @@ if __name__ == "__main__":
 	plt.xlabel('Deposited Energy / MeV')
 	plt.ylabel('Counts')
 	plt.legend()
+
+	# access to deposited energy in lead brick (see G4LeadSimulator application)
+	edep_brick = merged_df.get('Detector_3/DepositedEnergy')
+	if edep_brick is not None:
+		fig = plt.figure()
+		plt.hist(edep_brick[edep_brick>0.1], bins=50, lw=1.8, color='gray', histtype='step', label='Lead Brick')
+		plt.xlabel('Deposited Energy / MeV')
+		plt.ylabel('Counts')
+		plt.legend()
 
 	plt.show()

@@ -14,10 +14,6 @@
 
 // Geant4 headers
 #include "FTFP_BERT.hh"
-#include "G4RunManagerFactory.hh"
-#include "G4UImanager.hh"
-#include "G4VisExecutive.hh"
-#include "G4UIExecutive.hh"
 #include "Randomize.hh"
 
 // Framework libraries
@@ -38,10 +34,6 @@ Particle G4LeadSimulator::currentParticle;
 G4LeadSimulator* fG4LeadSimulator;
 string fCfgFile;
 const string cApplicationName = "G4LeadSimulator";
-
-G4LeadSimulator::G4LeadSimulator()
-{
-}
 
 int main(int argc, char** argv) 
 {
@@ -70,8 +62,27 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-bool
-G4LeadSimulator::RunSimulation(Event &aEvent)
+G4LeadSimulator::G4LeadSimulator()
+{
+}
+
+void G4LeadSimulator::Initialize(Event &aEvent, std::string aFileName)
+{
+	// Fill Event object from configuration file
+	ConfigManager::ReadConfigurationFile(aEvent, aFileName);
+	// get simulation simulation settings
+	const Event::Config &cfg = aEvent.GetConfig();
+	ConfigManager::PrintConfig(cfg);
+	// Read Detector Configuration
+	ConfigManager::ReadDetectorList(cfg.fDetectorList, aEvent);
+	
+	// extra flag to handle lead brick simulation
+	ptree tree;
+	read_json(aFileName, tree);
+	fSimulateBrick = tree.get<bool>("LeadBrick.Simulate", false);
+}
+
+bool G4LeadSimulator::RunSimulation(Event &aEvent)
 {
 	const Event::Config &cfg = aEvent.GetConfig();
 	SimData& simData = aEvent.GetSimData();
@@ -92,7 +103,7 @@ G4LeadSimulator::RunSimulation(Event &aEvent)
 	// construct the default run manager
 	auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly);
 	// set mandatory initialization classes
-	runManager->SetUserInitialization(new G4LeadDetectorConstruction(aEvent));
+	runManager->SetUserInitialization(new G4LeadDetectorConstruction(aEvent, fSimulateBrick));
 	runManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
 	runManager->SetUserInitialization(new G4LeadActionInitialization(aEvent));
 	// initialize G4 kernel

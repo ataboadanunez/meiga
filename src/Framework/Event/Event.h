@@ -27,7 +27,20 @@ class Event
 {
 
 public:
-	struct Config {
+		using DetectorMap = std::map<int, std::unique_ptr<Detector>>;
+		SimData& GetSimData() { return fSimData; }
+
+		Detector& GetDetector(const int id);
+		bool HasDetector(unsigned int id);
+		void MakeDetector(int id, Detector::DetectorType type);
+		const DetectorMap& DetectorRange() const { return fDetectorMap; }
+		int GetNDetectors() {return fNDetectors; }
+		std::vector<int> GetDetectorIds();
+
+		void SetMaximumHeight(double maxH) { fMaximumHeight = maxH; }
+		double GetMaximumHeight() { return fMaximumHeight; }
+
+		struct Config {
 	
 			// program configuration variables
 			std::string fConfigurationFileName;
@@ -61,19 +74,6 @@ public:
 			bool fSaveCounts;
 			// add more stuff below in case is needed
 		};
-
-		using DetectorMap = std::map<int, std::unique_ptr<Detector>>;
-		// interface to fwk/SimData
-		SimData& GetSimData() { return fSimData; }
-
-		Detector& GetDetector(const int id);
-		bool HasDetector(const int id);
-		void MakeDetector(const int id, const Detector::DetectorType type);
-		const DetectorMap& DetectorRange() const { return fDetectorMap; }
-		int GetNDetectors() {return fNDetectors; }
-
-		void SetMaximumHeight(double maxH) { fMaximumHeight = maxH; }
-		double GetMaximumHeight() { return fMaximumHeight; }
 
 		Config& GetConfig() { return cfg; }
 		const Config& GetConfig() const { return cfg; }

@@ -283,6 +283,18 @@ An example of a `DetectorList.xml` file is given bellow:
 </detectorList>
 ```
 
+## Predefined Detector Models
+Meiga provides predefined detector configurations commonly used in Astroparticle physics and muography such as a Water-Cerenkov Detector and a hodoscope made of scintillator planes:
+![Detectors](src/Documentation/detectors.png)*Example of predefined detectors in Meiga: a Water-Cerenkov Detector with a half-sphere PMT(left) and three Hodoscope detectors with WLS optical fibers (right).*
+
+The detectors are defined as independent classes in the G4Models directory and are automatically build in the G4DetectorConstructor class of each application. The user needs to specify which detector type will be used and the location in the `DetectorList.xml` file as described above. The following detector types are allowed:
+* `eScintillator` \
+Plane of _N_ bars of scintillator material. Allowed modification parameters are: `numberOfBars`, `barWidth`, `barLength`, `barThickness`.
+* `eHodoscope` \
+Grid of _NxN_ scintillator bars and WLS optical fibers. In addition to the parameters of the `eScintillator` detector it allows the following modifications: `fiberLength`, `fiberRadius` and `claddingThickness` for the WLS optical fiber configuration. 
+* `eWCD` \
+A Water-Cerenkov Detector with a Photo-Multiplier Tube located at the top center of the tank. Allow the following modifications: `tankRadius` and `tankHeight`.
+
 # Simulation Output
 
 The simulation output is stored in a JSON format using the 
@@ -306,6 +318,9 @@ The level of output to be stored can be set in the configuration file using the 
 This might depend on the detector configuration or application needs.
 
 In addition to the simulation output, information of the DetectorList containing detector naming, positioning and list of optical device IDs are also stored in the output file.
+
+# Example Applications
+A few example applications are provided in the source code
 
 # Analysis
 
@@ -358,6 +373,9 @@ First of all, checkout the `src/Utilities/RunJobs` directory where you will find
 - `createjobs.py`
 - `runjobs.py`
 
+and another script to merge the output in a single file:
+- `mergeoutput.py`
+
 Then, follow these steps:
 
 1. Create a `base/` directory with the following files:
@@ -383,6 +401,12 @@ This will split the input file containing $N_\mathrm{tot}$ lines into $N = N_\ma
     ```
 
 Will execute the $N$ jobs in a queue using a maximum of $n_\mathrm{threads}$ at a time. Once the simulation finishes, the output file will be located in its corresponding job directory.
+
+5. Use the `mergeoutput.py` to merge the generated output files in a single file:
+  ```bash
+  python3 mergeoutput.py -j <path-to-jobs> -o <path-to-merged-directory>
+  ```
+It will fetch the output files located in the jobs directory and merge in a single file that will be located in the `<path-to-merged-directory>` (if no output directory is given it will create a default `./merged_output`).
 
 ## Add RunJobs to your environment
 

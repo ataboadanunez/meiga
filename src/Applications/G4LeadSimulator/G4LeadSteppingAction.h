@@ -24,7 +24,6 @@ class G4LeadSteppingAction : public G4UserSteppingAction
 		virtual void UserSteppingAction(const G4Step* step);
 
 	private:
-		G4LeadEventAction* fEventAction;
 		Event& fEvent;
 };
 

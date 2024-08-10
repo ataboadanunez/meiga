@@ -1,4 +1,5 @@
 #include "G4LeadEventAction.h"
+#include "G4LeadSimulator.h"
 #include "SimData.h"
 #include "DetectorSimData.h"
 #include "OptDeviceSimData.h"
@@ -19,7 +20,6 @@ G4LeadEventAction::~G4LeadEventAction()
 void
 G4LeadEventAction::BeginOfEventAction(const G4Event*)
 {
-
 }
 
 void 
@@ -50,8 +50,6 @@ G4LeadEventAction::EndOfEventAction(const G4Event*)
 		detSimData.SetEnergyDeposit(totalEdep);
 		// clear total energy deposit after the event is terminated to reset counter
 		detSimData.ClearTotalEnergyDeposit();
-
-
 	}
 
 }

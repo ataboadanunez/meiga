@@ -182,9 +182,9 @@ class SimDataReader:
 
 	def GetDetectorSimData(self, det_id : int):
 		"""
-		Returns pointer to the DetectorSimData given its id
+		Returns DetectorSimData object for a detector ID
 		"""
-		return self.DetectorSimData(det_id, self._data)
+		return self.DetectorSimData(det_id, self._data, self._detector_list)
 
 	class DetectorSimData:
 			
@@ -197,13 +197,16 @@ class SimDataReader:
 
 		"""
 
-		def __init__(self, det_id : int, data : dict):
+		def __init__(self, det_id : int, data : dict, detectorData : dict):
 
 			self._detector_id = det_id
 			self._parent_simdata = data
+			self._detector_data = detectorData
 
 			self._deposited_energy = None
 			self._binary_counter = None
+			self._name = ""
+			self._position = None
 
 		
 		def get_deposited_energy(self) -> np.array:
@@ -259,6 +262,29 @@ class SimDataReader:
 					continue
 
 			return np.array(binary_list)
+		
+		def get_name(self) -> str:
+			
+			"""
+			Returns the detector name (str)
+			"""
+			detectorKey = 'Detector_' + str(self._detector_id)
+			detectorData = self._detector_data.get(detectorKey)
+			if detectorData is not None:
+				self._name = detectorData.get('Name')
+			
+			return self._name
+
+		def get_position(self) -> np.array:
+			"""
+			Returns the detector position (np.array)
+			"""
+			detectorKey = 'Detector_' + str(self._detector_id)
+			detectorData = self._detector_data.get(detectorKey)
+			if detectorData is not None:
+				self._position = detectorData.get('Position')
+			
+			return np.array(self._position)
 
 		def GetOptDeviceSimData(self, od_id : int):
 			"""

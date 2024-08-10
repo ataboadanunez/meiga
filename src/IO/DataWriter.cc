@@ -179,6 +179,59 @@ DataWriter::FileWriter(Event& theEvent)
 	
 }
 
+std::string DataWriter::ReadFile(const std::string &aFilePath, bool aIsZipped)
+{
+	if (aIsZipped) {
+		std::ifstream file(aFilePath, std::ios_base::in | std::ios_base::binary);
+		if (!file.is_open()) {
+			throw std::runtime_error("Could not open file: " + aFilePath);
+		}
+
+		boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
+		in.push(boost::iostreams::gzip_decompressor());
+		in.push(file);
+
+		std::stringstream buffer;
+		boost::iostreams::copy(in, buffer);
+		return buffer.str();
+	} else {
+		std::ifstream file(aFilePath);
+		if (!file.is_open()) {
+			throw std::runtime_error("Could not open file: " + aFilePath);
+		}
+
+		std::stringstream buffer;
+		buffer << file.rdbuf();
+		return buffer.str();
+	}
+}
+
+void DataWriter::WriteFile(const std::string &aFilePath, const std::string &aContent, bool aIsZipped)
+{
+	if (aIsZipped) {
+		std::ofstream file(aFilePath, std::ios_base::out | std::ios_base::binary);
+		if (!file.is_open()) {
+			throw std::runtime_error("Could not open file: " + aFilePath);
+		}
+
+		boost::iostreams::filtering_streambuf<output> out;
+		out.push(boost::iostreams::gzip_compressor());
+		out.push(file);
+
+		std::stringstream buffer;
+		buffer << aContent;
+		boost::iostreams::copy(buffer, out);
+	} else {
+		std::ofstream file(aFilePath);
+		if (!file.is_open()) {
+			throw std::runtime_error("Could not open file: " + aFilePath);
+		}
+
+		file << aContent;
+		file.close();
+	}
+}
+
 void
 DataWriter::SaveInputFlux(json& jEvent, SimData& simData, size_t evid)
 {
@@ -198,12 +251,9 @@ DataWriter::SaveInputFlux(json& jEvent, SimData& simData, size_t evid)
 void 
 DataWriter::SaveDepositedEnergy(json &jEvent, const DetectorSimData& detSimData, int detId, size_t eventId)
 {
-
-
 	// get vector of energy deposits
 	const auto & energyDeposit = detSimData.GetEnergyDeposit(); 
 	jEvent["Detector_"+to_string(detId)]["EnergyDeposit"] = energyDeposit.at(eventId);
-
 }
 
 

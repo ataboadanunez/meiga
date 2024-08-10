@@ -1,6 +1,9 @@
 #ifndef G4LeadSimulator_h
 #define G4LeadSimulator_h 1
-
+#include "G4RunManagerFactory.hh"
+#include "G4UImanager.hh"
+#include "G4VisExecutive.hh"
+#include "G4UIExecutive.hh"
 // C++ libraries
 #include <sstream>
 #include <fstream>
@@ -20,6 +23,7 @@ class G4LeadSimulator : public G4MBaseApplication
     G4LeadSimulator();
     virtual ~G4LeadSimulator() {;}
 
+    void Initialize(Event &aEvent, std::string aFileName) override;
     bool RunSimulation(Event &aEvent) override;
 
     // static members 
@@ -29,6 +33,7 @@ class G4LeadSimulator : public G4MBaseApplication
   private:
     // name of configuration file
     std::string fCfgFile;
+    bool fSimulateBrick;
 };
 
 #endif

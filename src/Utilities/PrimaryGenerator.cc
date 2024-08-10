@@ -3,6 +3,7 @@
 #include "Geometry.h"
 #include "Particle.h"
 #include "SimData.h"
+#include "Logger.h"
 
 #include "Randomize.hh"
 #include <CLHEP/Random/Randomize.h>
@@ -184,9 +185,12 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
     auto mode = simData.GetInjectionMode();
     Particle &currentParticle = simData.GetCurrentParticle();
     vector<double> injectionOrigin = simData.GetInjectionOrigin();
+    bool isDefaultOrigin = true;
     double x0 = injectionOrigin[0];
     double y0 = injectionOrigin[1];
     double z0 = injectionOrigin[2];
+    if (x0 != 0.0 || y0 != 0.0 || z0 != 0.0)
+        isDefaultOrigin = false;
 
     double xInj;
     double yInj;
@@ -271,6 +275,15 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
         break;
     }
     case SimData::InjectionMode::eFromFile:
+        if (isDefaultOrigin) {
+            cout    << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: in injection mode 'eFromFile', found coordinates for the origin position: (" 
+                    << x0 / CLHEP::m << ", " << y0 / CLHEP::m << ", " << z0 / CLHEP::m 
+                    << ") m. These will be ignored." << endl;
+        }
+
+        if (fUseEcoMug) {
+            cout << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: using injection mode 'eFromFile' with EcoMug particle generator might not produce the desired results." << endl;
+        }
         xInj = currentParticle.GetPosition().at(0);
         yInj = currentParticle.GetPosition().at(1);
         zInj = currentParticle.GetPosition().at(2);

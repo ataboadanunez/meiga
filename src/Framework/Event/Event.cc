@@ -9,15 +9,17 @@
 #include <fstream>
 #include <sstream>
 
-// Event::Event()
-// {
-// }
+std::vector<int> Event::GetDetectorIds()
+{
+    std::vector<int> ids;
+	for (const auto &kv : fDetectorMap) {
+		ids.push_back(kv.first);
+	}
+	return ids;
+}
 
-// Event::~Event()
-// {
-// }
-
-bool Event::HasDetector(const int id)
+bool
+Event::HasDetector(unsigned int id)
 {	
 	return fDetectorMap.find(id) != fDetectorMap.end();
 }
