@@ -2,7 +2,7 @@
 
 #include "G4Timer.hh"
 #include "G4Run.hh"
-#include "g4root.hh"
+// #include "g4root.hh"
 #include "G4AccumulableManager.hh"
  
 #include "G4MuDecRunAction.h"
@@ -13,7 +13,6 @@
 G4MuDecRunAction::G4MuDecRunAction()
  : G4UserRunAction()
 {
-  G4cout << "...G4MuDecRunAction..." << G4endl;
 }
 
 

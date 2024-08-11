@@ -4,6 +4,7 @@
 #include "OptDeviceSimData.h"
 #include "OptDevice.h"
 #include "CorsikaUtilities.h"
+#include "Logger.h"
 
 #include <G4Step.hh>
 #include <G4TouchableHistory.hh>
@@ -19,12 +20,12 @@ G4MPMTAction::G4MPMTAction(const G4String& name, const G4int dId, const G4int oI
 		fOptDeviceId(oId)
 
 	{ 
-		
-		cout << "[INFO] G4Models::G4MPMTAction: Registering Sensitive Detector " << name << endl;
 		SimData& simData = fEvent.GetSimData();
 		DetectorSimData& detSimData = simData.GetDetectorSimData(fDetectorId);
 		detSimData.MakeOptDeviceSimData(fOptDeviceId);
-		// OptDeviceSimData& OptDeviceSimData = detSimData.GetOptDeviceSimData(fOptDeviceId);
+		ostringstream msg;
+		msg << "Registering Sensitive Detector " << name;
+		Logger::Print(msg, INFO, "G4MPMTAction");
 
 	}
 
@@ -64,10 +65,14 @@ G4MPMTAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 
 }
 
+G4VSensitiveDetector *G4MPMTAction::Clone() const
+{
+    return nullptr;
+}
+
 G4bool
 G4MPMTAction::ProcessHits(G4Step* const step, G4TouchableHistory* const /*rOHist*/)
 {
-	
 	// reject particle in case it is not a photon
 	if (step->GetTrack()->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition())
 		return true;

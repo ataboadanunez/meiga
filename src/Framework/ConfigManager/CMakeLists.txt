@@ -5,4 +5,3 @@ set(MEIGA_LIBRARIES meiga_framework_configmanager ${MEIGA_LIBRARIES} PARENT_SCOP
 target_link_libraries(meiga_framework_configmanager meiga_framework_event)
 install(FILES ${headers} DESTINATION include)
 install(TARGETS meiga_framework_configmanager DESTINATION lib)
-target_compile_definitions(meiga_framework_configmanager PRIVATE CONFIG_FILE_PATH="${CONFIG_FILE_PATH}")

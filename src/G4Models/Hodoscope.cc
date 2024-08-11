@@ -13,11 +13,15 @@
 #include <iostream>
 using namespace std;
 
-void
-Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps)
+Hodoscope::Hodoscope(const int id, const Detector::DetectorType type) :
+	Scintillator(id, type)
 {
+	fName = "Hodoscope";
+}
 
-
+void
+Hodoscope::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheckOverlaps)
+{
 	// solids
 	G4Box* solidEnclosure = nullptr;
 	G4Box* solidCasing = nullptr;
@@ -42,38 +46,38 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 
 	G4LogicalVolume* logPixel = nullptr;
 
-	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
+	auto sdMan = G4SDManager::GetSDMpointer();
 
 	// number of scintillator bars
-	int nBars = detector.GetNBars();
+	int nBars = GetNBars();
 	
 	// Scintillator bars
-	double barWidth = detector.GetBarWidth();
-	double barLength = detector.GetBarLength();
-	double barThickness = detector.GetBarThickness();
-	double barCoatingThickness = detector.GetBarCoatingThickness();
+	double barWidth = GetBarWidth();
+	double barLength = GetBarLength();
+	double barThickness = GetBarThickness();
+	double barCoatingThickness = GetBarCoatingThickness();
 	double detectorWidth = nBars * (barWidth + barCoatingThickness);
 	double halfWidth = 0.5 * nBars * (barWidth + barCoatingThickness);
 
 	// optical fibers
-	double claddingThickness = detector.GetCladdingThickness();
-	double fiberRadius = detector.GetFiberRadius();
+	double claddingThickness = GetCladdingThickness();
+	double fiberRadius = GetFiberRadius();
 
 	// optical device
-	OptDevice pixel = detector.GetOptDevice(OptDevice::eMChPMT);
+	OptDevice pixel = GetOptDevice(OptDevice::eMChPMT);
 	double pixelSizeX = pixel.GetLength();
 	double pixelSizeY = pixel.GetWidth();
 	double pixelSizeZ = pixel.GetThickness();
 
 	// detector
-	G4ThreeVector detectorPos = Geometry::ToG4Vector(detector.GetDetectorPosition(), 1.);
-	int detectorId = detector.GetId();
+	G4ThreeVector detectorPos = Geometry::ToG4Vector(GetDetectorPosition(), 1.);
+	int detectorId = GetId();
 	ostringstream namedetector;
 	namedetector.str("");
 	namedetector << "Hodoscope_"+to_string(detectorId);
-	cout << "[INFO] Hodoscope::BuildDetector: Building detector " << namedetector.str();
-	cout << " (ID = " << detectorId << ")";
-	cout << " with " << nBars << " scintillator bars " << endl;
+	ostringstream msg; 
+	msg << "Building detector: " << namedetector.str() << ", ID: " << detectorId;
+	Logger::Print(msg, INFO, "BuildDetector");
 
 	// determine casing size
 	double maxLength;
@@ -109,8 +113,8 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 	G4RotationMatrix* rotationEnclosure = new G4RotationMatrix();
 	G4RotationMatrix* rotationFiber = new G4RotationMatrix();
 	G4RotationMatrix* rotationBot = new G4RotationMatrix();
-	double alpha = detector.GetRotationAngle();
-	cout << "[INFO] Hodoscope::BuildDetector: Rotation Angle = " << alpha << endl;
+	double alpha = GetRotationAngle();
+	Logger::Print("Rotation angle: " + std::to_string(alpha), INFO, "BuildDetector");
 	rotationEnclosure->rotateX(alpha);
 	rotationFiber->rotateY(M_PI/2);
 	rotationBot->rotateZ(M_PI/2);
@@ -154,7 +158,7 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 		string nameFiber = "Fiber_"+gridName;
 		string namePixel = "Pixel_"+gridName+to_string(barId2);
 		// register pixel in the detector class
-		detector.MakeOptDevice(barId, OptDevice::eMChPMT);
+		MakeOptDevice(barId, OptDevice::eMChPMT);
 
 		// logical volumes
 		logCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
@@ -172,7 +176,7 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 		new G4PVPlacement(nullptr, barPosition, logCoating, nameCoating, logCasing, false, barId2, fCheckOverlaps);
 		new G4PVPlacement(nullptr, G4ThreeVector(), logScinBar, nameScinBar, logCoating, false, barId2, fCheckOverlaps);
 		// register scintillator bar as Sensitive Detector to store hits
-		G4MScintillatorBarAction* const scinBarSD = new G4MScintillatorBarAction(namedetector.str() + "/" + nameScinBar+"_"+to_string(barId), detectorId, barId, theEvent);
+		G4MScintillatorBarAction* const scinBarSD = new G4MScintillatorBarAction(namedetector.str() + "/" + nameScinBar+"_"+to_string(barId), detectorId, barId, aEvent);
 		sdMan->AddNewDetector(scinBarSD);
 		logScinBar->SetSensitiveDetector(scinBarSD);
 
@@ -183,7 +187,7 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 		new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberPosX, 0, fFiberPosZ), logPixel, namePixel, logScinBar, false, barId2, fCheckOverlaps);
 
 		// registration of pixel as a Sensitive Volume
-		G4MOptDeviceAction* const pixelTopSD = new G4MOptDeviceAction(namedetector.str() + "/" + namePixel, detectorId, barId, theEvent);
+		G4MOptDeviceAction* const pixelTopSD = new G4MOptDeviceAction(namedetector.str() + "/" + namePixel, detectorId, barId, aEvent);
 		sdMan->AddNewDetector(pixelTopSD);
 		logPixel->SetSensitiveDetector(pixelTopSD);
 
@@ -210,7 +214,7 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 		string nameFiber = "Fiber_"+gridName;
 		string namePixel = "Pixel_"+gridName+to_string(barId2);
 		// register pixel in the detector class
-		detector.MakeOptDevice(barId, OptDevice::eMChPMT);
+		MakeOptDevice(barId, OptDevice::eMChPMT);
 
 		// logical volumes
 		logCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
@@ -228,7 +232,7 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 		new G4PVPlacement(rotationBot, barPosition, logCoating, nameCoating, logCasing, false, barId2, fCheckOverlaps);
 		new G4PVPlacement(nullptr, G4ThreeVector(), logScinBar, nameScinBar, logCoating, false, barId2, fCheckOverlaps);
 		
-		G4MScintillatorBarAction* const scinBarSD = new G4MScintillatorBarAction(namedetector.str() + "/" + nameScinBar+"_"+to_string(barId), detectorId, barId, theEvent);
+		G4MScintillatorBarAction* const scinBarSD = new G4MScintillatorBarAction(namedetector.str() + "/" + nameScinBar+"_"+to_string(barId), detectorId, barId, aEvent);
 		sdMan->AddNewDetector(scinBarSD);
 		logScinBar->SetSensitiveDetector(scinBarSD);
 		// register scintillator bar as Sensitive Detector to store hits
@@ -239,7 +243,7 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 		new G4PVPlacement(rotationFiber, G4ThreeVector(fFiberPosX, 0, fFiberPosZ), logPixel, namePixel, logScinBar, false, barId2, fCheckOverlaps);
 
 		// registration of pixel as a Sensitive Volume
-		G4MOptDeviceAction* const pixelBotSD = new G4MOptDeviceAction(namedetector.str() + "/" + namePixel, detectorId, barId, theEvent);
+		G4MOptDeviceAction* const pixelBotSD = new G4MOptDeviceAction(namedetector.str() + "/" + namePixel, detectorId, barId, aEvent);
 		sdMan->AddNewDetector(pixelBotSD);
 		logPixel->SetSensitiveDetector(pixelBotSD);
 
@@ -247,3 +251,5 @@ Hodoscope::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& 
 	} // end loop of batrs of the bottom panel
 
 }
+
+

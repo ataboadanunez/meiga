@@ -11,6 +11,8 @@ class G4MDetectorConstruction : public G4VUserDetectorConstruction
     public:
         G4MDetectorConstruction(Event& aEvent);
         virtual ~G4MDetectorConstruction() { };
+
+        // G4VUserDetectorConstruction methods
         virtual G4VPhysicalVolume* Construct();
 
     private:

@@ -43,11 +43,14 @@ class ExtraPhysics : public G4VPhysicsConstructor
 {
   public:
 
-    ExtraPhysics();
+    ExtraPhysics(int aVerboseLevel);
     virtual ~ExtraPhysics();
 
     virtual void ConstructParticle();
     virtual void ConstructProcess();
+  
+  private:
+    int fVerboseLevel;
 
 };
 

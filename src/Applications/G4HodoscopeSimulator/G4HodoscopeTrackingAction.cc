@@ -14,18 +14,15 @@ using namespace std;
 G4HodoscopeTrackingAction::G4HodoscopeTrackingAction(Event &theEvent) :
 	fEvent(theEvent) 
 {
-
 }
 
 void
 G4HodoscopeTrackingAction::PreUserTrackingAction(const G4Track* track)
 { 
-
 }
 
 
 void
 G4HodoscopeTrackingAction::PostUserTrackingAction(const G4Track* track)
 {
-  
 }

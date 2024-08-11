@@ -10,12 +10,7 @@
 // Headers of this particular application
 #include "G4LeadSimulator.h"
 #include "G4LeadDetectorConstruction.h"
-#include "G4MPrimaryGeneratorAction.h"
-#include "G4LeadEventAction.h"
-#include "G4LeadRunAction.h"
-#include "G4LeadTrackingAction.h"
-#include "G4LeadSteppingAction.h"
-#include "G4LeadPhysicsList.h" 
+#include "G4LeadActionInitialization.h"
 
 // Geant4 headers
 #include "FTFP_BERT.hh"
@@ -31,175 +26,98 @@
 #include "OptDevice.h"
 #include "G4MPhysicsList.h"
 #include "DataWriter.h"
+#include "Logger.h"
 
 using namespace std;
 
 Particle G4LeadSimulator::currentParticle;
 G4LeadSimulator* fG4LeadSimulator;
 string fCfgFile;
+const string cApplicationName = "G4LeadSimulator";
+
+int main(int argc, char** argv) 
+{
+	
+	Logger::DisplayLogo();
+	try {
+		Logger::CheckCommandLineParameters(argc, argv, fCfgFile, cApplicationName);
+	} catch (const std::invalid_argument &e) {
+		Logger::Print(e.what(), ERROR, cApplicationName);
+		Logger::ProgramUsage(cApplicationName);
+		return 1;
+	}
+	
+	Timer timer;
+
+	fG4LeadSimulator = new G4LeadSimulator();
+	// Create Event object
+	Event theEvent;
+	fG4LeadSimulator->Initialize(theEvent, fCfgFile);
+	if(fG4LeadSimulator->RunSimulation(theEvent)) {
+		fG4LeadSimulator->WriteEventInfo(theEvent);
+	}
+	timer.PrintElapsedTime();
+	
+	delete fG4LeadSimulator;
+	return 0;
+}
 
 G4LeadSimulator::G4LeadSimulator()
 {
 }
 
-G4LeadSimulator::~G4LeadSimulator()
+void G4LeadSimulator::Initialize(Event &aEvent, std::string aFileName)
 {
-}
-
-namespace 
-{
-	void ProgramUsage() 
-	{
-		cerr << " Program Usage: " << endl;
-		cerr << " ./G4LeadSimulator [ -c ConfigFile.json ] " << endl;
-	}
-
-}
-
-
-int main(int argc, char** argv) 
-{
-
-	if (argc < 3) {
-		ProgramUsage();
-		throw invalid_argument("[ERROR] G4LeadSimulator::main: A configuration file is needed!");
-	}
-
-	for (int i=1; i<argc; i=i+2) {
-		string sarg(argv[i]);
-		if (sarg == "-c")
-			fCfgFile = argv[i+1];
-	}
-	// for program time calculation
-	time_t start, end;
-	time(&start);
-	fG4LeadSimulator = new G4LeadSimulator();
-	// Create Event object
-	Event theEvent;
-	fG4LeadSimulator->Initialize(theEvent, fCfgFile);
-	fG4LeadSimulator->RunSimulation(theEvent);
-	/*************************************************
-		Geant4 simulation ended here!
-		What happens next is up to you =)
-	**************************************************/
-	fG4LeadSimulator->WriteEventInfo(theEvent);
-	time(&end);
-	// Calculating total time taken by the program.
-	double time_taken = double(end - start);
-	cout << "[INFO] G4LeadSimulator: Time taken by program is : " << fixed
-			 << time_taken << setprecision(5);
-	cout << " sec " << endl;
-	return 0;
-}
-
-void
-G4LeadSimulator::Initialize(Event& theEvent, string cfgFile)
-{
-	cout << "[INFO] G4LeadSimulator::Initialize" << endl;
-	cout << "[INFO] G4LeadSimulator::Initialize: Reading configuration file " << cfgFile << endl;
 	// Fill Event object from configuration file
-	// Read Simulation configuration
-	theEvent = ConfigManager::ReadConfigurationFile(cfgFile);
-	// extra flag to handle lead brick simulation
-	ptree tree;
-	read_json(cfgFile, tree);
-	fSimulateBrick = tree.get<bool>("LeadBrick.Simulate", false);
+	ConfigManager::ReadConfigurationFile(aEvent, aFileName);
 	// get simulation simulation settings
-	const Event::Config &cfg = theEvent.GetConfig();
+	const Event::Config &cfg = aEvent.GetConfig();
 	ConfigManager::PrintConfig(cfg);
 	// Read Detector Configuration
-	ConfigManager::ReadDetectorList(cfg.fDetectorList, theEvent);
-}            
+	ConfigManager::ReadDetectorList(cfg.fDetectorList, aEvent);
+	
+	// extra flag to handle lead brick simulation
+	ptree tree;
+	read_json(aFileName, tree);
+	fSimulateBrick = tree.get<bool>("LeadBrick.Simulate", false);
+}
 
-
-bool
-G4LeadSimulator::RunSimulation(Event& theEvent)
+bool G4LeadSimulator::RunSimulation(Event &aEvent)
 {
-	cout << "[INFO] G4LeadSimulator::RunSimulation" << endl;
-	const Event::Config &cfg = theEvent.GetConfig();
-	SimData& simData = theEvent.GetSimData();
-	const unsigned int NumberOfParticles = simData.GetTotalNumberOfParticles();
-	cout << "[INFO] G4LeadSimulator::RunSimulation: Number of particles to be simulated = " << NumberOfParticles << endl;
-	if (!NumberOfParticles) {
-		cerr << "[ERROR] G4LeadSimulator::RunSimulation: No Particles in the Event! Exiting." << endl;
+	const Event::Config &cfg = aEvent.GetConfig();
+	SimData& simData = aEvent.GetSimData();
+	const unsigned int numberOfParticles = simData.GetTotalNumberOfParticles();
+	ostringstream msg;
+	if (!numberOfParticles) {
+		msg << "No particles in the Event! Exiting...";
+		Logger::Print(msg, ERROR, "RunSimulation");	
 		return false;
 	}
-	/***************
-		Geant4 Setup    
-	*****************/
+	msg << "Number of particles to be simulated: " << numberOfParticles;
+	Logger::Print(msg, INFO, "RunSimulation");
+	
 	G4long myseed = time(NULL);
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
 	G4Random::setTheSeed(myseed);
-	cout << "Seed for random generation: " << myseed << endl;
+
 	// construct the default run manager
-	G4VisManager *visManager = nullptr;
-	G4RunManager *runManager = G4RunManagerFactory::CreateRunManager();
+	auto runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::SerialOnly);
 	// set mandatory initialization classes
-	auto fDetConstruction = new G4LeadDetectorConstruction(theEvent, fSimulateBrick);
-	runManager->SetUserInitialization(fDetConstruction);
-	runManager->SetUserInitialization(new G4LeadPhysicsList(cfg.fPhysicsListName));  
-	G4MPrimaryGeneratorAction *fPrimaryGenerator = new G4MPrimaryGeneratorAction(theEvent);
-	runManager->SetUserAction(fPrimaryGenerator);
-	G4LeadRunAction *fRunAction = new G4LeadRunAction(theEvent);
-	runManager->SetUserAction(fRunAction);
-	G4LeadEventAction *fEventAction = new G4LeadEventAction(theEvent);
-	runManager->SetUserAction(fEventAction);
-	runManager->SetUserAction(new G4LeadTrackingAction(theEvent));
-	G4LeadSteppingAction *fSteppingAction = new G4LeadSteppingAction(theEvent);
-	runManager->SetUserAction(fSteppingAction);
+	runManager->SetUserInitialization(new G4LeadDetectorConstruction(aEvent, fSimulateBrick));
+	runManager->SetUserInitialization(new G4MPhysicsList(cfg.fPhysicsListName));
+	runManager->SetUserInitialization(new G4LeadActionInitialization(aEvent));
 	// initialize G4 kernel
 	runManager->Initialize();
-	// initialize visualization
-	if ((cfg.fGeoVis || cfg.fTrajVis) && !visManager)
-		visManager = new G4VisExecutive;
-
-	// get the pointer to the UI manager and set verbosities
-	G4UImanager* uiManager = G4UImanager::GetUIpointer();
-	switch (cfg.fVerbosity) {
-		case 1:
-			uiManager->ApplyCommand("/run/verbose 1");
-			uiManager->ApplyCommand("/event/verbose 0");
-			uiManager->ApplyCommand("/tracking/verbose 0");
-			break;
-		case 2:
-			uiManager->ApplyCommand("/run/verbose 1");
-			uiManager->ApplyCommand("/event/verbose 1");
-			uiManager->ApplyCommand("/tracking/verbose 0");
-			break;
-		case 3:
-			uiManager->ApplyCommand("/run/verbose 1");
-			uiManager->ApplyCommand("/event/verbose 1");
-			uiManager->ApplyCommand("/tracking/verbose 1");
-			break;
-		default:
-			uiManager->ApplyCommand("/run/verbose 0");
-			uiManager->ApplyCommand("/event/verbose 0");
-			uiManager->ApplyCommand("/tracking/verbose 0");
-		}
 	
-	if (cfg.fGeoVis || cfg.fTrajVis) {
-		visManager->Initialize();
-		uiManager->ApplyCommand(("/vis/open " + fRenderFile).c_str());
-		uiManager->ApplyCommand("/vis/scene/create");
-		uiManager->ApplyCommand("/vis/sceneHandler/attach");
-		uiManager->ApplyCommand("/vis/scene/add/volume");
-		uiManager->ApplyCommand("/vis/scene/add/axes");
-		uiManager->ApplyCommand("/vis/viewer/set/viewpointThetaPhi 0. 0.");
-		uiManager->ApplyCommand("/vis/viewer/set/targetPoint 0 0 0");
-		uiManager->ApplyCommand("/vis/viewer/zoom 1");
-		uiManager->ApplyCommand("/vis/viewero/set/style/wireframe");
-		uiManager->ApplyCommand("/vis/drawVolume");
-		uiManager->ApplyCommand("/vis/scene/notifyHandlers");
-		uiManager->ApplyCommand("/vis/viewer/update");
-	}
-	if (cfg.fTrajVis) {
-		uiManager->ApplyCommand("/tracking/storeTrajectory 1");
-		uiManager->ApplyCommand("/vis/scene/add/trajectories");
-		uiManager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");
-		// for debugging purposes, gammas are not drawn
-		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
-		uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
-	}
+	// setup ui & visualization managers
+	G4UImanager* uiManager = G4UImanager::GetUIpointer();
+	G4VisManager* visManager = new G4VisExecutive;;
+	SetupManagers(aEvent, *uiManager, *visManager);
+	// for debugging purposes, gammas are not draw:
+	uiManager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");
+	uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
+	uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
+	
 	// loop over particle vector
 	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
 		G4LeadSimulator::currentParticle = *it;
@@ -207,18 +125,10 @@ G4LeadSimulator::RunSimulation(Event& theEvent)
 		// Run simulation
 		runManager->BeamOn(1);
 	}
-	delete runManager;
+	
 	delete visManager;
-	cout << "[INFO] G4LeadSimulator::RunSimulation: Geant4 Simulation ended successfully. " << endl;
+	delete runManager;
+	
+	Logger::Print("Geant4 Simulation ended successfully.", INFO, "RunSimulation");
 	return true;
-}
-
-
-void
-G4LeadSimulator::WriteEventInfo(Event& theEvent)
-{
-	cout << "[INFO] G4LeadSimulator::WriteEventInfo" << endl;
-	DataWriter::FileWriter(theEvent);
-
-	return;
 }

@@ -9,20 +9,16 @@ G4MuDecStackingAction::G4MuDecStackingAction(Event& theEvent) :
   fEvent(theEvent)
 
 {
-
 }
 
 G4MuDecStackingAction::~G4MuDecStackingAction() 
 { 
-
 }
 
 
 G4ClassificationOfNewTrack
 G4MuDecStackingAction::ClassifyNewTrack(const G4Track* const track)
 {
-
-
   // if particle is no a photon, track it
   if (track->GetDefinition() != G4OpticalPhoton::OpticalPhoton())
     return fWaiting;
@@ -37,7 +33,7 @@ G4MuDecStackingAction::ClassifyNewTrack(const G4Track* const track)
     return fWaiting;
 
   // get PMT
-  OptDevice pmt = fEvent.GetDetector().GetOptDevice(OptDevice::ePMT);
+  OptDevice pmt = OptDevice(OptDevice::ePMT);
   double energy = track->GetKineticEnergy() / CLHEP::eV;
 
   bool isDetected = pmt.IsPhotonDetected(energy);

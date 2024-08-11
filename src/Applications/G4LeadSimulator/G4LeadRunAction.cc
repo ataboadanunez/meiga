@@ -1,9 +1,11 @@
 // implementation of the G4LeadRunAction class
 #include "G4Timer.hh"
 #include "G4Run.hh"
-#include "g4root.hh"
+// #include "g4root.hh"
 #include "G4AccumulableManager.hh"
 #include "G4LeadRunAction.h"
+
+#include "Scintillator.h"
 
 #include <bitset>
 
@@ -16,22 +18,18 @@ using namespace std;
 G4LeadRunAction::G4LeadRunAction(Event& theEvent)
  : G4UserRunAction(),
  fEvent(theEvent)
-{
-	G4cout << "...G4LeadRunAction..." << G4endl;
-	
+{	
 }
 
 
 G4LeadRunAction::~G4LeadRunAction()
 {	
-
 }
 
 
 void 
 G4LeadRunAction::BeginOfRunAction(const G4Run* aRun)
 {
-	
 }
 
 
@@ -39,21 +37,23 @@ void
 G4LeadRunAction::EndOfRunAction(const G4Run* aRun)
 { 
 	
-
 	// loop over scintillator panels (independent detectors) 	
-
-	for (auto detIt = fEvent.DetectorRange().begin(); detIt != fEvent.DetectorRange().end(); detIt++) {
+	for (auto &pair : fEvent.DetectorRange()) {
 
 		G4int g4RunId = aRun->GetRunID();
 
-		Detector& currDet = detIt->second;
+		Detector& currDet = *(pair.second);
 		if(currDet.GetType() != Detector::eHodoscope)
 			continue;
-		const unsigned int detId = currDet.GetId();
 
+		const unsigned int detId = currDet.GetId();
 		DetectorSimData& detSimData = fEvent.GetSimData().GetDetectorSimData(detId);
 
-		int nBars = currDet.GetNBars();
+		int nBars;
+		const Scintillator *scintDet = dynamic_cast<const Scintillator*>(&currDet);
+		if(scintDet) {
+			nBars = scintDet->GetNBars();
+		}
 		// initialize string to 0s. total number of bars x2 since is a grid of 2 x NBars
 		string binaryString(2*nBars, '0');
 		

@@ -1,7 +1,7 @@
 #ifndef Musaic_h
 #define Musaic_h 1
 
-#include "G4SDManager.hh"
+// #include "G4SDManager.hh"
 #include "G4PVPlacement.hh"
 #include "G4LogicalVolume.hh"
 #include "G4Box.hh"
@@ -10,24 +10,19 @@
 
 #include "Event.h"
 #include "Detector.h"
+#include "Scintillator.h"
 #include "Materials.h"
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4OpticalSkinSurface;
 
-class Musaic {
-	// description
+class Musaic : public Scintillator
+{
 
 public:
-
-	static void BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps = false);
-
-private:
-	Musaic();
-	virtual ~Musaic();
-
-
+	Musaic(const int aId, const Detector::DetectorType aType);
+	void BuildDetector(G4LogicalVolume* logMother, Event& theEvent, G4bool fCheckOverlaps = false) override;
 
 };
 

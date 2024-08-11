@@ -14,18 +14,15 @@ using namespace std;
 G4LeadTrackingAction::G4LeadTrackingAction(Event &theEvent) :
 	fEvent(theEvent) 
 {
-
 }
 
 void
 G4LeadTrackingAction::PreUserTrackingAction(const G4Track* track)
 { 
-
 }
 
 
 void
 G4LeadTrackingAction::PostUserTrackingAction(const G4Track* track)
 {
-  
 }

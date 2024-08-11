@@ -17,7 +17,6 @@ G4MScintillatorBarAction::G4MScintillatorBarAction(const G4String& barName, cons
 	fBarId(barId)
 
 	{
-
 		/*
 				Implementation of the G4MScintillatorBarAction
 
@@ -29,9 +28,7 @@ G4MScintillatorBarAction::G4MScintillatorBarAction(const G4String& barName, cons
 				with id barId is part of.
 
 		*/
-
-		cout << "[INFO] G4Models::G4MScintillatorBarAction: Registering Sensitive Detector " << barName << endl;
-
+		Logger::Print("Registering Senstive Detector " + barName, INFO, "G4MScintillatorBarAction");
 	}
 
 
@@ -49,6 +46,11 @@ G4MScintillatorBarAction::EndOfEvent(G4HCofThisEvent* const /*hce*/)
 	// adding energy deposited at barId in this event
 	detSimData.AddEnergyDeposit(fBarEdep);
 
+}
+
+G4VSensitiveDetector *G4MScintillatorBarAction::Clone() const
+{
+    return nullptr;
 }
 
 G4bool

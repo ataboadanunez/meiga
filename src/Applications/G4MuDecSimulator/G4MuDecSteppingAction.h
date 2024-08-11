@@ -16,15 +16,11 @@ class G4MuDecEventAction;
 class G4MuDecSteppingAction : public G4UserSteppingAction
 {
 	public:
-		G4MuDecSteppingAction(const G4MuDecConstruction* det, G4MuDecEventAction* event, Event& theEvent);
+		G4MuDecSteppingAction();
 			virtual ~G4MuDecSteppingAction();
 			virtual void UserSteppingAction(const G4Step* step);
 
 	private:
-		const G4MuDecConstruction* fDetectorConstruction;
-		G4MuDecEventAction* fEventAction;
-		std::ofstream* fOutputFile;
-		Event& fEvent;
 
 };
 

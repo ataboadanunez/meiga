@@ -3,17 +3,18 @@
 #include "SimData.h"
 #include "DetectorSimData.h"
 #include "OptDeviceSimData.h"
+#include "Logger.h"
 
 using namespace std;
 
 G4LeadEventAction::G4LeadEventAction(Event& theEvent) : 
 	fEvent(theEvent),
 	G4UserEventAction()
-{
+{		
 }
 
 G4LeadEventAction::~G4LeadEventAction()
-{
+{		
 }
 
 void
@@ -30,10 +31,10 @@ G4LeadEventAction::EndOfEventAction(const G4Event*)
 	// the deposits per bar are calculated by the G4MScintillatorBarAction
 
 	// loop over detectors in the event
-	for (auto detIt = fEvent.DetectorRange().begin(); detIt != fEvent.DetectorRange().end(); detIt++) {
+	for (auto & pair : fEvent.DetectorRange()) {
 
 		// get current detector data
-		Detector& currDet = detIt->second;
+		Detector& currDet = *(pair.second);
 		const unsigned int detId = currDet.GetId();
 		
 		// skip if detector is not an hodoscope
@@ -44,6 +45,7 @@ G4LeadEventAction::EndOfEventAction(const G4Event*)
 		DetectorSimData &detSimData = fEvent.GetSimData().GetDetectorSimData(detId);
 		// get total deposited energy at the event
 		double totalEdep = detSimData.GetTotalEnergyDeposit();
+		cout << "Detector " << currDet.GetId() << " total Energy Deposit = " << totalEdep / CLHEP::MeV << " MeV" << endl;
 		// set it to the deposited energy vector
 		detSimData.SetEnergyDeposit(totalEdep);
 		// clear total energy deposit after the event is terminated to reset counter

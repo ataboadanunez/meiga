@@ -19,16 +19,12 @@ class G4HodoscopeEventAction;
 class G4HodoscopeSteppingAction : public G4UserSteppingAction
 {
 	public:
-		G4HodoscopeSteppingAction(G4HodoscopeEventAction* event, Event& theEvent);
+		G4HodoscopeSteppingAction(Event	&aEvent);
 		virtual ~G4HodoscopeSteppingAction();
 		virtual void UserSteppingAction(const G4Step* step);
 
 	private:
-		G4HodoscopeEventAction* fEventAction;
 		Event& fEvent;
-
-		//std::vector<int> fBarsX1;
-		//std::vector<int> fBarsY1;
 };
 
 #endif

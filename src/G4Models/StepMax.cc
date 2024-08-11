@@ -36,10 +36,10 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-StepMax::StepMax(const G4String& aName)
+StepMax::StepMax(const G4String& aName, int aVerboseLevel)
   : G4VDiscreteProcess(aName), fMaxChargedStep(DBL_MAX)
 {
-   if (verboseLevel>0) {
+   if (aVerboseLevel>0) {
      G4cout << GetProcessName() << " is created "<< G4endl;
    }
 }

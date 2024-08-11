@@ -3,6 +3,7 @@
 #include "Geometry.h"
 #include "Particle.h"
 #include "SimData.h"
+#include "Logger.h"
 
 #include "Randomize.hh"
 #include <CLHEP/Random/Randomize.h>
@@ -21,11 +22,15 @@ PrimaryGenerator::PrimaryGenerator(Event& theEvent) :
     fUseEcoMug = (simData.GetInputMode() == SimData::InputMode::eUseEcoMug);
     Event::Config &cfg = fEvent.GetConfig();
     fSaveInput = cfg.fSaveInput;
-    cout << "[INFO] PrimaryGenerator::PrimaryGenerator: SaveInput = " << (fSaveInput ? "yes" : "no") << endl;
+    ostringstream msg;
+    msg << "SaveInput = " << (fSaveInput ? "yes" : "no");
+    Logger::Print(msg, INFO, "PrimaryGenerator");
     // initialize EcoMug generator in case is needed: only muons or HalfSphere generation
     if (fUseEcoMug) {
         // print info
-        cout << "[INFO] PrimaryGenerator::PrimaryGenerator: Primary generation using EcoMug. Only muons will be generated!" << endl;
+        ostringstream msg;
+        msg << "Primary generation using EcoMug. Only muons will be generated!";
+        Logger::Print(msg, WARNING, "PrimaryGenerator");
         
         fMuonGen.SetUseHSphere();
         double injectionRadius = simData.GetInjectionRadius();
@@ -199,7 +204,9 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
         double injRadius = simData.GetInjectionRadius();
         double injHeight = simData.GetInjectionHeight();
         if (injHeight != z0){
-            cout << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: in injection mode 'eCircle', `injHeight` does not match with `z-coordinate` of the circle. Using `injHeight` as default." << endl;
+            ostringstream warnmsg;
+            warnmsg << "In injectionMode = eCircle, `injHeight` does not match with `z-coordinate` of the circle. Using `injHeight` as default.";
+            Logger::Print(warnmsg, WARNING, "ComputeInjectionPosition");
         }
 
 
@@ -241,13 +248,18 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
         double injRadius = simData.GetInjectionRadius();
         double injHeight = simData.GetInjectionHeight();
         if (injHeight != z0){
-            cout << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: in injection mode 'eVertical', `injHeight` does not match with `z-coordinate`. Using `injHeight` as default." << endl;
-            zInj = injHeight;
+            ostringstream warnmsg;
+            warnmsg << "In injectionMode = eCircle, `injHeight` does not match with `z-coordinate` of the circle. Using `injHeight` as default.";
+            Logger::Print(warnmsg, WARNING, "ComputeInjectionPosition");
+            zInj = std::max(injHeight, z0);
         } else {
             zInj = z0;
         }
         if (injRadius) {
-            cout << "[INFO] PrimaryGenerator::ComputeInjectionPosition: Injecting particle vertically over a circle of radius: " << injRadius / CLHEP::m << " m at height: " << zInj / CLHEP::m << endl;
+            ostringstream infomsg;
+            infomsg << "Injecting particle vertically over a circle of radius: " << injRadius / CLHEP::m << " m at height: " << zInj / CLHEP::m;
+            Logger::Print(infomsg, INFO, "ComputeInjectionPosition");
+
             double rand = RandFlat::shoot(0., 1.);
             double r = injRadius * sqrt(rand);
             double minPhi = simData.GetInjectionMinPhi() * (CLHEP::pi / 180);
@@ -287,6 +299,5 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
         }
 
     particlePosition = {xInj, yInj, zInj};
-    cout << "[INFO] PrimaryGenerator::ComputeInjectionPosition: Injecting particle at position: x = " << xInj / CLHEP::m << ", y = " << yInj / CLHEP::m << ", z = " << zInj / CLHEP::m << " m " << endl;
-
+    Logger::PrintVector(particlePosition, "Injecting particle at position: ", INFO, "ComputeInjectionPosition");
 }

@@ -3,7 +3,7 @@
 #define G4MuDecConstruction_h 1
 
 #include "G4VUserDetectorConstruction.hh"
-#include "G4SDManager.hh"
+// // #include "G4SDManager.hh"
 #include "globals.hh"
 #include "G4Element.hh"
 #include "G4ElementTable.hh"

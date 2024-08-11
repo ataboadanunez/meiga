@@ -11,20 +11,16 @@
 #include "Particle.h"
 #include "Event.h"
 #include "Detector.h"
+#include "G4MBaseApplication.h"
 
-class G4RunManager;
-
-class G4WCDSimulator 
+class G4WCDSimulator : public G4MBaseApplication
 {
 	public:
 	
 		G4WCDSimulator();
 		virtual ~G4WCDSimulator() {;}
 
-		// main methods of the application
-		void Initialize(Event& evt, std::string fileName);
-		bool RunSimulation(Event& evt);
-		void WriteEventInfo(Event& evt);
+		bool RunSimulation(Event& aEvent) override;
 
 		// static members 
 		static Particle currentParticle;
@@ -33,24 +29,6 @@ class G4WCDSimulator
 		// name of configuration file
 		std::string fCfgFile;
 
-	private:
-
-		// flags for configuration (see .json file)
-		std::string fInputFile;
-		std::string fOutputFile;
-		std::string fDetectorList;
-		std::string fDetectorProperties;
-		SimData::SimulationMode fSimulationMode;
-		SimData::InjectionMode fInjectionMode;
-
-		bool fGeoVisOn = true;
-		bool fTrajVisOn = false;
-		int fVerbosity = 1;
-		std::string fRenderFile = "VRML2FILE";
-		std::string fPhysicsName = "QGSP_BERT_HP";
-		
-		friend class G4WCDDetectorConstructor;
-		friend class G4WCDPrimaryGenerator;
 };
 
 #endif

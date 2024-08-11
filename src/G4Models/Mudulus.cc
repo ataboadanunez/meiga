@@ -4,14 +4,21 @@
 #include "Geometry.h"
 #include "G4MOptDeviceAction.h"
 
+#include "G4SDManager.hh"
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 
 using namespace std;
 
+Mudulus::Mudulus(const int aId, const Detector::DetectorType aType) :
+	Scintillator(aId, aType)
+{
+	fName = "Mudulus";
+}
+
 
 void 
-Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps)
+Mudulus::BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheckOverlaps)
 {
 	
 	// the following variables need to be declared here as
@@ -53,7 +60,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 
 	// detector properties are fixed for this detector.
 	G4int nPanels = 3;
-	G4double fDistanceBtwPanels = detector.GetDistanceBtwPanels();
+	G4double fDistanceBtwPanels = GetDistanceBtwPanels();
 
 	const G4int nBars = 12;
 	const G4double fBarLength   = 495 * CLHEP::mm;
@@ -74,20 +81,16 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	const G4double fPMTSizeY = 1.0 * CLHEP::mm;
 	const G4double fPMTSizeZ = 0.1 * CLHEP::mm;
 
-	G4ThreeVector  detectorPos = Geometry::ToG4Vector(detector.GetDetectorPosition(), 1.);
+	G4ThreeVector  detectorPos = Geometry::ToG4Vector(GetDetectorPosition(), 1.);
 
-	int detectorId = detector.GetId();
+	int detectorId = GetId();
 
-	OptDevice pmt = detector.GetOptDevice(OptDevice::eMChPMT);
+	OptDevice pmt = GetOptDevice(OptDevice::eMChPMT);
 
 	ostringstream namedetector;
 	namedetector.str("");
 	namedetector << "Mudulus";
-	cout << "[INFO] Mudulus::BuildDetector: Building detector " << namedetector.str();
-	cout << " (ID = " << detectorId << ")";
-	cout << " with " << pmt.GetName() << ". " << endl;
-	cout << "Distance between panels = " << fDistanceBtwPanels / CLHEP::mm << " mm " << endl;
-
+	
 	/*************************************************
 		
 		Geant4 Volume construction
@@ -142,8 +145,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	G4RotationMatrix* rotationCasing = new G4RotationMatrix();
 	G4RotationMatrix* rotationFiber = new G4RotationMatrix();
 	G4RotationMatrix* rotationBot = new G4RotationMatrix();
-	G4double alpha = detector.GetRotationAngle();
-	cout << "[DEBUG] G4Models::Mudulus: Rotation Angle = " << alpha << endl;
+	G4double alpha = GetRotationAngle();
 	rotationCasing->rotateX(alpha);
 	rotationFiber->rotateY(M_PI/2);
 	rotationBot->rotateZ(M_PI/2);
@@ -154,7 +156,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	G4VisAttributes black(G4Colour::Black());
 
 	// assemble Mudulus detector
-	G4SDManager* const sdMan = G4SDManager::GetSDMpointer();
+	auto sdMan = G4SDManager::GetSDMpointer();
 	logicEnclosure = new G4LogicalVolume(solidEnclosure, Materials().Air, "Enclosure", 0, 0, 0);
 	new G4PVPlacement(rotationCasing, G4ThreeVector(detectorPos.getX(), detectorPos.getY(), detectorPos.getZ()), logicEnclosure, "Enclosure", logMother, false, detectorId, fCheckOverlaps);
 
@@ -226,8 +228,8 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			G4String namePixelL = "PMT_"+gridName+"_"+to_string(pixelLId);
 			G4String namePixelR = "PMT_"+gridName+"_"+to_string(pixelRId);
 			// register PMTs in the detector class
-			detector.MakeOptDevice(pixelLId, OptDevice::eMChPMT);
-			detector.MakeOptDevice(pixelRId, OptDevice::eMChPMT);
+			MakeOptDevice(pixelLId, OptDevice::eMChPMT);
+			MakeOptDevice(pixelRId, OptDevice::eMChPMT);
 			
 
 			// logical volumes
@@ -263,11 +265,11 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 				namePixelR, logicFiber, false, pixelRId, false);
 
 			// registration of PMTs as Sensitive Detectors
-			G4MOptDeviceAction* const PixelTopL = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelL, detectorId, pixelLId, theEvent);
+			G4MOptDeviceAction* const PixelTopL = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelL, detectorId, pixelLId, aEvent);
 			sdMan->AddNewDetector(PixelTopL);
 			logicPixelL->SetSensitiveDetector(PixelTopL);
 
-			G4MOptDeviceAction* const PixelTopR = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelR, detectorId, pixelRId, theEvent);
+			G4MOptDeviceAction* const PixelTopR = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelR, detectorId, pixelRId, aEvent);
 			sdMan->AddNewDetector(PixelTopR);
 			logicPixelR->SetSensitiveDetector(PixelTopR);
 
@@ -310,8 +312,8 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 			G4String namePixelL = "PMT_"+gridName+"_"+to_string(pixelLId);
 			G4String namePixelR = "PMT_"+gridName+"_"+to_string(pixelRId);
 			// register PMTs in the detector class
-			detector.MakeOptDevice(pixelLId, OptDevice::eMChPMT);
-			detector.MakeOptDevice(pixelRId, OptDevice::eMChPMT);
+			MakeOptDevice(pixelLId, OptDevice::eMChPMT);
+			MakeOptDevice(pixelRId, OptDevice::eMChPMT);
 
 			// logical volumes
 			logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, nameCoating, 0, 0, 0);
@@ -345,11 +347,11 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 					namePixelR, logicFiber, false, pixelRId, false);
 
 			// registration of pixels as Sensitive Detectors
-			G4MOptDeviceAction* const PixelBotL = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelL, detectorId, pixelLId, theEvent);
+			G4MOptDeviceAction* const PixelBotL = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelL, detectorId, pixelLId, aEvent);
 			sdMan->AddNewDetector(PixelBotL);
 			logicPixelL->SetSensitiveDetector(PixelBotL);
 
-			G4MOptDeviceAction* const PixelBotR = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelR, detectorId, pixelRId, theEvent);
+			G4MOptDeviceAction* const PixelBotR = new G4MOptDeviceAction(namedetector.str() + "/" + nameCasing + namePixelR, detectorId, pixelRId, aEvent);
 			sdMan->AddNewDetector(PixelBotR);
 			logicPixelR->SetSensitiveDetector(PixelBotR);
 
@@ -358,6 +360,7 @@ Mudulus::BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& th
 	} // end loop panels
 
 }
+
 
 G4double
 Mudulus::GetFiberXCoordinate(G4int barId, G4double barLength, G4double fiberLength)

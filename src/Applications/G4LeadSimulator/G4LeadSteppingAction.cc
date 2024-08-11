@@ -13,6 +13,7 @@
 #include "G4MuonPlus.hh"
 #include "G4MuonMinus.hh"
 
+#include "Logger.h"
 #include "SimData.h"
 #include "OptDeviceSimData.h"
 #include "Detector.h"
@@ -21,14 +22,15 @@
 
 using namespace std;
 
-G4LeadSteppingAction::G4LeadSteppingAction(Event& theEvent)
-	: G4UserSteppingAction(),
-    	fEvent(theEvent)
+G4LeadSteppingAction::G4LeadSteppingAction(Event& aEvent)
+	: G4UserSteppingAction(), fEvent(aEvent)
 {
 
 	if (fEvent.GetSimData().GetSimulationMode() == SimData::SimulationMode::eFast) {
-		cout << "[INFO] G4LeadSteppingAction::G4LeadSteppingAction: Running Simulation in Fast mode." << endl;
-		cout << "[INFO] G4LeadSteppingAction::G4LeadSteppingAction: Optical photons will be killed! " << endl;
+		ostringstream msg;
+		msg << "Running Simulation in Fast mode: Optical photons will be killed!";
+		Logger::Print(msg, INFO, "G4LeadSteppingAction");
+		
 	}
 
 }
@@ -48,5 +50,5 @@ G4LeadSteppingAction::UserSteppingAction(const G4Step* step)
 		if (track->GetParticleDefinition() == G4OpticalPhoton::OpticalPhoton())
 			track->SetTrackStatus(fStopAndKill);
 	}
-	
+
 }
