@@ -30,7 +30,7 @@ Meiga is a framework designed to develop astroparticle simulations and their pos
 Prior to install and use Meiga, the following packages need to be installed:
 
 - **Geant4**:\
-  Meiga uses Geant4 as a toolkit for simulating the interaction of particles with the detector. Current version used is **geant4-10.07.p03** and can be downloaded from the [source page](https://geant4.web.cern.ch/download/10.7.3.html). Geant4 must be built with X11 OpenGL drivers (in order to enable visualization) and with DATA packages enabled:
+  Meiga uses Geant4 as a toolkit for simulating the interaction of particles with the detector. Current version used is **Geant4 11.2.1** and can be downloaded from the [source page](https://geant4.web.cern.ch/download/11.2.1.html). Geant4 must be built with X11 OpenGL drivers (in order to enable visualization) and with DATA packages enabled:
 ```bash
 $cmake -DCMAKE_INSTALL_PREFIX=<path-to-install> -DGEANT4_INSTALL_DATA=ON -DGEANT_USE_OPENGL_X11=ON <path-to-source>
 ```
@@ -53,13 +53,13 @@ Before installing Meiga, be sure that Geant4 and the DATA packages are correctly
 # source the Geant4 environment
 source $HOME/lib/geant4/install/bin/geant4.sh
 # export all DATA packages
-G4COMP="$HOME/lib/geant4/install/share/Geant4-10.7.3"
-export G4ABLA=$G4COMP/data/G4ABLA3.1
-export G4EMLOW=$G4COMP/data/G4EMLOW7.13
+G4COMP="$HOME/lib/geant4/install/share/Geant4"
+export G4ABLA=$G4COMP/data/G4ABLA3.3
+export G4EMLOW=$G4COMP/data/G4EMLOW8.15
 export G4ENSDFSTATE=$G4COMP/data/G4ENSDFSTATE2.3
-export G4INCL=$G4COMP/data/G4INCL1.0
-export G4NDL=$G4COMP/data/G4NDL4.6
-export G4PARTICLEXS=$G4COMP/data/G4PARTICLEXS3.1.1
+export G4INCL=$G4COMP/data/G4INCL1.2
+export G4NDL=$G4COMP/data/G4NDL4.7
+export G4PARTICLEXS=$G4COMP/data/G4PARTICLEXS4.0
 export G4PII=$G4COMP/data/G4PII1.3
 export G4SAIDDATA=$G4COMP/data/G4SAIDDATA2.0
 export PhotonEvaporation=$G4COMP/data/PhotonEvaporation5.7
@@ -285,7 +285,7 @@ An example of a `DetectorList.xml` file is given bellow:
 
 ## Predefined Detector Models
 Meiga provides predefined detector configurations commonly used in Astroparticle physics and muography such as a Water-Cerenkov Detector and a hodoscope made of scintillator planes:
-![Detectors](src/Documentation/detectors.png)*Example of predefined detectors in Meiga: a Water-Cerenkov Detector with a half-sphere PMT(left) and three Hodoscope detectors with WLS optical fibers (right).*
+![Detectors](src/Documentation/detectors.png)*Example of predefined detectors in Meiga: a Water-Cerenkov Detector with a half-sphere PMT (left) and three Hodoscope detectors with WLS optical fibers (right).*
 
 The detectors are defined as independent classes in the G4Models directory and are automatically build in the G4DetectorConstructor class of each application. The user needs to specify which detector type will be used and the location in the `DetectorList.xml` file as described above. The following detector types are allowed:
 * `eScintillator` \
@@ -320,7 +320,40 @@ This might depend on the detector configuration or application needs.
 In addition to the simulation output, information of the DetectorList containing detector naming, positioning and list of optical device IDs are also stored in the output file.
 
 # Example Applications
-A few example applications are provided in the source code
+A few example applications are provided in the source code as well as python scripts to analyze the simulation output.
+## G4WCDSimulator
+Simulates a flux of secondary particles over a Water-Cerenkov Detector (WCD) containing a Photo-Multiplier Tube (PMT) at the center top of the tank. The dimenions of the tank (radius and height) can be set from the `DetectorList.xml`
+```XML
+<detector id="0" type="eWCD">
+  <x unit="cm"> 0.0 </x>
+  <y unit="cm"> 0.0 </y>
+  <z unit="cm"> 0.0 </z>
+  <tankRadius unit="cm"> 90 </tankRadius>
+  <tankHeight unit="cm"> 120 </tankHeight>
+</detector>
+```
+Regarding the simulation output, if `SavePETimeDistribution` is set to `true`, the photo-electro time distributions will be stored as arrays in the output file, thus allowing to reconstrcut the time profile of the particles entering in the water. In addition, if `SaveComponentsPETimeDistribution` is set to `true`, this information will be given by particle component type: _muonic_, _electromagnetic_ and _hadronic_. Same applies to the deposited energy in the water tank.
+
+The code in `src/Analysis/G4WCDSimulator_Analysis.py` is provided to plot the simulation output.
+
+## G4HodoscopeSimulator
+Simulates a flux of muons using the `EcoMug` muon generator over three planes of scintillator panels (hodoscope). Each of the pannel has the type `eHodoscope` and constitutes an independent detector. In this way, users can simulate as many scintillator panels as needed and information will be stored accordingly. The number of scintillator bars per pannel as well as the dimensions of the scintillator bars can be set in the `DetectorList.xml` file:
+```XML
+<detector id="0" type="eHodoscope">
+  <x unit="m"> 0.0 </x>
+  <y unit="m"> 0.0 </y>
+  <z unit="m"> 0.0 </z>
+
+  <numberOfBars>            12  </numberOfBars>
+  <barLength unit="cm">     50  </barLength>
+  <barWidth unit="cm">      2   </barWidth>
+  <barThickness unit="cm">  1   </barThickness>
+</detector>
+
+```
+Regarding the simulation output: by setting the flag `SaveDepositedEnergy`, deposited energy per muon on each detector will be saved. In addition, the flag `SaveCounts` allows to store the hit of muons along each of the detector axis. The position is stored in a binary value of _2N_ bits where the first _N_ bits are reserved for the bars along the X-axis and the remaining _N_ bits are reserved for the bars along the Y-axis. A `1` represents a hit whereas a `0` means that that bar was not hit by the muon. For example, a binary value of `001000000000000100000000` means that the impinging muon has hit the bar number "3" along the X-axis and the bar number "4" along the Y-axis.
+
+The code in `src/Analysis/G4HodoscopeSimulator_Analysis.py` can be used to plot the simulation output.
 
 # Analysis
 

@@ -28,7 +28,7 @@ Each bar is stored as a Sensitive Detector itself by means of
 the G4MScintillatorBarAction class (in G4Models). 
 
 The G4HodoscopeAction class computes the `index` of the hit 
-bars alongeach axis in a binary value. This information is then 
+bars along each axis in a binary value. This information is then 
 stored in the DetectorSimData class for each injected particle. 
 The binary value reserves the first N bits to store hits of the 
 bars along the X-axis and the last N bits to store hits of the 
