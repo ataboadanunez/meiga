@@ -9,12 +9,10 @@
 #include "Particle.h"
 
 
-G4MuDecTrackingAction::G4MuDecTrackingAction(G4MuDecEventAction* G4event, Event& theEvent) : 
-	fEventAction(G4event),
-	fEvent(theEvent)
-	{
-
-	}
+G4MuDecTrackingAction::G4MuDecTrackingAction(Event& aEvent) : 
+	fEvent(aEvent)
+{
+}
 
 
 void
@@ -46,6 +44,4 @@ G4MuDecTrackingAction::PreUserTrackingAction(const G4Track* track)
 void
 G4MuDecTrackingAction::PostUserTrackingAction(const G4Track* track)
 {
-	
-	
 }

@@ -14,11 +14,8 @@
 #include "OptDeviceSimData.h"
 #include "Detector.h"
 
-G4ExSteppingAction::G4ExSteppingAction(const G4ExDetectorConstruction* det, G4ExEventAction* G4event, Event& theEvent)
-	: G4UserSteppingAction(),
-		fDetectorConstruction(det),
-		fEventAction(G4event),
-    fEvent(theEvent)
+G4ExSteppingAction::G4ExSteppingAction()
+	: G4UserSteppingAction()
 {
 }
 
@@ -26,9 +23,11 @@ G4ExSteppingAction::~G4ExSteppingAction()
 {
 }
 
+void G4ExSteppingAction::SetSteppingManagerPointer(G4SteppingManager *pValue)
+{
+}
+
 void
 G4ExSteppingAction::UserSteppingAction(const G4Step* step)
 {
-  
- 
 }

@@ -17,7 +17,7 @@ class G4MPhysicsList: public G4VModularPhysicsList
 {
   public:
 
-	G4MPhysicsList(G4String);
+	G4MPhysicsList(G4String, G4int aVerbosity = 0);
 	virtual ~G4MPhysicsList();
 
 	void SetCuts();
@@ -45,6 +45,8 @@ class G4MPhysicsList: public G4VModularPhysicsList
 
 	void SetVerbose(G4int);
 
+    G4int verboseLevel;
+
 private:
 
 	G4double fCutForGamma;
@@ -54,9 +56,6 @@ private:
 	StepMax* fStepMaxProcess;
 
 	OpticalPhysics* fOpticalPhysics;
-
-	//PhysicsListMessenger* fMessenger;
-
 	G4bool fAbsorptionOn;
 	
 	G4VMPLData::G4PhysConstVectorData* fPhysicsVector;

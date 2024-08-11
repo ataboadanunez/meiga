@@ -66,23 +66,25 @@ G4MPrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 	}
 
 	if (!particleDef) {
-		cout << "[WARNING] G4MPrimaryGeneratorAction::GeneratePrimaries: Undefined particle: " << currParticle.GetName() << " (" << currParticle.GetParticleId() << ") " << endl;
-		return;
+		ostringstream msg;
+		msg << "Undefined particle: " << currParticle.GetName() << " (" << currParticle.GetParticleId() << ") ";
+		Logger::Print(msg, WARNING, "GeneratePrimaryParticle");
 	}
 
-	// pass current particle momentum (direction) and position to Geant4
+	// set current particle momentum (direction) and position to Geant4
 	fParticleGun->SetParticleDefinition(particleDef);
 	fParticleGun->SetParticleMomentumDirection(Geometry::ToG4Vector(currParticle.GetMomentumDirection(), 1.));
 	fParticleGun->SetParticlePosition(Geometry::ToG4Vector(currParticle.GetInjectionPosition(), 1.));
 	fParticleGun->SetParticleEnergy(currParticle.GetKineticEnergy());
 	fParticleGun->GeneratePrimaryVertex(event);
-	cout << "[INFO] G4MPrimaryGeneratorAction::GeneratePrimaries: Injecting particle: " << endl;
-	cout << particleDef->GetParticleName() << " with ID " << particleDef->GetPDGEncoding() << endl;
-	cout << "Particle position = (" << currParticle.GetInjectionPosition().at(0) / CLHEP::cm << ", " << currParticle.GetInjectionPosition().at(1) / CLHEP::cm << ", " << currParticle.GetInjectionPosition().at(2) / CLHEP::cm << ") cm" << endl;
-	cout << "Particle direction = (" << currParticle.GetMomentumDirection().at(0) / CLHEP::GeV << ", " << currParticle.GetMomentumDirection().at(1) / CLHEP::GeV << ", " << currParticle.GetMomentumDirection().at(2) / CLHEP::GeV << ") GeV" << endl;
-	cout << "Particle (Theta, Phi) = (" << currParticle.GetZenith() << ", " << currParticle.GetAzimuth() << ") rad" << endl;
-	cout << "Particle Momentum = " << currParticle.GetMomentum() / CLHEP::GeV << " GeV " << endl;
-	cout << "Particle Kinetic Energy = " << currParticle.GetKineticEnergy() / CLHEP::GeV << " GeV " << endl;
 
-
+	ostringstream msg;
+	msg << "Primary Particle Information: " << endl;
+	msg << "Particle name: " << particleDef->GetParticleName() << ", ID: " << particleDef->GetPDGEncoding() << endl;
+	msg << "Particle position: (" << currParticle.GetInjectionPosition().at(0) / CLHEP::cm << ", " << currParticle.GetInjectionPosition().at(1) / CLHEP::cm << ", " << currParticle.GetInjectionPosition().at(2) / CLHEP::cm << ") cm" << endl;
+	msg << "Particle direction: (" << currParticle.GetMomentumDirection().at(0) / CLHEP::GeV << ", " << currParticle.GetMomentumDirection().at(1) / CLHEP::GeV << ", " << currParticle.GetMomentumDirection().at(2) / CLHEP::GeV << ") GeV" << endl;
+	msg << "Particle (Theta, Phi): (" << currParticle.GetZenith() << ", " << currParticle.GetAzimuth() << ") rad" << endl;
+	msg << "Particle Momentum: " << currParticle.GetMomentum() / CLHEP::GeV << " GeV " << endl;
+	msg << "Particle Kinetic Energy: " << currParticle.GetKineticEnergy() / CLHEP::GeV << " GeV " << endl;
+	Logger::Print(msg, INFO, "GeneratePrimaries");
 }

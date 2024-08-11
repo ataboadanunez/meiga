@@ -17,6 +17,7 @@ class G4MScintillatorBarAction : public G4VSensitiveDetector {
 		virtual void Initialize(G4HCofThisEvent* const /*hce*/) override;
 		virtual G4bool ProcessHits(G4Step* const step, G4TouchableHistory* const rOhist) override;
 		virtual void EndOfEvent(G4HCofThisEvent* const /*hce*/) override;
+		virtual G4VSensitiveDetector* Clone() const;
 
 	private:
 

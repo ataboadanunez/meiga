@@ -4,6 +4,8 @@
 #include "Particle.h"
 #include "SimData.h"
 #include "Detector.h"
+#include "DetectorFactory.h"
+
 #include <vector>
 #include <string>
 
@@ -13,8 +15,6 @@
 	This class is intended to store methods and variables
 	that will be handled during the simulation / reconstruction
 	processes. 
-
-	todo: Description about "event" concept.
 
 	author: Alvaro Taboada
 	date: 16 June 2021
@@ -26,25 +26,17 @@
 class Event 
 {
 
-	public:
-		
-		Event();
-		virtual ~Event();
-
+public:
+		using DetectorMap = std::map<int, std::unique_ptr<Detector>>;
 		SimData& GetSimData() { return fSimData; }
 
-		Detector& GetDetector() { return fDetector; }
-		Detector& GetDetector(unsigned int id) { return fDetectorMap[id]; }
+		Detector& GetDetector(const int id);
 		bool HasDetector(unsigned int id);
-		void MakeDetector(unsigned int id, Detector::DetectorType type);
-		void MakeDetector(const Detector & aDetector);
-
-		std::map<int, Detector>& DetectorRange() { return fDetectorMap; }
-		const std::map<int, Detector>& DetectorRange() const { return fDetectorMap; }
+		void MakeDetector(int id, Detector::DetectorType type);
+		const DetectorMap& DetectorRange() const { return fDetectorMap; }
 		int GetNDetectors() {return fNDetectors; }
 		std::vector<int> GetDetectorIds();
 
-		// should be part of DetectorSimData
 		void SetMaximumHeight(double maxH) { fMaximumHeight = maxH; }
 		double GetMaximumHeight() { return fMaximumHeight; }
 
@@ -91,13 +83,9 @@ class Event
 
 		Config cfg;
 		SimData fSimData;
-		Detector fDetector;
-
-		std::map<int, Detector> fDetectorMap;
+		DetectorMap fDetectorMap;
 		int fNDetectors = 0;
 		double fMaximumHeight;
-
-
 };
 
 

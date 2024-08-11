@@ -14,48 +14,26 @@
 #include "Particle.h"
 #include "Event.h"
 #include "Detector.h"
+#include "G4MBaseApplication.h"
 
-class G4RunManager;
-
-class G4LeadSimulator 
+class G4LeadSimulator : public G4MBaseApplication
 {
   public:
   
     G4LeadSimulator();
-    virtual ~G4LeadSimulator();
+    virtual ~G4LeadSimulator() {;}
 
-    // main methods of the application
-    void Initialize(Event& evt, std::string fileName);
-    bool RunSimulation(Event& evt);
-    void WriteEventInfo(Event& evt);
-    
+    void Initialize(Event &aEvent, std::string aFileName) override;
+    bool RunSimulation(Event &aEvent) override;
+
     // static members 
     static Particle currentParticle;
-    
-    G4LeadSimulator* fG4LeadSimulator;
-    bool fSimulateBrick;
-
+    static G4LeadSimulator* fG4LeadSimulator;
+  
+  private:
     // name of configuration file
     std::string fCfgFile;
-
-  private:
-    
-		// flags for configuration (see .json file)
-    std::string fInputFile;
-    std::string fOutputFile;
-    std::string fDetectorList;
-    std::string fDetectorProperties;
-    SimData::SimulationMode fSimulationMode;
-    SimData::InjectionMode fInjectionMode;
-
-    bool fGeoVisOn = true;
-    bool fTrajVisOn = false;
-    int fVerbosity = 1;
-    std::string fRenderFile = "VRML2FILE";
-    std::string fPhysicsName = "QGSP_BERT_HP";
-
-  	friend class G4LeadDetectorConstructor;
-  	friend class G4LeadPrimaryGenerator;
+    bool fSimulateBrick;
 };
 
 #endif

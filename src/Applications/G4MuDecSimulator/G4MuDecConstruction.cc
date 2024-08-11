@@ -16,7 +16,8 @@ G4MuDecConstruction::G4MuDecConstruction(Event& theEvent) :
 }
 
 G4MuDecConstruction::~G4MuDecConstruction() 
-	{ }
+{ 
+}
 
 
 G4VPhysicalVolume*
@@ -56,14 +57,13 @@ G4MuDecConstruction::PlaceDetector(Event& theEvent)
 {
 	
 	// loop in detector vector
-	for (auto detIt = theEvent.DetectorRange().begin(); detIt != theEvent.DetectorRange().end(); detIt++) {
-		auto& currentDet = detIt->second;
-		BuildDetector(logicWorld, currentDet, theEvent, true);
+	for (auto &pair : theEvent.DetectorRange()) {
+		auto& currentDet = *(pair.second);
+		currentDet.BuildDetector(logicWorld, theEvent, true);
 
 	}
 
 }
-
 
 G4VPhysicalVolume* 
 G4MuDecConstruction::Construct() 

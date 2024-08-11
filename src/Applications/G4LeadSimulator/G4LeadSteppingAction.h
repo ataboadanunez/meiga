@@ -19,7 +19,7 @@ class G4LeadEventAction;
 class G4LeadSteppingAction : public G4UserSteppingAction
 {
 	public:
-		G4LeadSteppingAction(Event& theEvent);
+		G4LeadSteppingAction(Event &aEvent);
 		virtual ~G4LeadSteppingAction();
 		virtual void UserSteppingAction(const G4Step* step);
 

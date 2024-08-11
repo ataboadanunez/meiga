@@ -18,7 +18,7 @@
 #include "G4MuonRadiativeDecayChannelWithSpin.hh"
 #include "G4RadioactiveDecayPhysics.hh"
 #include "G4SystemOfUnits.hh"
-//#include "PhysicsListMessenger.hh"
+#include "G4UnitsTable.hh"
 
 #include "StepMax.hh"
 #include "ExtraPhysics.hh"
@@ -26,8 +26,11 @@
 
 
 
-G4MPhysicsList::G4MPhysicsList(G4String physName) : G4VModularPhysicsList()
+G4MPhysicsList::G4MPhysicsList(G4String physName, G4int aVerbosity) : G4VModularPhysicsList()
 {
+
+	// setting verbose level
+	verboseLevel = aVerbosity;
 
 	G4LossTableManager::Instance();
 	defaultCutValue  = 1.*mm;
@@ -38,42 +41,35 @@ G4MPhysicsList::G4MPhysicsList(G4String physName) : G4VModularPhysicsList()
 	// G4PhysListFactory factory;
 	G4VModularPhysicsList* phys = NULL;
 	if (physName == "QGSP_BERT_HP") {
-		phys = new QGSP_BERT_HP;
+		phys = new QGSP_BERT_HP(verboseLevel);
 	} else {
-		phys = new FTFP_BERT;
+		phys = new FTFP_BERT(verboseLevel);
 	}
-	
-	/*
-	if (factory.IsReferencePhysList(physName)) {
-		phys = factory.GetReferencePhysList(physName);
-		if (!phys) {
-			G4Exception("PhysicsList::PhysicsList","InvalidSetup", FatalException,"PhysicsList does not exist");
-		}
-
-		fMessenger = new PhysicsListMessenger(this);
-  }
-	*/
-	
+	phys->SetVerboseLevel(verboseLevel); 
 	for (G4int i = 0; ; ++i) {
 		G4VPhysicsConstructor* elem = const_cast<G4VPhysicsConstructor*> (phys->GetPhysics(i));
-		if (elem == NULL) break;
-		G4cout << "RegisterPhysics: " << elem->GetPhysicsName() << G4endl;
+		if (elem == NULL) 
+			break;
+		
+		if(verboseLevel) {
+			G4cout << "RegisterPhysics: " << elem->GetPhysicsName() << G4endl;
+		}
+		elem->SetVerboseLevel(verboseLevel);
 		RegisterPhysics(elem);
 	}
 
 	fAbsorptionOn = true;
-	RegisterPhysics(new ExtraPhysics());
+	RegisterPhysics(new ExtraPhysics(verboseLevel));
 	RegisterPhysics(fOpticalPhysics = new OpticalPhysics(fAbsorptionOn));
-	RegisterPhysics(new G4RadioactiveDecayPhysics());
+	RegisterPhysics(new G4RadioactiveDecayPhysics(verboseLevel));
 
 	fStepMaxProcess = new StepMax();
+	fStepMaxProcess->SetVerboseLevel(verboseLevel);
 
 }
 
 G4MPhysicsList::~G4MPhysicsList()
 {
-	//delete fMessenger;
-	delete fStepMaxProcess;
 }
 
 void 
@@ -92,13 +88,13 @@ G4MPhysicsList::ConstructParticle()
 	G4VModularPhysicsList::ConstructParticle();
 
 	G4DecayTable* MuonPlusDecayTable = new G4DecayTable();
-	MuonPlusDecayTable -> Insert(new G4MuonDecayChannelWithSpin("mu+",0.986));
-	MuonPlusDecayTable -> Insert(new G4MuonRadiativeDecayChannelWithSpin("mu+",0.014));
-	G4MuonPlus::MuonPlusDefinition() -> SetDecayTable(MuonPlusDecayTable);
+	MuonPlusDecayTable->Insert(new G4MuonDecayChannelWithSpin("mu+",0.986));
+	MuonPlusDecayTable->Insert(new G4MuonRadiativeDecayChannelWithSpin("mu+",0.014));
+	G4MuonPlus::MuonPlusDefinition()->SetDecayTable(MuonPlusDecayTable);
 	G4DecayTable* MuonMinusDecayTable = new G4DecayTable();
-	MuonMinusDecayTable -> Insert(new G4MuonDecayChannelWithSpin("mu-",0.986));
-	MuonMinusDecayTable -> Insert(new G4MuonRadiativeDecayChannelWithSpin("mu-",0.014));
-	G4MuonMinus::MuonMinusDefinition() -> SetDecayTable(MuonMinusDecayTable);
+	MuonMinusDecayTable->Insert(new G4MuonDecayChannelWithSpin("mu-",0.986));
+	MuonMinusDecayTable->Insert(new G4MuonRadiativeDecayChannelWithSpin("mu-",0.014));
+	G4MuonMinus::MuonMinusDefinition()->SetDecayTable(MuonMinusDecayTable);
 
 }
 
@@ -112,7 +108,6 @@ G4MPhysicsList::ConstructProcess()
 	SetVerbose(0);
 
 	G4DecayWithSpin* decayWithSpin = new G4DecayWithSpin();
-
 	G4ProcessTable* processTable = G4ProcessTable::GetProcessTable();
 
 	G4VProcess* decay;
@@ -122,33 +117,39 @@ G4MPhysicsList::ConstructProcess()
 	pManager = G4MuonPlus::MuonPlus()->GetProcessManager();
 
 	if (pManager) {
-		if (decay) pManager->RemoveProcess(decay);
+		pManager->SetVerboseLevel(verboseLevel);
+		if (decay) {
+			pManager->RemoveProcess(decay);
+		}
 		pManager->AddProcess(decayWithSpin);
 		// set ordering for PostStepDoIt and AtRestDoIt
-		pManager ->SetProcessOrdering(decayWithSpin, idxPostStep);
-		pManager ->SetProcessOrdering(decayWithSpin, idxAtRest);
+		pManager->SetProcessOrdering(decayWithSpin, idxPostStep);
+		pManager->SetProcessOrdering(decayWithSpin, idxAtRest);
 	}
 
 	decay = processTable->FindProcess("Decay",G4MuonMinus::MuonMinus());
-
 	pManager = G4MuonMinus::MuonMinus()->GetProcessManager();
 
 	if (pManager) {
-		if (decay) pManager->RemoveProcess(decay);
+		pManager->SetVerboseLevel(verboseLevel);
+		if (decay) {
+			pManager->RemoveProcess(decay);
+		}
 		pManager->AddProcess(decayWithSpin);
 		// set ordering for PostStepDoIt and AtRestDoIt
-		pManager ->SetProcessOrdering(decayWithSpin, idxPostStep);
-		pManager ->SetProcessOrdering(decayWithSpin, idxAtRest);
+		pManager->SetProcessOrdering(decayWithSpin, idxPostStep);
+		pManager->SetProcessOrdering(decayWithSpin, idxAtRest);
 	}
 
 	G4PionDecayMakeSpin* poldecay = new G4PionDecayMakeSpin();
-
 	decay = processTable->FindProcess("Decay",G4PionPlus::PionPlus());
-
 	pManager = G4PionPlus::PionPlus()->GetProcessManager();
 
 	if (pManager) {
-		if (decay) pManager->RemoveProcess(decay);
+		pManager->SetVerboseLevel(verboseLevel);
+		if (decay) {
+			pManager->RemoveProcess(decay);
+		}
 		pManager->AddProcess(poldecay);
 		// set ordering for PostStepDoIt and AtRestDoIt
 		pManager ->SetProcessOrdering(poldecay, idxPostStep);
@@ -156,11 +157,13 @@ G4MPhysicsList::ConstructProcess()
 	}
 
 	decay = processTable->FindProcess("Decay",G4PionMinus::PionMinus());
-
 	pManager = G4PionMinus::PionMinus()->GetProcessManager();
 
 	if (pManager) {
-		if (decay) pManager->RemoveProcess(decay);
+		pManager->SetVerboseLevel(verboseLevel);
+		if (decay) {
+			pManager->RemoveProcess(decay);
+		}
 		pManager->AddProcess(poldecay);
 		// set ordering for PostStepDoIt and AtRestDoIt
 		pManager ->SetProcessOrdering(poldecay, idxPostStep);
@@ -195,20 +198,18 @@ G4MPhysicsList::RemoveFromPhysicsList(const G4String& name)
 void 
 G4MPhysicsList::SetAbsorption(G4bool toggle)
 {
- fAbsorptionOn = toggle;
- RemoveFromPhysicsList("Optical");
- fPhysicsVector->
-							push_back(fOpticalPhysics = new OpticalPhysics(toggle));
- fOpticalPhysics->ConstructProcess();
+	fAbsorptionOn = toggle;
+ 	RemoveFromPhysicsList("Optical");
+ 	fPhysicsVector->push_back(fOpticalPhysics = new OpticalPhysics(toggle));
+ 	fOpticalPhysics->ConstructProcess();
 }
 
 void 
 G4MPhysicsList::SetCuts()
 {
-	if (verboseLevel >0) {
+	if (verboseLevel > 0) {
 			G4cout << "PhysicsList::SetCuts:";
-			G4cout << "CutLength : " << G4BestUnit(defaultCutValue,"Length")
-						 << G4endl;
+			G4cout << "CutLength : " << G4BestUnit(defaultCutValue,"Length") << G4endl;
 	}
 
 	// set cut values for gamma at first and for e- second and next for e+,
@@ -217,7 +218,9 @@ G4MPhysicsList::SetCuts()
 	SetCutValue(fCutForElectron, "e-");
 	SetCutValue(fCutForPositron, "e+");
 
-	if (verboseLevel>0) DumpCutValuesTable();
+	if (verboseLevel>0) {
+		DumpCutValuesTable();
+	}
 }
 
 void 
@@ -260,14 +263,16 @@ G4MPhysicsList::AddStepMax()
 
 	auto particleIterator=GetParticleIterator();
 	particleIterator->reset();
-	while ((*particleIterator)()){
-			G4ParticleDefinition* particle = particleIterator->value();
-			G4ProcessManager* pmanager = particle->GetProcessManager();
+	while ((*particleIterator)()) {
+		G4ParticleDefinition* particle = particleIterator->value();
+		G4ProcessManager* pmanager = particle->GetProcessManager();
 
-			if (fStepMaxProcess->IsApplicable(*particle) && !particle->IsShortLived())
-			{
-				 if (pmanager) pmanager ->AddDiscreteProcess(fStepMaxProcess);
+		if (fStepMaxProcess->IsApplicable(*particle) && !particle->IsShortLived()) {
+			if (pmanager) {
+				pmanager->SetVerboseLevel(verboseLevel);
+				pmanager->AddDiscreteProcess(fStepMaxProcess);
 			}
+		}
 	}
 }
 

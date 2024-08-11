@@ -1,6 +1,7 @@
 // implementation of class SimData
 #include "SimData.h"
 #include "DetectorSimData.h"
+#include "Logger.h"
 
 using namespace std;
 
@@ -25,10 +26,12 @@ SimData::InputModeConversion(string name)
 	else if (name == "UseEcoMug")
 		return SimData::InputMode::eUseEcoMug;
 	else {
-		string what = "[ERROR] SimData::InputModeConversion: Unknown input mode: " + name;
-		throw invalid_argument(what);
-		return SimData::InputMode::eUnknown;
+		ostringstream msg;
+		msg << "Unknown input mode: " + name;
+		Logger::Print(msg, ERROR, "InputModeConversion");
+		throw invalid_argument("Invalid input mode");
 	}
+	return SimData::InputMode::eUnknown;
 }
 
 
@@ -47,9 +50,10 @@ SimData::InjectionConversion(string name)
 	else if (name == "eFromFile")
 		return SimData::InjectionMode::eFromFile;
 	else {
-		cout << "[WARNING] SimData::InjectionConversion: Unknown injection type!" << endl;
-		return SimData::InjectionMode::eUnknown;
+		Logger::Print("Unknown injection type!", ERROR, "InjectionConversion");
+		throw invalid_argument("Invalid injection type.");
 	}
+	return SimData::InjectionMode::eUnknown;
 }
 
 SimData::SimulationMode
@@ -63,7 +67,7 @@ SimData::SimulationModeConversion(string name)
 	else if (name == "eFast")
 		return SimData::SimulationMode::eFast;
 	else {
-		cout << "[WARNING] SimData::SimulationModeConversion: Unknown simulation type! (uwsing Full by default)." << endl;
+		Logger::Print("Unknown simulation type! (uwsing Full by default).", WARNING, "SimulationModeConversion");
 		return SimData::SimulationMode::eFull;
 	}
 }

@@ -14,9 +14,11 @@ class G4MPMTAction : public G4VSensitiveDetector {
     G4MPMTAction(const G4String& name, const G4int dId, const G4int oId, Event& theEvent);
     virtual ~G4MPMTAction() { }
 
+    // G4VSensitiveDetector methods
     virtual void Initialize(G4HCofThisEvent* const /*hce*/) override;
     virtual G4bool ProcessHits(G4Step* const step, G4TouchableHistory* const rOhist) override;
     virtual void EndOfEvent(G4HCofThisEvent* const /*hce*/) override;
+    virtual G4VSensitiveDetector* Clone() const;
 
   private:
     

@@ -5,7 +5,6 @@
 
 #include "globals.hh"
 #include "G4UserRunAction.hh"
-#include "g4root.hh"
 
 #include <fstream>
 #include <iostream>

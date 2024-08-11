@@ -5,12 +5,14 @@
 
 #include "Event.h"
 #include "Detector.h"
+#include "Scintillator.h"
 
 class G4VPhysicalVolume;
 class G4LogicalVolume;
 class G4OpticalSkinSurface;
 
-class Hodoscope {
+class Hodoscope : public Scintillator
+{
 	/*
 		Model class for an hodoscope-like detector.
 		This type of detectors are used in muon detection techniques.
@@ -23,12 +25,8 @@ class Hodoscope {
 	*/
 
 public:
-	static void BuildDetector(G4LogicalVolume* logMother, Detector& detector, Event& theEvent, G4bool fCheckOverlaps = false);
-
-private:
-	Hodoscope();
-	virtual ~Hodoscope();
-
+	Hodoscope(const int id, const Detector::DetectorType type);
+	void BuildDetector(G4LogicalVolume* logMother, Event& aEvent, G4bool fCheckOverlaps = false) override;
 
 };
 

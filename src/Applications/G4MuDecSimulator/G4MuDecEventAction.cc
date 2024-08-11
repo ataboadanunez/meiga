@@ -1,6 +1,7 @@
 #include "G4MuDecEventAction.h"
 #include "G4MuDecSimulator.h"
 #include "DetectorSimData.h"
+#include "Logger.h"
 
 #include "G4Track.hh"
 
@@ -8,14 +9,10 @@ G4MuDecEventAction::G4MuDecEventAction(Event& theEvent) : G4UserEventAction(),
 	fEvent(theEvent)
 
 {
-	
-	G4cout << "...G4MuDecEventAction..." << G4endl;
-
 }
 
 G4MuDecEventAction::~G4MuDecEventAction()
 {
-
 }
 
 void
@@ -43,9 +40,12 @@ G4MuDecEventAction::EndOfEventAction(const G4Event* )
 	int numberCerenkovDelta = G4MuDecEventAction::GetNumberCerenkovDelta();
 	trackLength = G4MuDecEventAction::GetTrackLength();
 	double energyDeposit = G4MuDecEventAction::GetEnergyDeposit();
-
-	std::cout << "CerenkovCounter " << particleMomentum / CLHEP::GeV << " " << numberCerenkov << " " << numberCerenkovDelta << " " << trackLength / CLHEP::cm << std::endl;
-	std::cout << "EnergyDeposit " << energyDeposit / CLHEP::MeV << std::endl;
+	std::ostringstream msg;
+	msg << "CerenkovCounter " << particleMomentum / CLHEP::GeV << " " 
+							  << numberCerenkov << " " << numberCerenkovDelta 
+							  << " " << trackLength / CLHEP::cm 
+							  << "EnergyDeposit " << energyDeposit / CLHEP::MeV;
+	Logger::Print(msg, DEBUG, "EndOfEventAction");
 	
 }
 

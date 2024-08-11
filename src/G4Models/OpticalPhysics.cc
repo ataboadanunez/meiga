@@ -49,6 +49,7 @@ OpticalPhysics::OpticalPhysics(G4bool toggle)
   fMieHGScatteringProcess    = NULL;
 
   fAbsorptionOn              = toggle;
+  SetVerboseLevel(0);
 }
 
 OpticalPhysics::~OpticalPhysics() { }
@@ -64,14 +65,16 @@ void OpticalPhysics::ConstructParticle()
 
 void OpticalPhysics::ConstructProcess()
 {
-    G4cout << "OpticalPhysics:: Add Optical Physics Processes"
-           << G4endl;
+    if(GetVerboseLevel()) {
+      G4cout << "OpticalPhysics:: Add Optical Physics Processes" << G4endl;
+    }
+    
 
   fProcess = new G4OpWLS();
-
+  
   fScintProcess = new G4Scintillation();
-  fScintProcess->SetScintillationYieldFactor(1.);
   fScintProcess->SetTrackSecondariesFirst(true);
+  fScintProcess->SetVerboseLevel(0);
 
   fCerenkovProcess = new G4Cerenkov();
   fCerenkovProcess->SetMaxNumPhotonsPerStep(300);
@@ -104,8 +107,8 @@ void OpticalPhysics::ConstructProcess()
 
   pManager->AddDiscreteProcess(fProcess);
 
-  fScintProcess->SetScintillationYieldFactor(1.);
-  fScintProcess->SetScintillationExcitationRatio(0.0);
+  // fScintProcess->SetScintillationYieldFactor(1.);
+  // fScintProcess->SetScintillationExcitationRatio(0.0);
   fScintProcess->SetTrackSecondariesFirst(true);
 
   // Use Birks Correction in the Scintillation process
@@ -127,8 +130,9 @@ void OpticalPhysics::ConstructProcess()
        G4Exception("OpticalPhysics::ConstructProcess()","",
                     FatalException,o.str().c_str());
     }
-
+    pManager->SetVerboseLevel(0);
     if(fCerenkovProcess->IsApplicable(*particle)){
+      
       pManager->AddProcess(fCerenkovProcess);
       pManager->SetProcessOrdering(fCerenkovProcess,idxPostStep);
     }

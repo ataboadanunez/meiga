@@ -1,11 +1,9 @@
 #ifndef ConfigManager_h
 #define ConfigManager_h 1
-
 // Meiga headers
 #include "Event.h"
 #include "SimData.h"
 #include "Detector.h"
-#include "DefaultProperties.h"
 
 // Geant4 headers
 #include "G4UnitsTable.hh"
@@ -31,13 +29,9 @@ class ConfigManager
 		ConfigManager() { }
 		~ConfigManager() { }
 		// public and static to be called within the applications 'without object'
-		static Event ReadConfigurationFile(const std::string &filename);
+		static void ReadConfigurationFile(Event& aEvent, const std::string &filename);
 		static void ReadDetectorList(const std::string &filename, Event& theEvent);
 		static void PrintConfig(const Event::Config &cfg);
-
-	private:
-		
-		static DefaultProperties defProp;
 
 		// return value giving the XML path
 		template <typename T>
@@ -65,9 +59,6 @@ class ConfigManager
 			
 			return res;
 		}
-
-	friend class DefaultProperties;
-
 };
 
 #endif

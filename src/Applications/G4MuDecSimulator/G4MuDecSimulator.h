@@ -11,20 +11,16 @@
 #include "Particle.h"
 #include "Event.h"
 #include "Detector.h"
+#include "G4MBaseApplication.h"
 
-class G4RunManager;
-
-class G4MuDecSimulator 
+class G4MuDecSimulator : public G4MBaseApplication
 {
   public:
   
     G4MuDecSimulator();
     virtual ~G4MuDecSimulator() {;}
 
-    // main methods of the application
-    void Initialize(Event& evt, std::string fileName);
-    bool RunSimulation(Event& evt);
-    void WriteEventInfo(Event& evt);
+    bool RunSimulation(Event& aEvent) override;
 
     // static members 
     static Particle currentParticle;
@@ -33,10 +29,6 @@ class G4MuDecSimulator
     // name of configuration file
     std::string fCfgFile;
 
-  private:
-
-  	friend class G4MuDecDetectorConstructor;
-  	friend class G4MuDecPrimaryGenerator;
 };
 
 #endif

@@ -6,8 +6,6 @@
 
 G4WCDEventAction::G4WCDEventAction() : G4UserEventAction()
 {
-  G4cout << "...G4WCDEventAction..." << G4endl;
-
 }
 
 G4WCDEventAction::~G4WCDEventAction()
