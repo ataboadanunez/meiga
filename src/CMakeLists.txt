@@ -4,6 +4,8 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 project(meiga VERSION 3.0)
+set(MEIGA_VERSION "${PROJECT_VERSION}" CACHE INTERNAL "Meiga project version")
+
 # set(CMAKE_BUILD_TYPE Debug)
 set(CONFIG_FILE_PATH "${CMAKE_SOURCE_DIR}/Config/" CACHE STRING "Path to configuration files")
 
@@ -12,11 +14,15 @@ set(CONFIG_FILE_PATH "${CMAKE_SOURCE_DIR}/Config/" CACHE STRING "Path to configu
 ################################################################################
 
 # Find Geant4 package
-option(WITH_GEANT4_UIVIS "Build example with Geant4 UI and Vis drivers" ON)
-if(WITH_GEANT4_UIVIS)
-  find_package(Geant4 REQUIRED ui_all vis_all)
-else()
-  find_package(Geant4 REQUIRED)
+# Set the required Geant4 version
+set(MINIMUM_GEANT4_VERSION "11.2.0")
+
+# Find the Geant4 package
+find_package(Geant4 ${REQUIRED_GEANT4_VERSION} REQUIRED)
+
+# Check if the found version of Geant4 matches the required version exactly
+if(Geant4_VERSION VERSION_LESS MINIMUM_GEANT4_VERSION)
+    message(FATAL_ERROR "Geant4 version ${MINIMUM_GEANT4_VERSION} or higher is required. Found version: ${Geant4_VERSION}.")
 endif()
 include(${Geant4_USE_FILE})
 include_directories(${Geant4_INCLUDE_DIRS})

@@ -2,8 +2,6 @@
 
 using namespace std;
 
-
-
 void Logger::DisplayLogo() {
 	
   	cout << R"(	
@@ -19,11 +17,11 @@ void Logger::DisplayLogo() {
  | |  | | | (_| | | | | | |  __/\ V  V / (_) | |  |   < 
  |_|  |_|  \__,_|_| |_| |_|\___| \_/\_/ \___/|_|  |_|\_\
                                                         
-	© Alvaro Taboada Nunez - 2023
-	https://github.com/ataboadanunez/meiga
-
 	)" << endl;
-
+	cout << "Version: " << MEIGA_VERSION << " (2024)" << endl; 
+	cout << "Author: Alvaro Taboada Nunez" << endl;
+	cout << "GitHub: https://github.com/ataboadanunez/meiga" << endl;
+	cout << "\n";
 	}
 
 void Logger::ProgramUsage(string aName) {
