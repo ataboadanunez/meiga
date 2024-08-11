@@ -6,7 +6,7 @@ endif()
 # set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 set(CMAKE_BUILD_TYPE Debug)
 
-project(meiga VERSION 2.0)
+project(meiga VERSION 2.1.1)
 set(CONFIG_FILE_PATH "${CMAKE_SOURCE_DIR}/Config/" CACHE STRING "Path to configuration files")
 
 ################################################################################
@@ -14,12 +14,10 @@ set(CONFIG_FILE_PATH "${CMAKE_SOURCE_DIR}/Config/" CACHE STRING "Path to configu
 ################################################################################
 
 # Find Geant4 package
-
-option(WITH_GEANT4_UIVIS "Build example with Geant4 UI and Vis drivers" ON)
-if(WITH_GEANT4_UIVIS)
-  find_package(Geant4 REQUIRED ui_all vis_all)
-else()
-  find_package(Geant4 REQUIRED)
+set(REQUIRED_GEANT4_VERSION "10.7.2")
+find_package(Geant4 ${REQUIRED_GEANT4_VERSION} REQUIRED)
+if(NOT Geant4_VERSION VERSION_EQUAL REQUIRED_GEANT4_VERSION)
+  message(FATAL_ERROR "Geant4 version ${REQUIRED_GEANT4_VERSION} is required. Found version: ${Geant4_VERSION}. Please use the correct version.")
 endif()
 include(${Geant4_USE_FILE})
 
@@ -33,7 +31,6 @@ find_package(Boost 1.34 REQUIRED COMPONENTS system filesystem iostreams)
 ################################################################################
 # Subdirectories                                                               #
 ################################################################################
-
 include_directories(${CMAKE_SOURCE_DIR}/Utilities ${CMAKE_SOURCE_DIR}/Framework/Event ${CMAKE_SOURCE_DIR}/Framework/Detector ${CMAKE_SOURCE_DIR}/Framework/ConfigManager ${CMAKE_SOURCE_DIR}/Framework/SimData ${CMAKE_SOURCE_DIR}/IO ${CMAKE_SOURCE_DIR}/G4Models ${CMAKE_SOURCE_DIR}/Documentation ${CMAKE_SOURCE_DIR}/Externals ${CMAKE_SOURCE_DIR}/UnitTest)
 add_subdirectory(Externals)
 add_subdirectory(Utilities)
