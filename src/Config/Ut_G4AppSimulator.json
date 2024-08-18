@@ -16,7 +16,10 @@
 		"SaveComponentsEnergy" : false
 	},
 	"DetectorList" : "./DetectorList.xml",
-	"DetectorProperties" : "./DetectorProperties.xml",
+	"ParticleInjection" : {
+		"Type" : "eVertical",
+		"Origin" : [0.0, 0.0, 100]
+	},
 	"Simulation" :
 	{
 		"SimulationMode" : "eFast",

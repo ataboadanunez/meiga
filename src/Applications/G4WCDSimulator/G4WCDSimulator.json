@@ -17,6 +17,11 @@
 	
 	},
 	"DetectorList" : "./DetectorList.xml",
+	"ParticleInjection" : {
+		"Type" : "eCircle",
+		"Origin" : [0, 0, 200],
+		"Radius" : 150 
+	},
 	"Simulation" :
 	{
 		"SimulationMode" : "eFast",

@@ -1,5 +1,6 @@
 #include "Event.h"
 #include "Utilities.h"
+#include "ParticleInjection.h"
 #include "ConfigManager.h"
 #include "G4MDetectorConstruction.h"
 #include "G4MPhysicsList.h"
@@ -20,6 +21,20 @@ const string cDetectorFilename = Utilities::ConcatenatePaths(GetConfigFilePath()
 
 namespace
 {   
+    double threshold = 1e-10;
+    double sanitizeZero(double value) {
+        return (std::abs(value) < threshold) ? 0.0 : value;
+    }
+
+    void compareValues(double expected, double actual, bool debug=false) {
+        if (debug) {
+            std::cout << "Expected: " << std::fixed << std::setprecision(15) << expected << std::endl;
+            std::cout << "Actual  : " << std::fixed << std::setprecision(15) << actual << std::endl;
+        }
+        // adjust tolerance as needed
+        assert(std::abs(expected - actual) < 1e-12);
+    }
+
     Event test_ReadConfigurationFile() {
     
         Event event;
@@ -48,8 +63,10 @@ namespace
 
         ConfigManager::ReadDetectorList(cDetectorFilename, aEvent);
         SimData &simData = aEvent.GetSimData();
-        assert(simData.GetInjectionMode() == SimData::InjectionMode::eVertical);
-        const std::vector<double> &injectionOrigin = simData.GetInjectionOrigin();
+        ParticleInjection &injection = simData.GetParticleInjection();
+        assert(injection.IsValid());
+        assert(injection.GetInjectionType() == ParticleInjection::eVertical);
+        const std::vector<double> &injectionOrigin = injection.GetInjectionOrigin();
         assert(injectionOrigin.at(0) == 0.0 * CLHEP::m);
         assert(injectionOrigin.at(1) == 0.0 * CLHEP::m);
         assert(injectionOrigin.at(2) == 1.0 * CLHEP::m);
@@ -75,15 +92,16 @@ namespace
         Particle currentParticle = aSimData.GetCurrentParticle();
         assert(std::abs(currentParticle.GetParticleId()) == 13);
         const std::vector<double> &injectionPosition = currentParticle.GetInjectionPosition();
-        assert(injectionPosition.at(0) == 0.0);
-        assert(injectionPosition.at(1) == 0.0);
-        assert(injectionPosition.at(2) == 1.0 * CLHEP::m);
+        compareValues(0.0, sanitizeZero(injectionPosition.at(0)) / CLHEP::m);
+        compareValues(0.0, sanitizeZero(injectionPosition.at(1)) / CLHEP::m);
+        compareValues(1.0, sanitizeZero(injectionPosition.at(2)) / CLHEP::m);
         const std::vector<double> &momentumDirection = currentParticle.GetMomentumDirection();
-        assert(momentumDirection.at(0) == 0.0);
-        assert(momentumDirection.at(1) == 0.0);
-        assert(momentumDirection.at(2) == -449.16473577427365);
-        assert(currentParticle.GetZenith() == 2.4114694941536605);
-        assert(currentParticle.GetAzimuth() == 3.5926461359435269);
+        compareValues(0.0, momentumDirection.at(0));
+        compareValues(0.0, momentumDirection.at(1));
+        compareValues(-837.874689031361299, momentumDirection.at(2));
+        compareValues(2.257155077674716, currentParticle.GetZenith());
+        compareValues(1.022436562227548, currentParticle.GetAzimuth());
+        
         Logger::Print("PASS", INFO, "test_PrimaryGenerator");
     }
 }

@@ -1,4 +1,5 @@
 #include "PrimaryGenerator.h"
+#include "ParticleInjection.h"
 #include "CorsikaUtilities.h"
 #include "Geometry.h"
 #include "Particle.h"
@@ -18,7 +19,6 @@ PrimaryGenerator::PrimaryGenerator(Event& theEvent) :
 {
     
     SimData &simData = fEvent.GetSimData();
-    injMode = simData.GetInjectionMode();
     fUseEcoMug = (simData.GetInputMode() == SimData::InputMode::eUseEcoMug);
     Event::Config &cfg = fEvent.GetConfig();
     fSaveInput = cfg.fSaveInput;
@@ -33,8 +33,13 @@ PrimaryGenerator::PrimaryGenerator(Event& theEvent) :
         Logger::Print(msg, WARNING, "PrimaryGenerator");
         
         fMuonGen.SetUseHSphere();
-        double injectionRadius = simData.GetInjectionRadius();
-        vector<double> injectionOrigin = simData.GetInjectionOrigin();
+        ParticleInjection &injection = simData.GetParticleInjection();
+        if (!injection.IsValid()) {
+            Logger::Print("Invalid particle injection.", ERROR, "PrimaryGenerator");
+            throw runtime_error("Invalid particle injection.");
+        }
+        double injectionRadius = injection.GetInjectionRadius();
+        vector<double> injectionOrigin = injection.GetInjectionOrigin();
         double oX = injectionOrigin[0];
         double oY = injectionOrigin[1];
         double oZ = injectionOrigin[2];
@@ -45,10 +50,10 @@ PrimaryGenerator::PrimaryGenerator(Event& theEvent) :
         // limits for momentum and position
         fMuonGen.SetMinimumMomentum(1e-1);
         fMuonGen.SetMaximumMomentum(1e4);
-        double minPhi = simData.GetInjectionMinPhi();
-        double maxPhi = simData.GetInjectionMaxPhi();
-        double minTheta = simData.GetInjectionMinTheta();
-        double maxTheta = simData.GetInjectionMaxTheta();
+        double minPhi = injection.GetInjectionMinPhi();
+        double maxPhi = injection.GetInjectionMaxPhi();
+        double minTheta = injection.GetInjectionMinTheta();
+        double maxTheta = injection.GetInjectionMaxTheta();
 
         fMuonGen.SetHSphereMinPositionTheta(minTheta * (M_PI / 180));
         fMuonGen.SetHSphereMaxPositionTheta(maxTheta * (M_PI / 180));
@@ -67,7 +72,12 @@ PrimaryGenerator::GeneratePrimaryParticle()
 {
     SimData &simData = fEvent.GetSimData();
     Particle &currentParticle = simData.GetCurrentParticle();
-    auto injectionMode = simData.GetInjectionMode();
+    ParticleInjection &injection = simData.GetParticleInjection();
+    if (!injection.IsValid()) {
+        Logger::Print("Invalid particle injection.", ERROR, "GeneratePrimaryParticle");
+            throw runtime_error("Invalid particle injection.");
+    }
+    auto injectionMode = injection.GetInjectionType();
     // components of particle momentum
     double px;
     double py;
@@ -104,7 +114,7 @@ PrimaryGenerator::GeneratePrimaryParticle()
         pTot = fMuonGen.GetGenerationMomentum() * CLHEP::GeV;
         pTheta = fMuonGen.GetGenerationTheta();
         pPhi = fMuonGen.GetGenerationPhi();
-        if (injectionMode != SimData::InjectionMode::eVertical) {
+        if (injectionMode != ParticleInjection::eVertical) {
             px = pTot * sin(pTheta) * cos(pPhi);
             py = pTot * sin(pTheta) * sin(pPhi);
             pz = pTot * cos(pTheta);
@@ -148,7 +158,7 @@ PrimaryGenerator::GeneratePrimaryParticle()
         */
 
         pTot = currentParticle.GetMomentum();
-        if (injectionMode != SimData::InjectionMode::eVertical) {
+        if (injectionMode != ParticleInjection::eVertical) {
             px = currentParticle.GetMomentumDirection().at(0);
             py = currentParticle.GetMomentumDirection().at(1);
             pz = currentParticle.GetMomentumDirection().at(2);
@@ -173,18 +183,21 @@ PrimaryGenerator::GeneratePrimaryParticle()
         // save particle information
         simData.InsertInjectedParticle(currentParticle);
     }
-
-
+    
     return;
 }
 
 void 
 PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double> &particlePosition)
 {
-
-    auto mode = simData.GetInjectionMode();
     Particle &currentParticle = simData.GetCurrentParticle();
-    vector<double> injectionOrigin = simData.GetInjectionOrigin();
+    ParticleInjection &injection = simData.GetParticleInjection();
+    if (!injection.IsValid()) {
+        Logger::Print("Invalid particle injection.", ERROR, "ComputeInjectionPosition");
+            throw runtime_error("Invalid particle injection.");
+    }
+    auto injectionType = injection.GetInjectionType();
+    vector<double> injectionOrigin = injection.GetInjectionOrigin();
     bool isDefaultOrigin = true;
     double x0 = injectionOrigin[0];
     double y0 = injectionOrigin[1];
@@ -196,107 +209,90 @@ PrimaryGenerator::ComputeInjectionPosition(SimData &simData, std::vector<double>
     double yInj;
     double zInj;
 
-    switch(mode) {
-
-    case SimData::InjectionMode::eCircle:
+    switch(injectionType) 
     {
+        case ParticleInjection::eCircle:
+        {
 
-        double injRadius = simData.GetInjectionRadius();
-        double injHeight = simData.GetInjectionHeight();
-        if (injHeight != z0){
-            ostringstream warnmsg;
-            warnmsg << "In injectionMode = eCircle, `injHeight` does not match with `z-coordinate` of the circle. Using `injHeight` as default.";
-            Logger::Print(warnmsg, WARNING, "ComputeInjectionPosition");
-        }
-
-
-        double rand = RandFlat::shoot(0., 1.);
-        double r = injRadius * sqrt(rand);
-        double minPhi = simData.GetInjectionMinPhi() * (CLHEP::pi / 180);
-        double maxPhi = simData.GetInjectionMaxPhi() * (CLHEP::pi / 180);
-        double phi = RandFlat::shoot(minPhi, maxPhi);
-
-        xInj = r * cos(phi) + x0;
-        yInj = r * sin(phi) + y0;
-        zInj = injHeight;
-
-        break;
-    }
-
-    case SimData::InjectionMode::eHalfSphere:
-    {
-        double injRadius = simData.GetInjectionRadius();
-        
-        double minTheta = simData.GetInjectionMinTheta() * (CLHEP::pi / 180);
-        double maxTheta = simData.GetInjectionMaxTheta() * (CLHEP::pi / 180);
-        double maxCosTheta = cos(maxTheta);
-        double minCosTheta = cos(minTheta);
-
-        double minPhi = simData.GetInjectionMinPhi() * (CLHEP::pi / 180);
-        double maxPhi = simData.GetInjectionMaxPhi() * (CLHEP::pi / 180);
-
-        double randTheta = acos(RandFlat::shoot(maxCosTheta, minCosTheta));
-        double randPhi = RandFlat::shoot(minPhi, maxPhi);
-
-        xInj = injRadius * sin(randTheta) * cos(randPhi) + x0;
-        yInj = injRadius * sin(randTheta) * sin(randPhi) + y0;
-        zInj = injRadius * cos(randTheta) + z0;
-        break;
-    }
-    case SimData::InjectionMode::eVertical:
-    {   
-        double injRadius = simData.GetInjectionRadius();
-        double injHeight = simData.GetInjectionHeight();
-        if (injHeight != z0){
-            ostringstream warnmsg;
-            warnmsg << "In injectionMode = eCircle, `injHeight` does not match with `z-coordinate` of the circle. Using `injHeight` as default.";
-            Logger::Print(warnmsg, WARNING, "ComputeInjectionPosition");
-            zInj = std::max(injHeight, z0);
-        } else {
-            zInj = z0;
-        }
-        if (injRadius) {
-            ostringstream infomsg;
-            infomsg << "Injecting particle vertically over a circle of radius: " << injRadius / CLHEP::m << " m at height: " << zInj / CLHEP::m;
-            Logger::Print(infomsg, INFO, "ComputeInjectionPosition");
+            double injRadius = injection.GetInjectionRadius();
 
             double rand = RandFlat::shoot(0., 1.);
             double r = injRadius * sqrt(rand);
-            double minPhi = simData.GetInjectionMinPhi() * (CLHEP::pi / 180);
-            double maxPhi = simData.GetInjectionMaxPhi() * (CLHEP::pi / 180);
+            double minPhi = injection.GetInjectionMinPhi() * (CLHEP::pi / 180);
+            double maxPhi = injection.GetInjectionMaxPhi() * (CLHEP::pi / 180);
             double phi = RandFlat::shoot(minPhi, maxPhi);
+
             xInj = r * cos(phi) + x0;
             yInj = r * sin(phi) + y0;
-
-        } else {
-            xInj = x0;
-            yInj = y0;
+            zInj = z0;
+            break;
         }
-        break;
+        case ParticleInjection::eHalfSphere:
+        {
+            double injRadius = injection.GetInjectionRadius();
+            
+            double minTheta = injection.GetInjectionMinTheta() * (CLHEP::pi / 180);
+            double maxTheta = injection.GetInjectionMaxTheta() * (CLHEP::pi / 180);
+            double maxCosTheta = cos(maxTheta);
+            double minCosTheta = cos(minTheta);
+
+            double minPhi = injection.GetInjectionMinPhi() * (CLHEP::pi / 180);
+            double maxPhi = injection.GetInjectionMaxPhi() * (CLHEP::pi / 180);
+
+            double randTheta = acos(RandFlat::shoot(maxCosTheta, minCosTheta));
+            double randPhi = RandFlat::shoot(minPhi, maxPhi);
+
+            xInj = injRadius * sin(randTheta) * cos(randPhi) + x0;
+            yInj = injRadius * sin(randTheta) * sin(randPhi) + y0;
+            zInj = injRadius * cos(randTheta) + z0;
+            break;
+        }
+        case ParticleInjection::eVertical:
+        {   
+            double injRadius = injection.GetInjectionRadius();
+            zInj = z0;
+            if (injRadius) {
+                ostringstream infomsg;
+                infomsg << "Injecting particle vertically over a circle of radius: " << injRadius / CLHEP::m << " m at height: " << zInj / CLHEP::m;
+                Logger::Print(infomsg, INFO, "ComputeInjectionPosition");
+
+                double rand = RandFlat::shoot(0., 1.);
+                double r = injRadius * sqrt(rand);
+                double minPhi = injection.GetInjectionMinPhi() * (CLHEP::pi / 180);
+                double maxPhi = injection.GetInjectionMaxPhi() * (CLHEP::pi / 180);
+                double phi = RandFlat::shoot(minPhi, maxPhi);
+                xInj = r * cos(phi) + x0;
+                yInj = r * sin(phi) + y0;
+
+            } else {
+                xInj = x0;
+                yInj = y0;
+            }
+            break;
+        }
+        case ParticleInjection::eFromFile:
+            if (isDefaultOrigin) {
+                ostringstream infomsg;
+                infomsg << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: in injection mode 'eFromFile', found coordinates for the origin position: (" 
+                        << x0 / CLHEP::m << ", " << y0 / CLHEP::m << ", " << z0 / CLHEP::m 
+                        << ") m. These will be ignored." << endl;
+                Logger::Print(infomsg, WARNING, "ComputeInjectionPosition");
+            }
+
+            if (fUseEcoMug) {
+                Logger::Print("using injection mode 'eFromFile' with EcoMug particle generator might not produce the desired results.", WARNING, "ComputeInjectionPosition");
+            }
+            xInj = currentParticle.GetPosition().at(0);
+            yInj = currentParticle.GetPosition().at(1);
+            zInj = currentParticle.GetPosition().at(2);
+            break;
+        case ParticleInjection::eUnknown:
+        default:
+            xInj = currentParticle.GetPosition().at(0);
+            yInj = currentParticle.GetPosition().at(1);
+            zInj = currentParticle.GetPosition().at(2);
+            break;
     }
-    case SimData::InjectionMode::eFromFile:
-        if (isDefaultOrigin) {
-            cout    << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: in injection mode 'eFromFile', found coordinates for the origin position: (" 
-                    << x0 / CLHEP::m << ", " << y0 / CLHEP::m << ", " << z0 / CLHEP::m 
-                    << ") m. These will be ignored." << endl;
-        }
-
-        if (fUseEcoMug) {
-            cout << "[WARNING] PrimaryGenerator::ComputeInjectionPosition: using injection mode 'eFromFile' with EcoMug particle generator might not produce the desired results." << endl;
-        }
-        xInj = currentParticle.GetPosition().at(0);
-        yInj = currentParticle.GetPosition().at(1);
-        zInj = currentParticle.GetPosition().at(2);
-        break;
-    case SimData::InjectionMode::eUnknown:
-    default:
-        xInj = currentParticle.GetPosition().at(0);
-        yInj = currentParticle.GetPosition().at(1);
-        zInj = currentParticle.GetPosition().at(2);
-        break;
-    
-
-        }
 
     particlePosition = {xInj, yInj, zInj};
     Logger::PrintVector(particlePosition, "Injecting particle at position: ", INFO, "ComputeInjectionPosition");

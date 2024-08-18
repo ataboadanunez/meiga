@@ -2,6 +2,7 @@
 #define SimData_h
 
 #include "Particle.h"
+#include "ParticleInjection.h"
 #include "DetectorSimData.h"
 #include <string>
 #include <vector>
@@ -25,15 +26,6 @@ class SimData
 			eFull = 0,
 			eFast = 1
 		};
-
-		enum class InjectionMode {
-			eUnknown = 0,
-			eCircle = 1,
-			eHalfSphere = 2,
-			eVertical = 3,
-			eFromFile
-		};
-
 
 		typedef std::vector<Particle> ParticleVector;
 		const ParticleVector& GetParticleVector() const { return fParticles; }
@@ -91,49 +83,8 @@ class SimData
 		void SetDetectorPropertiesFile(const std::string file) { fDetectorProperties = file; }
 		std::string GetDetectorPropertiesFile() const { return fDetectorProperties; }
 
-		// getters and setters for ground dimensions
-		/*
-			in Geant4 coordinate system
-			Lenght    along x-axis
-			Width     " " 	y-axis
-			Thickness " " 	z-axis
-		*/
-		void SetGroundLength(const double l) { fGroundLength = l; }
-		double GetGroundLength() { return fGroundLength; }
-
-		void SetGroundWidth(const double w) { fGroundWidth = w; }
-		double GetGroundWidth() { return fGroundWidth; }
-
-		void SetGroundThickness(const double t) { fGroundThickness = t; }
-		double GetGroundThickness() { return fGroundThickness; }
-
-		// settings for particle injection
-		InjectionMode InjectionConversion(std::string name);
-		void SetInjectionMode(const InjectionMode injMode) { fInjectionMode = injMode; }
-		InjectionMode GetInjectionMode() const { return fInjectionMode; }
-		std::string GetInjectionModeName() const { return fInjectionModeName; }
-
-		const std::vector<double>& GetInjectionOrigin() const { return fInjectionOrigin; }
-		void SetInjectionOrigin(const std::vector<double> &pos) { fInjectionOrigin = pos; }
-
-		// for circle & halfsphere injection 
-		void SetInjectionRadius(const double r) { fInjectionRadius = r; }
-		double GetInjectionRadius() { return fInjectionRadius; }
-
-		void SetInjectionHeight(const double h) { fInjectionHeight = h; }
-		double GetInjectionHeight() { return fInjectionHeight; }
-
-		void SetInjectionMinTheta(const double minTh) { fInjectionMinTheta = minTh; }
-		double GetInjectionMinTheta() { return fInjectionMinTheta; }
-
-		void SetInjectionMaxTheta(const double maxTh) { fInjectionMaxTheta = maxTh; }
-		double GetInjectionMaxTheta() { return fInjectionMaxTheta; }
-
-		void SetInjectionMinPhi(const double minPh) { fInjectionMinPhi = minPh; }
-		double GetInjectionMinPhi() { return fInjectionMinPhi; }
-
-		void SetInjectionMaxPhi(const double maxPh) { fInjectionMaxPhi = maxPh; }
-		double GetInjectionMaxPhi() { return fInjectionMaxPhi; }
+		void SetParticleInjection(ParticleInjection aInjection) { fParticleInjection = aInjection; }
+		ParticleInjection& GetParticleInjection() { return fParticleInjection; }
 
 		void SetSeed(const long int aSeed) { fSeed = aSeed; }
 		long int GetSeed() { return fSeed; }
@@ -161,8 +112,8 @@ class SimData
 		std::string fInputModeName;
 		SimulationMode fSimulationMode;
 		std::string fSimulationModeName;
-		InjectionMode  fInjectionMode;
-		std::string fInjectionModeName;
+		
+		ParticleInjection fParticleInjection;
 
 		bool fGeoVis = false;
 		bool fTrajVis = false;
@@ -173,22 +124,6 @@ class SimData
 		std::string fDetectorList; 
 		std::string fDetectorProperties;
 		int fVerbosity = 0;
-
-		double fGroundLength;
-		double fGroundWidth;
-		double fGroundThickness;
-
-		double fInjectionRadius = 0;
-		double fInjectionHeight = 0;
-
-		double fInjectionMinTheta = 0;
-		double fInjectionMaxTheta = 90;
-
-		double fInjectionMinPhi = 0;
-		double fInjectionMaxPhi = 360;
-
-		std::vector<double> fInjectionOrigin;
-
 		long int fSeed = 0;
 };
 

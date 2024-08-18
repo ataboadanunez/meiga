@@ -34,28 +34,6 @@ SimData::InputModeConversion(string name)
 	return SimData::InputMode::eUnknown;
 }
 
-
-SimData::InjectionMode
-SimData::InjectionConversion(string name)
-{
-	
-	fInjectionModeName = name;
-
-	if (name == "eCircle")
-		return SimData::InjectionMode::eCircle;
-	else if (name == "eHalfSphere")
-		return SimData::InjectionMode::eHalfSphere;
-	else if (name == "eVertical")
-		return SimData::InjectionMode::eVertical;
-	else if (name == "eFromFile")
-		return SimData::InjectionMode::eFromFile;
-	else {
-		Logger::Print("Unknown injection type!", ERROR, "InjectionConversion");
-		throw invalid_argument("Invalid injection type.");
-	}
-	return SimData::InjectionMode::eUnknown;
-}
-
 SimData::SimulationMode
 SimData::SimulationModeConversion(string name)
 {

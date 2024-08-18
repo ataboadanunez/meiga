@@ -10,7 +10,7 @@ class Geometry
 
 	public:
 		Geometry();
-		~Geometry();
+		~Geometry() {;}
 
 		static G4ThreeVector ToG4Vector(const std::vector<double>* v, const double unit);
 		static G4ThreeVector ToG4Vector(const std::vector<double>& v, const double unit);

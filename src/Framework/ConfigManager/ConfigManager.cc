@@ -2,6 +2,7 @@
 #include "ConfigManager.h"
 #include "ParticleFiller.h"
 #include "Utilities.h"
+#include "ParticleInjection.h"
 #include "Logger.h"
 // Geant4 headers
 #include "G4UnitsTable.hh"
@@ -37,6 +38,11 @@ ConfigManager::ReadConfigurationFile(Event &aEvent, const string &fConfigFile)
 		Logger::Print("Selected InputMode = eUseEcoMug. An input number of particles is needed.", WARNING, "ReadConfigurationFile");
 		ParticleFiller::FillParticleVector(cfg.fInputNParticles, aEvent);
 	}
+	else {
+		ostringstream msg;
+		msg << "Unknown input mode " << cfg.fInputMode << ". Valid types are: eUserARTI, eUseEcoMug";
+		throw invalid_argument(msg.str());
+	}
 		
 	cfg.fDetectorList  = tree.get<string>("DetectorList", "./DetectorList.xml");
 
@@ -61,6 +67,8 @@ ConfigManager::ReadConfigurationFile(Event &aEvent, const string &fConfigFile)
 	cfg.fSaveComponentsEnergy = tree.get<bool>("Output.SaveComponentsEnergy", false);
 	cfg.fSaveCharge = tree.get<bool>("Output.SaveCharge", false);
 	cfg.fSaveCounts = tree.get<bool>("Output.SaveCounts", false);
+
+	SetupParticleInection(tree, simData);
 }
 
 void
@@ -79,56 +87,7 @@ ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
 	// read XML with detector positions
 	ptree tree;
 	read_xml(fDetectorList, tree);
-
-	// injection settings
-	string injectionBranch = "detectorList.injectionMode";
-	// injection type
-	string injModestr = tree.get<string>(injectionBranch + ".<xmlattr>.type");
-	SimData::InjectionMode injMode = simData.InjectionConversion(injModestr);
-	simData.SetInjectionMode(injMode);
-	msg << "---------- Particle Injection ------------- " << "\n";
-	msg << "Injection Mode: " << simData.GetInjectionModeName() << "\n";
-
-	double posX = GetPropertyFromXML<double>(tree, injectionBranch, "x", 0.0);
-	double posY = GetPropertyFromXML<double>(tree, injectionBranch, "y", 0.0);
-	double posZ = GetPropertyFromXML<double>(tree, injectionBranch, "z", 0.0);
-	vector<double> injectionOrigin = {posX, posY, posZ}; 
-	simData.SetInjectionOrigin(injectionOrigin);
-	msg << "Origin of injection coordinates: " << "\n";
-	msg << "(x0, y0, z0) = (" << posX / CLHEP::m << ", " << posY / CLHEP::m << ", " << posZ / CLHEP::m << ") m" << "\n";
-
- 	// injection radius
-	double defInjRadius = simData.GetInjectionRadius();
-	double xmlInjRadius = GetPropertyFromXML<double>(tree, injectionBranch, "radius", defInjRadius);
-	simData.SetInjectionRadius(xmlInjRadius);
-	msg << "Injection Radius = " << xmlInjRadius / CLHEP::m << " m" << "\n";
-	// injection height
-	double defInjHeight = simData.GetInjectionHeight();
-	double xmlInjHeight = GetPropertyFromXML<double>(tree, injectionBranch, "height", defInjHeight);
-	simData.SetInjectionHeight(xmlInjHeight);
-	msg << "Injection Height = " << xmlInjHeight / CLHEP::m << " m" << "\n";
-	// injection min theta
-	double defMinTheta = simData.GetInjectionMinTheta();
-	double xmlMinTheta = GetPropertyFromXML<double>(tree, injectionBranch, "minTheta", defMinTheta, false);
-	simData.SetInjectionMinTheta(xmlMinTheta);
-	msg << "Injection MinTheta = " << xmlMinTheta << " deg" << "\n"; 
-	// injection max theta
-	double defMaxTheta = simData.GetInjectionMaxTheta();
-	double xmlMaxTheta = GetPropertyFromXML<double>(tree, injectionBranch, "maxTheta", defMaxTheta, false);
-	simData.SetInjectionMaxTheta(xmlMaxTheta);
-	msg << "Injection MaxTheta = " << xmlMaxTheta << " deg" << "\n";
-	// injection min phi
-	double defMinPhi = simData.GetInjectionMinPhi();
-	double xmlMinPhi = GetPropertyFromXML<double>(tree, injectionBranch, "minPhi", defMinPhi, false);
-	simData.SetInjectionMinPhi(xmlMinPhi);
-	msg << "Injection MinPhi = " << xmlMinPhi << " deg" << "\n";
-	// injection max phi
-	double defMaxPhi = simData.GetInjectionMaxPhi();
-	double xmlMaxPhi = GetPropertyFromXML<double>(tree, injectionBranch, "maxPhi", defMaxPhi, false);
-	simData.SetInjectionMaxPhi(xmlMaxPhi);
-	msg << "Injection MaxPhi = " << xmlMaxPhi << " deg" << "\n";
-	msg << "===========================================" << "\n";
-	msg << "===========================================" << "\n";
+	
 	Logger::Print(msg, INFO, "ReadDetectorList");
 	std::cout << "------------ Detector Info -------------- " << "\n";
 	for (const auto& det : tree.get_child("detectorList")) {
@@ -192,4 +151,56 @@ ConfigManager::PrintConfig(const Event::Config &cfg)
 	msg << "==================================" << endl;
 	msg << "==================================" << endl;
 	Logger::Print(msg, INFO, "PrintConfig");
+}
+
+void ConfigManager::SetupParticleInection(const ptree &tree, SimData &aSimData)
+{
+	const auto& injectionTree = tree.get_child("ParticleInjection");
+	// Retrieve the type
+	std::string type;
+	try {
+		type = injectionTree.get<std::string>("Type");
+	} catch (const boost::property_tree::ptree_bad_path& e) {
+		Logger::Print("Type field not found in configuration file: " + std::string(e.what()), ERROR, "SetupParticleInjection");
+	} catch (const std::exception &e) {
+		Logger::Print("An error occurred while retrieveing injection type: " + std::string(e.what()), ERROR, "SetupParticleInjection");
+	}
+	
+	// Create a ParticleInjection object with these values
+	ParticleInjection injection(type);
+
+	// Retrieve the origin as a vector
+	auto originNode = injectionTree.get_child_optional("Origin");
+	if (originNode) {
+		std::vector<double> origin;
+		for (const auto& item: originNode.get()) {
+			origin.push_back(item.second.get_value<double>() * CLHEP::cm);
+		}
+		injection.SetInjectionOrigin(origin);
+	}
+	
+	// additional injection parameters for eCircle and eHalfSphere injection types
+	auto radius = injectionTree.get_optional<double>("Radius");
+	if (radius.has_value()) {
+		injection.SetInjectionRadius(radius.get() * CLHEP::cm);
+	}
+	auto minTheta = injectionTree.get_optional<double>("MinTheta");
+	if (minTheta.has_value())
+		injection.SetInjectionMinTheta(minTheta.get());
+	auto maxTheta = injectionTree.get_optional<double>("MaxTheta");
+	if (maxTheta.has_value())
+		injection.SetInjectionMaxTheta(maxTheta.get());
+	auto minPhi = injectionTree.get_optional<double>("MinPhi");
+	if (minPhi.has_value())
+		injection.SetInjectionMinPhi(minPhi.get());
+	auto maxPhi = injectionTree.get_optional<double>("MaxPhi");
+	if (maxPhi.has_value())
+		injection.SetInjectionMaxPhi(maxPhi.get());
+
+	// Now you can use the 'injection' object as needed
+	if (injection.IsValid()) {
+		aSimData.SetParticleInjection(injection);
+	} else {
+		throw invalid_argument("Invalid ParticleInjection parameters were found in the configuration file.");
+	}
 }

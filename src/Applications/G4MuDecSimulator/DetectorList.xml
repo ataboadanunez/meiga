@@ -1,15 +1,6 @@
 <?xml version='1.0' encoding='ISO-8859-1'?>
 
 <detectorList>
-	
-	<injectionMode type="eCircle">
-		<x unit="m"> 0 </x>
-		<y unit="m"> 0 </y>
-		<z unit="m"> 0 </z>
-		<radius unit="m"> 1.5 </radius>
-		<height unit="m"> 2 </height>
-	</injectionMode>
-	
 
 	<detector id="0" type="eWCD">
 		<x unit="cm"> 0.0 </x>

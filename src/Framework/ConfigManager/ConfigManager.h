@@ -33,6 +33,8 @@ class ConfigManager
 		static void ReadDetectorList(const std::string &filename, Event& theEvent);
 		static void PrintConfig(const Event::Config &cfg);
 
+		static void SetupParticleInection(const ptree &tree, SimData &aSimData);
+
 		// return value giving the XML path
 		template <typename T>
 		inline static T GetPropertyFromXML(const ptree &tree, const string &branchName, const string &property, bool hasUnit = true) {

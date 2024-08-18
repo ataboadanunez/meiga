@@ -15,6 +15,10 @@
 		"SaveCharge" : false
 	},
 	"DetectorList" : "./DetectorList.xml",
+	"ParticleInjection" : {
+		"Type" : "eVertical",
+		"Origin" : [0, 0, 100]
+	},
 	"Simulation" :
 	{
 		"SimulationMode" : "eFull",
