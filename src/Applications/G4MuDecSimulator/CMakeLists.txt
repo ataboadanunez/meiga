@@ -46,13 +46,3 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E copy "${copy_source_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
   COMMENT "Copying ${copy_file_name} to build directory"
 )
-
-# Copying DetectorList.xml from source to build directory
-set(copy_file_name "DetectorList.xml")
-add_custom_command(
-  TARGET G4MuDecSimulator POST_BUILD 
-  COMMAND ${CMAKE_COMMAND} -E copy "${copy_source_dir}/${copy_file_name}" "${copy_dest_dir}/${copy_file_name}"
-  COMMENT "Copying ${copy_file_name} to build directory"
-)
-
-

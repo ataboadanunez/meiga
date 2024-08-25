@@ -50,11 +50,16 @@ ConfigManager::ReadConfigurationFile(Event &aEvent, const string &fConfigFile)
 	simData.SetSimulationMode(simData.SimulationModeConversion(cfg.fSimulationMode));
 	
 	cfg.fGeoVis  = tree.get<bool>("Simulation.GeoVisOn", false);
+	simData.SetVisualizationGeometry(cfg.fGeoVis);
 	cfg.fTrajVis = tree.get<bool>("Simulation.TrajVisOn", false);
+	simData.SetVisualizationTrajectory(cfg.fTrajVis);
 	cfg.fCheckOverlaps = tree.get<bool>("Simulation.CheckOverlaps", false);
 	cfg.fRenderFile = tree.get<string>("Simulation.RenderFile", "VRML2FILE");
+	simData.SetRenderName(cfg.fRenderFile);
 	cfg.fPhysicsListName = tree.get<string>("Simulation.PhysicsName", "QGSP_BERT_HP");
+	simData.SetPhysicsListName(cfg.fPhysicsListName);
 	cfg.fVerbosity = tree.get<int>("Simulation.Verbosity", 1);
+	simData.SetVerbosity(cfg.fVerbosity);
 
 	cfg.fOutputFileName = tree.get<string>("Output.OutputFile");
 	simData.SetOutputFileName(cfg.fOutputFileName);
@@ -69,50 +74,7 @@ ConfigManager::ReadConfigurationFile(Event &aEvent, const string &fConfigFile)
 	cfg.fSaveCounts = tree.get<bool>("Output.SaveCounts", false);
 
 	SetupParticleInection(tree, simData);
-}
-
-void
-ConfigManager::ReadDetectorList(const string &fDetectorList, Event& theEvent)
-{
-	ostringstream msg;
-	msg << "Reading DetectorList File " << fDetectorList << "\n";
-	// print detector configuration
-	msg << "Using the following detector configuration: " << "\n";
-	msg << "===========================================" << "\n";
-
-	SimData& simData = theEvent.GetSimData();
-	// used to determine maximum value of Z coordinate of current detectors in file
-	double maxHeight = 0.;
-	
-	// read XML with detector positions
-	ptree tree;
-	read_xml(fDetectorList, tree);
-	
-	Logger::Print(msg, INFO, "ReadDetectorList");
-	std::cout << "------------ Detector Info -------------- " << "\n";
-	for (const auto& det : tree.get_child("detectorList")) {
-		if (det.first == "detector") {
-			string detIdstr = det.second.get<string>("<xmlattr>.id");
-			string detTypestr = det.second.get<string>("<xmlattr>.type");
-			int detId = stoi(detIdstr);
-			Detector::DetectorType detType = Detector::StringToType(detTypestr);
-			std::cout << "Reading configuration of detector " << detTypestr << " with ID = " << detId << "\n";
-			// register detector in the Event
-			if (!theEvent.HasDetector(detId)) {
-				theEvent.MakeDetector(detId, detType);
-			}
-			else {
-				Logger::Print("Detector with ID = "+detIdstr+" already registered! IDs must be unique, please check your DetectorList.xml", WARNING, "ReadDetectorList");
-				continue;
-			}
-			
-			Detector& detector = theEvent.GetDetector(detId);
-			detector.SetDetectorProperties(det.second);
-		}
-
-	}
-	std::cout << "===========================================" << endl;
-	std::cout << "===========================================" << endl;
+	SetupDetectorList(tree, aEvent);
 }
 
 void
@@ -203,4 +165,45 @@ void ConfigManager::SetupParticleInection(const ptree &tree, SimData &aSimData)
 	} else {
 		throw invalid_argument("Invalid ParticleInjection parameters were found in the configuration file.");
 	}
+}
+
+void ConfigManager::SetupDetectorList(const ptree &tree, Event &aEvent)
+{
+	try {
+		const auto& detectorTree = tree.get_child("DetectorList");
+		int detectorId = 0;
+		for (const auto &detectorNode : detectorTree) {
+			string detectorType = detectorNode.second.get<string>("Type");
+			vector<double> detectorPosition;
+			for (const auto &coord : detectorNode.second.get_child("Position")) {
+				double value = coord.second.get_value<double>() * CLHEP::cm;
+				detectorPosition.push_back(value);
+			}
+			
+			if (detectorPosition.size() != 3) {
+				throw std::runtime_error("Invalid or missing 'Position' for detector ID: " + std::to_string(detectorId));
+			}
+
+			Detector::DetectorType detType = Detector::StringToType(detectorType);
+			// register detector in the Event
+			if (!aEvent.HasDetector(detectorId)) {
+				aEvent.MakeDetector(detectorId, detType);
+			}
+			else {
+				Logger::Print("Detector with ID = "+std::to_string(detectorId)+" already registered! IDs must be unique, please check the DetectorList configuration.", WARNING, "ReadDetectorList");
+				continue;
+			}
+			
+			Detector& detector = aEvent.GetDetector(detectorId);
+			detector.SetDetectorPosition(detectorPosition);
+			detector.SetDetectorProperties(detectorNode.second);
+
+			detectorId++;
+		}
+
+	} catch (const std::exception &e) {
+		Logger::Print("An Error occurred parsing the DetectorList node: " + std::string(e.what()), ERROR, "SetupDetectorList");
+	}
+	
+
 }

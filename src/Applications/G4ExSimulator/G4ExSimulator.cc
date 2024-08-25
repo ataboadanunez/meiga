@@ -105,7 +105,7 @@ G4ExSimulator::RunSimulation(Event& aEvent)
 
 	// setup ui & visualization managers
 	G4UImanager* uiManager = G4UImanager::GetUIpointer();
-	G4VisManager* visManager = new G4VisExecutive;;
+	G4VisManager* visManager = new G4VisExecutive;
 	SetupManagers(aEvent, *uiManager, *visManager);
 	// for debugging purposes, gammas are not draw:
 	uiManager->ApplyCommand("/vis/filtering/trajectories/create/particleFilter");

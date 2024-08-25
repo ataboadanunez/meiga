@@ -30,10 +30,10 @@ class ConfigManager
 		~ConfigManager() { }
 		// public and static to be called within the applications 'without object'
 		static void ReadConfigurationFile(Event& aEvent, const std::string &filename);
-		static void ReadDetectorList(const std::string &filename, Event& theEvent);
 		static void PrintConfig(const Event::Config &cfg);
 
 		static void SetupParticleInection(const ptree &tree, SimData &aSimData);
+		static void SetupDetectorList(const ptree &tree, Event &aEvent);
 
 		// return value giving the XML path
 		template <typename T>

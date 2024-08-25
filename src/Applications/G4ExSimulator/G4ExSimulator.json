@@ -14,7 +14,18 @@
 		"SavePETimeDistribution" : false,
 		"SaveCharge" : false
 	},
-	"DetectorList" : "./DetectorList.xml",
+	"DetectorList" : [
+		{
+			"Type" : "eScintillator",
+			"Position" : [0, 0, 100],
+			"BarLength" : 20
+		},
+		{
+			"Type" : "eWCD",
+			"Position" : [0, 0, 0],
+			"TankRadius" : 40
+		}
+	],
 	"ParticleInjection" : {
 		"Type" : "eVertical",
 		"Origin" : [0, 0, 100]

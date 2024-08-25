@@ -9,8 +9,6 @@ void G4MBaseApplication::Initialize(Event &aEvent, std::string aFileName)
 	// get simulation simulation settings
 	const Event::Config &cfg = aEvent.GetConfig();
 	ConfigManager::PrintConfig(cfg);
-	// Read Detector Configuration
-	ConfigManager::ReadDetectorList(cfg.fDetectorList, aEvent);
 }
 
 void G4MBaseApplication::WriteEventInfo(Event &aEvent)

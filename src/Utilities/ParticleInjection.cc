@@ -48,22 +48,9 @@ void ParticleInjection::InjectionConversion(std::string aName)
 void ParticleInjection::SetDefaultParameters()
 {
 	fInjectionOrigin = {0, 0, 0};
-	switch (fType) {
-		case InjectionType::eCircle:
-			fInjectionRadius = 0;
-			fInjectionMinPhi = 0;
-			fInjectionMaxPhi = 360;
-			break;
-		case InjectionType::eHalfSphere:
-			fInjectionRadius = 0;
-			fInjectionMinTheta = 0;
-			fInjectionMaxTheta = 90;
-			fInjectionMinPhi = 0;
-			fInjectionMaxPhi = 360;			
-			break;
-		case InjectionType::eVertical:
-			break;
-		case InjectionType::eFromFile:
-			break;
-	}
+	fInjectionRadius = 0;
+	fInjectionMinTheta = 0;
+	fInjectionMaxTheta = 90;
+	fInjectionMinPhi = 0;
+	fInjectionMaxPhi = 360;	
 }

@@ -16,7 +16,20 @@
 		"SaveCharge" : false,
 		"SavePETimeDistribution" : false
 	},
-	"DetectorList" : "./DetectorList.xml",
+	"DetectorList" : [
+		{
+			"Type" : "eHodoscope",
+			"Position" : [0, 0, 0]
+		},
+		{
+			"Type" : "eHodoscope",
+			"Position" : [0, 0, 100]
+		},
+		{
+			"Type" : "eHodoscope",
+			"Position" : [0, 0, -100]
+		}
+	],
 	"ParticleInjection" : {
 		"Type" : "eCircle",
 		"Origin" : [0, 0, 150],

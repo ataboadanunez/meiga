@@ -177,58 +177,44 @@ void WCD::SetDefaultProperties()
 
 void WCD::SetDetectorProperties(const boost::property_tree::ptree &aTree)
 {
-	vector<double> detPosition;
-	detPosition.reserve(3);
-
-	for (const auto& property : aTree) {
-		string xmlLabel = property.first;
-		string xmlValue = property.second.data();
-
-		if(xmlLabel == "<xmlattr>")
+	for (const auto &property : aTree) {
+		
+		const string oKey = property.first;
+		string key = oKey;
+		std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+		
+		if (key == "type" || key == "position") {
 			continue;
-		if(xmlLabel == "<xmlcomment>")
-			continue;
-
-		if ( xmlLabel == "x" || xmlLabel == "y" || xmlLabel == "z") {
-			string value = property.second.data();
-			boost::algorithm::trim(value);
-			double dValue = stod(value);
-			string unit = property.second.get<string>("<xmlattr>.unit");
-			double coord = G4UnitDefinition::GetValueOf(unit) * dValue;
-			detPosition.push_back(coord);
-		} else if (xmlLabel == "tankRadius") {
-				double value = stod(xmlValue);
-				double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
-				fOverwrittenPropertiesVector.push_back(xmlLabel);
-				SetTankRadius(value * unit);
-			}
-			else if (xmlLabel == "tankHeight") {
-				double value = stod(xmlValue);
-				double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
-				fOverwrittenPropertiesVector.push_back(xmlLabel);
-				SetTankHeight(value * unit);
-			}
-			else if (xmlLabel == "tankThickness") {
-				double value = stod(xmlValue);
-				double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
-				fOverwrittenPropertiesVector.push_back(xmlLabel);
-				SetTankThickness(value * unit);
-			}
-			else if (xmlLabel == "impuritiesFraction") {
-				double value = stod(xmlValue);
-				fOverwrittenPropertiesVector.push_back(xmlLabel);
-				SetImpuritiesFraction(value);
-			}
-			else {
-				ostringstream msg;
-				msg << xmlLabel << " is not a property of detector " << TypeToString(fType) << ". Skipping...";
-				Logger::Print(msg, WARNING, "SetDetectorProperties");
 		}
+
+		if (key == "tankradius") {
+			double value = property.second.get_value<double>() * CLHEP::cm;
+			fOverwrittenPropertiesVector.emplace(oKey, value);
+			SetTankRadius(value);
+		} else if (key == "tankheight") {
+			double value =  property.second.get_value<double>() * CLHEP::cm;
+			fOverwrittenPropertiesVector.emplace(oKey, value);
+			SetTankHeight(value);
+		} else if (key == "tankthickness") {
+			double value =  property.second.get_value<double>() * CLHEP::cm;
+			fOverwrittenPropertiesVector.emplace(oKey, value);
+			SetTankThickness(value);
+		} else if (key == "impuritiesfraction") {
+			double value =  property.second.get_value<double>();
+			fOverwrittenPropertiesVector.emplace(oKey, value);
+			SetImpuritiesFraction(value);
+		} else {
+			Logger::Print("Unsupported property " + oKey + " for detector " + fName, WARNING, "SetDetectorProperties");
+		}	
 	}
-	SetDetectorPosition(detPosition);
+
 	Logger::PrintVector(fDetectorPosition, "Detector position: ", INFO, "SetDetectorProperties");
-	
 	if(!fOverwrittenPropertiesVector.empty()) {
-		Logger::PrintVector(fOverwrittenPropertiesVector, "Overwritten properties for detector " + TypeToString(fType), INFO, "SetDetectorProperties");
+		ostringstream msg;
+		msg << "Overwritten properties for detector " << TypeToString(fType) << ": " << endl;
+		for (const auto value : fOverwrittenPropertiesVector) {
+			msg << value.first << " = " << value.second << endl;
+		}
+		Logger::Print(msg, INFO, "SetDetectorProperties");
 	}
 }

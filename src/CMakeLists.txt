@@ -5,6 +5,7 @@ endif()
 
 project(meiga VERSION 3.0)
 set(MEIGA_VERSION "${PROJECT_VERSION}" CACHE INTERNAL "Meiga project version")
+set(CMAKE_BUILD_TYPE Debug)
 
 # set(CMAKE_BUILD_TYPE Debug)
 set(CONFIG_FILE_PATH "${CMAKE_SOURCE_DIR}/Config/" CACHE STRING "Path to configuration files")

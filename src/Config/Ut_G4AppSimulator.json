@@ -8,17 +8,23 @@
 	
 	"Output" : 
 	{
-		"OutputFile" : "",
+		"OutputFile" : "test.json",
 		"CompressOutput" : true,
-		"SavePETimeDistribution" : true,
+		"SavePETimeDistribution" : false,
 		"SaveComponentsPETimeDistribution" : false,
-		"SaveEnergy" : false,
+		"SaveEnergy" : true,
 		"SaveComponentsEnergy" : false
 	},
-	"DetectorList" : "./DetectorList.xml",
+	"DetectorList" : [
+		{
+			"Type" : "eScintillator",
+			"Position" : [-1.0, 2.0, 0],
+			"NumberOfBars" : 8
+		}
+	],
 	"ParticleInjection" : {
 		"Type" : "eVertical",
-		"Origin" : [0.0, 0.0, 100]
+		"Origin" : [0.0, 0.0, 10]
 	},
 	"Simulation" :
 	{

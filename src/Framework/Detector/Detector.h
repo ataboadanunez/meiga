@@ -57,7 +57,7 @@ public:
 	
 	void SetType(Detector::DetectorType type) { fType = type; }
 	DetectorType GetType() const { return fType; }
-	bool isValid() { return fType != DetectorType::eUnknown; }
+	bool IsValid() { return fType != DetectorType::eUnknown; }
 	
 	static DetectorType StringToType(const std::string name);
 	static std::string TypeToString(const DetectorType aType);
@@ -98,7 +98,7 @@ public:
 		std::map<int, OptDevice> fOptDeviceMap;
 		std::map<OptDevice::DeviceType, OptDevice> fOptDeviceMapT;
 		std::map<std::string, G4LogicalVolume*> fLogicalVolumeMap;
-		std::vector<std::string> fOverwrittenPropertiesVector;
+		std::map<std::string, double> fOverwrittenPropertiesVector;
 };
 
 #endif

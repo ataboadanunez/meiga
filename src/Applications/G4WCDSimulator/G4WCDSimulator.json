@@ -16,7 +16,12 @@
 		"SaveCharge" : true
 	
 	},
-	"DetectorList" : "./DetectorList.xml",
+	"DetectorList" : [
+		{
+			"Type" : "eWCD",
+			"Position" : [0, 0, 0]
+		}
+	],
 	"ParticleInjection" : {
 		"Type" : "eCircle",
 		"Origin" : [0, 0, 200],

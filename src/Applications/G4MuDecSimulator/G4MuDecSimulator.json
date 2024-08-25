@@ -13,7 +13,14 @@
 		"SaveComponentsPETimeDistribution" : true,
 		"SaveEnergy" : true
 	},
-	"DetectorList" : "./DetectorList.xml",
+	"DetectorList" : [
+		{
+			"Type" : "eWCD",
+			"Position" : [0, 0, 0],
+			"TankRadius" : 78,
+			"TankHeight" : 158
+		}
+	],
 	"ParticleInjection" : {
 		"Type" : "eCircle",
 		"Origin" : [0, 0, 200],

@@ -124,104 +124,64 @@ void Scintillator::SetDefaultProperties()
 
 void Scintillator::SetDetectorProperties(const boost::property_tree::ptree &aTree)
 {
-	vector<double> detPosition;
-	detPosition.reserve(3);
-
-	for (const auto& property : aTree) {
-		string xmlLabel = property.first;
-		string xmlValue = property.second.data();
-
-		if(xmlLabel == "<xmlattr>")
-			continue;
-		if(xmlLabel == "<xmlcomment>")
-			continue;
-
-		if ( xmlLabel == "x" || xmlLabel == "y" || xmlLabel == "z") {
-			string value = property.second.data();
-			boost::algorithm::trim(value);
-			double dValue = stod(value);
-			string unit = property.second.get<string>("<xmlattr>.unit");
-			double coord = G4UnitDefinition::GetValueOf(unit) * dValue;
-			detPosition.push_back(coord);
-		} else if (xmlLabel == "numberOfBars") {
-			int value = stoi(xmlValue);
-			fOverwrittenPropertiesVector.push_back(xmlLabel);
-			SetNBars(value);
-		}
-		else if (xmlLabel == "barLength") {
-			double value = stod(xmlValue);
-			double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
-			fOverwrittenPropertiesVector.push_back(xmlLabel);
-			SetBarLength(value * unit);
-		}
-		else if (xmlLabel == "barWidth") {
-			double value = stod(xmlValue);
-			double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
-			fOverwrittenPropertiesVector.push_back(xmlLabel);
-			SetBarWidth(value * unit);
-		}
-		else if (xmlLabel == "barThickness") {
-			double value = stod(xmlValue);
-			double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
-			fOverwrittenPropertiesVector.push_back(xmlLabel);
-			SetBarThickness(value * unit);
-		}
-		else if (xmlLabel == "coatingThickness") {
-			double value = stod(xmlValue);
-			double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
-			fOverwrittenPropertiesVector.push_back(xmlLabel);
-			SetBarCoatingThickness(value * unit);
-		}
-		else if (xmlLabel == "casingThickness") {
-			double value = stod(xmlValue);
-			double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
-			fOverwrittenPropertiesVector.push_back(xmlLabel);
-			SetCasingThickness(value * unit);
-		}
-		else if (xmlLabel == "rotationAngle") {
-			double value = stod(xmlValue);
-			SetRotationAngle(value);
-		}
-		else if (xmlLabel == "fiberLength") {
-			double value = stod(xmlValue);
-			double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
-			fOverwrittenPropertiesVector.push_back(xmlLabel);
-			SetFiberLength(value * unit);
-		}
-		else if (xmlLabel == "fiberRadius") {
-			double value = stod(xmlValue);
-			double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
-			fOverwrittenPropertiesVector.push_back(xmlLabel);
-			SetFiberRadius(value * unit);
-		}
-		else if (xmlLabel == "claddingThickness") {
-			double value = stod(xmlValue);
-			double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
-			fOverwrittenPropertiesVector.push_back(xmlLabel);
-			SetCladdingThickness(value * unit);
-		}
-		else if (xmlLabel == "distancePanels") {
-			double value = stod(xmlValue);
-			double unit = G4UnitDefinition::GetValueOf(property.second.get<string>("<xmlattr>.unit"));
-			fOverwrittenPropertiesVector.push_back(xmlLabel);
-			SetDistanceBtwPanels(value * unit);
-		}
-		else if (xmlLabel == "numberOfPanels") {
-			int value = stoi(xmlValue);
-			fOverwrittenPropertiesVector.push_back(xmlLabel);
-			SetNPanels(value);
-		}
-		else {
-			ostringstream msg;
-			msg << xmlLabel << " is not a property of detector " << TypeToString(fType) << ". Skipping...";
-			Logger::Print(msg, WARNING, "SetDetectorProperties");
-		}
-	}
-	SetDetectorPosition(detPosition);
-	Logger::PrintVector(fDetectorPosition, "Detector position: ", INFO, "SetDetectorProperties");
 	
+	for (const auto &property : aTree) {
+		
+		const string oKey = property.first;
+		string key = oKey;
+		std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+		
+		if (key == "type" || key == "position") {
+			continue;
+		}
+
+		if (key == "numberofbars") {
+			int value = property.second.get_value<int>();
+			fOverwrittenPropertiesVector.emplace(oKey, (double)value);
+			SetNBars(value);
+		} else if (key == "barlength") {
+			double value =  property.second.get_value<double>() * CLHEP::cm;
+			fOverwrittenPropertiesVector.emplace(oKey, value);
+			SetBarLength(value);
+		} else if (key == "barwidth") {
+			double value =  property.second.get_value<double>() * CLHEP::cm;
+			fOverwrittenPropertiesVector.emplace(oKey, value);
+			SetBarWidth(value);
+		} else if (key == "barthickness") {
+			double value =  property.second.get_value<double>() * CLHEP::cm;
+			fOverwrittenPropertiesVector.emplace(oKey, value);
+			SetBarThickness(value);
+		} else if (key == "fiberlength") {
+			double value =  property.second.get_value<double>() * CLHEP::cm;
+			fOverwrittenPropertiesVector.emplace(oKey, value);
+			SetFiberLength(value);
+		} else if (key == "rotationangle") {
+			double value =  property.second.get_value<double>();
+			fOverwrittenPropertiesVector.emplace(oKey, value);
+			SetRotationAngle(value);
+		} else if (key == "distancepanels") {
+			double value =  property.second.get_value<double>() * CLHEP::cm;
+			fOverwrittenPropertiesVector.emplace(oKey, value);
+			SetDistanceBtwPanels(value);
+		} else if (key == "numberofpanels") {
+			int value =  property.second.get_value<int>();
+			fOverwrittenPropertiesVector.emplace(oKey, (double)value);
+			SetNPanels(value);
+		} else {
+			Logger::Print("Unsupported property " + oKey + " for detector " + fName, WARNING, "SetDetectorProperties");
+			continue;
+		}
+		
+	}
+
+	Logger::PrintVector(fDetectorPosition, "Detector position: ", INFO, "SetDetectorProperties");
 	if(!fOverwrittenPropertiesVector.empty()) {
-		Logger::PrintVector(fOverwrittenPropertiesVector, "Overwritten properties for detector " + TypeToString(fType), INFO, "SetDetectorProperties");
+		ostringstream msg;
+		msg << "Overwritten properties for detector " << TypeToString(fType) << ": " << endl;
+		for (const auto value : fOverwrittenPropertiesVector) {
+			msg << value.first << " = " << value.second << endl;
+		}
+		Logger::Print(msg, INFO, "SetDetectorProperties");
 	}
 }
 
