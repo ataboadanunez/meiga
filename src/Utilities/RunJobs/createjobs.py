@@ -215,8 +215,8 @@ def PrepareConfigFile(job_dir, nlines):
 			
 		infile 	= path.join(jobpath, inputFileName)
 		cfgfile = path.join(jobpath, cfgFileName)
-		detlist = path.join(jobpath, 'DetectorList.xml')
-		detprop = path.join(jobpath, 'DetectorProperties.xml')
+		#detlist = path.join(jobpath, 'DetectorList.xml')
+		#detprop = path.join(jobpath, 'DetectorProperties.xml')
 		outfile = path.join(jobpath, outputFileName)
 
 		# flags to be replaced in the configuration file
@@ -224,9 +224,7 @@ def PrepareConfigFile(job_dir, nlines):
 							"@INPUTMODE@" : ('UseEcoMug' if ((nlines != 0) and (inputFileName == '')) else 'UseARTI'),
 							"@INPUTFILE@" : ('' if ((nlines != 0) and (inputFileName == '')) else infile),
 							"@NPARTICLES@" : nlines,
-							"@OUTPUTFILE@" : outfile,
-							"@DETECTORLIST@" : detlist,
-							"@DETECTORPROPERTIES@" : detprop
+							"@OUTPUTFILE@" : outfile
 						 }
 
 		# read json file and replace the key flags
@@ -242,8 +240,6 @@ def PrepareConfigFile(job_dir, nlines):
 		copydata['Input']['InputFileName'] = flags['@INPUTFILE@']		
 		copydata['Input']['InputNParticles'] = flags['@NPARTICLES@']
 		copydata['Output']['OutputFile'] = flags['@OUTPUTFILE@']
-		copydata['DetectorList'] = flags['@DETECTORLIST@']
-		copydata['DetectorProperties'] = flags['@DETECTORPROPERTIES@']
 
 		# check that copy and original have the same keys
 		if not data.keys() == copydata.keys():
@@ -285,15 +281,14 @@ def main():
 	"""
 
 	parser = argparse.ArgumentParser(description='This script creates job directories to run multiple simulations in parallel.', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-	#parser.add_argument("-e", dest="inext",
-		#help="input file extension", default=None, required=True)
+	
 	parser.add_argument("-i", dest="infile",
 		help="full path to input file and filename with extension. Example: /home/user/file.shw", default=None, required=False)
-	parser.add_argument("-n", dest="nlines",
-		help="number of lines to split input file", default=100000)
 	parser.add_argument("-p", dest="inpart",
 		help="number of particles to be simulated in case no input file is given", default=0, required=False)
-
+	
+	parser.add_argument("-n", dest="nlines",
+		help="number of lines to split input file", default=100000)
 	parser.add_argument("-b", dest="basedir",
 		help="base directory (containing Executable and cfg files)", default=None, required=True)
 	parser.add_argument("-j", dest="jobdir",
@@ -315,7 +310,7 @@ def main():
 	nlines = int(options.nlines)
 	#filext    = options.inext
 	if not input_file and not input_part:
-		print("[ERROR] Input file or Input number of particles must be given!")
+		print("[ERROR] Input File (-i) or Input Number of Particles (-p) must be given!")
 		return False
 
 	print("[INFO] Running createjobs script with the following options:\n")
