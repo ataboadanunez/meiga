@@ -21,7 +21,6 @@ using boost::property_tree::ptree;
 
 
 const string cConfigFilename = Utilities::ConcatenatePaths(GetConfigFilePath(), "Ut_G4AppSimulator.json");
-const string cDetectorFilename = Utilities::ConcatenatePaths(GetConfigFilePath(), "Ut_DetectorList.xml");
 ptree fTree;
 const G4long cSeed = 123456789;
 
@@ -161,11 +160,9 @@ namespace
 		return true;
 	}
 
-	bool test_ReadDetectorList(Event &aEvent) {
-
+	bool test_ParticleInjection(Event &aEvent) {
 		try {
 			SimData &simData = aEvent.GetSimData();
-			// ConfigManager::SetupParticleInection(fTree, simData);
 			ParticleInjection &injection = simData.GetParticleInjection();
 			compareBool(true, injection.IsValid(), "InjectionValid");
 			compareInteger(ParticleInjection::eVertical, injection.GetInjectionType(), "InjectionType");
@@ -173,8 +170,17 @@ namespace
 			compareValues(0.0 * CLHEP::m, injectionOrigin.at(0), "InjectionOrigin_0");
 			compareValues(0.0 * CLHEP::m, injectionOrigin.at(1), "InjectionOrigin_1");
 			compareValues(0.1 * CLHEP::m, injectionOrigin.at(2), "InjectionOrigin_2");
-			// ConfigManager::SetupDetectorList(fTree, aEvent);
-			// get instances of Detector with ID 0
+		} catch (std::exception &e) {
+			Logger::Print("FAIL: " + std::string(e.what()), ERROR, "test_ParticleInjection");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool test_DetectorList(Event &aEvent) {
+
+		try {
 			Detector& detector = aEvent.GetDetector(0);
 			compareBool(true, detector.IsValid(), "DetectorValid");
 			compareInteger(Detector::eScintillator, detector.GetType(), "DetectorType");
@@ -188,7 +194,7 @@ namespace
 			assert(nBars == 8);
 			
 		} catch (std::exception &e) {
-			Logger::Print("FAIL: " + std::string(e.what()), ERROR, "test_ReadDetectorList");
+			Logger::Print("FAIL: " + std::string(e.what()), ERROR, "test_DetectorList");
 			return false;
 		}
 
@@ -236,13 +242,15 @@ int main(int argc, char** argv)
 {
 	bool configTestPass;
 	bool injectionTestPass;
+	bool detectorTestPass;
 	bool simulationTestPass;
 	bool primaryTestPass;
 
 	read_json(cConfigFilename, fTree);
 	Event event;
 	configTestPass = test_ReadConfigurationFile(event);
-	injectionTestPass = test_ReadDetectorList(event);
+	injectionTestPass = test_ParticleInjection(event);
+	detectorTestPass = test_DetectorList(event);
 	simulationTestPass = test_G4Simulation(event);
 	SimData &simData = event.GetSimData();
 	primaryTestPass = test_PrimaryGenerator(simData);
@@ -250,7 +258,8 @@ int main(int argc, char** argv)
 	ostringstream msg;
 	msg << "Summary of Unit Tests: " << endl;
 	msg << "test_ReadConfigurationFile: " << (configTestPass ? "PASS" : "FAIL") << endl;
-	msg << "test_ReadDetectorList: " << (injectionTestPass ? "PASS" : "FAIL") << endl;
+	msg << "test_ParticleInjection: " << (injectionTestPass ? "PASS" : "FAIL") << endl;
+	msg << "test_DetectorList: " << (detectorTestPass ? "PASS" : "FAIL") << endl;
 	msg << "test_G4simulation: " << (simulationTestPass ? "PASS" : "FAIL") << endl;
 	msg << "test_PrimaryGenerator: " << (primaryTestPass ? "PASS" : "FAIL") << endl;
 	
