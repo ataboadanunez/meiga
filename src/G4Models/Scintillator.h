@@ -25,7 +25,9 @@ class Scintillator : public Detector
 
 	public:
 		Scintillator(const int id, const Detector::DetectorType type);
+		virtual ~Scintillator();
 		virtual void BuildDetector(G4LogicalVolume *logMother, Event& aEvent, G4bool overlaps = false) override;
+		void ConstructSensitiveDetector(Detector &aDetector, Event &aEvent);
 	
 		virtual void SetDefaultProperties() override;
 		virtual void SetDetectorProperties(const boost::property_tree::ptree &aTree) override;
@@ -68,6 +70,7 @@ class Scintillator : public Detector
 		double GetRotationAngle() const { return fRotationAngle; }
 		void SetRotationAngle(double angle);
 
+private:
 		double fBarWidth;
 		double fBarLength;
 		double fBarThickness;
@@ -80,6 +83,8 @@ class Scintillator : public Detector
 		int    fNumberOfBars;
 		int    fNumberOfPanels;
 		double fDistancePanels;
+
+	static G4LogicalVolume* fLogScinBar;
 };
 
 #endif

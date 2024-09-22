@@ -1,6 +1,7 @@
 // Meiga headers
 #include "Scintillator.h"
 #include "Geometry.h"
+#include "Utilities.h"
 #include "G4MDetectorAction.h"
 #include "ConfigManager.h"
 
@@ -15,6 +16,7 @@
 using namespace std;
 using boost::property_tree::ptree;
 
+G4LogicalVolume* Scintillator::fLogScinBar = nullptr;
 
 Scintillator::Scintillator(const int id, const Detector::DetectorType type) :
 	Detector(id, type)
@@ -22,6 +24,12 @@ Scintillator::Scintillator(const int id, const Detector::DetectorType type) :
 	fName = "Scintillator";
 	fOverwrittenPropertiesVector.clear();
 	SetDefaultProperties();
+}
+
+Scintillator::~Scintillator()
+{
+	if(fLogScinBar)
+		delete fLogScinBar;
 }
 
 void Scintillator::BuildDetector(G4LogicalVolume *logMother, Event &aEvent, G4bool fCheckOverlaps)
@@ -44,7 +52,7 @@ void Scintillator::BuildDetector(G4LogicalVolume *logMother, Event &aEvent, G4bo
 
 	// logical volumes
 	G4LogicalVolume* logicCoating = nullptr;
-	G4LogicalVolume* logicScinBar = nullptr;
+	// G4LogicalVolume* logicScinBar = nullptr;
 
 	// following variables are read from Detector class
 	G4double fCoatingThickness = GetBarCoatingThickness();
@@ -64,7 +72,7 @@ void Scintillator::BuildDetector(G4LogicalVolume *logMother, Event &aEvent, G4bo
 
 	// logical volumes
 	logicCoating = new G4LogicalVolume(solidCoating, Materials().ScinCoating, "BarCoating", 0, 0, 0);
-	logicScinBar = new G4LogicalVolume(solidScinBar, Materials().ScinPlastic, "BarScin", 0, 0, 0);
+	fLogScinBar = new G4LogicalVolume(solidScinBar, Materials().ScinPlastic, "BarScin", 0, 0, 0);
 
 	// bars placement
 	for (G4int i=0; i<fNBars; ++i) {
@@ -81,20 +89,28 @@ void Scintillator::BuildDetector(G4LogicalVolume *logMother, Event &aEvent, G4bo
 		// shift each bar position by 1/2 of the panel width to center the detector
 		yPos -= fHalfWidth;
 
-		
-
 		// physical volumes
 		new G4PVPlacement(nullptr, G4ThreeVector(detectorPos.getX(), yPos, detectorPos.getZ()), logicCoating, 
 			nameCoating, logMother, false, barId, fCheckOverlaps);
-		new G4PVPlacement(nullptr, G4ThreeVector(), logicScinBar, 
+		new G4PVPlacement(nullptr, G4ThreeVector(), fLogScinBar, 
 			nameScinBar, logicCoating, false, barId, fCheckOverlaps);
 
   }
+	if(!Utilities::IsMultiThread()) {
+		// register scintillator bar as sensitive detector
+		G4MDetectorAction* const scinSD = new G4MDetectorAction("BarScin", detectorId, aEvent);
+		sdMan->AddNewDetector(scinSD);
+		fLogScinBar->SetSensitiveDetector(scinSD);
+	}
+}
 
-  	// register scintillator bar as sensitive detector
-	G4MDetectorAction* const scinSD = new G4MDetectorAction("BarScin", detectorId, aEvent);
+void Scintillator::ConstructSensitiveDetector(Detector &aDetector, Event &aEvent)
+{
+	// register scintillator bar as sensitive detector
+	auto sdMan = G4SDManager::GetSDMpointer();
+	G4MDetectorAction* const scinSD = new G4MDetectorAction("BarScin", aDetector.GetId(), aEvent);
 	sdMan->AddNewDetector(scinSD);
-	logicScinBar->SetSensitiveDetector(scinSD);
+	fLogScinBar->SetSensitiveDetector(scinSD);
 }
 
 void Scintillator::SetDefaultProperties()

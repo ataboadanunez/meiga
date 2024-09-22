@@ -28,6 +28,7 @@ class WCD : public Detector
 
 public:
 	WCD(const int id, const DetectorType type);
+	virtual ~WCD();
 	virtual void BuildDetector(G4LogicalVolume *logMother, Event &aEvent, G4bool overlaps = false) override;
 	static void ConstructSensitiveDetector(Detector &aDetector, Event &aEvent);
 

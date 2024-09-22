@@ -1,5 +1,6 @@
 #include "WCD.h"
 #include "Geometry.h"
+#include "Utilities.h"
 #include "G4MDetectorAction.h"
 #include "G4MPMTAction.h"
 #include "ConfigManager.h"
@@ -25,6 +26,14 @@ WCD::WCD(const int id, const DetectorType type) :
 	fName = "WCD";
 	fOverwrittenPropertiesVector.clear();
 	SetDefaultProperties();
+}
+
+WCD::~WCD()
+{
+	if(fLogTank)
+		delete fLogTank;
+	if(fLogPMT)
+		delete fLogPMT;
 }
 
 void WCD::BuildDetector(G4LogicalVolume *aLogMother, Event &aEvent, G4bool aCheckOVerlaps)
@@ -127,16 +136,18 @@ void WCD::BuildDetector(G4LogicalVolume *aLogMother, Event &aEvent, G4bool aChec
 	fFullName.str("");
 	fFullName << "/WCD_"+to_string(detectorId) << "/" << optName;
 
-	// // register PMT as sensitive detector
-	auto sdMan = G4SDManager::GetSDMpointer();	
-	G4MPMTAction* const pmtSD = new G4MPMTAction(fFullName.str().c_str(), detectorId, pmtId, aEvent);
-	sdMan->AddNewDetector(pmtSD);
-	fLogPMT->SetSensitiveDetector(pmtSD);
+	// register PMT as sensitive detector
+	if(!Utilities::IsMultiThread()) {
+		auto sdMan = G4SDManager::GetSDMpointer();
+		G4MPMTAction* const pmtSD = new G4MPMTAction(fFullName.str().c_str(), detectorId, pmtId, aEvent);
+		sdMan->AddNewDetector(pmtSD);
+		fLogPMT->SetSensitiveDetector(pmtSD);
 
-	// register water volume as sensitive detector
-	G4MDetectorAction* const waterSD = new G4MDetectorAction(fNameDetector.str().c_str(), detectorId, aEvent);
-	sdMan->AddNewDetector(waterSD);
-	fLogTank->SetSensitiveDetector(waterSD);
+		// register water volume as sensitive detector
+		G4MDetectorAction* const waterSD = new G4MDetectorAction(fNameDetector.str().c_str(), detectorId, aEvent);
+		sdMan->AddNewDetector(waterSD);
+		fLogTank->SetSensitiveDetector(waterSD);
+	}
 	
 }
 
