@@ -356,13 +356,13 @@ class SimDataReader:
 					detector_data = self._parent_simdata[eventkey].get(detectorkey)
 
 					if detector_data is None:
-						print('[WARNING] get_charge(): There is no data from detector ', detectorkey)
+						print('[WARNING] get_pe_time_distribution(): There is no data from detector ', detectorkey)
 						return
 
 					od_data = detector_data.get(optdevicekey)
 
 					if od_data is None:
-						print('[WARNING] get_charge(): There is no data from opt device ', optdevicekey, " in detector ", detectorkey)
+						print('[WARNING] get_pe_time_distribution(): There is no data from opt device ', optdevicekey, " in detector ", detectorkey)
 						return
 
 					pe_time = od_data.get("PETimeDistribution")
@@ -394,13 +394,13 @@ class SimDataReader:
 					detector_data = self._parent_simdata[eventkey].get(detectorkey)
 
 					if detector_data is None:
-						print('[WARNING] get_charge(): There is no data from detector ', detectorkey)
+						print('[WARNING] get_pe_time_distribution(): There is no data from detector ', detectorkey)
 						return
 
 					od_data = detector_data.get(optdevicekey)
 
 					if od_data is None:
-						print('[WARNING] get_charge(): There is no data from opt device ', optdevicekey, " in detector ", detectorkey)
+						print('[WARNING] get_pe_time_distribution(): There is no data from opt device ', optdevicekey, " in detector ", detectorkey)
 						return
 
 					pe_time = od_data.get("PETimeDistribution_%s" %component)
