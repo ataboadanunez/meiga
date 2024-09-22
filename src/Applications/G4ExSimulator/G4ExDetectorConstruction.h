@@ -35,6 +35,8 @@ class G4ExDetectorConstruction : public G4VUserDetectorConstruction {
 		G4ExDetectorConstruction(Event& theEvent);
 		virtual ~G4ExDetectorConstruction();
 		virtual G4VPhysicalVolume* Construct();
+		// for MT
+		void ConstructSDandField(); 
 
 	private:
 		

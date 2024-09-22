@@ -21,5 +21,6 @@ G4ExActionInitialization::Build() const
 {
     SetUserAction(new G4MPrimaryGeneratorAction(fEvent));
     SetUserAction(new G4ExEventAction());
+    SetUserAction(new G4ExRunAction());
     SetUserAction(new G4ExSteppingAction());
 }
