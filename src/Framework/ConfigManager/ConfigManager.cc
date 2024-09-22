@@ -38,13 +38,15 @@ ConfigManager::ReadConfigurationFile(Event &aEvent, const string &fConfigFile)
 		Logger::Print("Selected InputMode = eUseEcoMug. An input number of particles is needed.", WARNING, "ReadConfigurationFile");
 		ParticleFiller::FillParticleVector(cfg.fInputNParticles, aEvent);
 	}
-	else {
+	else if (simData.GetInputMode() == SimData::InputMode::eGPS) {
+		Logger::Print("Selected InputMode = eGPS. A macro file is needed.", WARNING, "ReadConfigurationFile");
+	} else {
 		ostringstream msg;
-		msg << "Unknown input mode " << cfg.fInputMode << ". Valid types are: eUserARTI, eUseEcoMug";
+		msg << "Unknown input mode " << cfg.fInputMode << ". Valid types are: UseARTI, UseEcoMug, GPS";
 		throw invalid_argument(msg.str());
 	}
 		
-	cfg.fDetectorList  = tree.get<string>("DetectorList", "./DetectorList.xml");
+	// cfg.fDetectorList  = tree.get<string>("DetectorList", "./DetectorList.xml");
 
 	cfg.fSimulationMode = tree.get<string>("Simulation.SimulationMode", "eFull");
 	simData.SetSimulationMode(simData.SimulationModeConversion(cfg.fSimulationMode));

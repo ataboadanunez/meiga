@@ -8,6 +8,7 @@ using namespace std;
 SimData::SimData()
 {
 	fParticles.clear();
+	fEventCounter = -1;
 }
 
 SimData::~SimData()
@@ -20,11 +21,12 @@ SimData::InputModeConversion(string name)
 {
 
 	fInputModeName = name;
-
 	if (name == "UseARTI")
 		return SimData::InputMode::eUseARTI;
 	else if (name == "UseEcoMug")
 		return SimData::InputMode::eUseEcoMug;
+	else if (name == "GPS")
+		return SimData::InputMode::eGPS;
 	else {
 		ostringstream msg;
 		msg << "Unknown input mode: " + name;

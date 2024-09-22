@@ -77,13 +77,14 @@ G4HodoscopeSimulator::RunSimulation(Event& aEvent)
 	SimData& simData = aEvent.GetSimData();
 	const unsigned int numberOfParticles = simData.GetTotalNumberOfParticles();
 	ostringstream msg;
-	if (!numberOfParticles) {
+	if (!numberOfParticles && simData.GetInputMode() != SimData::InputMode::eGPS) {
 		msg << "No particles in the Event! Exiting...";
 		Logger::Print(msg, ERROR, "RunSimulation");	
 		return false;
+	} else {
+		msg << "Number of particles to be simulated: " << numberOfParticles;
+		Logger::Print(msg, INFO, "RunSimulation");
 	}
-	msg << "Number of particles to be simulated: " << numberOfParticles;
-	Logger::Print(msg, INFO, "RunSimulation");
 	
 	G4long myseed = time(NULL);
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
@@ -107,13 +108,16 @@ G4HodoscopeSimulator::RunSimulation(Event& aEvent)
 	uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/add opticalphoton");
 	uiManager->ApplyCommand("/vis/filtering/trajectories/particleFilter-0/invert true");
 
-	// loop over particle vector
-	for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
-		G4HodoscopeSimulator::currentParticle = *it;
-		simData.SetCurrentParticle(*it);
-		// Run simulation
-		runManager->BeamOn(1);
+	if (simData.GetInputMode() == SimData::InputMode::eGPS) {
+		uiManager->ApplyCommand("/control/execute " + cfg.fInputFileName);
+	} else {
+		for (auto it = simData.GetParticleVector().begin(); it != simData.GetParticleVector().end(); ++it) {
+			G4HodoscopeSimulator::currentParticle = *it;
+			simData.SetCurrentParticle(*it);
+			runManager->BeamOn(1);
+		}
 	}
+	
 	delete visManager;
 	delete runManager;
 	

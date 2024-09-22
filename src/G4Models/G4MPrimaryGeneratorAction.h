@@ -13,29 +13,33 @@
 #include "Event.h"
 
 class G4ParticleGun;
+class G4GeneralParticleSource;
 class G4Event;
 
 // Model for a primary generator action class with particle gun
 
 class G4MPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction 
 {
-  public:
-    G4MPrimaryGeneratorAction(Event& theEvent);
-    virtual ~G4MPrimaryGeneratorAction();
+	public:
+		G4MPrimaryGeneratorAction(Event& theEvent);
+		virtual ~G4MPrimaryGeneratorAction();
 
-    // method from the base class
-    virtual void GeneratePrimaries(G4Event*);
+		// method from the base class
+		virtual void GeneratePrimaries(G4Event*);
 
-    // method to access particle gun
-    const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
-    
-    PrimaryGenerator fPrimaryGenerator;
-    
-  private:
+		// method to access particle gun
+		const G4ParticleGun* GetParticleGun() const { return fParticleGun; }
+		
+		PrimaryGenerator fPrimaryGenerator;
+		
+	private:
 
-    G4ParticleGun* fParticleGun;
-    Event& fEvent;
-    
+		void PrintParticleInformation(Particle &aCurrentParticle);
+
+		G4ParticleGun* fParticleGun;
+		G4GeneralParticleSource* fParticleSource;
+		Event& fEvent;
+		
 };  
 
 #endif

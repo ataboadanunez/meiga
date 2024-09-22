@@ -19,7 +19,7 @@ class SimData
 			eUnknown = 0,
 			eUseARTI = 1,
 			eUseEcoMug = 2,
-
+			eGPS = 3
 		};
 
 		enum class SimulationMode {
@@ -36,7 +36,7 @@ class SimData
 		void SetTotalNumberOfParticles(const unsigned int n) { fTotalNumberOfParticles = n; }
 
 		Particle& GetCurrentParticle() { return fCurrentParticle; }
-		void SetCurrentParticle(Particle particle) { fCurrentParticle = particle; }
+		void SetCurrentParticle(Particle& particle) { fCurrentParticle = particle; }
 
 		typedef std::vector<Particle> InjectedParticleVector;
 		ParticleVector& GetInjectedParticleVector() { return fInjectedParticles; }
@@ -98,6 +98,9 @@ class SimData
 		const DetectorSimData& GetDetectorSimData(unsigned int id) const { return fDetectorSimDataMap.at(id); }
 		bool HasDetectorSimData(unsigned int id) const { return fDetectorSimDataMap.count(id) != 0; }
 
+		void IncreaseEventCounter() { fEventCounter++; }
+		long int const EventCounter() const { return fEventCounter; }
+
 	private:
 
 		ParticleVector fParticles;
@@ -125,6 +128,7 @@ class SimData
 		std::string fDetectorProperties;
 		int fVerbosity = 0;
 		long int fSeed = 0;
+		long int fEventCounter;
 };
 
 #endif

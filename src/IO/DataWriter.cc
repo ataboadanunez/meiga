@@ -45,6 +45,8 @@ DataWriter::FileWriter(Event& theEvent)
 	json jData;
 
 	SimData& simData = theEvent.GetSimData();
+	long int eventCounter = simData.EventCounter();
+	assert(eventCounter == simData.GetParticleVector().size()-1);
 
 	// testing event (particle) loop
 	for (auto pIt = simData.GetParticleVector().begin(); pIt != simData.GetParticleVector().end(); ++pIt) {
