@@ -14,6 +14,7 @@ class Geometry
 
 		static G4ThreeVector ToG4Vector(const std::vector<double>* v, const double unit);
 		static G4ThreeVector ToG4Vector(const std::vector<double>& v, const double unit);
+		static std::vector<double> ToStdVector(const G4ThreeVector& v);
 
 };
 
