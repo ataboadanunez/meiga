@@ -1,4 +1,6 @@
 #include "Utilities.h"
+#include <G4RunManager.hh>
+#include <G4MTRunManager.hh>
 #include <iostream>
 #include <string>
 #include <boost/filesystem.hpp>
@@ -54,4 +56,12 @@ Utilities::ReplacePlaceHolder(const string &aJsonString, const string &aPlaceHol
     }
     return result;
     
+}
+
+bool Utilities::IsMultiThread()
+{
+    if (dynamic_cast<G4MTRunManager*>(G4RunManager::GetRunManager())) {
+        return true;
+    }
+    return false;
 }

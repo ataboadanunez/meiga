@@ -15,6 +15,7 @@ class Utilities
         static string ResolveRelativePath(const string &aBasePath, const string &aRelPath);
         static void SplitPath(const string &aFullPath, string &aDirectory, string &aFileName);
         static string ReplacePlaceHolder(const string &aJsonString, const string &aPlaceHolder, const string &aReplacement);
+        static bool IsMultiThread();
 };
 
 #endif
