@@ -291,6 +291,77 @@ Consist of grids of plastic scintillator bars traversed with wave-length optical
 - `BarWidth` : width of the scintillator bars (in `cm`).
 - `BarThickness` : thickness of the scintillator bars (in `cm`).
 
+## Adding a new detector
+
+To add a new dectector to the framework you will need to follow these steps:
+
+1. *Define your detector* \
+First of all, add a new class to the `G4Models` directory with the detector name. The class must inherit from `Detector` and you need to override the `BuildDetector` function:
+
+```cpp
+// Example of how MyDetector.h file should looklike
+#ifndef MyDetector_h
+#define MyDetector_h 1
+
+class Detector;
+class Event;
+class G4LogicalVolume;
+
+class MyDetector : public Detector
+{
+	
+public:
+	MyDetector(const int aId, const Detector::DetectorType aType);
+  ~MyDetector() {};
+
+	void BuildDetector(G4LogicalVolume* aLogMother, Event& aEvent, G4bool aCheckOverlaps = true) override;
+
+};
+
+#endif
+```
+All the Geant4 stuff of the detector (logical volumes, solids, etc) go in the definition of the `BuildDetector` function (in the .cc file):
+```cpp
+// Example of MyDetector.cc
+void
+MyDetector::BuildDetector(G4LogicalVolume* aLogMother, Event& aEvent, G4bool aCheckOverlaps)
+{
+  int detectorId = GetId(); // the detector Id
+  G4ThreeVector detectorPos = Geometry::ToG4Vector(GetDetectorPosition(), 1.); // returns the detector position and converts to G4ThreeVector
+  G4double size = 1.0 * m;
+  G4Box* solid = new G4Box("MyDetector", size / 2, size / 2, size / 2);
+  G4LogicalVolume* logic = new G4LogicalVolume(solid, Materials().Air, "MyDetector");
+  G4VPhysicalVolume* phys = new G4PVPlacement(nullptr, detectorPosition, logic, "MyDetector", aLogMother, false, 0, true);
+}
+```
+
+2. *Register your detector* \
+Go to `Framwork/Detector.h` and add your detector to the `DetectorType` enumerator:
+```cpp
+enum DetectorType {
+  ...
+  eMyDetector=4,
+  eDummy
+};
+```
+Then, in `Framwork/Detector.cc` edit the `StringToType` and `TypeToString` functions to handle the detector name.
+**Note** The name you register in the `StringToType` function is the way you will identify your detector in the detector list.
+3. *Add it to the factory* \
+Finally, go to `Framework/DetectorFactory.cc` and add the corresponding case to the `CreateDetector` function:
+```cpp
+case Detector::eMyDetector:
+  return std::make_unique<MyDetector>(aId, aType); // make sure you #include "MyDetector.h"
+```
+
+And that's all. Then you can obtain data from your detector as explained in [Framework structure](#framework-structure).
+
+## Defining new materials
+
+The materials are defined in the file `G4Models/Materials.cc`. If you want to define a new material just add the elements to the `CreateElements` function and the define material name and properties in the `CreateMaterials` function. Then, your new material will be available for the detector construction:
+```cpp
+// in MyDetector::BuildDetector
+G4LogicalVolume* logic = new G4LogicalVolume(solid, Materials().MyMaterial, "MyDetector"); // use your custom material here
+```
 
 # Particle Injection
 

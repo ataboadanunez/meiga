@@ -36,14 +36,8 @@ Detector::StringToType(string name)
 		return Detector::eWCD;
 	else if (name == "eScintillator")
 		return Detector::eScintillator;
-	else if (name == "eMusaic")
-		return Detector::eMusaic;
-	else if (name == "eMudulus")
-		return Detector::eMudulus;
 	else if (name == "eHodoscope")
 		return Detector::eHodoscope;
-	else if (name == "eSaltyWCD")
-		return Detector::eSaltyWCD;
 	else if (name == "eDummy")
 		return Detector::eDummy;
 	else {
@@ -60,17 +54,8 @@ std::string Detector::TypeToString(const DetectorType aType)
 	case Detector::eWCD:
 		name = "eWCD";
 		break;
-	case Detector::eSaltyWCD:
-		name = "eSaltyWCD";
-		break;
 	case Detector::eScintillator:
 		name = "eScintillator";
-		break;
-	case Detector::eMusaic:
-		name = "eMusaic";
-		break;
-	case Detector::eMudulus:
-		name = "eMudulus";
 		break;
 	case Detector::eHodoscope:
 		name = "eHodoscope";

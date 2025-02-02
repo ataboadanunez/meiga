@@ -37,12 +37,9 @@ class Detector
 
 		enum DetectorType {
 			eUnknown = 0,
-			eMusaic = 1,
-			eMudulus = 2,
-			eWCD = 3,
-			eScintillator = 4,
-			eHodoscope = 5,
-			eSaltyWCD = 6,
+			eWCD = 1,
+			eScintillator = 2,
+			eHodoscope = 3,
 			eDummy
 		};
 

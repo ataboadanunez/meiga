@@ -12,11 +12,9 @@ Dummy::Dummy(const int aId, const Detector::DetectorType aType) :
 	fName = "Dummy";
 }
 
-
 void
-Dummy::BuildDetector(G4LogicalVolume* logMother, Event& , G4bool )
+Dummy::BuildDetector(G4LogicalVolume* aLogMother, Event& aEvent, G4bool aCheckOverlaps)
 {
-	
 	int detectorId = GetId();
 	G4ThreeVector detectorPos = Geometry::ToG4Vector(GetDetectorPosition(), 1.);
 
@@ -26,7 +24,4 @@ Dummy::BuildDetector(G4LogicalVolume* logMother, Event& , G4bool )
 	cout << "[INFO] G4Models::Dummy: Building detector " << namedetector.str() << " (ID = " << detectorId << ")" << endl;
 	cout << "[INFO] G4Models::Dummy: Detector Position = ";
 	cout << "(" << detectorPos.getX() / CLHEP::cm << ", " << detectorPos.getY() << ", " << detectorPos.getZ() / CLHEP::cm << ") cm" << endl;
-
-
-
 }
