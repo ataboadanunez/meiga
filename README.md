@@ -346,6 +346,7 @@ enum DetectorType {
 ```
 Then, in `Framwork/Detector.cc` edit the `StringToType` and `TypeToString` functions to handle the detector name.
 **Note** The name you register in the `StringToType` function is the way you will identify your detector in the detector list.
+
 3. *Add it to the factory* \
 Finally, go to `Framework/DetectorFactory.cc` and add the corresponding case to the `CreateDetector` function:
 ```cpp
